@@ -1,0 +1,10 @@
+setup.py
+witcher/__init__.py
+witcher/__main__.py
+witcher/witcher.py
+witcher/wrunner.py
+witcher.egg-info/PKG-INFO
+witcher.egg-info/SOURCES.txt
+witcher.egg-info/dependency_links.txt
+witcher.egg-info/requires.txt
+witcher.egg-info/top_level.txt
