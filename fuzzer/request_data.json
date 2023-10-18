@@ -1,23 +1,22 @@
 {
   "requestsFound": {
-      "POST http://localhost/wp-admin/admin-ajax.php ": {
+      "GET http://localhost/test.php?test=a&test1=AAA ": {
           "_id": 1,
-          "_urlstr": "http://localhost/wp-admin/admin-ajax.php",
-          "_method": "POST",
-          "_postData": "action=zpm_view_project&project_id=1&zpm_nonce=29b56c6f55",
+          "_urlstr": "http://localhost/test.php?test=a&test1=AAA",
+          "_method": "GET",
+          "_postData": "",
           "_headers": {},
           "_resourceType": "endpoint",
           "multipleParamKeys": {},
-          "_url": "http://localhost/wp-admin/admin-ajax.php",
+          "_url": "http://localhost/test.php?test=a&test1=AAA",
           "attempts": 1,
           "processed": 1,
           "from": "",
-          "key": "POST http://localhost/wp-admin/admin-ajax.php"
+          "key": "GET http://localhost/test.php?test=a&test1=AAA"
       }
   },
   "inputSet": [
-      "action=zpm_view_project",
-      "project_id=1",
-      "zpm_nonce=29b56c6f55"
+      "test=a",
+      "test1=AAA"
   ]
 }

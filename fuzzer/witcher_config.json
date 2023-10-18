@@ -7,7 +7,7 @@
     "ld_library_path":"/wclibs",
     "number_of_trials": 1,
     "number_of_refuzzes": 1,
-    "timeout" : 300,
+    "timeout" : 600,
     "run_timeout": 5000,
     "server_base_port": 80,
     "script_skip_list": [],
@@ -30,7 +30,7 @@
     },
   
     "direct":{
-      "url": "http://localhost/wp-login.php?loggedout=true&wp_lang=ko_KR",
+      "url": "http://localhost/index.php",
          "postData": "log=test&pwd=test&wp-submit=%EB%A1%9C%EA%B7%B8%EC%9D%B8&redirect_to=http%3A%2F%2Flocalhost%2Fwp-admin%2F&testcookie=1",
       "getData": "",
       "method": "POST",
