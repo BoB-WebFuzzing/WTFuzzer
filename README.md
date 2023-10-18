@@ -11,7 +11,7 @@ Edit /app/wp-config.php
 Edit /usr/local/lib/php.ini
 - upload_max_filesize=200M;
 
-chmod -R 777 /appwp-content/
+chmod -R 777 /app/wp-content/
 
 ```
 
