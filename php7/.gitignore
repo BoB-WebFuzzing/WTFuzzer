@@ -16,7 +16,7 @@
 *.opt
 *.plg
 *swp
-*.patch
+# *.patch
 *.tgz
 *.tar.gz
 *.tar.bz2
