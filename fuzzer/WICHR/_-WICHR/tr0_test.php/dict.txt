@@ -1,2 +1,0 @@
-string_0="test1\x3dAAA\x26"
-string_1="test\x3da\x26"
