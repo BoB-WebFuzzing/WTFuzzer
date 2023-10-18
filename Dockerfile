@@ -1,6 +1,6 @@
 ## this base is used under the image name witcher, which is used by
 FROM ubuntu:20.04
-LABEL maintainer="erik.trickel@asu.edu"
+LABEL version="1.0"
 RUN sed -i 's@archive.ubuntu.com@mirror.kakao.com@g' /etc/apt/sources.list
 
 # Use the fastest APT repo
@@ -183,7 +183,7 @@ RUN mkdir -p /test && chown wc:wc /test
 
 RUN su - wc -c "source /home/wc/.virtualenvs/witcher/bin/activate && pip install ply "
 
-COPY php7 /phpsrc
+COPY php7 /phpsrc 
 
 RUN cd /phpsrc && git apply ./witcher.patch && ./buildconf --force
 
