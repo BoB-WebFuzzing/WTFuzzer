@@ -1,7 +1,6 @@
 #include "../Zend/zend_compile.h"
 #include "zend.h"
 #include "zend_modules.h"
-
 #include <unistd.h>
 #include <string.h>     /* For the real memset prototype.  */
 #include <stdio.h>
@@ -255,12 +254,28 @@ void prefork_cgi_setup(){
     setenv("REQUEST_URI", "SCRIPT",1);
     login_cookie = getenv("LOGIN_COOKIE");
 
+
+    // Save cookie value in /tmp/cookie.txt
+    FILE* file = fopen("/tmp/cookie.txt", "w");
+
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open the file.\n");
+    }
+    else{
+        fprintf(file, "%s\n", login_cookie);
+
+        fclose(file);
+    }
+    
+
     char* preset_cookie = (char *) malloc(MAX_CMDLINE_LEN);
     memset(preset_cookie, 0, MAX_CMDLINE_LEN);
 
     if (login_cookie){
         strcat(preset_cookie, login_cookie);
         setenv(env_vars[0], login_cookie, 1);
+
+        
         if (!strchr(login_cookie,';')){
             strcat(login_cookie,";");
         }
@@ -348,11 +363,31 @@ void setup_cgi_env(){
 
     // loop through the strings read via stdin and break at each \x00
     // Cookies, Query String, Post (via re-writting to stdin)
+
+
+
     char* cookie = (char *) malloc(MAX_CMDLINE_LEN);
     memset(cookie, 0, MAX_CMDLINE_LEN);
-    if (preset_cookie){
-        strcat(cookie, preset_cookie);
+
+    // Get cookie value from /tmp/cookie.txt
+    FILE* file = fopen("/tmp/cookie.txt", "r");
+
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open the file.\n");
     }
+
+    if (fgets(cookie, MAX_CMDLINE_LEN, file) == NULL) {
+        fprintf(stderr, "Failed to read from the file.\n");
+        fclose(file);  // 파일 닫기
+    }
+
+    char* newline = strchr(cookie, '\n');
+    if (newline != NULL) {
+        *newline = '\0';
+    }
+
+    fclose(file);
+
 
     setenv(env_vars[0], cookie, 1);
     char* post_data = (char *) malloc(MAX_CMDLINE_LEN);
@@ -463,7 +498,7 @@ void afl_error_handler(int nSignum) {
         fprintf(elog, "\033[36m[Witcher] detected error in child but AFL_META_INFO_ID is not set. !!!\033[0m\n");
         fclose(elog);
     }
-}   
+}
 
 /************************************************************************************************/
 /********************************** END HTTP direct **************************************************/
@@ -605,4 +640,3 @@ void vld_external_trace(zend_execute_data *execute_data, const zend_op *opline){
         fclose(ofile);
     }
 }
-
