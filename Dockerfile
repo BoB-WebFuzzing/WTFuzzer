@@ -5,13 +5,14 @@ RUN sed -i 's@archive.ubuntu.com@mirror.kakao.com@g' /etc/apt/sources.list
 
 # Use the fastest APT repo
 #COPY ./files/sources.list.with_mirrors /etc/apt/sources.list
-RUN apt-get update
+
 
 ENV DEBIAN_FRONTEND noninteractive
 
-
+RUN apt-get update
 # Install apt-fast to speed things up
-RUN apt-get install -y aria2 curl wget virtualenvwrapper
+RUN apt-get install -y aria2 curl wget virtualenvwrapper libsqlite3-dev autoconf re2c  libonig-dev
+
 
 RUN apt-get install -y git
 
@@ -163,7 +164,7 @@ RUN rm -f /wclibs/lib_db_fault_escalator.so && \
 
 #COPY --chown=wc:wc bins /bins
 
-ARG ARG_PHP_VER=7
+ARG ARG_PHP_VER=8
 ENV PHP_VER=${ARG_PHP_VER}
 ENV PHP_INI_DIR="/etc/php/"
 ENV LD_LIBRARY_PATH="/wclibs"
@@ -183,9 +184,9 @@ RUN mkdir -p /test && chown wc:wc /test
 
 RUN su - wc -c "source /home/wc/.virtualenvs/witcher/bin/activate && pip install ply "
 
-COPY php7 /phpsrc 
+COPY php8 /phpsrc 
 
-RUN cd /phpsrc && git apply ./witcher.patch && ./buildconf --force
+RUN cd /phpsrc && ./buildconf --force
 
 RUN cd /phpsrc &&         \
         ./configure       \
@@ -196,6 +197,7 @@ RUN cd /phpsrc &&         \
 		--enable-cgi      \
 		--enable-ftp      \
 		--enable-mbstring \
+        --enable-exif \
 		--with-gd         \
 		\
 		--with-openssl \
@@ -242,10 +244,10 @@ RUN rm -f /etc/apache2/mods-enabled/mpm_event.* \
 #RUN cd /tmp && /usr/bin/go-pear && rm /usr/bin/go-pear
 COPY config/supervisord.conf /etc/supervisord.conf
 COPY config/php.ini /usr/local/lib/php.ini
-COPY config/php.ini /etc/php/7.4/apache2/php.ini
-COPY config/php7.conf config/php7.load /etc/apache2/mods-available/
+COPY config/php.ini /etc/php/8.3/apache2/php.ini
+COPY config/php8.conf config/php8.load /etc/apache2/mods-available/
 
-RUN ln -f -s /etc/apache2/mods-available/php7.load /etc/apache2/mods-enabled/ && ln -f -s /etc/apache2/mods-available/php7.conf /etc/apache2/mods-enabled/
+RUN ln -f -s /etc/apache2/mods-available/php8.load /etc/apache2/mods-enabled/ && ln -f -s /etc/apache2/mods-available/php8.conf /etc/apache2/mods-enabled/
 
 #COPY config/php.ini /etc/php/5.5/cli/php.ini
 
@@ -259,7 +261,9 @@ RUN rm -fr /var/www/html && ln -s /app /var/www/html
 
 #### XDEBUG
 
-RUN cd /phpsrc/ext/xdebug && phpize && ./configure --enable-xdebug && make -j $(nproc) && make install
+COPY xdebug /xdebug
+
+RUN cd /xdebug && phpize && ./configure --enable-xdebug && make -j $(nproc) && make install
 
 # disable directory browsing in apache2
 RUN sed -i 's/Indexes//g' /etc/apache2/apache2.conf && \
@@ -268,8 +272,8 @@ RUN sed -i 's/Indexes//g' /etc/apache2/apache2.conf && \
 # add index
 COPY config/000-default.conf /etc/apache2/sites-available/
 
-RUN printf '\nzend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20180731/xdebug.so\nxdebug.mode=coverage\nauto_prepend_file=/enable_cc.php\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
-RUN for fn in $(find /etc/php/ . -name 'php.ini'); do printf '\nzend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20180731/xdebug.so\nxdebug.mode=coverage\nauto_prepend_file=/enable_cc.php\n\n' >> $fn; done
+RUN printf '\nzend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20230901/xdebug.so\nxdebug.mode=coverage\nauto_prepend_file=/enable_cc.php\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
+RUN for fn in $(find /etc/php/ . -name 'php.ini'); do printf '\nzend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20230901/xdebug.so\nxdebug.mode=coverage\nauto_prepend_file=/enable_cc.php\n\n' >> $fn; done
 
 #RUN echo alias p='python -m witcher --affinity $(( $(ifconfig |egrep -oh "inet 172[\.0-9]+"|cut -d "." -f4) * 2 ))' >> /home/wc/.bashrc
 COPY config/py_aff.alias /root/py_aff.alias
