@@ -28,7 +28,7 @@ RUN apt-fast install -y git build-essential  \
                         libxml2-dev libxslt1-dev libffi-dev cmake libreadline-dev \
                         libtool debootstrap debian-archive-keyring libglib2.0-dev libpixman-1-dev \
                         libssl-dev qtdeclarative5-dev libcapnp-dev libtool-bin \
-                        libcurl4-nss-dev libpng-dev libgmp-dev \
+                        libcurl4-openssl-dev libpng-dev libgmp-dev \
                         # x86 Libraries
                         #libc6:i386 libgcc1:i386 libstdc++6:i386 libtinfo5:i386 zlib1g:i386 \
                         #python 3
