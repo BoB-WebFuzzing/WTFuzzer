@@ -195,6 +195,7 @@ RUN cd /phpsrc &&         \
         --with-apxs2=/usr/bin/apxs \
 #		\
 		--enable-cgi      \
+        --enable-gettext \
 		--enable-ftp      \
 		--enable-mbstring \
         --enable-exif \
@@ -258,6 +259,11 @@ RUN a2enmod rewrite
 ENV PHP_UPLOAD_MAX_FILESIZE 200M
 ENV PHP_POST_MAX_SIZE 10M
 RUN rm -fr /var/www/html && ln -s /app /var/www/html
+
+### Composer install
+
+RUN curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin/
+RUN sudo ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
 
 #### XDEBUG
 
