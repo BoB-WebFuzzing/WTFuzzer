@@ -199,7 +199,7 @@ RUN cd /phpsrc &&         \
 		--enable-mbstring \
         --enable-exif \
         --enable-intl \
-		--with-gd         \
+		--enable-gd         \
 		--with-gettext \
 		--with-openssl \
 		--with-curl \
