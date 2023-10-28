@@ -198,6 +198,7 @@ RUN cd /phpsrc &&         \
 		--enable-ftp      \
 		--enable-mbstring \
         --enable-exif \
+        --enable-intl \
 		--with-gd         \
 		--with-gettext \
 		--with-openssl \
