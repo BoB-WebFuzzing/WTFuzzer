@@ -195,12 +195,11 @@ RUN cd /phpsrc &&         \
         --with-apxs2=/usr/bin/apxs \
 #		\
 		--enable-cgi      \
-        --enable-gettext \
 		--enable-ftp      \
 		--enable-mbstring \
         --enable-exif \
 		--with-gd         \
-		\
+		--with-gettext \
 		--with-openssl \
 		--with-curl \
 		--with-mysql      \
