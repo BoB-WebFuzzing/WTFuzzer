@@ -1,9 +1,7 @@
 services:
-  wp-test:
+  wtfuzzer:
     build: .
     privileged: true
     ports:
       - "80:80"
-    volumes:
-      - ./fuzzer:/home/wc/witcher
     
