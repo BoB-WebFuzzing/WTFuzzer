@@ -140,11 +140,9 @@ WORKDIR /
 
 RUN wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
 RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.3.linux-amd64.tar.gz
-ENV PATH=$PATH:/usr/local/go/bin
 
-RUN git clone https://github.com/shirohacker/fuzzer.git && cd /fuzzer && make
-RUN git clone https://github.com/shirohacker/crawlergo.git && cd /crawlergo && make build
-RUN cd /crawlergo && npx @puppeteer/browsers install chrome@stable
+RUN git clone https://github.com/shirohacker/fuzzer.git && cd /fuzzer
+RUN git clone https://github.com/shirohacker/crawlergo.git && cd /crawlergo
 
 ######## DASH ######
 
