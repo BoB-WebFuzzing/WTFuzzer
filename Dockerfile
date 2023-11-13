@@ -108,6 +108,11 @@ COPY xdebug /xdebug
 
 RUN cd /xdebug && phpize && ./configure --enable-xdebug && make -j $(nproc) && make install
 
+RUN git clone https://github.com/krakjoe/uopz.git
+
+RUN cd /uopz && phpize && ./configure --enable-uopz && make -j $(nproc) && make install
+
+
 # disable directory browsing in apache2
 RUN sed -i 's/Indexes//g' /etc/apache2/apache2.conf && \
     echo "DirectoryIndex index.php index.phtml index.html index.htm" >> /etc/apache2/apache2.conf
@@ -115,8 +120,12 @@ RUN sed -i 's/Indexes//g' /etc/apache2/apache2.conf && \
 # add index
 COPY config/000-default.conf /etc/apache2/sites-available/
 
-RUN printf '\nzend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20230901/xdebug.so\nxdebug.mode=coverage\nauto_prepend_file=/enable_cc.php\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
-RUN for fn in $(find /etc/php/ . -name 'php.ini'); do printf '\nzend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20230901/xdebug.so\nxdebug.mode=coverage\nauto_prepend_file=/enable_cc.php\n\n' >> $fn; done
+
+RUN mkdir /home/tmp && mkdir /lib
+
+COPY hook.php /lib/hook.php
+
+RUN printf '\nauto_prepend_file=/lib/hook.php\nextension=uopz\nuopz.exit=1\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
 
 COPY config/codecov_conversion.py config/enable_cc.php /
 
