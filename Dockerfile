@@ -121,7 +121,7 @@ RUN sed -i 's/Indexes//g' /etc/apache2/apache2.conf && \
 COPY config/000-default.conf /etc/apache2/sites-available/
 
 
-RUN mkdir /home/tmp && mkdir /lib
+RUN mkdir /home/tmp
 
 COPY hook.php /lib/hook.php
 
