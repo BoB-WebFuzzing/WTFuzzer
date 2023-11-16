@@ -500,8 +500,6 @@ const char* randomSelection(Map map) {
     int randomValue = rand() % totalValue;
     int cumulativeValue = 0;
 
-    printf("%d\n", randomValue);
-
     for (int i = 0; i < map.size; ++i) {
         cumulativeValue += map.data[i]->value;
     
@@ -623,6 +621,8 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         }
     }
 
+    printf("post : %s\n", post);
+
     if (strcmp(post, "")) {
         char* postToken = strdup(strtok(post, "&"));
         char* tempToken;
@@ -661,7 +661,6 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 // Select vuln class
     switch (findIndex(vulns, 5, vuln)) {
         case 0:
-            printf("vuln is %s\n", vuln);
 
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
@@ -676,7 +675,6 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 
             break;
         case 1:
-            printf("vuln is %s\n", vuln);
 
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
@@ -691,7 +689,6 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 
             break;
         case 2:
-            printf("vuln is %s\n", vuln);
 
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
@@ -706,7 +703,6 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 
             break;
         case 3:
-            printf("vuln is %s\n", vuln);
 
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
@@ -721,7 +717,6 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 
             break;
         case 4:
-            printf("vuln is %s\n", vuln);
 
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
@@ -736,7 +731,8 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 
             break;
         default:
-            printf("%s is not in vulns\n", vuln);
+          break;
+            // printf("%s is not in vulns\n", vuln);
     }
 
 // Concat by =, &
@@ -770,36 +766,24 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         ret[1 + strlen(get)] = '\x00';
         strcat(ret + 2 + strlen(get), post);
         ret[1 + strlen(get) + 1 + strlen(post)] = '\x00';
-        return 1 + strlen(get) + 1 + strlen(post);
+        return 1 + strlen(get) + 1 + strlen(post) + 1;
     } else if (strcmp(get, "") && !strcmp(post, "")) {
         ret[0] = '\x00';
         strcat(ret + 1, get);
         ret[1 + strlen(get)] = '\x00';
         ret[1 + strlen(get) + 1] = '\x00';
-        return 1 + strlen(get) + 1;
+        return 1 + strlen(get) + 1 + 1;
     } else if (!strcmp(get, "") && strcmp(post, "")) {
         ret[0] = '\x00';
         ret[1] = '\x00';
         strcat(ret + 2, post);
         ret[2 + strlen(post)] = '\x00';
-        return 2 + strlen(post);
+        return 2 + strlen(post) + 1;
     } else {
         ret[0] = '\x00';
         ret[1] = '\x00';
         ret[2] = '\x00';
-        return 2;
-    }
-
-    if (strcmp(get, "")) {
-        printf("get : %s\n", get);
-        free(get);
-        // printf("get free\n");
-    }
-
-    if (strcmp(post, "")) {
-        printf("post : %s\n", post);
-        free(post);
-        // printf("post free\n");
+        return 3;
     }
 }
 
@@ -5937,7 +5921,6 @@ skip_interest:
   initializeMap(&vulnsMap, mapSize);
 
   while (fgets(line, sizeof(line), fp) != NULL) {
-    printf("%s", line);
     sscanf(line, "%s : %d", vuln, &count);
 
     addToMap(&vulnsMap, vuln, count);
@@ -7494,3 +7477,4 @@ stop_fuzzing:
 }
 
 #endif /* !AFL_LIB */
+
