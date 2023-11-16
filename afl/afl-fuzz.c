@@ -792,13 +792,13 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 
     if (strcmp(get, "")) {
         printf("get : %s\n", get);
-        // free(get);
+        free(get);
         // printf("get free\n");
     }
 
     if (strcmp(post, "")) {
         printf("post : %s\n", post);
-        // free(post);
+        free(post);
         // printf("post free\n");
     }
 }
