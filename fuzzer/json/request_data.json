@@ -1,0 +1,826 @@
+{
+	"requestsFound": [
+		{
+			"url": "http://witcher.kro.kr:4280/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "Target"
+		},
+		{
+			"url": "https://witcher.kro.kr:4280/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "Target"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/exec/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/brute/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/fi/index.php?page=include.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/upload/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/sqli/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/sqli_blind/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/xss_d/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/xss_r/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/xss_s/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/csp/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/javascript/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/open_redirect/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/logout.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/fi/index.php?page=file2.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/fi/?page=include.php",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/fi/index.php?page=file1.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/fi/?page=include.php",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/fi/index.php?page=file3.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/fi/?page=include.php",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=fi&security=low&locale=en",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/fi/?page=include.php",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "OpenWindow"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=fi&security=low",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/fi/?page=include.php",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "OpenWindow"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=exec&security=low&locale=en",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/exec/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=exec&security=low",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/exec/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/exec/index.php",
+			"method": "POST",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Origin": "http://witcher.kro.kr:4280",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/exec/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "ip=Crawlergo",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/exec/index.php",
+			"method": "POST",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Origin": "http://witcher.kro.kr:4280",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/exec/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "ip=Crawlergo&Submit=Submit",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=xss_d&security=low&locale=en",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/xss_d/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=xss_d&security=low",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/xss_d/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/xss_d/index.php?default=English",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/xss_d/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/upload/index.php",
+			"method": "POST",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryQ0zTGCa3cqKBMQ0c",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Origin": "http://witcher.kro.kr:4280",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/upload/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=upload&security=low&locale=en",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/upload/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "OpenWindow"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=upload&security=low",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/upload/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "OpenWindow"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/sqli/index.php?id=gordonb",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/sqli/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/sqli/index.php?id=gordonb&Submit=Submit",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/sqli/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=sqli&security=low&locale=en",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/sqli/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "OpenWindow"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=sqli&security=low",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/sqli/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "OpenWindow"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/sqli_blind/index.php?id=gordonb",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/sqli_blind/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=sqli_blind&security=low&locale=en",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/sqli_blind/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=sqli_blind&security=low",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/sqli_blind/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/sqli_blind/index.php?id=gordonb&Submit=Submit",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/sqli_blind/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=brute&security=low&locale=en",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/brute/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=brute&security=low",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/brute/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/brute/index.php?username=gordonb&password=abc123",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/brute/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/brute/index.php?username=gordonb&password=abc123&Login=Login",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/brute/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/xss_r/index.php?name=gordonb",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/xss_r/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=xss_r&security=low&locale=en",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/xss_r/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "OpenWindow"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=xss_r&security=low",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/xss_r/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "OpenWindow"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/open_redirect/source/low.php?redirect=info.php?id=1",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/open_redirect/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=open_redirect&security=low&locale=en",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/open_redirect/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=open_redirect&security=low",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/open_redirect/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/xss_s/index.php",
+			"method": "POST",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Origin": "http://witcher.kro.kr:4280",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/xss_s/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "txtName=Cgroarwdlo&mtxMessage=",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/csp/index.php",
+			"method": "POST",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Origin": "http://witcher.kro.kr:4280",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/csp/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "include=Crawlergo",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/csp/Crawlergo/index.php",
+			"method": "GET",
+			"headers": {
+				"Accept": "*/*",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/csp/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/javascript/index.php",
+			"method": "POST",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Origin": "http://witcher.kro.kr:4280",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/javascript/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "token=8b479aefbd90795395b3e7089ae0dc09&phrase=CrawlergoChangeMe",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/javascript/index.php",
+			"method": "POST",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Origin": "http://witcher.kro.kr:4280",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/javascript/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "token=8b479aefbd90795395b3e7089ae0dc09&phrase=CrawlergoChangeMe&send=Submit",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/hackable/flags/fi.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_help.php?id=fi&security=low&locale=en",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "DOM"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=fi&security=low",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source_all.php?id=fi",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=fi&security=low",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/include.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=fi&security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/file1.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=fi&security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/file2.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=fi&security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/file3.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=fi&security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=exec&security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/hackable/uploads/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=upload&security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/image/jpeg/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=upload&security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/image/png/index.php",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source.php?id=upload&security=low",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "JavaScript"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/open_redirect/source/low.php?redirect=info.php?id=1",
+			"method": "GET",
+			"headers": {
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/open_redirect/",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "Navigation"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/open_redirect/source/info.php?id=1",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/open_redirect/",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "Navigation"
+		},
+		{
+			"url": "http://witcher.kro.kr:4280/vulnerabilities/view_source_all.php?",
+			"method": "GET",
+			"headers": {
+				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+				"Cookie": "PHPSESSID=4f5c943a8fc68425a469e5184edabf9b; security=low",
+				"Referer": "http://witcher.kro.kr:4280/vulnerabilities/view_source_all.php?id=fi",
+				"Upgrade-Insecure-Requests": "1",
+				"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+			},
+			"data": "",
+			"source": "XHR"
+		}
+	],
+	"inputSet": [
+		"",
+		"page=include.php",
+		"page=file2.php",
+		"page=file1.php",
+		"page=file3.php",
+		"id=fi",
+		"security=low",
+		"locale=en",
+		"id=exec",
+		"ip=Crawlergo",
+		"Submit=Submit",
+		"id=xss_d",
+		"default=English",
+		"id=upload",
+		"id=gordonb",
+		"id=sqli",
+		"id=sqli_blind",
+		"id=brute",
+		"username=gordonb",
+		"password=abc123",
+		"Login=Login",
+		"name=gordonb",
+		"id=xss_r",
+		"redirect=info.php?id=1",
+		"id=open_redirect",
+		"txtName=Cgroarwdlo",
+		"mtxMessage=",
+		"include=Crawlergo",
+		"token=8b479aefbd90795395b3e7089ae0dc09",
+		"phrase=CrawlergoChangeMe",
+		"send=Submit",
+		"id=1"
+	]
+}

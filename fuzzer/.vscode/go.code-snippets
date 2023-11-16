@@ -1,0 +1,14 @@
+{
+    "init": {
+        "scope": "go",
+        "prefix": "!init",
+        "body": [
+            "package main",
+            "",
+            "import ("
+            ""
+            ")"
+        ],
+        "description": "init go"
+    }
+}
