@@ -46,7 +46,6 @@ void mutateSSRF(char* value) {
 void mutateFILE(char* value) {
     int targetIndex = rand() % strlen(value);
     char* mutateSet[4] = {"/", "/../../../etc/passwd", "/etc/passwd", "/\\../\\../\\..\\/etc/passwd"};
-    // strcpy(value, insertString(value, mutateSet[rand() % 4], targetIndex));
     strcpy(value, mutateSet[rand() % 4]);
 }
 
@@ -161,10 +160,10 @@ void main() {
 
     mutate(mutetdSeed, svuln, buffer, bufsize);
 
-    for (int i = 0; i < bufsize+30; i++) {
-        printf("%c", mutetdSeed[i]);
-    }
-    printf("\n");
+    // for (int i = 0; i < bufsize+30; i++) {
+    //     printf("%c", mutetdSeed[i]);
+    // }
+    // printf("\n");
 
     //------------
 
@@ -407,11 +406,13 @@ void mutate(char* ret, const char* vuln, char* seed, int length) {
 
     if (strcmp(get, "")) {
         printf("get : %s\n", get);
-        free(get);
+        // free(get);
+        // printf("get free\n");
     }
 
     if (strcmp(post, "")) {
         printf("post : %s\n", post);
-        free(post);
+        // free(post);
+        // printf("post free\n");
     }
 }
