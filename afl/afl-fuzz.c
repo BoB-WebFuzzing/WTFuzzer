@@ -952,85 +952,6 @@ static void bind_to_free_cpu(void) {
 /* Helper function to compare buffers; returns first and last differing offset. We
    use this to find reasonable locations for splicing two files. */
 
-struct Node {
-    char *key;
-    char *pair;
-    struct Node *next;
-};
-
-struct Node *list = NULL;
-
-// 새로운 노드를 생성하는 함수
-struct Node *createNode(char *key, char *pair) {
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-    if (newNode == NULL) {
-        fprintf(stderr, "메모리 할당 오류\n");
-        exit(EXIT_FAILURE);
-    }
-
-    newNode->key = strdup(key);    // strdup를 사용하여 문자열 복제
-    newNode->pair = strdup(pair);
-    newNode->next = NULL;
-
-    return newNode;
-}
-
-// 링크드 리스트에 노드를 추가하는 함수
-void appendNode(struct Node **head, char *key, char *pair) {
-
-    FILE * debug = fopen("/tmp/debug.log", "a+");
-
-    struct Node *current = *head;
-    while (current != NULL) {
-        if (strcmp(current->key, key) == 0) {
-            fprintf(debug, "duplicated key: %s\n", key);
-            fclose(debug);
-            return; // 중복된 key가 있으면 함수 종료
-        }
-        current = current->next;
-    }
-
-    struct Node *newNode = createNode(key, pair);
-
-    if (*head == NULL) {
-        *head = newNode;
-    } else {
-        struct Node *temp = *head;
-        while (temp->next != NULL) {
-            temp = temp->next;
-        }
-        temp->next = newNode;
-    }
-    fclose(debug);
-}
-
-// 링크드 리스트의 노드를 출력하는 함수
-void printList(struct Node *head) {
-    FILE * debug = fopen("/tmp/debug.log", "a+");
-
-    struct Node *current = head;
-    while (current != NULL) {
-        fprintf(debug, "Key: %s, Pair: %s\n", current->key, current->pair);
-        current = current->next;
-    }
-
-    fclose(debug);
-}
-
-// 메모리 해제 함수
-void freeList(struct Node *head) {
-    struct Node *current = head;
-    struct Node *next;
-
-    while (current != NULL) {
-        next = current->next;
-        free(current->key);
-        free(current->pair);
-        free(current);
-        current = next;
-    }
-}
-
 
 static void locate_diffs(u8* ptr1, u8* ptr2, u32 len, s32* first, s32* last) {
 
@@ -1298,10 +1219,6 @@ static void mark_as_redundant(struct queue_entry* q, u8 state) {
 static void add_to_queue(u8* fname, u32 len, u8 passed_det) {
 
   struct queue_entry* q = ck_alloc(sizeof(struct queue_entry));
-
-      FILE * debug = fopen("/tmp/debug.log", "a+");
-    fprintf(debug, "add_to_queue : %s\n", fname);
-    fclose(debug);
 
 
   q->fname        = fname;
@@ -2010,11 +1927,6 @@ static void read_testcases(void) {
   for (i = 0; i < nl_cnt; i++) {
 
     struct stat st;
-
-    FILE * debug = fopen("/tmp/debug.log", "a+");
-    fprintf(debug, "testcase : %s\n", nl[i] -> d_name);
-    fclose(debug);
-
 
     u8* fn = alloc_printf("%s/%s", in_dir, nl[i]->d_name);
     u8* dfn = alloc_printf("%s/.state/deterministic_done/%s", in_dir, nl[i]->d_name);
