@@ -431,6 +431,380 @@ static inline void add_var_to_ll(char* str, u8 which){
 }
 
 
+
+/*  WTFUZZER FUNCTION HERE  */
+char* vulns[] = {"SQLi", "SSRF", "FileUpload", "FileDownload", "FileDeletion"};
+
+typedef struct {
+    char* key;
+    int value;
+} KeyValuePair;
+
+typedef struct {
+    KeyValuePair** data;
+    size_t size;
+} Map;
+
+char* insertString(const char* original, const char* insertion, size_t position) {
+    size_t originalLen = strlen(original);
+    size_t insertionLen = strlen(insertion);
+
+    char* result = (char*)malloc(originalLen + insertionLen + 1);
+    if (result == NULL)
+        exit(EXIT_FAILURE);
+
+    memcpy(result, original, position);
+    memcpy(result + position, insertion, insertionLen);
+    memcpy(result + position + insertionLen, original + position, originalLen - position + 1);
+
+    return result;
+}
+
+void mutateSQLI(char* value) {
+    int targetIndex = rand() % strlen(value);
+    char* mutateSet[8] = {"\'", "\"", "\\", "#", "-- -", "--%20-", "%23", ""};
+    strcpy(value, insertString(value, mutateSet[rand() % 8], targetIndex));
+}
+
+void mutateSSRF(char* value) {
+    char* mutateSet[3] = {"http://localhost", "http://127.0.0.1", "file:///etc/passwd"};
+    // strcpy(value, insertString(value, mutateSet[rand() % 3], targetIndex));
+    strcpy(value, mutateSet[rand() % 3]);
+}
+
+void mutateFILE(char* value) {
+    char* mutateSet[3] = {"/", "/../../../etc/passwd", "/etc/passwd"};
+    strcpy(value, mutateSet[rand() % 3]);
+}
+
+int mutate(char* ret, const char* vuln, char* seed, int length);
+
+int findIndex(char* arr[], int n, const char* target) {
+    for (int i = 0; i < n; ++i) {
+        if (strcmp(arr[i], target) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+const char* randomSelection(Map map) {
+    srand((unsigned int)time(NULL));
+    int totalValue = 0;
+
+    for (int i = 0; i < map.size; ++i) {
+        totalValue += map.data[i]->value;
+    }
+
+    int randomValue = rand() % totalValue;
+    int cumulativeValue = 0;
+
+    printf("%d\n", randomValue);
+
+    for (int i = 0; i < map.size; ++i) {
+        cumulativeValue += map.data[i]->value;
+    
+        if (randomValue < cumulativeValue) {
+            return map.data[i]->key;
+        }
+    }
+}
+
+void initializeMap(Map* map, size_t size) {
+    map->data = (KeyValuePair**)malloc(size * sizeof(KeyValuePair*));
+    map->size = size;
+
+    for (size_t i = 0; i < size; ++i) {
+        map->data[i] = NULL;
+    }
+}
+
+void addToMap(Map* map, const char* key, int value) {
+    unsigned int index = findIndex(vulns, map->size, key);
+    KeyValuePair* newPair = (KeyValuePair*)malloc(sizeof(KeyValuePair));
+
+    newPair->key = strdup(key);
+    newPair->value = value;
+    map->data[index] = newPair;
+}
+
+int getFromMap(const Map* map, const char* key) {
+    unsigned int index = findIndex(vulns, map->size, key);
+    KeyValuePair* pair = map->data[index];
+
+    if (pair && strcmp(pair->key, key) == 0) {
+        return pair->value;
+    }
+
+    return -1;
+}
+
+void freeMap(Map* map) {
+    for (size_t i = 0; i < map->size; ++i) {
+        KeyValuePair* pair = map->data[i];
+
+        if (pair) {
+            free(pair->key);
+            free(pair);
+        }
+    }
+
+    free(map->data);
+}
+
+int mutate(char* ret, const char* vuln, char* seed, int length) {
+    char* get = NULL;
+    char* post = NULL;
+    char buffer[1024*1024];
+    int part = 0;
+    int i = 0;
+
+    seed += 1;
+
+    while (i < length) {
+        if (seed[i] == '\x00') {
+            strncpy(buffer, seed, i);
+
+            buffer[i] = '\0';
+
+            switch (part) {
+                case 0:
+                    get = strdup(buffer);
+                    break;
+                case 1:
+                    post = strdup(buffer);
+                    break;
+                default:
+                    break;
+            }
+
+            memset(buffer, 0, sizeof(buffer));
+
+            seed += i + 1;
+            length -= i + 1;
+            i = 0;
+            part++;
+
+            continue;
+        }
+
+        i++;
+    }
+
+    char* getArray[10];
+    int getCount = 0;
+    char* getKey[10];
+    char* getValue[10];
+
+    char* postArray[10];
+    int postCount = 0;
+    char* postKey[10];
+    char* postValue[10];
+
+// Parsing by &
+    if (strcmp(get, "")) {
+        char* getToken = strdup(strtok(get, "&"));
+        char* tempToken;
+        i = 0;
+
+        while (getToken != NULL && i < 10) {
+            getArray[i] = getToken;
+            i++;
+            getCount++;
+
+            // free(getToken);
+            tempToken = strtok(NULL, "&");
+
+            if (tempToken == NULL)
+                break;
+
+            getToken = strdup(tempToken);
+        }
+    }
+
+    if (strcmp(post, "")) {
+        char* postToken = strdup(strtok(post, "&"));
+        char* tempToken;
+        i = 0;
+
+        while (postToken != NULL && i < 10) {
+            postArray[i] = postToken;
+            i++;
+            postCount++;
+
+            // free(postToken);
+            tempToken = strtok(NULL, "&");
+
+            if (tempToken == NULL)
+                break;
+
+            postToken = strdup(tempToken);
+        }
+    }
+
+// Parsing by =
+    for (int i = 0; i < getCount; i++) {
+        if (getArray[i]) {
+            getKey[i] = strdup(strtok(getArray[i], "="));
+            getValue[i] = strdup(strtok(NULL, "="));
+        }
+    }
+
+    for (int i = 0; i < postCount; i++) {
+        if (postArray[i]) {
+            postKey[i] = strdup(strtok(postArray[i], "="));
+            postValue[i] = strdup(strtok(NULL, "="));
+        }
+    }
+
+// Select vuln class
+    switch (findIndex(vulns, 5, vuln)) {
+        case 0:
+            printf("vuln is %s\n", vuln);
+
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    mutateSQLI(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    mutateSQLI(postValue[i]);
+                }
+            }
+
+            break;
+        case 1:
+            printf("vuln is %s\n", vuln);
+
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    mutateSSRF(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    mutateSSRF(postValue[i]);
+                }
+            }
+
+            break;
+        case 2:
+            printf("vuln is %s\n", vuln);
+
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    mutateFILE(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    mutateFILE(postValue[i]);
+                }
+            }
+
+            break;
+        case 3:
+            printf("vuln is %s\n", vuln);
+
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    mutateFILE(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    mutateFILE(postValue[i]);
+                }
+            }
+
+            break;
+        case 4:
+            printf("vuln is %s\n", vuln);
+
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    mutateFILE(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    mutateFILE(postValue[i]);
+                }
+            }
+
+            break;
+        default:
+            printf("%s is not in vulns\n", vuln);
+    }
+
+// Concat by =, &
+    if (strcmp(get, "")) {
+        for (int i = 0; i < getCount; i++) {
+            getArray[i] = strcat(strcat(getKey[i], "="), getValue[i]);
+        }
+
+        get = getArray[0];
+
+        for (int i = 1; i < getCount; i++) {
+            strcat(strcat(get, "&"), getArray[i]);
+        }
+    }
+
+    if (strcmp(post, "")) {
+        for (int i = 0; i < postCount; i++) {
+            postArray[i] = strcat(strcat(postKey[i], "="), postValue[i]);
+        }
+
+        post = postArray[0];
+
+        for (int i = 1; i < postCount; i++) {
+            strcat(strcat(post, "&"), postArray[i]);
+        }
+    }
+
+    if (strcmp(get, "") && strcmp(post, "")) {
+        ret[0] = '\x00';
+        strcat(ret + 1, get);
+        ret[1 + strlen(get)] = '\x00';
+        strcat(ret + 2 + strlen(get), post);
+        ret[1 + strlen(get) + 1 + strlen(post)] = '\x00';
+        return 1 + strlen(get) + 1 + strlen(post);
+    } else if (strcmp(get, "") && !strcmp(post, "")) {
+        ret[0] = '\x00';
+        strcat(ret + 1, get);
+        ret[1 + strlen(get)] = '\x00';
+        ret[1 + strlen(get) + 1] = '\x00';
+        return 1 + strlen(get) + 1;
+    } else if (!strcmp(get, "") && strcmp(post, "")) {
+        ret[0] = '\x00';
+        ret[1] = '\x00';
+        strcat(ret + 2, post);
+        ret[2 + strlen(post)] = '\x00';
+        return 2 + strlen(post);
+    } else {
+        ret[0] = '\x00';
+        ret[1] = '\x00';
+        ret[2] = '\x00';
+        return 2;
+    }
+
+    if (strcmp(get, "")) {
+        printf("get : %s\n", get);
+        // free(get);
+        // printf("get free\n");
+    }
+
+    if (strcmp(post, "")) {
+        printf("post : %s\n", post);
+        // free(post);
+        // printf("post free\n");
+    }
+}
+
+
+
 /* Shuffle an array of pointers. Might be slightly biased. */
 
 static void shuffle_ptrs(void** ptrs, u32 cnt) {
@@ -577,6 +951,86 @@ static void bind_to_free_cpu(void) {
 
 /* Helper function to compare buffers; returns first and last differing offset. We
    use this to find reasonable locations for splicing two files. */
+
+struct Node {
+    char *key;
+    char *pair;
+    struct Node *next;
+};
+
+struct Node *list = NULL;
+
+// 새로운 노드를 생성하는 함수
+struct Node *createNode(char *key, char *pair) {
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        fprintf(stderr, "메모리 할당 오류\n");
+        exit(EXIT_FAILURE);
+    }
+
+    newNode->key = strdup(key);    // strdup를 사용하여 문자열 복제
+    newNode->pair = strdup(pair);
+    newNode->next = NULL;
+
+    return newNode;
+}
+
+// 링크드 리스트에 노드를 추가하는 함수
+void appendNode(struct Node **head, char *key, char *pair) {
+
+    FILE * debug = fopen("/tmp/debug.log", "a+");
+
+    struct Node *current = *head;
+    while (current != NULL) {
+        if (strcmp(current->key, key) == 0) {
+            fprintf(debug, "duplicated key: %s\n", key);
+            fclose(debug);
+            return; // 중복된 key가 있으면 함수 종료
+        }
+        current = current->next;
+    }
+
+    struct Node *newNode = createNode(key, pair);
+
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        struct Node *temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+    fclose(debug);
+}
+
+// 링크드 리스트의 노드를 출력하는 함수
+void printList(struct Node *head) {
+    FILE * debug = fopen("/tmp/debug.log", "a+");
+
+    struct Node *current = head;
+    while (current != NULL) {
+        fprintf(debug, "Key: %s, Pair: %s\n", current->key, current->pair);
+        current = current->next;
+    }
+
+    fclose(debug);
+}
+
+// 메모리 해제 함수
+void freeList(struct Node *head) {
+    struct Node *current = head;
+    struct Node *next;
+
+    while (current != NULL) {
+        next = current->next;
+        free(current->key);
+        free(current->pair);
+        free(current);
+        current = next;
+    }
+}
+
 
 static void locate_diffs(u8* ptr1, u8* ptr2, u32 len, s32* first, s32* last) {
 
@@ -844,6 +1298,11 @@ static void mark_as_redundant(struct queue_entry* q, u8 state) {
 static void add_to_queue(u8* fname, u32 len, u8 passed_det) {
 
   struct queue_entry* q = ck_alloc(sizeof(struct queue_entry));
+
+      FILE * debug = fopen("/tmp/debug.log", "a+");
+    fprintf(debug, "add_to_queue : %s\n", fname);
+    fclose(debug);
+
 
   q->fname        = fname;
   q->len          = len;
@@ -1551,6 +2010,11 @@ static void read_testcases(void) {
   for (i = 0; i < nl_cnt; i++) {
 
     struct stat st;
+
+    FILE * debug = fopen("/tmp/debug.log", "a+");
+    fprintf(debug, "testcase : %s\n", nl[i] -> d_name);
+    fclose(debug);
+
 
     u8* fn = alloc_printf("%s/%s", in_dir, nl[i]->d_name);
     u8* dfn = alloc_printf("%s/.state/deterministic_done/%s", in_dir, nl[i]->d_name);
@@ -5329,6 +5793,11 @@ static u32 build_buf_from_var(u8* var_str[], u32 var_strlen[], u8* outbufvars[],
 
 static u8 fuzz_one(char** argv) {
 
+
+  /* WTFUZZ init */
+  Map vulnsMap;
+  size_t mapSize = 5;
+
   s32 len, fd, temp_len, i, j;
   u8  *in_buf, *out_buf, *orig_in, *ex_tmp, *eff_map = 0;
   u64 havoc_queued,  orig_hit_cnt, new_hit_cnt;
@@ -5443,27 +5912,27 @@ static u8 fuzz_one(char** argv) {
    * TRIMMING *
    ************/
 
-  if (!dumb_mode && !queue_cur->trim_done) {
+  // if (!dumb_mode && !queue_cur->trim_done) {
 
-    u8 res = trim_case(argv, queue_cur, in_buf);
+  //   u8 res = trim_case(argv, queue_cur, in_buf);
 
-    if (res == FAULT_ERROR)
-      FATAL("Unable to execute target application");
+  //   if (res == FAULT_ERROR)
+  //     FATAL("Unable to execute target application");
 
-    if (stop_soon) {
-      cur_skipped_paths++;
-      goto abandon_entry;
-    }
+  //   if (stop_soon) {
+  //     cur_skipped_paths++;
+  //     goto abandon_entry;
+  //   }
 
-    /* Don't retry trimming, even if it failed. */
+  //   /* Don't retry trimming, even if it failed. */
 
-    queue_cur->trim_done = 1;
+  //   queue_cur->trim_done = 1;
 
-    if (len != queue_cur->len) len = queue_cur->len;
+  //   if (len != queue_cur->len) len = queue_cur->len;
 
-  }
+  // }
 
-  memcpy(out_buf, in_buf, len);
+  // memcpy(out_buf, in_buf, len);
 
   /*********************
    * PERFORMANCE SCORE *
@@ -5481,13 +5950,13 @@ static u8 fuzz_one(char** argv) {
       // this covers when queue is larger and fuzzer-master gets stuck in http queue combining and 
       // also to prevent it from being for every core when dictionary size is larger.
       if (strcmp(sync_id,"fuzzer-1") == 0){
-        goto http_dictionary_havoc_stage; // formerly havoc_stage, if using phuzzer naming then set fuzzer-1 to http dict, b/c only slighl
+        goto skip_interest; // formerly havoc_stage, if using phuzzer naming then set fuzzer-1 to http dict, b/c only slighl
       } else {
-        goto havoc_stage; // formerly havoc_stage
+        goto skip_interest; // formerly havoc_stage
       }
       
     } else {
-      goto http_queue_var_combine_stage;
+      goto skip_interest;
     }
   }
     
@@ -5497,7 +5966,7 @@ static u8 fuzz_one(char** argv) {
      for this master instance. */
 
   if (master_max && (queue_cur->exec_cksum % master_max) != master_id - 1)
-    goto http_dictionary_havoc_stage; // formerly havoc_stage
+    goto skip_interest; // formerly havoc_stage
 
   doing_det = 1;
 
@@ -5511,167 +5980,6 @@ static u8 fuzz_one(char** argv) {
     _arf[(_bf) >> 3] ^= (128 >> ((_bf) & 7)); \
   } while (0)
 
-  /* Single walking bit. */
-
-  stage_short = "flip1";
-  stage_max   = len << 3;
-  stage_name  = "bitflip 1/1";
-
-  stage_val_type = STAGE_VAL_NONE;
-
-  orig_hit_cnt = queued_paths + unique_crashes;
-
-  prev_cksum = queue_cur->exec_cksum;
-
-  for (stage_cur = 0; stage_cur < stage_max; stage_cur++) {
-
-    stage_cur_byte = stage_cur >> 3;
-
-    FLIP_BIT(out_buf, stage_cur);
-
-    if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-
-    FLIP_BIT(out_buf, stage_cur);
-
-    /* While flipping the least significant bit in every byte, pull of an extra
-       trick to detect possible syntax tokens. In essence, the idea is that if
-       you have a binary blob like this:
-
-       xxxxxxxxIHDRxxxxxxxx
-
-       ...and changing the leading and trailing bytes causes variable or no
-       changes in program flow, but touching any character in the "IHDR" string
-       always produces the same, distinctive path, it's highly likely that
-       "IHDR" is an atomically-checked magic value of special significance to
-       the fuzzed format.
-
-       We do this here, rather than as a separate stage, because it's a nice
-       way to keep the operation approximately "free" (i.e., no extra execs).
-       
-       Empirically, performing the check when flipping the least significant bit
-       is advantageous, compared to doing it at the time of more disruptive
-       changes, where the program flow may be affected in more violent ways.
-
-       The caveat is that we won't generate dictionaries in the -d mode or -S
-       mode - but that's probably a fair trade-off.
-
-       This won't work particularly well with paths that exhibit variable
-       behavior, but fails gracefully, so we'll carry out the checks anyway.
-
-      */
-
-    if (!dumb_mode && (stage_cur & 7) == 7) {
-
-      u32 cksum = hash32(trace_bits, MAP_SIZE, HASH_CONST);
-
-      if (stage_cur == stage_max - 1 && cksum == prev_cksum) {
-
-        /* If at end of file and we are still collecting a string, grab the
-           final character and force output. */
-
-        if (a_len < MAX_AUTO_EXTRA) a_collect[a_len] = out_buf[stage_cur >> 3];
-        a_len++;
-
-        if (a_len >= MIN_AUTO_EXTRA && a_len <= MAX_AUTO_EXTRA)
-          maybe_add_auto(a_collect, a_len);
-
-      } else if (cksum != prev_cksum) {
-
-        /* Otherwise, if the checksum has changed, see if we have something
-           worthwhile queued up, and collect that if the answer is yes. */
-
-        if (a_len >= MIN_AUTO_EXTRA && a_len <= MAX_AUTO_EXTRA)
-          maybe_add_auto(a_collect, a_len);
-
-        a_len = 0;
-        prev_cksum = cksum;
-
-      }
-
-      /* Continue collecting string, but only if the bit flip actually made
-         any difference - we don't want no-op tokens. */
-
-      if (cksum != queue_cur->exec_cksum) {
-
-        if (a_len < MAX_AUTO_EXTRA) a_collect[a_len] = out_buf[stage_cur >> 3];        
-        a_len++;
-
-      }
-
-    }
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_FLIP1]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_FLIP1] += stage_max;
-
-  /* Two walking bits. */
-
-  stage_name  = "bitflip 2/1";
-  stage_short = "flip2";
-  stage_max   = (len << 3) - 1;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (stage_cur = 0; stage_cur < stage_max; stage_cur++) {
-
-    stage_cur_byte = stage_cur >> 3;
-
-    FLIP_BIT(out_buf, stage_cur);
-    FLIP_BIT(out_buf, stage_cur + 1);
-
-    if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-
-    FLIP_BIT(out_buf, stage_cur);
-    FLIP_BIT(out_buf, stage_cur + 1);
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_FLIP2]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_FLIP2] += stage_max;
-
-  /* Four walking bits. */
-
-  stage_name  = "bitflip 4/1";
-  stage_short = "flip4";
-  stage_max   = (len << 3) - 3;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (stage_cur = 0; stage_cur < stage_max; stage_cur++) {
-
-    stage_cur_byte = stage_cur >> 3;
-
-    FLIP_BIT(out_buf, stage_cur);
-    FLIP_BIT(out_buf, stage_cur + 1);
-    FLIP_BIT(out_buf, stage_cur + 2);
-    FLIP_BIT(out_buf, stage_cur + 3);
-
-    if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-
-    FLIP_BIT(out_buf, stage_cur);
-    FLIP_BIT(out_buf, stage_cur + 1);
-    FLIP_BIT(out_buf, stage_cur + 2);
-    FLIP_BIT(out_buf, stage_cur + 3);
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_FLIP4]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_FLIP4] += stage_max;
-
-  /* Effector map setup. These macros calculate:
-
-     EFF_APOS      - position of a particular file offset in the map.
-     EFF_ALEN      - length of a map with a particular number of bytes.
-     EFF_SPAN_ALEN - map span for a sequence of bytes.
-
-   */
 
 #define EFF_APOS(_p)          ((_p) >> EFF_MAP_SCALE2)
 #define EFF_REM(_x)           ((_x) & ((1 << EFF_MAP_SCALE2) - 1))
@@ -5689,608 +5997,8 @@ static u8 fuzz_one(char** argv) {
     eff_cnt++;
   }
 
-  /* Walking byte. */
-
-  stage_name  = "bitflip 8/8";
-  stage_short = "flip8";
-  stage_max   = len;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (stage_cur = 0; stage_cur < stage_max; stage_cur++) {
-
-    stage_cur_byte = stage_cur;
-
-    out_buf[stage_cur] ^= 0xFF;
-
-    if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-
-    /* We also use this stage to pull off a simple trick: we identify
-       bytes that seem to have no effect on the current execution path
-       even when fully flipped - and we skip them during more expensive
-       deterministic stages, such as arithmetics or known ints. */
-
-    if (!eff_map[EFF_APOS(stage_cur)]) {
-
-      u32 cksum;
-
-      /* If in dumb mode or if the file is very short, just flag everything
-         without wasting time on checksums. */
-
-      if (!dumb_mode && len >= EFF_MIN_LEN)
-        cksum = hash32(trace_bits, MAP_SIZE, HASH_CONST);
-      else
-        cksum = ~queue_cur->exec_cksum;
-
-      if (cksum != queue_cur->exec_cksum) {
-        eff_map[EFF_APOS(stage_cur)] = 1;
-        eff_cnt++;
-      }
-
-    }
-
-    out_buf[stage_cur] ^= 0xFF;
-
-  }
-
-  /* If the effector map is more than EFF_MAX_PERC dense, just flag the
-     whole thing as worth fuzzing, since we wouldn't be saving much time
-     anyway. */
-
-  if (eff_cnt != EFF_ALEN(len) &&
-      eff_cnt * 100 / EFF_ALEN(len) > EFF_MAX_PERC) {
-
-    memset(eff_map, 1, EFF_ALEN(len));
-
-    blocks_eff_select += EFF_ALEN(len);
-
-  } else {
-
-    blocks_eff_select += eff_cnt;
-
-  }
-
-  blocks_eff_total += EFF_ALEN(len);
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_FLIP8]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_FLIP8] += stage_max;
-
-  /* Two walking bytes. */
-
-  if (len < 2) goto skip_bitflip;
-
-  stage_name  = "bitflip 16/8";
-  stage_short = "flip16";
-  stage_cur   = 0;
-  stage_max   = len - 1;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (i = 0; i < len - 1; i++) {
-
-    /* Let's consult the effector map... */
-
-    if (!eff_map[EFF_APOS(i)] && !eff_map[EFF_APOS(i + 1)]) {
-      stage_max--;
-      continue;
-    }
-
-    stage_cur_byte = i;
-
-    *(u16*)(out_buf + i) ^= 0xFFFF;
-
-    if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-    stage_cur++;
-
-    *(u16*)(out_buf + i) ^= 0xFFFF;
-
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_FLIP16]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_FLIP16] += stage_max;
-
-  if (len < 4) goto skip_bitflip;
-
-  /* Four walking bytes. */
-
-  stage_name  = "bitflip 32/8";
-  stage_short = "flip32";
-  stage_cur   = 0;
-  stage_max   = len - 3;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (i = 0; i < len - 3; i++) {
-
-    /* Let's consult the effector map... */
-    if (!eff_map[EFF_APOS(i)] && !eff_map[EFF_APOS(i + 1)] &&
-        !eff_map[EFF_APOS(i + 2)] && !eff_map[EFF_APOS(i + 3)]) {
-      stage_max--;
-      continue;
-    }
-
-    stage_cur_byte = i;
-
-    *(u32*)(out_buf + i) ^= 0xFFFFFFFF;
-
-    if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-    stage_cur++;
-
-    *(u32*)(out_buf + i) ^= 0xFFFFFFFF;
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_FLIP32]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_FLIP32] += stage_max;
-
-skip_bitflip:
-
-  if (no_arith) goto skip_arith;
-
-  /**********************
-   * ARITHMETIC INC/DEC *
-   **********************/
-
-  /* 8-bit arithmetics. */
-
-  stage_name  = "arith 8/8";
-  stage_short = "arith8";
-  stage_cur   = 0;
-  stage_max   = 2 * len * ARITH_MAX;
-
-  stage_val_type = STAGE_VAL_LE;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (i = 0; i < len; i++) {
-
-    u8 orig = out_buf[i];
-
-    /* Let's consult the effector map... */
-
-    if (!eff_map[EFF_APOS(i)]) {
-      stage_max -= 2 * ARITH_MAX;
-      continue;
-    }
-
-    stage_cur_byte = i;
-
-    for (j = 1; j <= ARITH_MAX; j++) {
-
-      u8 r = orig ^ (orig + j);
-
-      /* Do arithmetic operations only if the result couldn't be a product
-         of a bitflip. */
-
-      if (!could_be_bitflip(r)) {
-
-        stage_cur_val = j;
-        out_buf[i] = orig + j;
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      r =  orig ^ (orig - j);
-
-      if (!could_be_bitflip(r)) {
-
-        stage_cur_val = -j;
-        out_buf[i] = orig - j;
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      out_buf[i] = orig;
-
-    }
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_ARITH8]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_ARITH8] += stage_max;
-
-  /* 16-bit arithmetics, both endians. */
-
-  if (len < 2) goto skip_arith;
-
-  stage_name  = "arith 16/8";
-  stage_short = "arith16";
-  stage_cur   = 0;
-  stage_max   = 4 * (len - 1) * ARITH_MAX;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (i = 0; i < len - 1; i++) {
-
-    u16 orig = *(u16*)(out_buf + i);
-
-    /* Let's consult the effector map... */
-
-    if (!eff_map[EFF_APOS(i)] && !eff_map[EFF_APOS(i + 1)]) {
-      stage_max -= 4 * ARITH_MAX;
-      continue;
-    }
-
-    stage_cur_byte = i;
-
-    for (j = 1; j <= ARITH_MAX; j++) {
-
-      u16 r1 = orig ^ (orig + j),
-          r2 = orig ^ (orig - j),
-          r3 = orig ^ SWAP16(SWAP16(orig) + j),
-          r4 = orig ^ SWAP16(SWAP16(orig) - j);
-
-      /* Try little endian addition and subtraction first. Do it only
-         if the operation would affect more than one byte (hence the 
-         & 0xff overflow checks) and if it couldn't be a product of
-         a bitflip. */
-
-      stage_val_type = STAGE_VAL_LE; 
-
-      if ((orig & 0xff) + j > 0xff && !could_be_bitflip(r1)) {
-
-        stage_cur_val = j;
-        *(u16*)(out_buf + i) = orig + j;
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
- 
-      } else stage_max--;
-
-      if ((orig & 0xff) < j && !could_be_bitflip(r2)) {
-
-        stage_cur_val = -j;
-        *(u16*)(out_buf + i) = orig - j;
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      /* Big endian comes next. Same deal. */
-
-      stage_val_type = STAGE_VAL_BE;
-
-
-      if ((orig >> 8) + j > 0xff && !could_be_bitflip(r3)) {
-
-        stage_cur_val = j;
-        *(u16*)(out_buf + i) = SWAP16(SWAP16(orig) + j);
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      if ((orig >> 8) < j && !could_be_bitflip(r4)) {
-
-        stage_cur_val = -j;
-        *(u16*)(out_buf + i) = SWAP16(SWAP16(orig) - j);
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      *(u16*)(out_buf + i) = orig;
-
-    }
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_ARITH16]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_ARITH16] += stage_max;
-
-  /* 32-bit arithmetics, both endians. */
-
-  if (len < 4) goto skip_arith;
-
-  stage_name  = "arith 32/8";
-  stage_short = "arith32";
-  stage_cur   = 0;
-  stage_max   = 4 * (len - 3) * ARITH_MAX;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (i = 0; i < len - 3; i++) {
-
-    u32 orig = *(u32*)(out_buf + i);
-
-    /* Let's consult the effector map... */
-
-    if (!eff_map[EFF_APOS(i)] && !eff_map[EFF_APOS(i + 1)] &&
-        !eff_map[EFF_APOS(i + 2)] && !eff_map[EFF_APOS(i + 3)]) {
-      stage_max -= 4 * ARITH_MAX;
-      continue;
-    }
-
-    stage_cur_byte = i;
-
-    for (j = 1; j <= ARITH_MAX; j++) {
-
-      u32 r1 = orig ^ (orig + j),
-          r2 = orig ^ (orig - j),
-          r3 = orig ^ SWAP32(SWAP32(orig) + j),
-          r4 = orig ^ SWAP32(SWAP32(orig) - j);
-
-      /* Little endian first. Same deal as with 16-bit: we only want to
-         try if the operation would have effect on more than two bytes. */
-
-      stage_val_type = STAGE_VAL_LE;
-
-      if ((orig & 0xffff) + j > 0xffff && !could_be_bitflip(r1)) {
-
-        stage_cur_val = j;
-        *(u32*)(out_buf + i) = orig + j;
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      if ((orig & 0xffff) < j && !could_be_bitflip(r2)) {
-
-        stage_cur_val = -j;
-        *(u32*)(out_buf + i) = orig - j;
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      /* Big endian next. */
-
-      stage_val_type = STAGE_VAL_BE;
-
-      if ((SWAP32(orig) & 0xffff) + j > 0xffff && !could_be_bitflip(r3)) {
-
-        stage_cur_val = j;
-        *(u32*)(out_buf + i) = SWAP32(SWAP32(orig) + j);
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      if ((SWAP32(orig) & 0xffff) < j && !could_be_bitflip(r4)) {
-
-        stage_cur_val = -j;
-        *(u32*)(out_buf + i) = SWAP32(SWAP32(orig) - j);
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      *(u32*)(out_buf + i) = orig;
-
-    }
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_ARITH32]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_ARITH32] += stage_max;
-
-skip_arith:
-
-  /**********************
-   * INTERESTING VALUES *
-   **********************/
-
-  stage_name  = "interest 8/8";
-  stage_short = "int8";
-  stage_cur   = 0;
-  stage_max   = len * sizeof(interesting_8);
-
-  stage_val_type = STAGE_VAL_LE;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  /* Setting 8-bit integers. */
-
-  for (i = 0; i < len; i++) {
-
-    u8 orig = out_buf[i];
-
-    /* Let's consult the effector map... */
-
-    if (!eff_map[EFF_APOS(i)]) {
-      stage_max -= sizeof(interesting_8);
-      continue;
-    }
-
-    stage_cur_byte = i;
-
-    for (j = 0; j < sizeof(interesting_8); j++) {
-
-      /* Skip if the value could be a product of bitflips or arithmetics. */
-
-      if (could_be_bitflip(orig ^ (u8)interesting_8[j]) ||
-          could_be_arith(orig, (u8)interesting_8[j], 1)) {
-        stage_max--;
-        continue;
-      }
-
-      stage_cur_val = interesting_8[j];
-      out_buf[i] = interesting_8[j];
-
-      if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-
-      out_buf[i] = orig;
-      stage_cur++;
-
-    }
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_INTEREST8]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_INTEREST8] += stage_max;
-
-  /* Setting 16-bit integers, both endians. */
-
-  if (no_arith || len < 2) goto skip_interest;
-
-  stage_name  = "interest 16/8";
-  stage_short = "int16";
-  stage_cur   = 0;
-  stage_max   = 2 * (len - 1) * (sizeof(interesting_16) >> 1);
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (i = 0; i < len - 1; i++) {
-
-    u16 orig = *(u16*)(out_buf + i);
-
-    /* Let's consult the effector map... */
-
-    if (!eff_map[EFF_APOS(i)] && !eff_map[EFF_APOS(i + 1)]) {
-      stage_max -= sizeof(interesting_16);
-      continue;
-    }
-
-    stage_cur_byte = i;
-
-    for (j = 0; j < sizeof(interesting_16) / 2; j++) {
-
-      stage_cur_val = interesting_16[j];
-
-      /* Skip if this could be a product of a bitflip, arithmetics,
-         or single-byte interesting value insertion. */
-
-      if (!could_be_bitflip(orig ^ (u16)interesting_16[j]) &&
-          !could_be_arith(orig, (u16)interesting_16[j], 2) &&
-          !could_be_interest(orig, (u16)interesting_16[j], 2, 0)) {
-
-        stage_val_type = STAGE_VAL_LE;
-
-        *(u16*)(out_buf + i) = interesting_16[j];
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      if ((u16)interesting_16[j] != SWAP16(interesting_16[j]) &&
-          !could_be_bitflip(orig ^ SWAP16(interesting_16[j])) &&
-          !could_be_arith(orig, SWAP16(interesting_16[j]), 2) &&
-          !could_be_interest(orig, SWAP16(interesting_16[j]), 2, 1)) {
-
-        stage_val_type = STAGE_VAL_BE;
-
-        *(u16*)(out_buf + i) = SWAP16(interesting_16[j]);
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-    }
-
-    *(u16*)(out_buf + i) = orig;
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_INTEREST16]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_INTEREST16] += stage_max;
-
-  if (len < 4) goto skip_interest;
-
-  /* Setting 32-bit integers, both endians. */
-
-  stage_name  = "interest 32/8";
-  stage_short = "int32";
-  stage_cur   = 0;
-  stage_max   = 2 * (len - 3) * (sizeof(interesting_32) >> 2);
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (i = 0; i < len - 3; i++) {
-
-    u32 orig = *(u32*)(out_buf + i);
-
-    /* Let's consult the effector map... */
-
-    if (!eff_map[EFF_APOS(i)] && !eff_map[EFF_APOS(i + 1)] &&
-        !eff_map[EFF_APOS(i + 2)] && !eff_map[EFF_APOS(i + 3)]) {
-      stage_max -= sizeof(interesting_32) >> 1;
-      continue;
-    }
-
-    stage_cur_byte = i;
-
-    for (j = 0; j < sizeof(interesting_32) / 4; j++) {
-
-      stage_cur_val = interesting_32[j];
-
-      /* Skip if this could be a product of a bitflip, arithmetics,
-         or word interesting value insertion. */
-
-      if (!could_be_bitflip(orig ^ (u32)interesting_32[j]) &&
-          !could_be_arith(orig, interesting_32[j], 4) &&
-          !could_be_interest(orig, interesting_32[j], 4, 0)) {
-
-        stage_val_type = STAGE_VAL_LE;
-
-        *(u32*)(out_buf + i) = interesting_32[j];
-
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-      if ((u32)interesting_32[j] != SWAP32(interesting_32[j]) &&
-          !could_be_bitflip(orig ^ SWAP32(interesting_32[j])) &&
-          !could_be_arith(orig, SWAP32(interesting_32[j]), 4) &&
-          !could_be_interest(orig, SWAP32(interesting_32[j]), 4, 1)) {
-
-        stage_val_type = STAGE_VAL_BE;
-
-        *(u32*)(out_buf + i) = SWAP32(interesting_32[j]);
-        if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-        stage_cur++;
-
-      } else stage_max--;
-
-    }
-
-    *(u32*)(out_buf + i) = orig;
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_INTEREST32]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_INTEREST32] += stage_max;
 
 skip_interest:
-
-
-  /********************
-   * DICTIONARY STUFF *
-   ********************/
-
-
-  if (!extras_cnt) goto skip_user_extras;
 
   /* Overwrite with user-supplied extras. */
 
@@ -6301,1199 +6009,77 @@ skip_interest:
 
   stage_val_type = STAGE_VAL_NONE;
 
-  orig_hit_cnt = new_hit_cnt;
+  orig_hit_cnt = queued_paths + unique_crashes;
 
-  for (i = 0; i < len; i++) {
+  struct queue_entry * queue_search;
 
-    u32 last_len = 0;
+  queue_search = queue;
 
-    stage_cur_byte = i;
+  FILE *fp;
+  fp = fopen("/tmp/mutate.txt", "r");
+  char line[100];
+  char vuln[20];
+  int count;
+  char * tweaked;
+  
+  initializeMap(&vulnsMap, mapSize);
 
-    /* Extras are sorted by size, from smallest to largest. This means
-       that we don't have to worry about restoring the buffer in
-       between writes at a particular offset determined by the outer
-       loop. */
+  while (fgets(line, sizeof(line), fp) != NULL) {
+    printf("%s", line);
+    sscanf(line, "%s : %d", vuln, &count);
 
-    for (j = 0; j < extras_cnt; j++) {
+    addToMap(&vulnsMap, vuln, count);
 
-      /* Skip extras probabilistically if extras_cnt > MAX_DET_EXTRAS. Also
-         skip them if there's no room to insert the payload, if the token
-         is redundant, or if its entire span has no bytes set in the effector
-         map. */
+    // printf("key : %s, value : %d\n------------\n", vuln, getFromMap(&vulnsMap, vuln));
+    i++;
+  }
+  const char* svuln = randomSelection(vulnsMap);
 
-      if ((extras_cnt > MAX_DET_EXTRAS && UR(extras_cnt) >= MAX_DET_EXTRAS) ||
-          extras[j].len > len - i ||
-          !memcmp(extras[j].data, out_buf + i, extras[j].len) ||
-          !memchr(eff_map + EFF_APOS(i), 1, EFF_SPAN_ALEN(i, extras[j].len))) {
+  char buffer[1 * 1024 * 1024];
+  char * mutatedSeed;
+  
 
-        stage_max--;
-        continue;
+  while(queue_search != NULL){
+    mutatedSeed = ck_alloc(1*1024*1024);
+    
 
-      }
+    FILE* qfn = fopen(queue_search->fname,"rb");
 
-      last_len = extras[j].len;
-      memcpy(out_buf + i, extras[j].data, last_len);
-
-      if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-
-      stage_cur++;
-
+    if (qfn == NULL){
+      queue_search = queue_search->next;
+      continue;
     }
 
-    /* Restore all the clobbered memory. */
-    memcpy(out_buf + i, in_buf + i, last_len);
+    int buf_size = fread(buffer, 1, (1 * 1024 * 1024), qfn);
 
+    fclose(qfn);
+    int mutate_size = mutate(mutatedSeed, svuln, buffer, buf_size);
+
+    if (common_fuzz_stuff(argv, mutatedSeed, mutate_size)) {
+      goto abandon_entry;
+    }
+
+    int current_hit_cnt = queued_paths + unique_crashes;
+
+    if(current_hit_cnt != orig_hit_cnt){
+      printf("Mutator found new path\n");
+    }
+
+    queue_search = queue_search->next;
+
+    ck_free(mutatedSeed);
   }
+
+  freeMap(&vulnsMap);
+  fclose(fp);
 
   new_hit_cnt = queued_paths + unique_crashes;
 
   stage_finds[STAGE_EXTRAS_UO]  += new_hit_cnt - orig_hit_cnt;
   stage_cycles[STAGE_EXTRAS_UO] += stage_max;
 
-  /* Insertion of user-supplied extras. */
+goto skip_interest;
 
-  stage_name  = "user extras (insert)";
-  stage_short = "ext_UI";
-  stage_cur   = 0;
-  stage_max   = extras_cnt * len;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  ex_tmp = ck_alloc(len + MAX_DICT_FILE);
-
-  for (i = 0; i <= len; i++) {
-
-    stage_cur_byte = i;
-
-    for (j = 0; j < extras_cnt; j++) {
-
-      if (len + extras[j].len > MAX_FILE) {
-        stage_max--; 
-        continue;
-      }
-
-      /* Insert token */
-      memcpy(ex_tmp + i, extras[j].data, extras[j].len);
-
-      /* Copy tail */
-      memcpy(ex_tmp + i + extras[j].len, out_buf + i, len - i);
-
-      if (common_fuzz_stuff(argv, ex_tmp, len + extras[j].len)) {
-        ck_free(ex_tmp);
-        goto abandon_entry;
-      }
-
-      stage_cur++;
-
-    }
-
-    /* Copy head */
-    ex_tmp[i] = out_buf[i];
-
-  }
-
-  ck_free(ex_tmp);
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_EXTRAS_UI]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_EXTRAS_UI] += stage_max;
-
-skip_user_extras:
-
-  if (!a_extras_cnt) goto skip_extras;
-
-  stage_name  = "auto extras (over)";
-  stage_short = "ext_AO";
-  stage_cur   = 0;
-  stage_max   = MIN(a_extras_cnt, USE_AUTO_EXTRAS) * len;
-
-  stage_val_type = STAGE_VAL_NONE;
-
-  orig_hit_cnt = new_hit_cnt;
-
-  for (i = 0; i < len; i++) {
-
-    u32 last_len = 0;
-
-    stage_cur_byte = i;
-
-    for (j = 0; j < MIN(a_extras_cnt, USE_AUTO_EXTRAS); j++) {
-
-      /* See the comment in the earlier code; extras are sorted by size. */
-
-      if (a_extras[j].len > len - i ||
-          !memcmp(a_extras[j].data, out_buf + i, a_extras[j].len) ||
-          !memchr(eff_map + EFF_APOS(i), 1, EFF_SPAN_ALEN(i, a_extras[j].len))) {
-
-        stage_max--;
-        continue;
-
-      }
-
-      last_len = a_extras[j].len;
-      memcpy(out_buf + i, a_extras[j].data, last_len);
-
-      if (common_fuzz_stuff(argv, out_buf, len)) goto abandon_entry;
-
-      stage_cur++;
-
-    }
-
-    /* Restore all the clobbered memory. */
-    memcpy(out_buf + i, in_buf + i, last_len);
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_EXTRAS_AO]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_EXTRAS_AO] += stage_max;
-
-skip_extras:
-
-  /* If we made this to here without jumping to havoc_stage or abandon_entry,
-     we're properly done with deterministic steps and can mark it as such
-     in the .state/ directory. */
-
-  if (!queue_cur->passed_det) mark_as_det_done(queue_cur);
-
-  /* HTTP STAGE 1
-   * Start of HTTP Extras, 2 stages
-   * Queue Combine takes COOKIES/GETS/POSTS from each queue combines them into 3 linked lists
-   * It then adds them to the current out_buf and all queued inputs until all vars have been used at leasst once
-   */
-  
-  http_queue_var_combine_stage:
-  
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  if (skip_http_dict) goto havoc_stage;
-  
-  aflout_extras  = fopen("/tmp/aflout-extras.log","a+");  // DEBUG TO REMOVE
-  fprintf(aflout_extras, "[WC-AFL] ******* Processing HTTP Stage 1 ******** \n");
-
-  stage_name  = "http queue comb";
-  stage_short = "ext_HQC";
-  stage_cur   = 0;
-  stage_max   = extras_cnt * len;
-
-  stage_val_type = STAGE_VAL_NONE;
-
-  orig_hit_cnt = queued_paths + unique_crashes;
-  u32 prior_round_hit_cnt = orig_hit_cnt;
-  struct queue_entry *queue_search;
-
-  queue_search = queue;
-
-  FILE *logfile2 = fopen("/tmp/afl_queue","a+");
-  fprintf(logfile2, "Starting http extras\n");
-
-  u8 buffer[MAX_FILE];
-  u8 vars[3][MAX_FILE];
-  u32 vars_len[] = {0,0,0};
-
-  int var_type_cnt = 0;
-  int adds_to_ll =0;
-  u64 length_added=0;
-  u64 queue_elem_cnt=0;
-  //build linked list of name value pairs by type, COOKIES, GETS, POSTS using all queued files
-  // output => vars_ll (linked list)
-  
-  while(queue_search != NULL){
-    for (int i=0; i < 3; i++){
-      vars[i][0] = '\x00';
-    }
-    fprintf(logfile2,"%s ",  queue_search->fname);
-
-    FILE* qfn = fopen(queue_search->fname,"rb");
-    if (qfn == NULL){
-      queue_search = queue_search->next;
-      continue;
-    }
-    int buf_size = fread(buffer,1, MAX_FILE,qfn);
-    fclose(qfn);
-    var_type_cnt = 0;
-    u32 var_str_pos =0;
-    for (int i =0; i< buf_size;i++){
-      if (buffer[i] == '\x00') {
-        vars_len[var_type_cnt]++;
-        var_type_cnt++;
-        var_str_pos = 0;
-      } else {
-        vars[var_type_cnt][var_str_pos] = buffer[i];
-        vars_len[var_type_cnt]++;
-        var_str_pos++;
-        vars[var_type_cnt][var_str_pos] = '\x00';
-      }
-      if (var_type_cnt == 3){  //don't care about values after POSTS section
-        fprintf(logfile2, "BREAKING OUT DOOODS!\n");
-        break;
-      }
-    }
-
-    for(int i=0; i < 3;i++){
-      u8* starting_str = strdup(vars[i]);
-      u8* token = starting_str;
-      token = strtok(token, "&");
-      u8 skip = 0;
-      fprintf(logfile2, "HERE\n");
-      fflush(logfile2);
-      while (token != NULL){
-        struct var_entry* cur_ve = vars_ll[i];
-        while (cur_ve != NULL){
-          if (strcmp(token, cur_ve->varname) == 0){
-            skip = 1;
-            break;
-          }
-          cur_ve = cur_ve->next;
-        }
-        cur_ve = NULL;
-
-        if (skip){
-          fprintf(logfile2, "\t SKIPPING %d = %s\n",i, token);
-
-        } else {
-
-          fprintf(logfile2, "\t Using %d = %s\n",i, token);
-          fflush(logfile2);
-          add_var_to_ll(token, i);
-          adds_to_ll++;
-          length_added += strlen(token);
-        }
-        skip = 0;
-        token = strtok(NULL,"&");
-      } // end while token
-
-      free(starting_str);
-    }
-    queue_search = queue_search->next;
-    queue_elem_cnt++;
-  } // end while queue_search of inputs
-  fprintf(logfile2,"[WC-AFL] Number of name-value pairs added to linked list = %d for %llu bytes queue eles= %llu\n", adds_to_ll, length_added, queue_elem_cnt);
-
-
-    u8 keepgoing =1;
-    struct var_entry *cur_var[3];
-    cur_var[COOKIES] = vars_ll[COOKIES];
-    cur_var[GETS] = vars_ll[GETS];
-    cur_var[POSTS] = vars_ll[POSTS];
-    u32 loopcnt=0;
-
-    // let's use any new inputs
-    if (qskip % 10 == 0) {
-      fprintf(aflout_extras, "[WC-AFL] Reseting queue ptr to run through entire queue\n");  // maybe better is randomly select a few queues.
-      stopped_running_queue_at = NULL;  // queue is the bottom of the queue
-    }
-    // loop through vars_ll until we've exhausted all 3 COOKIES, GETs, POSTS at least once
-    while (keepgoing != 7) {
-      loopcnt++;
-      u8 *var_str[3] = {NULL, NULL, NULL};
-      u32 var_strlen[3] = {0,0,0};
-      u8 keeper = 1;
-
-      // using vars_ll create 3 var_str to move forward with, set keepgoing if end of a ll is reached.
-      for (int i=0; i < 3; i++){
-        char sep = '&';
-        if (i==COOKIES){
-          sep = ';';
-        }
-
-        if (cur_var[i]){
-          var_strlen[i] = cur_var[i]->len + 1;                   // for prepended var separator
-          var_str[i] = ck_alloc(var_strlen[i]+1);          // for null terminating char
-          var_str[i][0] = sep;
-          memcpy(var_str[i]+1, cur_var[i]->varname, var_strlen[i]);
-          cur_var[i] = cur_var[i]->next;
-        } else {
-          //assert("never here");
-        }
-        if (!cur_var[i]){  // if cur var is null reset immeidately for next orbit in while loop
-           cur_var[i] = vars_ll[i];
-           keepgoing |= keeper;
-        }
-        keeper = keeper * 2;
-      } // end for i
-
-      // if all three have cycled at least once, then stop.
-      if (keepgoing == 7){
-        fprintf(aflout_extras, "[WC-AFL] END OF LOOP cnt=%d keepgoing=%d skipcnt=%d \n", loopcnt-1, keepgoing, qskip);
-        fflush(aflout_extras);
-        break;
-      }
-      
-      /**
-       * 
-       * This starts HTTP stage 1a (single var with outbuf)
-       * 
-       * 
-       */
-
-      u8* outbufvars[3];
-      build_base_bufs(outbufvars, out_buf, len);
-
-      u8* tweaked = ck_alloc(len+var_strlen[COOKIES]+var_strlen[GETS]+var_strlen[POSTS]+3+3); // 3 for potential extra null terms and 3 for additional & preceeding original
-      // Combination of everything into tweaked.
-      
-      // creates tweaked buffer from var_str selected earlier and the outbufvars 
-      int cur_len = build_buf_from_var(var_str, var_strlen, outbufvars, tweaked);
-
-      // run tweaked buffer without concatenating with other queue files.
-      // this tests the tweaked (with a new var added from queue)
-      int current_hit_cnt = queued_paths + unique_crashes;
-      if (common_fuzz_stuff(argv, tweaked, cur_len)) {
-        fprintf(aflout_extras, "Aborted and now freeing\n");
-        goto abandon_entry;
-      }
-      http_execs++;
-      if (current_hit_cnt != prior_round_hit_cnt){
-        print_buf(aflout_extras, tweaked, cur_len, var_strlen, "\e33m] OUT+VAR FOUND PATH\e[0m");
-        fflush(aflout_extras);
-        prior_round_hit_cnt=current_hit_cnt;
-      }
-
-      free_var_array(outbufvars, 3);
-      ck_free(tweaked);
-
-      /**
-       * 
-       * This ends HTTP stage 1a (single var with outbuf)
-       * 
-       */
-      
-      /**
-       * 
-       * This start  HTTP stage 1b (single var with each queue buf)
-       * 
-       */
-
-      u8 *qbuff = ck_alloc(MAX_FILE);
-      if (stopped_running_queue_at == NULL){
-        queue_search = queue;
-      } else {
-        queue_search = stopped_running_queue_at->next;
-      }
-
-      int qfilep =0;
-      u32 outbufvars_allocs = 0;
-      prior_round_hit_cnt = current_hit_cnt;
-      u32 inner_loopcnt=0;
-
-      // for each queue_file use the var_str to cross polinate variables between queues
-      while(queue_search != NULL) {
-
-        memset(qbuff,0,MAX_FILE);
-        //fprintf(aflout, "#%d %s\n", qfilep, queue_search->fname);
-        //fflush(aflout);
-        FILE *qfn = fopen(queue_search->fname, "rb");
-
-        int buf_size = fread(qbuff,1, MAX_FILE,qfn);
-        fclose(qfn);
-        
-        // builds outbufvars from queued file instead of out_buf
-        outbufvars_allocs = build_base_bufs(outbufvars, qbuff, buf_size);
-
-        int tweaked_len = buf_size+var_strlen[COOKIES]+var_strlen[GETS]+var_strlen[POSTS]+3+3;
-        tweaked = ck_alloc(tweaked_len); // 3 for potential extra null terms and 3 for additional & preceeding original
-        
-        // clean up tweaked incase left over junk from last pass.
-        memset(tweaked,0,tweaked_len);
-        
-        // build tweaked from var_str 
-        cur_len = build_buf_from_var(var_str, var_strlen, outbufvars, tweaked);
-
-        prior_round_hit_cnt=queued_paths + unique_crashes;        
-        if (common_fuzz_stuff(argv, tweaked, cur_len)) {
-          fprintf(aflout_extras, "Aborted and now freeing\n");
-          goto abandon_entry;
-        }
-        
-        current_hit_cnt = queued_paths + unique_crashes;
-
-        http_execs++;
-        if (current_hit_cnt != prior_round_hit_cnt){
-          fprintf(aflout_extras, "[WC-AFL] \e[32m ADDED new input to QUEUE \e[0m Outbuf allocs = %d queue_size= %lld, loop count = %d, inner loop cnt = %u \n", outbufvars_allocs, queue_elem_cnt, loopcnt, inner_loopcnt);
-          fflush(aflout_extras);
-          //print_buf(aflout_extras, tweaked, cur_len, var_strlen, "\e[33m QUEUE+VAR FOUND PATH \e[0m");
-        }
-        //print_buf(aflout, tweaked, cur_len, var_strlen, "VAR+QUEUE");
-
-        qfilep++;
-
-        inner_loopcnt++;
-        queue_search = queue_search->next;
-        
-        ck_free(tweaked);
-        free_var_array(outbufvars, outbufvars_allocs);
-
-      } // end while searching through all queue files for concat of the current var
-
-      fprintf(aflout_extras, "[WC-AFL] End of Inner Loop queue_size= %lld, loop count = %d, inner loop cnt = %u,  est totol_execs=%d \n", queue_elem_cnt, loopcnt, inner_loopcnt, (loopcnt*inner_loopcnt) );
-
-      ck_free(qbuff);
-      free_var_array(var_str, 3);
-
-    } //end while keepgoing != 7
-    // end of loop print is above
-
-    stopped_running_queue_at = queue_top;
-    qskip++;
-
-    cur_var[POSTS] = NULL;
-    cur_var[GETS] = NULL;
-    cur_var[COOKIES] = NULL;
-
-    fprintf(logfile2,"\n");
-
-    fflush(logfile2);
-
-  // clean up vars_ll
-  int free_cnt = 0;
-  for(int i=0; i < 3;i++){
-    struct var_entry* cur_ve = vars_ll[i];
-    while (cur_ve != NULL){
-      struct var_entry* prior_ve = cur_ve;
-      cur_ve = prior_ve->next;
-      prior_ve->next = NULL;
-      free(prior_ve->varname);
-      ck_free(prior_ve);
-      entry_cnt--;
-      free_cnt++;
-    }
-    vars_ll[i] = NULL;
-  }
-  
-  fprintf(aflout_extras, "[WC-AFL] Number of entries not freed = %u and number frees performed = %d\n", entry_cnt, free_cnt);
-  
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_EXTRAS_HQC]  += new_hit_cnt - orig_hit_cnt;
-  fprintf(aflout_extras, "[WC-AFL] FINISHED http extras stage  Total Paths =%lld, Paths Gained=%lld, Total Paths gained from Stage =%lld\n"
-          ,new_hit_cnt, new_hit_cnt - orig_hit_cnt, stage_finds[STAGE_EXTRAS_HT]);
-
-  stage_cycles[STAGE_EXTRAS_HQC] += stage_max;
-
-/*
-   * HTTP STAGE 2
-   * Start of HTTP Extras stage 2, dictionary stage
-   * The HTTP dictionary stage takes random number of variables from the dictionary and adds them to the COOKIES/GETS/POSTS
-   * of the out_buf and tests them
-   * TODO: this might not need to be part of the non-deterministic group
-   */
-  http_dictionary_havoc_stage :
-  
-  if (aflout_extras == NULL){
-    aflout_extras  = fopen("/tmp/aflout-extras.log","a+");  // DEBUG TO REMOVE
-  }
-
-  if (sync_id){
-    fprintf(aflout_extras, "[WC-AFL] ******* Processing HTTP Stage 2 for %s ******** \n", sync_id);
-  } else {
-    fprintf(aflout_extras, "[WC-AFL] ******* Processing HTTP Stage 2 for MASTER ******** \n");
-  }
-  
-  if (skip_http_dict) goto havoc_stage;
-
-  stage_name  = "http extras (ins)";
-  stage_short = "ext_HT";
-  stage_cur   = 0;
-  stage_max   = extras_cnt * len;
-
-  stage_val_type = STAGE_VAL_NONE;
-
-  orig_hit_cnt = queued_paths + unique_crashes;
-  prior_round_hit_cnt = orig_hit_cnt;
-
-//  fprintf(aflout_extras, "[WC-AFL] Initial Input => \e[34m");
-//  simp_pbuf(len, out_buf, aflout_extras);
-//  fprintf(aflout_extras,"\e[0m\n");
-
-  for (exptr = 0; exptr < extras_cnt; exptr++) {
-    random_items = UR(10) + 1;
-    // extras is ordered by length, last element is longest
-    add_on = ck_alloc(extras[extras_cnt-1].len*random_items + 2);
-
-    add_on[0] = '&';
-    add_on_len = 1;
-
-    zeroPntCnt = 0;
-    last_optr = 0;
-    cur_pick_len = 0;
-
-    // randomly chose X items from dictionary to add
-    for (t = 0; t < random_items; t++) {
-      if (t==0){
-        random_loc = exptr;
-      } else {
-        random_loc = UR(extras_cnt);
-      }
-      memcpy(add_on + add_on_len, extras[random_loc].data, extras[random_loc].len);
-      add_on_len += extras[random_loc].len;
-    } // end for t
-    add_on[add_on_len] = '\x00';
-    add_on_len += 1;
-    //fprintf(aflout_extras, "\t Created Random list of args add_to len=%d   max=%d\n", add_on_len, extras[extras_cnt-1].len*random_items+2);
-
-    // outbuf length + an add_on for cookies, get, and post
-
-    last_zero_ptr = 0;
-    for (optr=0; optr < len; optr++){
-      if (out_buf[optr] == '\x00'){
-        zeroPntCnt++;
-        last_zero_ptr = optr;
-        if (zeroPntCnt == 3){
-          fprintf(aflout_extras, "breaking out \n");
-          break;
-        }
-      }
-    }
-
-    pick_len = len + add_on_len * 3 - zeroPntCnt;
-    pick_buf = ck_alloc(pick_len);
-
-    for (optr=0; optr <= last_zero_ptr; optr++){
-      if (out_buf[optr] == '\x00'){
-        memcpy(pick_buf+cur_pick_len, out_buf+last_optr, optr-last_optr);
-        added_dist = optr - last_optr;
-        memcpy(pick_buf+cur_pick_len+added_dist, add_on, add_on_len);
-        last_optr = optr +1;
-        cur_pick_len += added_dist + add_on_len;
-      }
-    }
-    // if less than 3 null bytes appear in input, then tack on for the remaining.
-    if (zeroPntCnt < 3 && len > 0){
-      optr = len;
-      //fprintf(aflout_extras, "[WC-AFL] %d < 3 :: Tacking on unused out_buf cur_pick_len=%d, last_opt=%d, unused_len=%d\n", zeroPntCnt, cur_pick_len, last_optr, optr-last_optr);
-      memcpy(pick_buf+cur_pick_len, out_buf+last_optr, optr-last_optr);
-
-      added_dist = optr - last_optr;
-      cur_pick_len += added_dist;
-      //fprintf(aflout_extras, "[WC-AFL] Adding add_on %d %d\n", cur_pick_len, add_on_len);
-      memcpy(pick_buf+cur_pick_len, add_on, add_on_len);
-      last_optr = optr+1;
-      zeroPntCnt++;
-
-      cur_pick_len += add_on_len;
-    }
-
-    for (x=zeroPntCnt; x < 3;x++){
-      memcpy(pick_buf+cur_pick_len, add_on, add_on_len );
-      cur_pick_len += add_on_len;
-    } //end x
-
-    fflush(aflout_extras);
-    ck_free(add_on);
-
-//    fprintf(aflout_extras, "[WC-AFL] Final Input => ");
-//    simp_pbuf(cur_pick_len, pick_buf, aflout_extras);
-//    fprintf(aflout_extras, " END TESTER VAR %d v %d maxlen=%d cur_pick_len=%d\n", add_on_len, t, pick_len, cur_pick_len);
-//
-//    fprintf(aflout_extras, "Pick_buf start=%p ender pos= %d,%d  val= %x\n", pick_buf, ALLOC_S(pick_buf), pick_len, ALLOC_C2(pick_buf));
-//    fflush(aflout_extras);
-
-    int current_hit_cnt = queued_paths + unique_crashes;
-    if (common_fuzz_stuff(argv, pick_buf, cur_pick_len)) {
-      fprintf(aflout_extras, "Aborted and now freeing\n");
-      ck_free(pick_buf);
-      goto abandon_entry;
-    }
-    if (current_hit_cnt != prior_round_hit_cnt){
-      fprintf(aflout_extras,"\e[33m DICT FOUND PATH\e[0m ");
-      //simp_pbuf( cur_pick_len, pick_buf, aflout_extras);
-      prior_round_hit_cnt=current_hit_cnt;
-      //fprintf(aflout_extras, "\n\t\tTrimming %s %d ", queue_top->fname, queue_top->len);
-      //u8 trim_res = trim_case(argv, queue_top, in_buf);
-
-      //if (trim_res == FAULT_ERROR) {
-      //  FATAL("Unable to execute target application");
-      //}
-      //fprintf(aflout_extras, "\n\tShortened TO %d \n",  queue_top->len);
-    }
-
-    http_execs++;
-
-//    fprintf(aflout_extras, "Pick_buf start=%p ender pos= %d,%d  val= %x\n", pick_buf, ALLOC_S(pick_buf), pick_len, ALLOC_C2(pick_buf));
-//    fflush(aflout_extras);
-
-    ck_free(pick_buf);
-
-  } // end exptr
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  stage_finds[STAGE_EXTRAS_HT]  += new_hit_cnt - orig_hit_cnt;
-  stage_cycles[STAGE_EXTRAS_HT] += stage_max;
-
-  fprintf(aflout_extras, "[WC-AFL] END of HTTP dictionary fuzzing\n");
-
-  // The HTTP DICT routine tends to bloat the queue files, so we force a trim
-
-
-  /*****************************
-   * END HTTP Dictionary stuff
-   *****************************/
-
-  fclose(aflout_extras);
-  aflout_extras = NULL;
-
-  /****************
-   * RANDOM HAVOC *
-   ****************/
-
-havoc_stage:
-
-  stage_cur_byte = -1;
-
-  /* The havoc stage mutation code is also invoked when splicing files; if the
-     splice_cycle variable is set, generate different descriptions and such. */
-
-  if (!splice_cycle) {
-
-    stage_name  = "havoc";
-    stage_short = "havoc";
-    stage_max   = (doing_det ? HAVOC_CYCLES_INIT : HAVOC_CYCLES) *
-                  perf_score / havoc_div / 100;
-
-  } else {
-
-    static u8 tmp[32];
-
-    perf_score = orig_perf;
-
-    sprintf(tmp, "splice %u", splice_cycle);
-    stage_name  = tmp;
-    stage_short = "splice";
-    stage_max   = SPLICE_HAVOC * perf_score / havoc_div / 100;
-
-  }
-
-  if (stage_max < HAVOC_MIN) stage_max = HAVOC_MIN;
-//  stage_max = 2;
-//  if (queued_paths < 5){
-//    for (int i=0; i < 5;i++){
-//      printf("******* ALERT havoc set at 2 *********\n");
-//    }
-//  }
-
-
-  temp_len = len;
-
-  orig_hit_cnt = queued_paths + unique_crashes;
-
-  havoc_queued = queued_paths;
-
-  /* We essentially just do several thousand runs (depending on perf_score)
-     where we take the input file and make random stacked tweaks. */
-
-  for (stage_cur = 0; stage_cur < stage_max; stage_cur++) {
-
-    u32 use_stacking = 1 << (1 + UR(HAVOC_STACK_POW2));
-
-    stage_cur_val = use_stacking;
- 
-    for (i = 0; i < use_stacking; i++) {
-
-      switch (UR(15 + ((extras_cnt + a_extras_cnt) ? 2 : 0))) {
-
-        case 0:
-
-          /* Flip a single bit somewhere. Spooky! */
-
-          FLIP_BIT(out_buf, UR(temp_len << 3));
-          break;
-
-        case 1: 
-
-          /* Set byte to interesting value. */
-
-          out_buf[UR(temp_len)] = interesting_8[UR(sizeof(interesting_8))];
-          break;
-
-        case 2:
-
-          /* Set word to interesting value, randomly choosing endian. */
-
-          if (temp_len < 2) break;
-
-          if (UR(2)) {
-
-            *(u16*)(out_buf + UR(temp_len - 1)) =
-              interesting_16[UR(sizeof(interesting_16) >> 1)];
-
-          } else {
-
-            *(u16*)(out_buf + UR(temp_len - 1)) = SWAP16(
-              interesting_16[UR(sizeof(interesting_16) >> 1)]);
-
-          }
-
-          break;
-
-        case 3:
-
-          /* Set dword to interesting value, randomly choosing endian. */
-
-          if (temp_len < 4) break;
-
-          if (UR(2)) {
-  
-            *(u32*)(out_buf + UR(temp_len - 3)) =
-              interesting_32[UR(sizeof(interesting_32) >> 2)];
-
-          } else {
-
-            *(u32*)(out_buf + UR(temp_len - 3)) = SWAP32(
-              interesting_32[UR(sizeof(interesting_32) >> 2)]);
-
-          }
-
-          break;
-
-        case 4:
-
-          /* Randomly subtract from byte. */
-
-          out_buf[UR(temp_len)] -= 1 + UR(ARITH_MAX);
-          break;
-
-        case 5:
-
-          /* Randomly add to byte. */
-
-          out_buf[UR(temp_len)] += 1 + UR(ARITH_MAX);
-          break;
-
-        case 6:
-
-          /* Randomly subtract from word, random endian. */
-
-          if (temp_len < 2) break;
-
-          if (UR(2)) {
-
-            u32 pos = UR(temp_len - 1);
-
-            *(u16*)(out_buf + pos) -= 1 + UR(ARITH_MAX);
-
-          } else {
-
-            u32 pos = UR(temp_len - 1);
-            u16 num = 1 + UR(ARITH_MAX);
-
-            *(u16*)(out_buf + pos) =
-              SWAP16(SWAP16(*(u16*)(out_buf + pos)) - num);
-
-          }
-
-          break;
-
-        case 7:
-
-          /* Randomly add to word, random endian. */
-
-          if (temp_len < 2) break;
-
-          if (UR(2)) {
-
-            u32 pos = UR(temp_len - 1);
-
-            *(u16*)(out_buf + pos) += 1 + UR(ARITH_MAX);
-
-          } else {
-
-            u32 pos = UR(temp_len - 1);
-            u16 num = 1 + UR(ARITH_MAX);
-
-            *(u16*)(out_buf + pos) =
-              SWAP16(SWAP16(*(u16*)(out_buf + pos)) + num);
-
-          }
-
-          break;
-
-        case 8:
-
-          /* Randomly subtract from dword, random endian. */
-
-          if (temp_len < 4) break;
-
-          if (UR(2)) {
-
-            u32 pos = UR(temp_len - 3);
-
-            *(u32*)(out_buf + pos) -= 1 + UR(ARITH_MAX);
-
-          } else {
-
-            u32 pos = UR(temp_len - 3);
-            u32 num = 1 + UR(ARITH_MAX);
-
-            *(u32*)(out_buf + pos) =
-              SWAP32(SWAP32(*(u32*)(out_buf + pos)) - num);
-
-          }
-
-          break;
-
-        case 9:
-
-          /* Randomly add to dword, random endian. */
-
-          if (temp_len < 4) break;
-
-          if (UR(2)) {
-
-            u32 pos = UR(temp_len - 3);
-
-            *(u32*)(out_buf + pos) += 1 + UR(ARITH_MAX);
-
-          } else {
-
-            u32 pos = UR(temp_len - 3);
-            u32 num = 1 + UR(ARITH_MAX);
-
-            *(u32*)(out_buf + pos) =
-              SWAP32(SWAP32(*(u32*)(out_buf + pos)) + num);
-
-          }
-
-          break;
-
-        case 10:
-
-          /* Just set a random byte to a random value. Because,
-             why not. We use XOR with 1-255 to eliminate the
-             possibility of a no-op. */
-
-          out_buf[UR(temp_len)] ^= 1 + UR(255);
-          break;
-
-        case 11 ... 12: {
-
-            /* Delete bytes. We're making this a bit more likely
-               than insertion (the next option) in hopes of keeping
-               files reasonably small. */
-
-            u32 del_from, del_len;
-
-            if (temp_len < 2) break;
-
-            /* Don't delete too much. */
-
-            del_len = choose_block_len(temp_len - 1);
-
-            del_from = UR(temp_len - del_len + 1);
-
-            memmove(out_buf + del_from, out_buf + del_from + del_len,
-                    temp_len - del_from - del_len);
-
-            temp_len -= del_len;
-
-            break;
-
-          }
-
-        case 13:
-
-          if (temp_len + HAVOC_BLK_XL < MAX_FILE) {
-
-            /* Clone bytes (75%) or insert a block of constant bytes (25%). */
-
-            u8  actually_clone = UR(4);
-            u32 clone_from, clone_to, clone_len;
-            u8* new_buf;
-
-            if (actually_clone) {
-
-              clone_len  = choose_block_len(temp_len);
-              clone_from = UR(temp_len - clone_len + 1);
-
-            } else {
-
-              clone_len = choose_block_len(HAVOC_BLK_XL);
-              clone_from = 0;
-
-            }
-
-            clone_to   = UR(temp_len);
-
-            new_buf = ck_alloc_nozero(temp_len + clone_len);
-
-            /* Head */
-
-            memcpy(new_buf, out_buf, clone_to);
-
-            /* Inserted part */
-
-            if (actually_clone)
-              memcpy(new_buf + clone_to, out_buf + clone_from, clone_len);
-            else
-              memset(new_buf + clone_to,
-                     UR(2) ? UR(256) : out_buf[UR(temp_len)], clone_len);
-
-            /* Tail */
-            memcpy(new_buf + clone_to + clone_len, out_buf + clone_to,
-                   temp_len - clone_to);
-
-            ck_free(out_buf);
-            out_buf = new_buf;
-            temp_len += clone_len;
-
-          }
-
-          break;
-
-        case 14: {
-
-            /* Overwrite bytes with a randomly selected chunk (75%) or fixed
-               bytes (25%). */
-
-            u32 copy_from, copy_to, copy_len;
-
-            if (temp_len < 2) break;
-
-            copy_len  = choose_block_len(temp_len - 1);
-
-            copy_from = UR(temp_len - copy_len + 1);
-            copy_to   = UR(temp_len - copy_len + 1);
-
-            if (UR(4)) {
-
-              if (copy_from != copy_to)
-                memmove(out_buf + copy_to, out_buf + copy_from, copy_len);
-
-            } else memset(out_buf + copy_to,
-                          UR(2) ? UR(256) : out_buf[UR(temp_len)], copy_len);
-
-            break;
-
-          }
-
-        /* Values 15 and 16 can be selected only if there are any extras
-           present in the dictionaries. */
-
-        case 15: {
-
-            /* Overwrite bytes with an extra. */
-
-            if (!extras_cnt || (a_extras_cnt && UR(2))) {
-
-              /* No user-specified extras or odds in our favor. Let's use an
-                 auto-detected one. */
-
-              u32 use_extra = UR(a_extras_cnt);
-              u32 extra_len = a_extras[use_extra].len;
-              u32 insert_at;
-
-              if (extra_len > temp_len) break;
-
-              insert_at = UR(temp_len - extra_len + 1);
-              memcpy(out_buf + insert_at, a_extras[use_extra].data, extra_len);
-
-            } else {
-
-              /* No auto extras or odds in our favor. Use the dictionary. */
-
-              u32 use_extra = UR(extras_cnt);
-              u32 extra_len = extras[use_extra].len;
-              u32 insert_at;
-
-              if (extra_len > temp_len) break;
-
-              insert_at = UR(temp_len - extra_len + 1);
-              memcpy(out_buf + insert_at, extras[use_extra].data, extra_len);
-
-            }
-
-            break;
-
-          }
-
-        case 16: {
-
-            u32 use_extra, extra_len, insert_at = UR(temp_len + 1);
-            u8* new_buf;
-
-            /* Insert an extra. Do the same dice-rolling stuff as for the
-               previous case. */
-
-            if (!extras_cnt || (a_extras_cnt && UR(2))) {
-
-              use_extra = UR(a_extras_cnt);
-              extra_len = a_extras[use_extra].len;
-
-              if (temp_len + extra_len >= MAX_FILE) break;
-
-              new_buf = ck_alloc_nozero(temp_len + extra_len);
-
-              /* Head */
-              memcpy(new_buf, out_buf, insert_at);
-
-              /* Inserted part */
-              memcpy(new_buf + insert_at, a_extras[use_extra].data, extra_len);
-
-            } else {
-
-              use_extra = UR(extras_cnt);
-              extra_len = extras[use_extra].len;
-
-              if (temp_len + extra_len >= MAX_FILE) break;
-
-              new_buf = ck_alloc_nozero(temp_len + extra_len);
-
-              /* Head */
-              memcpy(new_buf, out_buf, insert_at);
-
-              /* Inserted part */
-              memcpy(new_buf + insert_at, extras[use_extra].data, extra_len);
-
-            }
-
-            /* Tail */
-            memcpy(new_buf + insert_at + extra_len, out_buf + insert_at,
-                   temp_len - insert_at);
-
-            ck_free(out_buf);
-            out_buf   = new_buf;
-            temp_len += extra_len;
-
-            break;
-
-          }
-
-      }
-
-    }
-
-    if (common_fuzz_stuff(argv, out_buf, temp_len))
-      goto abandon_entry;
-
-    /* out_buf might have been mangled a bit, so let's restore it to its
-       original size and shape. */
-
-    if (temp_len < len) out_buf = ck_realloc(out_buf, len);
-    temp_len = len;
-    memcpy(out_buf, in_buf, len);
-
-    /* If we're finding new stuff, let's run for a bit longer, limits
-       permitting. */
-
-    if (queued_paths != havoc_queued) {
-
-      if (perf_score <= HAVOC_MAX_MULT * 100) {
-        stage_max  *= 2;
-        perf_score *= 2;
-      }
-
-      havoc_queued = queued_paths;
-
-    }
-
-  }
-
-  new_hit_cnt = queued_paths + unique_crashes;
-
-  if (!splice_cycle) {
-    stage_finds[STAGE_HAVOC]  += new_hit_cnt - orig_hit_cnt;
-    stage_cycles[STAGE_HAVOC] += stage_max;
-  } else {
-    stage_finds[STAGE_SPLICE]  += new_hit_cnt - orig_hit_cnt;
-    stage_cycles[STAGE_SPLICE] += stage_max;
-  }
-
-#ifndef IGNORE_FINDS
-
-  /************
-   * SPLICING *
-   ************/
-
-  /* This is a last-resort strategy triggered by a full round with no findings.
-     It takes the current input file, randomly selects another input, and
-     splices them together at some offset, then relies on the havoc
-     code to mutate that blob. */
-
-retry_splicing:
-
-  if (use_splicing && splice_cycle++ < SPLICE_CYCLES &&
-      queued_paths > 1 && queue_cur->len > 1) {
-
-    struct queue_entry* target;
-    u32 tid, split_at;
-    u8* new_buf;
-    s32 f_diff, l_diff;
-
-    /* First of all, if we've modified in_buf for havoc, let's clean that
-       up... */
-
-    if (in_buf != orig_in) {
-      ck_free(in_buf);
-      in_buf = orig_in;
-      len = queue_cur->len;
-    }
-
-    /* Pick a random queue entry and seek to it. Don't splice with yourself. */
-
-    do { tid = UR(queued_paths); } while (tid == current_entry);
-
-    splicing_with = tid;
-    target = queue;
-
-    while (tid >= 100) { target = target->next_100; tid -= 100; }
-    while (tid--) target = target->next;
-
-    /* Make sure that the target has a reasonable length. */
-
-    while (target && (target->len < 2 || target == queue_cur)) {
-      target = target->next;
-      splicing_with++;
-    }
-
-    if (!target) goto retry_splicing;
-
-    /* Read the testcase into a new buffer. */
-
-    fd = open(target->fname, O_RDONLY);
-
-    if (fd < 0) PFATAL("Unable to open '%s'", target->fname);
-
-    new_buf = ck_alloc_nozero(target->len);
-
-    ck_read(fd, new_buf, target->len, target->fname);
-
-    close(fd);
-
-    /* Find a suitable splicing location, somewhere between the first and
-       the last differing byte. Bail out if the difference is just a single
-       byte or so. */
-
-    locate_diffs(in_buf, new_buf, MIN(len, target->len), &f_diff, &l_diff);
-
-    if (f_diff < 0 || l_diff < 2 || f_diff == l_diff) {
-      ck_free(new_buf);
-      goto retry_splicing;
-    }
-
-    /* Split somewhere between the first and last differing byte. */
-
-    split_at = f_diff + UR(l_diff - f_diff);
-
-    /* Do the thing. */
-
-    len = target->len;
-    memcpy(new_buf, in_buf, split_at);
-    in_buf = new_buf;
-
-    ck_free(out_buf);
-    out_buf = ck_alloc_nozero(len);
-    memcpy(out_buf, in_buf, len);
-
-    goto havoc_stage;
-
-  }
-
-#endif /* !IGNORE_FINDS */
-
-  ret_val = 0;
 
 abandon_entry:
 
