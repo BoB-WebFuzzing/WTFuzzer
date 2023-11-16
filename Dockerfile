@@ -122,6 +122,7 @@ COPY config/000-default.conf /etc/apache2/sites-available/
 
 
 RUN mkdir /home/tmp
+RUN chmod 777 -R /home/tmp
 
 COPY hook.php /lib/hook.php
 
