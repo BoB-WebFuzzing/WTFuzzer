@@ -122,6 +122,7 @@ COPY config/000-default.conf /etc/apache2/sites-available/
 
 
 RUN mkdir /home/tmp
+RUN chmod 777 -R /home/tmp
 
 COPY hook.php /lib/hook.php
 
@@ -151,7 +152,7 @@ RUN wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
 RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.3.linux-amd64.tar.gz
 ENV PATH=$PATH:/usr/local/go/bin
 
-RUN git clone https://github.com/Sanineng/fuzzer.git && cd /fuzzer && make
+RUN git clone https://github.com/BoB-WebFuzzing/fuzzer.git && cd /fuzzer && make
 RUN git clone https://github.com/shirohacker/crawlergo.git && cd /crawlergo && make build
 
 ######## DASH ######
