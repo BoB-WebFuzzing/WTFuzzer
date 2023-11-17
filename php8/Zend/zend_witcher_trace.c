@@ -114,6 +114,14 @@ static void afl_forkserver() {
 
         if (!child_pid) {  // child_pid == 0, i.e., in child
 
+            FILE *fptr;
+            fptr = fopen("/tmp/httpreqr.pid", "w");
+            if (fptr){
+                fprintf(fptr, "%d", getpid());
+                fclose(fptr);
+            }
+
+
             /* Child process. Close descriptors and run free. */
             debug_print(("\t\t\tlaunch cnt = %d Child pid == %d, but current pid = %d\n", claunch_cnt, child_pid, getpid()));
             fflush(stdout);
