@@ -13,7 +13,7 @@ function checkString($string, $funcname, $vuln) {
     }
 }
 
-$vulns = ["SQLi"=>0, "SSRF"=>0, "FileUpload"=>0, "FileDownload"=>0, "FileDeletion"=>0];
+$vulns = ["SQLi"=>1, "SSRF"=>1, "FileUpload"=>1, "FileDownload"=>1, "FileDeletion"=>1];
 
 # MySQL
 uopz_set_hook('mysqli_query', function ($mysql, $query) {
