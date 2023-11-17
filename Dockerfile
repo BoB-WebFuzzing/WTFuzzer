@@ -40,6 +40,29 @@ ENV AFL_PATH=/afl
 
 COPY wclibs /wclibs
 
+##################### APACHE INSTALL ##########################
+
+RUN wget https://dlcdn.apache.org/httpd/httpd-2.4.58.tar.gz
+RUN tar zxvf httpd-2.4.58.tar.gz
+
+RUN wget https://dlcdn.apache.org//apr/apr-1.7.4.tar.gz
+RUN tar zxvf apr-1.7.4.tar.gz
+RUN mv apr-1.7.4 httpd-2.4.58/srclib/apr
+
+RUN wget https://dlcdn.apache.org//apr/apr-util-1.6.3.tar.gz
+RUN tar zxvf apr-util-1.6.3.tar.gz
+RUN mv apr-util-1.6.3 httpd-2.4.58/srclib/apr-util
+
+ENV  CFLAGS="-DBIG_SECURITY_HOLE"
+RUN  cd httpd-2.4.58 && export CFLAGS && ./configure --prefix=/usr/local/apache \
+    --enable-rewrite=shared \
+    --enable-speling=shared \
+    --with-included-apr && make && make install
+
+COPY httpd.conf /usr/local/apache/conf/httpd.conf
+
+RUN mkdir /var/run/apache2 && chmod 777 -R /var/run/apache2
+
 ####################### LD_PRELOAD ######################
 COPY /wclibs/lib_db_fault_escalator.so /lib/lib_db_fault_escalator.so
 
@@ -53,7 +76,7 @@ RUN cd /phpsrc && ./buildconf --force
 
 RUN cd /phpsrc &&         \
         ./configure       \
-        --with-apxs2=/usr/bin/apxs \
+        --with-apxs2=/usr/local/apache/bin/apxs \
 		--enable-cgi      \
 		--enable-ftp      \
 		--enable-mbstring \
@@ -74,27 +97,12 @@ RUN cd /phpsrc \
 
 RUN cd /phpsrc && make install
 
-
-ENV APACHE_RUN_DIR=/etc/apache2/
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-
-
 RUN sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/my.cnf && \
   sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
 
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.* \
-    && rm -f /etc/apache2/mods-enabled/mpm_prefork.* \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf
-
 COPY config/supervisord.conf /etc/supervisord.conf
 COPY config/php.ini /usr/local/lib/php.ini
-COPY config/php.ini /etc/php/8.3/apache2/php.ini
-COPY config/php8.conf config/php8.load /etc/apache2/mods-available/
 
-RUN ln -f -s /etc/apache2/mods-available/php8.load /etc/apache2/mods-enabled/ && ln -f -s /etc/apache2/mods-available/php8.conf /etc/apache2/mods-enabled/
-
-RUN a2enmod rewrite
 RUN rm -fr /var/www/html && ln -s /app /var/www/html
 
 ### Composer install
@@ -111,15 +119,6 @@ RUN cd /xdebug && phpize && ./configure --enable-xdebug && make -j $(nproc) && m
 RUN git clone https://github.com/krakjoe/uopz.git
 
 RUN cd /uopz && phpize && ./configure --enable-uopz && make -j $(nproc) && make install
-
-
-# disable directory browsing in apache2
-RUN sed -i 's/Indexes//g' /etc/apache2/apache2.conf && \
-    echo "DirectoryIndex index.php index.phtml index.html index.htm" >> /etc/apache2/apache2.conf
-
-# add index
-COPY config/000-default.conf /etc/apache2/sites-available/
-
 
 RUN mkdir /home/tmp
 RUN chmod 777 -R /home/tmp
