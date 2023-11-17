@@ -449,6 +449,7 @@ char* insertString(const char* original, const char* insertion, size_t position)
     size_t originalLen = strlen(original);
     size_t insertionLen = strlen(insertion);
 
+
     char* result = (char*)malloc(originalLen + insertionLen + 1);
     if (result == NULL)
         exit(EXIT_FAILURE);
@@ -456,14 +457,14 @@ char* insertString(const char* original, const char* insertion, size_t position)
     memcpy(result, original, position);
     memcpy(result + position, insertion, insertionLen);
     memcpy(result + position + insertionLen, original + position, originalLen - position + 1);
-
     return result;
 }
 
 void mutateSQLI(char* value) {
+	
     int targetIndex = rand() % strlen(value);
     char* mutateSet[8] = {"\'", "\"", "\\", "#", "-- -", "--%20-", "%23", ""};
-    strcpy(value, insertString(value, mutateSet[rand() % 8], targetIndex));
+     strcpy(value, insertString(value, mutateSet[rand() % 8], targetIndex));
 }
 
 void mutateSSRF(char* value) {
@@ -621,7 +622,6 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         }
     }
 
-    printf("post : %s\n", post);
 
     if (strcmp(post, "")) {
         char* postToken = strdup(strtok(post, "&"));
@@ -650,18 +650,31 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
             getValue[i] = strdup(strtok(NULL, "="));
         }
     }
-
     for (int i = 0; i < postCount; i++) {
         if (postArray[i]) {
-            postKey[i] = strdup(strtok(postArray[i], "="));
-            postValue[i] = strdup(strtok(NULL, "="));
+	    char* tempKey = strdup(strtok(postArray[i], "="));
+	    char* tempValue = (strtok(NULL, "="));
+char blank[100] = "  ";
+	    if ((tempKey != NULL) && (tempValue != NULL)) {
+                postKey[i] = tempKey;
+                postValue[i] = tempValue;
+	    } else if ((tempKey != NULL) && (tempValue == NULL)) {
+		postKey[i] = tempKey;
+                postValue[i] = blank;
+	    } else if ((tempKey == NULL) && (tempValue != NULL)) {
+		postKey[i] = blank;
+                postValue[i] = tempValue;
+	    } else if ((tempKey == NULL) && (tempValue == NULL)) {
+		postKey[i] = blank;
+                postValue[i] = blank;
+	    }
+	    
         }
     }
 
 // Select vuln class
     switch (findIndex(vulns, 5, vuln)) {
         case 0:
-
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
                     mutateSQLI(getValue[i]);
@@ -669,6 +682,7 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
             }
             if (postCount) {
                 for (int i = 0; i < postCount; i++) {
+
                     mutateSQLI(postValue[i]);
                 }
             }
@@ -759,7 +773,6 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
             strcat(strcat(post, "&"), postArray[i]);
         }
     }
-
     if (strcmp(get, "") && strcmp(post, "")) {
         ret[0] = '\x00';
         strcat(ret + 1, get);
