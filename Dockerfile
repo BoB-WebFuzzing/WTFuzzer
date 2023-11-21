@@ -152,7 +152,7 @@ RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.3.linux-amd64.tar.gz
 ENV PATH=$PATH:/usr/local/go/bin
 
 RUN git clone https://github.com/BoB-WebFuzzing/fuzzer.git && cd /fuzzer && make
-RUN git clone https://github.com/shirohacker/crawlergo.git && cd /crawlergo && make build
+RUN git clone https://github.com/BoB-WebFuzzing/WTF-crawlergo.git && cd /WTF-crawlergo && make build
 
 ######## DASH ######
 
