@@ -3813,12 +3813,12 @@ keep_as_crash:
 
 #ifndef SIMPLE_FILES
 
-      fn = alloc_printf("%s/crashes/id:%06llu,sig:%02u,%s", out_dir,
+      fn = alloc_printf("%s/crashes/vuln:%s,id:%06llu,sig:%02u,%s", out_dir,stage_name,
                         unique_crashes, kill_signal, describe_op(0));
 
 #else
       
-      fn = alloc_printf("%s/crashes/id_%06llu_%02u", out_dir, unique_crashes,
+      fn = alloc_printf("%s/crashes/vuln:%s,id_%06llu_%02u", out_dir,stage_name, unique_crashes,
                         kill_signal);
 
 #endif /* ^!SIMPLE_FILES */
@@ -5966,6 +5966,7 @@ skip_interest:
     i++;
   }
   const char* svuln = randomSelection(vulnsMap);
+  stage_name = svuln;
 
   char buffer[1 * 1024 * 1024];
   char * mutatedSeed;
