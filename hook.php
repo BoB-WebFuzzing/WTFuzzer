@@ -1,15 +1,21 @@
 <?php
-function checkString($string, $funcname, $vuln) {
+function checkString($string, $funcname, ...$vulnsArray) {
     global $vulns;
-    if (str_contains($string, "WTFTEST")) {
-        $vulns[$vuln]++;
 
-        $path = $_SERVER['PHP_SELF'];
-        $fp = fopen("/home/tmp/".substr(str_replace('/', '+', $path), 1, strlen($path) - 4)."txt", 'a+');
-        fwrite($fp, $funcname." : ".$string.chr(13).chr(10));
-        fwrite($fp, "[[[".$vuln." : ".$vulns[$vuln]."]]]".chr(13).chr(10));
-        fclose($fp);
-        $checker = new CheckerClass();
+    if (str_contains($_COOKIE['checkFuzz'], "true")) {
+        if (str_contains($string, "WTFTEST")) {
+            $path = $_SERVER['PHP_SELF'];
+            $fp = fopen("/home/tmp/".substr(str_replace('/', '+', $path), 1, strlen($path) - 4)."txt", 'a+');
+            fwrite($fp, $funcname." : ".$string.chr(13).chr(10));
+            
+            foreach ($vulnsArray as $vuln) {
+                $vulns[$vuln]++;
+                fwrite($fp, "\e[1;31m[[[".$vuln." : ".$vulns[$vuln]."]]]\e[0m".chr(13).chr(10));
+            }
+
+            fclose($fp);
+            $checker = new CheckerClass();
+        }
     }
 }
 
@@ -80,11 +86,11 @@ uopz_set_hook('file_get_contents', function ($filename) {
 uopz_set_hook('curl_exec', function () {});
 
 uopz_set_hook('fopen', function ($filename, $mode) {
-    checkString($filename, "fopen", "SSRF");
+    checkString($filename, "fopen", "SSRF", "FileUpload");
 });
 
 uopz_set_hook('file', function ($filename) {
-    checkString($filename, "file", "SSRF");
+    checkString($filename, "file", "SSRF", "FileUpload");
 });
 
 # File Upload
@@ -139,5 +145,3 @@ class CheckerClass {
     }
 }
 ?>
-
-
