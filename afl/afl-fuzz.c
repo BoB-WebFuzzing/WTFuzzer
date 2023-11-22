@@ -3315,6 +3315,30 @@ static void perform_dry_run(char** argv) {
           q->cal_failed = CAL_CHANCES;
           cal_failures++;
           break;
+        }else{
+
+          FILE* qfn = fopen(q->fname,"rb");
+          char * buffer = ck_alloc(1*1024*1024);
+          u8 * save_fn;
+          s32 save_fd;
+
+          save_fn = alloc_printf("%s/crashes/%s", out_dir, fn);
+          save_fd = open(save_fn, O_WRONLY | O_CREAT | O_EXCL, 0600);
+          if (save_fd < 0) PFATAL("Unable to create Seed crash file '%s'", fn);
+
+          if (qfn != NULL){
+
+            int buf_size = fread(buffer, 1, (1 * 1024 * 1024), qfn);
+
+
+            ck_write(save_fd, buffer, buf_size, save_fn);
+
+          }
+
+          close(save_fd);
+          fclose(qfn);
+          ck_free(buffer);
+          ck_free(save_fn);
         }
 
         if (mem_limit) {
