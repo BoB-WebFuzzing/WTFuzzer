@@ -468,7 +468,7 @@ void mutateSQLI(char* value) {
 }
 
 void mutateSSRF(char* value) {
-    char* mutateSet[3] = {"http://localhost", "http://127.0.0.1", "file:///etc/passwd"};
+    char* mutateSet[3] = {"http://localhost:5000", "http://127.0.0.1:5000", "file:///etc/passwd"};
     // strcpy(value, insertString(value, mutateSet[rand() % 3], targetIndex));
     strcpy(value, mutateSet[rand() % 3]);
 }
