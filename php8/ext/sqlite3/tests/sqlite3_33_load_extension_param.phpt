@@ -20,10 +20,10 @@ $db = new SQLite3(':memory:');
 
 try {
   $db->loadExtension("");
-} catch (\Throwable $ex) {
+} catch (Extension $ex) {
   var_dump($ex->getMessage());
 }
 
 ?>
 --EXPECTF--
-string(61) "SQLite3::loadExtension(): Argument #1 ($name) cannot be empty"
+Warning: SQLite3::loadExtension(): Empty string as an extension in %s on line %d

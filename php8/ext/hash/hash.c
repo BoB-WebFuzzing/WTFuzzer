@@ -1123,12 +1123,12 @@ PHP_FUNCTION(hash_equals)
 
 	/* We only allow comparing string to prevent unexpected results. */
 	if (Z_TYPE_P(known_zval) != IS_STRING) {
-		zend_argument_type_error(1, "must be of type string, %s given", zend_zval_value_name(known_zval));
+		zend_argument_type_error(1, "must be of type string, %s given", zend_zval_type_name(known_zval));
 		RETURN_THROWS();
 	}
 
 	if (Z_TYPE_P(user_zval) != IS_STRING) {
-		zend_argument_type_error(2, "must be of type string, %s given", zend_zval_value_name(user_zval));
+		zend_argument_type_error(2, "must be of type string, %s given", zend_zval_type_name(user_zval));
 		RETURN_THROWS();
 	}
 
@@ -1190,7 +1190,7 @@ static void mhash_init(INIT_FUNC_ARGS)
 		}
 
 		len = slprintf(buf, 127, "MHASH_%s", algorithm.mhash_name);
-		zend_register_long_constant(buf, len, algorithm.value, CONST_PERSISTENT, module_number);
+		zend_register_long_constant(buf, len, algorithm.value, CONST_CS | CONST_PERSISTENT, module_number);
 	}
 
 	/* TODO: this cause #69823 zend_register_internal_module(&mhash_module_entry); */

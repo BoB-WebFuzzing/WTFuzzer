@@ -23,16 +23,7 @@ class foo2 extends foo {
 $f1 = new foo;
 $f2 = new foo2;
 
-set_error_handler(function ($severity, $message, $file, $line) {
-    throw new Exception($message);
-});
-try {
-    $f1->bar();
-} catch (Exception $e) {
-    echo $e->getMessage() . "\n";
-}
-set_error_handler(null);
-
+$f1->bar();
 $f2->bar();
 
 try {
@@ -53,10 +44,8 @@ $f1->testNull();
 
 echo "Done\n";
 ?>
---EXPECTF--
-Calling get_class() without arguments is deprecated
-
-Deprecated: Calling get_class() without arguments is deprecated in %s on line %d
+--EXPECT--
+string(3) "foo"
 string(3) "foo"
 get_class() without arguments must be called from within a class
 get_class(): Argument #1 ($object) must be of type object, string given

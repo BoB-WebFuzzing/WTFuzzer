@@ -1,9 +1,9 @@
 --TEST--
-Test new DateTimeZone(): Too few arguments
+Test new DateTimeZone() : error conditions
 --FILE--
 <?php
-// Set the default time zone
-date_default_timezone_set("UTC");
+//Set the default time zone
+date_default_timezone_set("GMT");
 
 echo "*** Testing DateTimeZone() : error conditions ***\n";
 
@@ -12,8 +12,8 @@ $timezone = "GMT";
 $extra_arg = 99;
 try {
     new DateTimeZone($timezone, $extra_arg);
-} catch (ArgumentCountError $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+} catch (TypeError $e) {
+    echo $e->getMessage(), "\n";
 }
 
 ?>
@@ -21,4 +21,4 @@ try {
 *** Testing DateTimeZone() : error conditions ***
 
 -- Testing new DateTimeZone() with more than expected no. of arguments --
-ArgumentCountError: DateTimeZone::__construct() expects exactly 1 argument, 2 given
+DateTimeZone::__construct() expects exactly 1 argument, 2 given

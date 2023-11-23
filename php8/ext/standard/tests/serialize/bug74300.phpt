@@ -10,5 +10,5 @@ var_dump(unserialize('d:2e++2;'));
 --EXPECTF--
 float(200)
 
-Warning: unserialize(): Error at offset 0 of 8 bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of 8 bytes in %s on line %d
 bool(false)

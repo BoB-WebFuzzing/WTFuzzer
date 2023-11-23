@@ -2,14 +2,10 @@
 Test ROWID bind
 --EXTENSIONS--
 oci8
---SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__."/connect.inc");
 
 function do_query($c)
 {

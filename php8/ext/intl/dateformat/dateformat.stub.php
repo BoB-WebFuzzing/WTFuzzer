@@ -50,11 +50,6 @@ class IntlDateFormatter
      * @cvalue UDAT_SHORT_RELATIVE
      */
     public const RELATIVE_SHORT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UDAT_PATTERN
-     */
-    public const PATTERN = UNKNOWN;
 
     /**
      * @var int
@@ -141,7 +136,7 @@ class IntlDateFormatter
      * @tentative-return-type
      * @alias datefmt_set_timezone
      */
-    public function setTimeZone($timezone): bool {}
+    public function setTimeZone($timezone): ?bool {} // TODO return true on success
 
     /**
      * @tentative-return-type

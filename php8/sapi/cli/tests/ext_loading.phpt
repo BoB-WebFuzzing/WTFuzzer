@@ -10,6 +10,7 @@ if (!file_exists($extDir . '/opcache.so') && !file_exists($extDir . '/php_opcach
 --FILE--
 <?php
 
+
 function loadZendExt($extension) {
     $cmd = [
         PHP_BINARY, '-n',
@@ -18,7 +19,7 @@ function loadZendExt($extension) {
         '-r', 'echo "Done.";'
     ];
     $proc = proc_open($cmd, [['null'], ['pipe', 'w'], ['redirect', 1]], $pipes);
-    echo "#####OUTPUT_BEGIN####\n", stream_get_contents($pipes[1]), "\n######OUTPUT_END#####\n";
+    echo "Output: ", stream_get_contents($pipes[1]), "\n";
 }
 
 echo "Only extension name:\n";
@@ -46,31 +47,19 @@ loadZendExt($path);
 ?>
 --EXPECTF--
 Only extension name:
-#####OUTPUT_BEGIN####
-Done.
-######OUTPUT_END#####
+Output: Done.
 Name with file extension:
-#####OUTPUT_BEGIN####
-Done.
-######OUTPUT_END#####
+Output: Done.
 Absolute path:
-#####OUTPUT_BEGIN####
-Done.
-######OUTPUT_END#####
+Output: Done.
 Unknown extension name (unknown):
-#####OUTPUT_BEGIN####
-
+Output: 
 Warning: Failed loading Zend extension 'unknown_ext' (tried: %s) in Unknown on line 0
 Done.
-######OUTPUT_END#####
 Name with file extension (unknown):
-#####OUTPUT_BEGIN####
-
+Output: 
 Warning: Failed loading Zend extension '%Sunknown_ext%S' (tried: %s) in Unknown on line 0
 Done.
-######OUTPUT_END#####
 Absolute path (unknown):
-#####OUTPUT_BEGIN####
-Failed loading %s
+Output: Failed loading %s
 Done.
-######OUTPUT_END#####

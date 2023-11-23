@@ -7,16 +7,14 @@ mysqlnd.collect_memory_statistics="1"
 mysqli
 --SKIPIF--
 <?PHP
-require_once 'skipifconnectfailure.inc';
+require_once('skipifconnectfailure.inc');
 if (!function_exists('mysqli_get_connection_stats')) {
     die("skip only available with mysqlnd");
 }
 ?>
 --FILE--
 <?php
-    // Use the operations performed in table.inc to create some traffic on the connection
-    // so that we can collect some statistics.
-    require 'table.inc';
+    require("table.inc");
 
     if (!is_array($info = mysqli_get_connection_stats($link)) || empty($info))
         printf("[003] Expecting array/any_non_empty, got %s/%s\n", gettype($info), $info);
@@ -57,7 +55,7 @@ if (!function_exists('mysqli_get_connection_stats')) {
     }
 
     mysqli_close($link);
-    require 'table.inc';
+    require("table.inc");
 
     if (!is_array($info = mysqli_get_connection_stats($link)) || empty($info))
         printf("[008] Expecting array/any_non_empty, got %s/%s\n", gettype($info), $info);
@@ -76,7 +74,7 @@ if (!function_exists('mysqli_get_connection_stats')) {
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 done!

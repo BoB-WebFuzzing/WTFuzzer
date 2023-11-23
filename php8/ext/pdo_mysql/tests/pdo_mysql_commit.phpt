@@ -85,7 +85,6 @@ if (false == MySQLPDOTest::detect_transactional_mysql_engine($db))
     }
 
     print "done!";
-?>
 --CLEAN--
 <?php
 require __DIR__ . '/mysql_pdo_test.inc';

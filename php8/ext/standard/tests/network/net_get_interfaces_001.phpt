@@ -3,7 +3,6 @@ net_get_interfaces IPv4 Loopback
 --SKIPIF--
 <?php
 function_exists('net_get_interfaces') || print 'skip';
-?>
 --FILE--
 <?php
 

@@ -55,6 +55,6 @@ int cdb_make_addbegin(struct cdb_make *, unsigned int, unsigned int);
 int cdb_make_addend(struct cdb_make *, unsigned int, unsigned int, uint32);
 int cdb_make_add(struct cdb_make *, char *, unsigned int, char *, unsigned int);
 int cdb_make_finish(struct cdb_make *);
-const char *cdb_make_version(void);
+char *cdb_make_version(void);
 
 #endif

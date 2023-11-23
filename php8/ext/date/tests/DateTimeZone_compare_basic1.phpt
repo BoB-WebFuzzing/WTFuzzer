@@ -14,11 +14,7 @@ foreach ($timezones as [$timezone1, $timezone2]) {
     compare_timezones($timezone1, $timezone2);
 }
 
-try {
-	var_dump(new DateTimeZone('Europe/Berlin') == new DateTimeZone('CET'));
-} catch (DateException $e) {
-	echo $e::class, ': ', $e->getMessage(), "\n";
-}
+var_dump(new DateTimeZone('Europe/Berlin') == new DateTimeZone('CET'));
 
 function compare_timezones($timezone1, $timezone2)
 {
@@ -45,7 +41,7 @@ $tz2 = new MyDateTimeZone();
 try {
     var_dump($tz1 == $tz2);
 } catch (Error $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage(), "\n";
 }
 
 ?>
@@ -74,5 +70,7 @@ compare Europe/Amsterdam with Europe/Berlin
 < bool(false)
 = bool(false)
 > bool(false)
-DateException: Cannot compare two different kinds of DateTimeZone objects
-DateObjectError: Trying to compare uninitialized DateTimeZone objects
+
+Warning: main(): Trying to compare different kinds of DateTimeZone objects in %s on line %d
+bool(false)
+Trying to compare uninitialized DateTimeZone objects

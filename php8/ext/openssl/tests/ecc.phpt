@@ -74,8 +74,7 @@ var_dump($csr);
 $pubkey1 = openssl_pkey_get_details(openssl_csr_get_public_key($csr));
 var_dump(isset($pubkey1["ec"]["priv_key"]));
 unset($d1["ec"]["priv_key"]);
-$diff = array_diff($d1["ec"], $pubkey1["ec"]);
-var_dump(isset($diff["d"]) && is_string($diff["d"]) && strlen($diff["d"]) > 0);
+var_dump(array_diff($d1["ec"], $pubkey1["ec"]));
 
 $x509 = openssl_csr_sign($csr, null, $key1, 365, $args);
 var_dump($x509);
@@ -122,7 +121,10 @@ Testing openssl_csr_new with existing ecc key
 object(OpenSSLCertificateSigningRequest)#%d (0) {
 }
 bool(false)
-bool(true)
+array(1) {
+  ["d"]=>
+  string(%d) "%a"
+}
 object(OpenSSLCertificate)#%d (0) {
 }
 Testing openssl_x509_check_private_key

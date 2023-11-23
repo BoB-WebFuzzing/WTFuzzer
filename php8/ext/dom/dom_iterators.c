@@ -38,7 +38,6 @@ struct _notationIterator {
 	xmlNotation *notation;
 };
 
-/* Function pointer typedef changed in 2.9.8, see https://github.com/GNOME/libxml2/commit/e03f0a199a67017b2f8052354cf732b2b4cae787 */
 #if LIBXML_VERSION >= 20908
 static void itemHashScanner (void *payload, void *data, const xmlChar *name) /* {{{ */
 #else
@@ -180,7 +179,7 @@ static void php_dom_iterator_move_forward(zend_object_iterator *iter) /* {{{ */
 	dom_object *intern;
 	dom_object *nnmap;
 	dom_nnodemap_object *objmap;
-	int previndex;
+	int previndex=0;
 	HashTable *nodeht;
 	zval *entry;
 	bool do_curobj_undef = 1;
@@ -206,31 +205,23 @@ static void php_dom_iterator_move_forward(zend_object_iterator *iter) /* {{{ */
 					do_curobj_undef = 0;
 				}
 			} else {
+				curnode = (xmlNodePtr)((php_libxml_node_ptr *)intern->ptr)->node;
 				if (objmap->nodetype == XML_ATTRIBUTE_NODE ||
 					objmap->nodetype == XML_ELEMENT_NODE) {
-					curnode = (xmlNodePtr)((php_libxml_node_ptr *)intern->ptr)->node;
 					curnode = curnode->next;
 				} else {
-					/* The collection is live, we nav the tree from the base object if we cannot
-					 * use the cache to restart from the last point. */
+					/* Nav the tree evey time as this is LIVE */
 					basenode = dom_object_get_node(objmap->baseobj);
-					if (UNEXPECTED(!basenode)) {
+					if (basenode && (basenode->type == XML_DOCUMENT_NODE ||
+						basenode->type == XML_HTML_DOCUMENT_NODE)) {
+						basenode = xmlDocGetRootElement((xmlDoc *) basenode);
+					} else if (basenode) {
+						basenode = basenode->children;
+					} else {
 						goto err;
 					}
-					if (php_dom_is_cache_tag_stale_from_node(&iterator->cache_tag, basenode)) {
-						php_dom_mark_cache_tag_up_to_date_from_node(&iterator->cache_tag, basenode);
-						previndex = 0;
-						if (basenode->type == XML_DOCUMENT_NODE || basenode->type == XML_HTML_DOCUMENT_NODE) {
-							curnode = xmlDocGetRootElement((xmlDoc *) basenode);
-						} else {
-							curnode = basenode->children;
-						}
-					} else {
-						previndex = iter->index - 1;
-						curnode = (xmlNodePtr)((php_libxml_node_ptr *)intern->ptr)->node;
-					}
 					curnode = dom_get_elements_by_tag_name_ns_raw(
-						basenode, curnode, (char *) objmap->ns, (char *) objmap->local, &previndex, iter->index);
+						basenode, (char *) objmap->ns, (char *) objmap->local, &previndex, iter->index);
 				}
 			}
 		} else {
@@ -267,7 +258,7 @@ zend_object_iterator *php_dom_get_iterator(zend_class_entry *ce, zval *object, i
 {
 	dom_object *intern;
 	dom_nnodemap_object *objmap;
-	xmlNodePtr curnode=NULL;
+	xmlNodePtr nodep, curnode=NULL;
 	int curindex = 0;
 	HashTable *nodeht;
 	zval *entry;
@@ -279,7 +270,6 @@ zend_object_iterator *php_dom_get_iterator(zend_class_entry *ce, zval *object, i
 	}
 	iterator = emalloc(sizeof(php_dom_iterator));
 	zend_iterator_init(&iterator->intern);
-	iterator->cache_tag.modification_nr = 0;
 
 	ZVAL_OBJ_COPY(&iterator->intern.data, Z_OBJ_P(object));
 	iterator->intern.funcs = &php_dom_iterator_funcs;
@@ -298,25 +288,24 @@ zend_object_iterator *php_dom_get_iterator(zend_class_entry *ce, zval *object, i
 					ZVAL_COPY(&iterator->curobj, entry);
 				}
 			} else {
-				xmlNodePtr basep = (xmlNode *)dom_object_get_node(objmap->baseobj);
-				if (!basep) {
+				nodep = (xmlNode *)dom_object_get_node(objmap->baseobj);
+				if (!nodep) {
 					goto err;
 				}
 				if (objmap->nodetype == XML_ATTRIBUTE_NODE || objmap->nodetype == XML_ELEMENT_NODE) {
 					if (objmap->nodetype == XML_ATTRIBUTE_NODE) {
-						curnode = (xmlNodePtr) basep->properties;
+						curnode = (xmlNodePtr) nodep->properties;
 					} else {
-						curnode = (xmlNodePtr) basep->children;
+						curnode = (xmlNodePtr) nodep->children;
 					}
 				} else {
-					xmlNodePtr nodep = basep;
 					if (nodep->type == XML_DOCUMENT_NODE || nodep->type == XML_HTML_DOCUMENT_NODE) {
 						nodep = xmlDocGetRootElement((xmlDoc *) nodep);
 					} else {
 						nodep = nodep->children;
 					}
 					curnode = dom_get_elements_by_tag_name_ns_raw(
-						basep, nodep, (char *) objmap->ns, (char *) objmap->local, &curindex, 0);
+						nodep, (char *) objmap->ns, (char *) objmap->local, &curindex, 0);
 				}
 			}
 		} else {

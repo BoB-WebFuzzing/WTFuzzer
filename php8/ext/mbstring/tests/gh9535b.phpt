@@ -1,9 +1,16 @@
 --TEST--
-Test output of mb_strcut for text encodings which use escape sequences
+Output of mb_strcut covers requested range of bytes even when output contains ending escape sequences
 --EXTENSIONS--
 mbstring
 --FILE--
 <?php
+// The existing behavior of mb_strcut is wrong for these encodings, when they add an extra closing
+// escape sequence to a string which would otherwise end in a non-default conversion mode
+// See https://github.com/php/php-src/pull/9562 for details on the bug
+
+// These tests were developed when fixing a different bug, but they don't pass because of
+// the bug involving the added closing escape sequences
+// When that bug is fixed, we can remove XFAIL (or combine this file with gh9535.phpt)
 
 $encodings = [
     'JIS',
@@ -71,14 +78,16 @@ foreach($encodings as $encoding) {
 }
 
 ?>
+--XFAIL--
+Discussion: https://github.com/php/php-src/pull/9562
 --EXPECTF--
-JIS: 宛如繁星
-ISO-2022-JP: 宛如繁星
+JIS: 宛如繁星般
+ISO-2022-JP: 宛如繁星般
 ISO-2022-JP-2004: 宛如繁星
 
 JIS: 星のように月の
 ISO-2022-JP: 星のように月の
-ISO-2022-JP-2004: 星のように月
+ISO-2022-JP-2004: 星のように月の
 
 JIS: あa
 ISO-2022-JP: あa

@@ -3,13 +3,7 @@ Bug #44618 (Fetching may rely on uninitialized data)
 --EXTENSIONS--
 odbc
 --SKIPIF--
-<?php
-include 'skipif.inc';
-
-if (ODBC_TYPE === "unixODBC") {
-    die("skip Fails with unixODBC");
-}
-?>
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 include __DIR__ . "/config.inc";

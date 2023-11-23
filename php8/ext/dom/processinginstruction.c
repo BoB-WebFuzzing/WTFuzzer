@@ -70,7 +70,7 @@ readonly=yes
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#ID-1478689192
 Since:
 */
-zend_result dom_processinginstruction_target_read(dom_object *obj, zval *retval)
+int dom_processinginstruction_target_read(dom_object *obj, zval *retval)
 {
 	xmlNodePtr nodep = dom_object_get_node(obj);
 
@@ -91,35 +91,46 @@ readonly=no
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#ID-837822393
 Since:
 */
-zend_result dom_processinginstruction_data_read(dom_object *obj, zval *retval)
+int dom_processinginstruction_data_read(dom_object *obj, zval *retval)
 {
-	xmlNodePtr nodep = dom_object_get_node(obj);
+	xmlNodePtr nodep;
+	xmlChar *content;
+
+	nodep = dom_object_get_node(obj);
 
 	if (nodep == NULL) {
 		php_dom_throw_error(INVALID_STATE_ERR, 1);
 		return FAILURE;
 	}
 
-	php_dom_get_content_into_zval(nodep, retval, false);
+	if ((content = xmlNodeGetContent(nodep)) != NULL) {
+		ZVAL_STRING(retval, (char *) content);
+		xmlFree(content);
+	} else {
+		ZVAL_EMPTY_STRING(retval);
+	}
 
 	return SUCCESS;
 }
 
-zend_result dom_processinginstruction_data_write(dom_object *obj, zval *newval)
+int dom_processinginstruction_data_write(dom_object *obj, zval *newval)
 {
 	xmlNode *nodep = dom_object_get_node(obj);
+	zend_string *str;
 
 	if (nodep == NULL) {
 		php_dom_throw_error(INVALID_STATE_ERR, 1);
 		return FAILURE;
 	}
 
-	/* Typed property, this is already a string */
-	ZEND_ASSERT(Z_TYPE_P(newval) == IS_STRING);
-	zend_string *str = Z_STR_P(newval);
+	str = zval_try_get_string(newval);
+	if (UNEXPECTED(!str)) {
+		return FAILURE;
+	}
 
-	xmlNodeSetContentLen(nodep, (xmlChar *) ZSTR_VAL(str), ZSTR_LEN(str));
+	xmlNodeSetContentLen(nodep, (xmlChar *) ZSTR_VAL(str), ZSTR_LEN(str) + 1);
 
+	zend_string_release_ex(str, 0);
 	return SUCCESS;
 }
 

@@ -6,7 +6,6 @@ intl
 <?php
 if (!class_exists('Spoofchecker'))
         die('skip intl extension does not have spoof checker');
-?>
 --FILE--
 <?php
 class A extends IntlDateFormatter {

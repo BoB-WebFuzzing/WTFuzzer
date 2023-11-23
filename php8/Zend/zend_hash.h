@@ -21,9 +21,7 @@
 #ifndef ZEND_HASH_H
 #define ZEND_HASH_H
 
-#include "zend_types.h"
-#include "zend_gc.h"
-#include "zend_string.h"
+#include "zend.h"
 #include "zend_sort.h"
 
 #define HASH_KEY_IS_STRING 1
@@ -194,7 +192,7 @@ static zend_always_inline zval *zend_hash_find_ex(const HashTable *ht, zend_stri
 }
 
 #define ZEND_HASH_INDEX_FIND(_ht, _h, _ret, _not_found) do { \
-		if (EXPECTED(HT_IS_PACKED(_ht))) { \
+		if (EXPECTED(HT_FLAGS(_ht) & HASH_FLAG_PACKED)) { \
 			if (EXPECTED((zend_ulong)(_h) < (zend_ulong)(_ht)->nNumUsed)) { \
 				_ret = &_ht->arPacked[_h]; \
 				if (UNEXPECTED(Z_TYPE_P(_ret) == IS_UNDEF)) { \
@@ -217,7 +215,7 @@ ZEND_API zval* ZEND_FASTCALL zend_hash_lookup(HashTable *ht, zend_string *key);
 ZEND_API zval* ZEND_FASTCALL zend_hash_index_lookup(HashTable *ht, zend_ulong h);
 
 #define ZEND_HASH_INDEX_LOOKUP(_ht, _h, _ret) do { \
-		if (EXPECTED(HT_IS_PACKED(_ht))) { \
+		if (EXPECTED(HT_FLAGS(_ht) & HASH_FLAG_PACKED)) { \
 			if (EXPECTED((zend_ulong)(_h) < (zend_ulong)(_ht)->nNumUsed)) { \
 				_ret = &_ht->arPacked[_h]; \
 				if (EXPECTED(Z_TYPE_P(_ret) != IS_UNDEF)) { \
@@ -300,7 +298,7 @@ ZEND_API int   zend_hash_compare(HashTable *ht1, HashTable *ht2, compare_func_t 
 ZEND_API void  ZEND_FASTCALL zend_hash_sort_ex(HashTable *ht, sort_func_t sort_func, bucket_compare_func_t compare_func, bool renumber);
 ZEND_API zval* ZEND_FASTCALL zend_hash_minmax(const HashTable *ht, compare_func_t compar, uint32_t flag);
 
-static zend_always_inline void ZEND_FASTCALL zend_hash_sort(HashTable *ht, bucket_compare_func_t compare_func, bool renumber) {
+static zend_always_inline void ZEND_FASTCALL zend_hash_sort(HashTable *ht, bucket_compare_func_t compare_func, zend_bool renumber) {
 	zend_hash_sort_ex(ht, zend_sort, compare_func, renumber);
 }
 
@@ -998,7 +996,7 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 	((zval*)(((char*)(_el)) - (_size)))
 
 #define _ZEND_HASH_FOREACH_VAL(_ht) do { \
-		const HashTable *__ht = (_ht); \
+		HashTable *__ht = (_ht); \
 		uint32_t _count = __ht->nNumUsed; \
 		size_t _size = ZEND_HASH_ELEMENT_SIZE(__ht); \
 		zval *_z = __ht->arPacked; \
@@ -1006,7 +1004,7 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 			if (UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF)) continue;
 
 #define _ZEND_HASH_REVERSE_FOREACH_VAL(_ht) do { \
-		const HashTable *__ht = (_ht); \
+		HashTable *__ht = (_ht); \
 		uint32_t _idx = __ht->nNumUsed; \
 		size_t _size = ZEND_HASH_ELEMENT_SIZE(__ht); \
 		zval *_z = ZEND_HASH_ELEMENT_EX(__ht, _idx, _size); \
@@ -1015,7 +1013,7 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 			if (UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF)) continue;
 
 #define ZEND_HASH_FOREACH_FROM(_ht, indirect, _from) do { \
-		const HashTable *__ht = (_ht); \
+		HashTable *__ht = (_ht); \
 		zend_ulong __h; \
 		zend_string *__key = NULL; \
 		uint32_t _idx = (_from); \
@@ -1043,7 +1041,7 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 #define ZEND_HASH_FOREACH(_ht, indirect) ZEND_HASH_FOREACH_FROM(_ht, indirect, 0)
 
 #define ZEND_HASH_REVERSE_FOREACH(_ht, indirect) do { \
-		const HashTable *__ht = (_ht); \
+		HashTable *__ht = (_ht); \
 		uint32_t _idx = __ht->nNumUsed; \
 		zval *_z; \
 		zend_ulong __h; \
@@ -1232,9 +1230,9 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 
 /* Hash array iterators */
 #define ZEND_HASH_MAP_FOREACH_FROM(_ht, indirect, _from) do { \
-		const HashTable *__ht = (_ht); \
+		HashTable *__ht = (_ht); \
 		Bucket *_p = __ht->arData + (_from); \
-		const Bucket *_end = __ht->arData + __ht->nNumUsed; \
+		Bucket *_end = __ht->arData + __ht->nNumUsed; \
 		ZEND_ASSERT(!HT_IS_PACKED(__ht)); \
 		for (; _p != _end; _p++) { \
 			zval *_z = &_p->val; \
@@ -1246,7 +1244,7 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 #define ZEND_HASH_MAP_FOREACH(_ht, indirect) ZEND_HASH_MAP_FOREACH_FROM(_ht, indirect, 0)
 
 #define ZEND_HASH_MAP_REVERSE_FOREACH(_ht, indirect) do { \
-		/* const */ HashTable *__ht = (_ht); \
+		HashTable *__ht = (_ht); \
 		uint32_t _idx = __ht->nNumUsed; \
 		Bucket *_p = __ht->arData + _idx; \
 		zval *_z; \
@@ -1440,7 +1438,7 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 
 /* Packed array iterators */
 #define ZEND_HASH_PACKED_FOREACH_FROM(_ht, _from) do { \
-		const HashTable *__ht = (_ht); \
+		HashTable *__ht = (_ht); \
 		zend_ulong _idx = (_from); \
 		zval *_z = __ht->arPacked + (_from); \
 		zval *_end = __ht->arPacked + __ht->nNumUsed; \
@@ -1452,7 +1450,7 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 #define ZEND_HASH_PACKED_FOREACH(_ht) ZEND_HASH_PACKED_FOREACH_FROM(_ht, 0)
 
 #define ZEND_HASH_PACKED_REVERSE_FOREACH(_ht) do { \
-		const HashTable *__ht = (_ht); \
+		HashTable *__ht = (_ht); \
 		zend_ulong _idx = __ht->nNumUsed; \
 		zval *_z = __ht->arPacked + _idx; \
 		ZEND_ASSERT(HT_IS_PACKED(__ht)); \
@@ -1515,12 +1513,12 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 		HashTable *__fill_ht = (ht); \
 		zval *__fill_val = __fill_ht->arPacked + __fill_ht->nNumUsed; \
 		uint32_t __fill_idx = __fill_ht->nNumUsed; \
-		ZEND_ASSERT(HT_IS_PACKED(__fill_ht));
+		ZEND_ASSERT(HT_FLAGS(__fill_ht) & HASH_FLAG_PACKED);
 
 #define ZEND_HASH_FILL_GROW() do { \
 		if (UNEXPECTED(__fill_idx >= __fill_ht->nTableSize)) { \
-			__fill_ht->nNumOfElements += __fill_idx - __fill_ht->nNumUsed; \
 			__fill_ht->nNumUsed = __fill_idx; \
+			__fill_ht->nNumOfElements = __fill_idx; \
 			__fill_ht->nNextFreeElement = __fill_idx; \
 			zend_hash_packed_grow(__fill_ht); \
 			__fill_val = __fill_ht->arPacked + __fill_idx; \
@@ -1559,8 +1557,8 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(HashTable *ht,
 	} while (0)
 
 #define ZEND_HASH_FILL_FINISH() do { \
-		__fill_ht->nNumOfElements += __fill_idx - __fill_ht->nNumUsed; \
 		__fill_ht->nNumUsed = __fill_idx; \
+		__fill_ht->nNumOfElements = __fill_idx; \
 		__fill_ht->nNextFreeElement = __fill_idx; \
 		__fill_ht->nInternalPointer = 0; \
 	} while (0)

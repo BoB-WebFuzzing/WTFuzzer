@@ -3552,7 +3552,7 @@ static void parse(void) {
 	}
 }
 
-zend_result zend_ffi_parse_decl(const char *str, size_t len) {
+int zend_ffi_parse_decl(const char *str, size_t len) {
 	if (SETJMP(FFI_G(bailout))==0) {
 		FFI_G(allow_vla) = 0;
 		FFI_G(attribute_parsing) = 0;
@@ -3565,7 +3565,7 @@ zend_result zend_ffi_parse_decl(const char *str, size_t len) {
 	}
 }
 
-zend_result zend_ffi_parse_type(const char *str, size_t len, zend_ffi_dcl *dcl) {
+int zend_ffi_parse_type(const char *str, size_t len, zend_ffi_dcl *dcl) {
 	int sym;
 
 	if (SETJMP(FFI_G(bailout))==0) {

@@ -36,7 +36,6 @@ foreach ($tests as $setting) {
     var_dump(zend_test_zend_ini_parse_quantity($setting));
     print "\n";
 }
-?>
 --EXPECTF--
 # "K"
 

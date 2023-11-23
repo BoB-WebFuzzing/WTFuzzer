@@ -76,16 +76,8 @@
 
 ZEND_DECLARE_MODULE_GLOBALS(sockets)
 
-#define SUN_LEN_NO_UB(su) (sizeof(*(su)) - sizeof((su)->sun_path) + strlen((su)->sun_path))
-/* The SUN_LEN macro does pointer arithmetics on NULL which triggers errors in the Clang UBSAN build */
-#ifdef __has_feature
-# if __has_feature(undefined_behavior_sanitizer)
-#  undef SUN_LEN
-#  define SUN_LEN(su) SUN_LEN_NO_UB(su)
-# endif
-#endif
 #ifndef SUN_LEN
-# define SUN_LEN(su) SUN_LEN_NO_UB(su)
+#define SUN_LEN(su) (sizeof(*(su)) - sizeof((su)->sun_path) + strlen((su)->sun_path))
 #endif
 
 #ifndef PF_INET
@@ -109,6 +101,7 @@ static zend_object *socket_create_object(zend_class_entry *class_type) {
 
 	zend_object_std_init(&intern->std, class_type);
 	object_properties_init(&intern->std, class_type);
+	intern->std.handlers = &socket_object_handlers;
 
 	intern->bsd_socket = -1; /* invalid socket */
 	intern->type		 = PF_UNSPEC;
@@ -170,6 +163,7 @@ static zend_object *address_info_create_object(zend_class_entry *class_type) {
 
 	zend_object_std_init(&intern->std, class_type);
 	object_properties_init(&intern->std, class_type);
+	intern->std.handlers = &address_info_object_handlers;
 
 	return &intern->std;
 }
@@ -223,7 +217,7 @@ ZEND_GET_MODULE(sockets)
 int inet_ntoa_lock = 0;
 #endif
 
-static bool php_open_listen_sock(php_socket *sock, int port, int backlog) /* {{{ */
+static int php_open_listen_sock(php_socket *sock, int port, int backlog) /* {{{ */
 {
 	struct sockaddr_in  la;
 	struct hostent		*hp;
@@ -266,7 +260,7 @@ static bool php_open_listen_sock(php_socket *sock, int port, int backlog) /* {{{
 }
 /* }}} */
 
-static bool php_accept_connect(php_socket *in_sock, php_socket *out_sock, struct sockaddr *la, socklen_t *la_len) /* {{{ */
+static int php_accept_connect(php_socket *in_sock, php_socket *out_sock, struct sockaddr *la, socklen_t *la_len) /* {{{ */
 {
 	out_sock->bsd_socket = accept(in_sock->bsd_socket, la, la_len);
 
@@ -434,7 +428,6 @@ static PHP_MINIT_FUNCTION(sockets)
 
 	socket_ce = register_class_Socket();
 	socket_ce->create_object = socket_create_object;
-	socket_ce->default_object_handlers = &socket_object_handlers;
 
 	memcpy(&socket_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	socket_object_handlers.offset = XtOffsetOf(php_socket, std);
@@ -446,7 +439,6 @@ static PHP_MINIT_FUNCTION(sockets)
 
 	address_info_ce = register_class_AddressInfo();
 	address_info_ce->create_object = address_info_create_object;
-	address_info_ce->default_object_handlers = &address_info_object_handlers;
 
 	memcpy(&address_info_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	address_info_object_handlers.offset = XtOffsetOf(php_addrinfo, std);
@@ -505,7 +497,7 @@ static int php_sock_array_to_fd_set(uint32_t arg_num, zval *sock_array, fd_set *
 		ZVAL_DEREF(element);
 
 		if (Z_TYPE_P(element) != IS_OBJECT || Z_OBJCE_P(element) != socket_ce) {
-			zend_argument_type_error(arg_num, "must only have elements of type Socket, %s given", zend_zval_value_name(element));
+			zend_argument_type_error(arg_num, "must only have elements of type Socket, %s given", zend_zval_type_name(element));
 			return -1;
 		}
 
@@ -526,13 +518,14 @@ static int php_sock_array_to_fd_set(uint32_t arg_num, zval *sock_array, fd_set *
 }
 /* }}} */
 
-static void php_sock_array_from_fd_set(zval *sock_array, fd_set *fds) /* {{{ */
+static int php_sock_array_from_fd_set(zval *sock_array, fd_set *fds) /* {{{ */
 {
 	zval		*element;
 	zval		*dest_element;
 	php_socket	*php_sock;
 	zval		new_hash;
-	zend_ulong  num_key;
+	int			num = 0;
+	zend_ulong       num_key;
 	zend_string *key;
 
 	ZEND_ASSERT(Z_TYPE_P(sock_array) == IS_ARRAY);
@@ -556,12 +549,15 @@ static void php_sock_array_from_fd_set(zval *sock_array, fd_set *fds) /* {{{ */
 				Z_ADDREF_P(dest_element);
 			}
 		}
+		num++;
 	} ZEND_HASH_FOREACH_END();
 
 	/* Destroy old array, add new one */
 	zval_ptr_dtor(sock_array);
 
 	ZVAL_COPY_VALUE(sock_array, &new_hash);
+
+	return num ? 1 : 0;
 }
 /* }}} */
 
@@ -1739,7 +1735,6 @@ PHP_FUNCTION(socket_get_option)
 				return;
 			}
 #endif
-
 		}
 	}
 
@@ -1959,41 +1954,6 @@ PHP_FUNCTION(socket_set_option)
 		}
 #endif
 
-#ifdef SO_ATTACH_REUSEPORT_CBPF
-		case SO_ATTACH_REUSEPORT_CBPF: {
-			convert_to_long(arg4);
-
-			if (!Z_LVAL_P(arg4)) {
-				ov = 1;
-				optlen = sizeof(ov);
-				opt_ptr = &ov;
-				optname = SO_DETACH_BPF;
-			} else {
-				uint32_t k = (uint32_t)Z_LVAL_P(arg4);
-				static struct sock_filter cbpf[8] = {0};
-				static struct sock_fprog bpfprog;
-
-				switch (k) {
-					case SKF_AD_CPU:
-					case SKF_AD_QUEUE:
-						cbpf[0].code = (BPF_LD|BPF_W|BPF_ABS);
-						cbpf[0].k = (uint32_t)(SKF_AD_OFF + k);
-						cbpf[1].code = (BPF_RET|BPF_A);
-						bpfprog.len = 2;
-					break;
-					default:
-						php_error_docref(NULL, E_WARNING, "Unsupported CBPF filter");
-						RETURN_FALSE;
-				}
-
-				bpfprog.filter = cbpf;
-				optlen = sizeof(bpfprog);
-				opt_ptr = &bpfprog;
-			}
-			break;
-		}
-#endif
-
 		default:
 default_case:
 			convert_to_long(arg4);
@@ -2105,32 +2065,6 @@ PHP_FUNCTION(socket_shutdown)
 /* }}} */
 #endif
 
-#ifdef HAVE_SOCKATMARK
-PHP_FUNCTION(socket_atmark)
-{
-	zval		*arg1;
-	php_socket	*php_sock;
-	int r;
-
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "O", &arg1, socket_ce) == FAILURE) {
-		RETURN_THROWS();
-	}
-
-	php_sock = Z_SOCKET_P(arg1);
-	ENSURE_SOCKET_VALID(php_sock);
-
-	r = sockatmark(php_sock->bsd_socket);
-	if (r < 0) {
-		PHP_SOCKET_ERROR(php_sock, "Unable to apply sockmark", errno);
-		RETURN_FALSE;
-	} else if (r == 0) {
-		RETURN_FALSE;
-	} else {
-		RETURN_TRUE;
-	}
-}
-#endif
-
 /* {{{ Returns the last socket error (either the last used or the provided socket resource) */
 PHP_FUNCTION(socket_last_error)
 {
@@ -2175,7 +2109,7 @@ PHP_FUNCTION(socket_clear_error)
 }
 /* }}} */
 
-bool socket_import_file_descriptor(PHP_SOCKET socket, php_socket *retsock)
+int socket_import_file_descriptor(PHP_SOCKET socket, php_socket *retsock)
 {
 #ifdef SO_DOMAIN
 	int						type;
@@ -2297,7 +2231,7 @@ PHP_FUNCTION(socket_export_stream)
 		getsockopt(socket->bsd_socket, SOL_SOCKET, SO_TYPE, (char *) &protoid, &protoidlen);
 
 		if (protoid == SOCK_STREAM) {
-			/* SO_PROTOCOL is not (yet?) supported on OS X, so let's assume it's TCP there */
+			/* SO_PROTOCOL is not (yet?) supported on OS X, so lets assume it's TCP there */
 #ifdef SO_PROTOCOL
 			protoidlen = sizeof(protoid);
 			getsockopt(socket->bsd_socket, SOL_SOCKET, SO_PROTOCOL, (char *) &protoid, &protoidlen);

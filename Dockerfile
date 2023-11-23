@@ -19,7 +19,7 @@ RUN apt-fast install -y git build-essential  \
                         libtool debootstrap debian-archive-keyring libglib2.0-dev libpixman-1-dev \
                         libssl-dev qtdeclarative5-dev libcapnp-dev libtool-bin \
                         libsqlite3-dev autoconf re2c  libonig-dev libcurl4-openssl-dev \
-                        libcurl4-openssl-dev libpng-dev libgmp-dev \
+                        libcurl4-openssl-dev libpng-dev libgmp-dev libzip-dev \
                         python3-pip python3-pexpect ipython3 \
                         sudo openssh-server automake rsync net-tools netcat  \
                         ccache make g++-multilib pkg-config coreutils rsyslog \
@@ -96,7 +96,8 @@ RUN cd /phpsrc &&         \
 		--with-ssl      \
 		--with-mysqli      \
 		--with-pdo-mysql  \
-		--with-zlib
+		--with-zlib \
+        --with-zip
 
 RUN cd /phpsrc \
 	&& make clean &&  EXTRA_CFLAGS="-DWITCHER_DEBUG=1" make -j $(nproc)

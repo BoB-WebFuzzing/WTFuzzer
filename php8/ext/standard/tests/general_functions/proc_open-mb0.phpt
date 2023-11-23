@@ -7,10 +7,9 @@ if (!function_exists("proc_open")) echo "skip proc_open() is not available";
 --FILE--
 <?php
 
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = PHP_BINARY;
 
 $f = __DIR__ . DIRECTORY_SEPARATOR . "proc_only_mb0.php";
-$f_escaped = escapeshellarg($f);
 file_put_contents($f,'<?php var_dump($argv); ?>');
 
 $ds = array(
@@ -20,7 +19,7 @@ $ds = array(
         );
 
 $p = proc_open(
-        "$php -n $f_escaped テストマルチバイト・パス füße карамба",
+        "$php -n $f テストマルチバイト・パス füße карамба",
         $ds,
         $pipes,
         NULL,

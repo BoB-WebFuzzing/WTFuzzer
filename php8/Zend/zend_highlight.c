@@ -28,6 +28,9 @@
 ZEND_API void zend_html_putc(char c)
 {
 	switch (c) {
+		case '\n':
+			ZEND_PUTS("<br />");
+			break;
 		case '<':
 			ZEND_PUTS("&lt;");
 			break;
@@ -37,8 +40,11 @@ ZEND_API void zend_html_putc(char c)
 		case '&':
 			ZEND_PUTS("&amp;");
 			break;
+		case ' ':
+			ZEND_PUTS("&nbsp;");
+			break;
 		case '\t':
-			ZEND_PUTS("    ");
+			ZEND_PUTS("&nbsp;&nbsp;&nbsp;&nbsp;");
 			break;
 		default:
 			ZEND_PUTC(c);
@@ -82,7 +88,8 @@ ZEND_API void zend_highlight(zend_syntax_highlighter_ini *syntax_highlighter_ini
 	char *last_color = syntax_highlighter_ini->highlight_html;
 	char *next_color;
 
-	zend_printf("<pre><code style=\"color: %s\">", last_color);
+	zend_printf("<code>");
+	zend_printf("<span style=\"color: %s\">\n", last_color);
 	/* highlight stuff coming back from zendlex() */
 	while ((token_type=lex_scan(&token, NULL))) {
 		switch (token_type) {
@@ -155,9 +162,10 @@ ZEND_API void zend_highlight(zend_syntax_highlighter_ini *syntax_highlighter_ini
 	}
 
 	if (last_color != syntax_highlighter_ini->highlight_html) {
-		zend_printf("</span>");
+		zend_printf("</span>\n");
 	}
-	zend_printf("</code></pre>");
+	zend_printf("</span>\n");
+	zend_printf("</code>");
 
 	/* Discard parse errors thrown during tokenization */
 	zend_clear_exception();

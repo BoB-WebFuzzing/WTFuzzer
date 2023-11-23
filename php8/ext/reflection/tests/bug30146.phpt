@@ -15,9 +15,7 @@ var_dump($r->getValue());
 $r->setValue(3);
 var_dump($r->getValue());
 ?>
---EXPECTF--
+--EXPECT--
 int(1)
 int(2)
-
-Deprecated: Calling ReflectionProperty::setValue() with a single argument is deprecated in %s on line %d
 int(3)

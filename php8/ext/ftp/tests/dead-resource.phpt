@@ -18,7 +18,6 @@ try {
 } catch (ValueError $ex) {
     echo "Exception: ", $ex->getMessage(), "\n";
 }
-?>
 --EXPECT--
 bool(true)
 bool(true)

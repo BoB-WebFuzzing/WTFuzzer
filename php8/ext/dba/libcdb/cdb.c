@@ -185,7 +185,7 @@ int cdb_find(struct cdb *c, char *key, unsigned int len)
 /* }}} */
 
 /* {{{ cdb_version */
-const char *cdb_version(void)
+char *cdb_version()
 {
 	return "0.75, $Id$";
 }

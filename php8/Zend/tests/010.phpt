@@ -15,22 +15,12 @@ class foo implements i {
 
 class bar extends foo {
     function test_bar() {
-        var_dump(get_parent_class($this));
+        var_dump(get_parent_class());
     }
 }
 
 $bar = new bar;
 $foo = new foo;
-
-set_error_handler(function ($severity, $message, $file, $line) {
-    throw new Exception($message);
-});
-try {
-    $foo->test();
-} catch (Exception $e) {
-    echo $e->getMessage() . "\n";
-}
-set_error_handler(null);
 
 $foo->test();
 $bar->test();
@@ -76,13 +66,8 @@ try {
 
 echo "Done\n";
 ?>
---EXPECTF--
-Calling get_parent_class() without arguments is deprecated
-
-Deprecated: Calling get_parent_class() without arguments is deprecated in %s on line %d
+--EXPECT--
 bool(false)
-
-Deprecated: Calling get_parent_class() without arguments is deprecated in %s on line %d
 bool(false)
 string(3) "foo"
 string(3) "foo"

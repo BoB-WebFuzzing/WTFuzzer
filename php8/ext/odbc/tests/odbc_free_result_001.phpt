@@ -11,11 +11,15 @@ include 'config.inc';
 
 $conn = odbc_connect($dsn, $user, $pass);
 
-odbc_exec($conn, 'CREATE TABLE free_result (TEST INT NOT NULL)');
+odbc_exec($conn, 'CREATE DATABASE odbcTEST');
 
-odbc_exec($conn, 'INSERT INTO free_result VALUES (1), (2)');
+odbc_exec($conn, 'CREATE TABLE FOO (TEST INT NOT NULL)');
+odbc_exec($conn, 'ALTER TABLE FOO ADD PRIMARY KEY (TEST)');
 
-$res = odbc_exec($conn, 'SELECT * FROM free_result');
+odbc_exec($conn, 'INSERT INTO FOO VALUES (1)');
+odbc_exec($conn, 'INSERT INTO FOO VALUES (2)');
+
+$res = odbc_exec($conn, 'SELECT * FROM FOO');
 
 var_dump(odbc_fetch_row($res));
 var_dump(odbc_result($res, 'test'));
@@ -40,7 +44,8 @@ try {
 <?php
 require 'config.inc';
 $conn = odbc_connect($dsn, $user, $pass);
-odbc_exec($conn, 'DROP TABLE free_result');
+odbc_exec($conn, 'DROP TABLE FOO');
+odbc_exec($conn, 'DROP DATABASE odbcTEST');
 ?>
 --EXPECT--
 bool(true)

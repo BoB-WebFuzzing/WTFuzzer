@@ -31,7 +31,6 @@ foreach (['', ' '] as $leadingWS) {
     }
   }
 }
-?>
 --EXPECT--
 # "1"
 int(1)

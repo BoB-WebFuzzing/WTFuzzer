@@ -20,5 +20,6 @@ var_dump($libc->strlen("abc"));
 ?>
 DONE
 --EXPECT--
-NULL
+object(FFI\CData:void)#2 (0) {
+}
 DONE

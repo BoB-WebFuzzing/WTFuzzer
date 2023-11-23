@@ -4,11 +4,12 @@ Interface of the class mysqli_result
 mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require('connect.inc');
+    require('table.inc');
 
     $mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
     $mysqli_result = $mysqli->query('SELECT * FROM test');

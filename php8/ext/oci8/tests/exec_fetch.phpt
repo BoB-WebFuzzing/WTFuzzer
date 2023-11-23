@@ -2,10 +2,6 @@
 fetch after failed oci_execute()
 --EXTENSIONS--
 oci8
---SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
 --FILE--
 <?php
 

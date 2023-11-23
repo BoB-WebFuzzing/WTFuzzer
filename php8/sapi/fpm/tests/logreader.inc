@@ -16,7 +16,7 @@ class LogReader
      *
      * @var string|null
      */
-    private ?string $currentSourceName = null;
+    private ?string $currentSourceName;
 
     /**
      * Log descriptors.

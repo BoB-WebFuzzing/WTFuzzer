@@ -11,7 +11,7 @@ ldap
         die("skip ldap_set_rebind_proc() does not exist");
     }
     require "connect.inc";
-    $link = @fsockopen($uri);
+    $link = @fsockopen($host, $port);
     if (!$link) {
         die("skip no server listening");
     }
@@ -33,7 +33,7 @@ function rebind_proc ($ds, $ldap_url) {
   }
 }
 
-$link = ldap_connect($uri);
+$link = ldap_connect($host, $port);
 try {
     $result = ldap_set_rebind_proc($link, "rebind_proc_inexistent");
 } catch(\TypeError $error) {

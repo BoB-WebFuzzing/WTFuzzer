@@ -11,9 +11,6 @@ if ($outfile === false)
 $outfile2 = tempnam(sys_get_temp_dir(), "ssl");
 if ($outfile2 === false)
     die("failed to get a temporary filename!");
-$outfile3 = tempnam(sys_get_temp_dir(), "ssl");
-if ($outfile3 === false)
-    die("failed to get a temporary filename!");
 
 $single_cert = "file://" . __DIR__ . "/cert.crt";
 $privkey = "file://" . __DIR__ . "/private_rsa_1024.key";
@@ -37,7 +34,6 @@ var_dump(openssl_pkcs7_encrypt($infile, $outfile, $wrong, $headers, 0, $cipher))
 var_dump(openssl_pkcs7_encrypt($infile, $outfile, $empty, $headers, 0, $cipher));
 var_dump(openssl_pkcs7_encrypt($infile, $outfile, $multi_certs, $headers, 0, $cipher));
 var_dump(openssl_pkcs7_encrypt($infile, $outfile, array_map('openssl_x509_read', $multi_certs), $headers, 0, $cipher));
-var_dump(openssl_pkcs7_encrypt($infile, $outfile3, $single_cert, $headers, PKCS7_NOOLDMIMETYPE, $cipher));
 
 if (file_exists($outfile)) {
     echo "true\n";
@@ -46,15 +42,6 @@ if (file_exists($outfile)) {
 if (file_exists($outfile2)) {
     echo "true\n";
     unlink($outfile2);
-}
-
-if (file_exists($outfile3)) {
-    $content = file_get_contents($outfile3, false, null, 0, 256);
-    if (str_contains($content, 'Content-Type: application/pkcs7-mime; smime-type=enveloped-data; name="smime.p7m"')) {
-        echo "true\n";
-    }
-    unset($content); 
-    unlink($outfile3);
 }
 ?>
 --EXPECT--
@@ -70,7 +57,5 @@ bool(false)
 bool(false)
 bool(true)
 bool(true)
-bool(true)
-true
 true
 true

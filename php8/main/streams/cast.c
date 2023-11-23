@@ -42,9 +42,9 @@ typedef struct {
 	int (*writer)(void *, const char *, int);
 	PHP_FPOS_T (*seeker)(void *, PHP_FPOS_T, int);
 	int (*closer)(void *);
-} cookie_io_functions_t;
+} COOKIE_IO_FUNCTIONS_T;
 
-FILE *fopencookie(void *cookie, const char *mode, cookie_io_functions_t *funcs)
+FILE *fopencookie(void *cookie, const char *mode, COOKIE_IO_FUNCTIONS_T *funcs)
 {
 	return funopen(cookie, funcs->reader, funcs->writer, funcs->seeker, funcs->closer);
 }
@@ -133,7 +133,7 @@ static int stream_cookie_closer(void *cookie)
 #endif /* elif defined(HAVE_FOPENCOOKIE) */
 
 #if HAVE_FOPENCOOKIE
-static cookie_io_functions_t stream_cookie_functions =
+static COOKIE_IO_FUNCTIONS_T stream_cookie_functions =
 {
 	stream_cookie_reader, stream_cookie_writer,
 	stream_cookie_seeker, stream_cookie_closer

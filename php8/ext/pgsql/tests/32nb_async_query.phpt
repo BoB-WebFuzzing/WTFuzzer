@@ -14,6 +14,13 @@ include('config.inc');
 include('nonblocking.inc');
 
 $db = pg_connect($conn_str);
+
+$version = pg_version($db);
+if ($version['protocol'] < 3) {
+    echo "OK";
+    exit(0);
+}
+
 $db_socket = pg_socket($db);
 stream_set_blocking($db_socket, false);
 
@@ -52,8 +59,8 @@ pg_field_name($result, 0);
 pg_field_num($result, $field_name);
 pg_field_size($result, 0);
 pg_field_type($result, 0);
-pg_field_prtlen($result, null, 0);
-pg_field_is_null($result, null, 0);
+pg_field_prtlen($result, 0);
+pg_field_is_null($result, 0);
 
 $nb_send = pg_send_query($db, "INSERT INTO ".$table_name." VALUES (8888, 'GGG');");
 if ($nb_send === FALSE) {

@@ -25,5 +25,5 @@ var_dump(unserialize($s));
 --EXPECTF--
 Cannot assign stdClass to property Test::$prop of type int
 
-Warning: unserialize(): Error at offset 38 of 38 bytes in %s on line %d
+Notice: unserialize(): Error at offset 38 of 38 bytes in %s on line %d
 bool(false)

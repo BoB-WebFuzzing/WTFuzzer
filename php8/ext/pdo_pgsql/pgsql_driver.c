@@ -278,6 +278,10 @@ static bool pgsql_handle_preparer(pdo_dbh_t *dbh, zend_string *sql, pdo_stmt_t *
 		execute_only = H->disable_prepares;
 	}
 
+	if (!emulate && PQprotocolVersion(H->server) <= 2) {
+		emulate = 1;
+	}
+
 	if (emulate) {
 		stmt->supports_placeholders = PDO_PLACEHOLDER_NONE;
 	} else {
@@ -441,59 +445,51 @@ static int pdo_pgsql_get_attribute(pdo_dbh_t *dbh, zend_long attr, zval *return_
 		}
 
 		case PDO_ATTR_SERVER_VERSION:
-			ZVAL_STRING(return_value, (char*)PQparameterStatus(H->server, "server_version"));
+			if (PQprotocolVersion(H->server) >= 3) { /* PostgreSQL 7.4 or later */
+				ZVAL_STRING(return_value, (char*)PQparameterStatus(H->server, "server_version"));
+			} else /* emulate above via a query */
+			{
+				PGresult *res = PQexec(H->server, "SELECT VERSION()");
+				if (res && PQresultStatus(res) == PGRES_TUPLES_OK) {
+					ZVAL_STRING(return_value, (char *)PQgetvalue(res, 0, 0));
+				}
+
+				if (res) {
+					PQclear(res);
+				}
+			}
 			break;
 
 		case PDO_ATTR_CONNECTION_STATUS:
 			switch (PQstatus(H->server)) {
 				case CONNECTION_STARTED:
-					ZVAL_STRINGL(return_value, "Waiting for connection to be made.", strlen("Waiting for connection to be made."));
+					ZVAL_STRINGL(return_value, "Waiting for connection to be made.", sizeof("Waiting for connection to be made.")-1);
 					break;
 
 				case CONNECTION_MADE:
 				case CONNECTION_OK:
-					ZVAL_STRINGL(return_value, "Connection OK; waiting to send.", strlen("Connection OK; waiting to send."));
+					ZVAL_STRINGL(return_value, "Connection OK; waiting to send.", sizeof("Connection OK; waiting to send.")-1);
 					break;
 
 				case CONNECTION_AWAITING_RESPONSE:
-					ZVAL_STRINGL(return_value, "Waiting for a response from the server.", strlen("Waiting for a response from the server."));
+					ZVAL_STRINGL(return_value, "Waiting for a response from the server.", sizeof("Waiting for a response from the server.")-1);
 					break;
 
 				case CONNECTION_AUTH_OK:
-					ZVAL_STRINGL(return_value, "Received authentication; waiting for backend start-up to finish.", strlen("Received authentication; waiting for backend start-up to finish."));
+					ZVAL_STRINGL(return_value, "Received authentication; waiting for backend start-up to finish.", sizeof("Received authentication; waiting for backend start-up to finish.")-1);
 					break;
 #ifdef CONNECTION_SSL_STARTUP
 				case CONNECTION_SSL_STARTUP:
-					ZVAL_STRINGL(return_value, "Negotiating SSL encryption.", strlen("Negotiating SSL encryption."));
+					ZVAL_STRINGL(return_value, "Negotiating SSL encryption.", sizeof("Negotiating SSL encryption.")-1);
 					break;
 #endif
 				case CONNECTION_SETENV:
-					ZVAL_STRINGL(return_value, "Negotiating environment-driven parameter settings.", strlen("Negotiating environment-driven parameter settings."));
+					ZVAL_STRINGL(return_value, "Negotiating environment-driven parameter settings.", sizeof("Negotiating environment-driven parameter settings.")-1);
 					break;
 
-#ifdef CONNECTION_CONSUME
-				case CONNECTION_CONSUME:
-					ZVAL_STRINGL(return_value, "Flushing send queue/consuming extra data.", strlen("Flushing send queue/consuming extra data."));
-					break;
-#endif
-#ifdef CONNECTION_GSS_STARTUP
-				case CONNECTION_SSL_STARTUP:
-					ZVAL_STRINGL(return_value, "Negotiating GSSAPI.", strlen("Negotiating GSSAPI."));
-					break;
-#endif
-#ifdef CONNECTION_CHECK_TARGET
-				case CONNECTION_CHECK_TARGET:
-					ZVAL_STRINGL(return_value, "Connection OK; checking target server properties.", strlen("Connection OK; checking target server properties."));
-					break;
-#endif
-#ifdef CONNECTION_CHECK_STANDBY
-				case CONNECTION_CHECK_STANDBY:
-					ZVAL_STRINGL(return_value, "Connection OK; checking if server in standby.", strlen("Connection OK; checking if server in standby."));
-					break;
-#endif
 				case CONNECTION_BAD:
 				default:
-					ZVAL_STRINGL(return_value, "Bad connection.", strlen("Bad connection."));
+					ZVAL_STRINGL(return_value, "Bad connection.", sizeof("Bad connection.")-1);
 					break;
 			}
 			break;
@@ -659,8 +655,8 @@ PHP_METHOD(PDO_PGSql_Ext, pgsqlCopyFromArray)
 				buffer_len = Z_STRLEN_P(tmp);
 				query = erealloc(query, buffer_len + 2); /* room for \n\0 */
 			}
+			memcpy(query, Z_STRVAL_P(tmp), Z_STRLEN_P(tmp));
 			query_len = Z_STRLEN_P(tmp);
-			memcpy(query, Z_STRVAL_P(tmp), query_len);
 			if (query[query_len - 1] != '\n') {
 				query[query_len++] = '\n';
 			}
@@ -1265,8 +1261,8 @@ static int pdo_pgsql_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{
 	}
 
 	/* escape username and password, if provided */
-	tmp_user = !strstr((char *) dbh->data_source, "user=") ? _pdo_pgsql_escape_credentials(dbh->username) : NULL;
-	tmp_pass = !strstr((char *) dbh->data_source, "password=") ? _pdo_pgsql_escape_credentials(dbh->password) : NULL;
+	tmp_user = _pdo_pgsql_escape_credentials(dbh->username);
+	tmp_pass = _pdo_pgsql_escape_credentials(dbh->password);
 
 	/* support both full connection string & connection string + login and/or password */
 	if (tmp_user && tmp_pass) {

@@ -49,22 +49,8 @@ try {
     echo $e->getMessage(), PHP_EOL;
 }
 
-try {
-    var_dump(randomizer()->getBytesFromString('123', 10));
-} catch (Random\BrokenRandomEngineError $e) {
-    echo $e->getMessage(), PHP_EOL;
-}
-
-try {
-    var_dump(randomizer()->getBytesFromString(str_repeat('a', 500), 10));
-} catch (Random\BrokenRandomEngineError $e) {
-    echo $e->getMessage(), PHP_EOL;
-}
-
 ?>
 --EXPECT--
-A random engine must return a non-empty string
-A random engine must return a non-empty string
 A random engine must return a non-empty string
 A random engine must return a non-empty string
 A random engine must return a non-empty string

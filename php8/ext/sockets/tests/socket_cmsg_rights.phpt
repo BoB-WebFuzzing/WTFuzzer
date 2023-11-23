@@ -11,7 +11,6 @@ die('skip not for Microsoft Windows');
 if (strtolower(substr(PHP_OS, 0, 3)) == 'aix') {
 die('skip not for AIX');
 }
-?>
 --FILE--
 <?php
 include __DIR__."/mcast_helpers.php.inc";
@@ -79,7 +78,6 @@ if ($data["control"]) {
 <?php
 $path = sys_get_temp_dir() . "/socket_cmsg_rights.sock";
 @unlink($path);
-?>
 --EXPECTF--
 creating send socket
 object(Socket)#%d (0) {

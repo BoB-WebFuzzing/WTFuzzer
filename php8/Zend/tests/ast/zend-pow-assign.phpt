@@ -2,14 +2,12 @@
 ZEND_POW_ASSIGN
 --INI--
 zend.assertions=1
+assert.exception=0
 --FILE--
 <?php
 
-try {
-    assert(false && ($a **= 2));
-} catch (AssertionError $e) {
-    echo 'assert(): ', $e->getMessage(), ' failed', PHP_EOL;
-}
+assert_options(ASSERT_WARNING);
+assert(false && ($a **= 2));
 ?>
---EXPECT--
-assert(): assert(false && ($a **= 2)) failed
+--EXPECTF--
+Warning: assert(): assert(false && ($a **= 2)) failed in %s%ezend-pow-assign.php on line %d

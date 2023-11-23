@@ -29,7 +29,6 @@ fclose($fd);
 
 http_server_kill($pid);
 
-?>
 --EXPECTF--
 GET / HTTP/1.1
 Host: %s:%d

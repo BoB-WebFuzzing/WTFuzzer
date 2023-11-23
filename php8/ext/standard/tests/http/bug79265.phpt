@@ -30,7 +30,6 @@ fclose($fd);
 
 http_server_kill($pid);
 
-?>
 --EXPECT--
 GET / HTTP/1.1
 Connection: close

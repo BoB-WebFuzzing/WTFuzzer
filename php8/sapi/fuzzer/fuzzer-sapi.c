@@ -80,7 +80,7 @@ static void send_header(sapi_header_struct *sapi_header, void *server_context)
 {
 }
 
-static char* read_cookies(void)
+static char* read_cookies()
 {
 	/* TODO: fuzz these! */
 	return NULL;
@@ -144,8 +144,7 @@ int fuzzer_init_php(const char *extra_ini)
 	if (extra_ini) {
 		ini_len += extra_ini_len + 1;
 	}
-	char *p = malloc(ini_len + 1);
-	fuzzer_module.ini_entries = p;
+	char *p = fuzzer_module.ini_entries = malloc(ini_len + 1);
 	memcpy(p, HARDCODED_INI, sizeof(HARDCODED_INI) - 1);
 	p += sizeof(HARDCODED_INI) - 1;
 	if (extra_ini) {
@@ -172,7 +171,7 @@ int fuzzer_init_php(const char *extra_ini)
 	return SUCCESS;
 }
 
-int fuzzer_request_startup(void)
+int fuzzer_request_startup()
 {
 	if (php_request_startup() == FAILURE) {
 		php_module_shutdown();
@@ -188,7 +187,7 @@ int fuzzer_request_startup(void)
 	return SUCCESS;
 }
 
-void fuzzer_request_shutdown(void)
+void fuzzer_request_shutdown()
 {
 	zend_try {
 		/* Destroy thrown exceptions. This does not happen as part of request shutdown. */
@@ -207,7 +206,7 @@ void fuzzer_request_shutdown(void)
 }
 
 /* Set up a dummy stack frame so that exceptions may be thrown. */
-void fuzzer_setup_dummy_frame(void)
+void fuzzer_setup_dummy_frame()
 {
 	static zend_execute_data execute_data;
 	static zend_function func;
@@ -235,7 +234,7 @@ int fuzzer_shutdown_php(void)
 	php_module_shutdown();
 	sapi_shutdown();
 
-	free((void *)fuzzer_module.ini_entries);
+	free(fuzzer_module.ini_entries);
 	return SUCCESS;
 }
 
@@ -262,9 +261,7 @@ int fuzzer_do_request_from_buffer(
 		zend_file_handle file_handle;
 		zend_stream_init_filename(&file_handle, filename);
 		file_handle.primary_script = 1;
-		file_handle.buf = emalloc(data_len + ZEND_MMAP_AHEAD);
-		memcpy(file_handle.buf, data, data_len);
-		memset(file_handle.buf + data_len, 0, ZEND_MMAP_AHEAD);
+		file_handle.buf = estrndup(data, data_len);
 		file_handle.len = data_len;
 		/* Avoid ZEND_HANDLE_FILENAME for opcache. */
 		file_handle.type = ZEND_HANDLE_STREAM;

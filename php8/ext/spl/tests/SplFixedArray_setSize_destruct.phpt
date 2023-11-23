@@ -12,7 +12,6 @@ class HasDestructor {
         global $values;
         var_dump($values);
         $values->setSize($values->getSize() - 1);
-        echo "After reducing size:\n";
         var_dump($values);
     }
 }
@@ -20,14 +19,14 @@ class HasDestructor {
 $values->setSize(5);
 $values->offsetSet(4, new HasDestructor());
 echo "Done\n";
-?>
 --EXPECT--
 object(SplFixedArray)#1 (1) {
   [0]=>
   bool(false)
 }
-After reducing size:
-object(SplFixedArray)#1 (0) {
+object(SplFixedArray)#1 (1) {
+  [0]=>
+  bool(false)
 }
 Done
 Done
@@ -44,7 +43,6 @@ object(SplFixedArray)#1 (5) {
   object(HasDestructor)#2 (0) {
   }
 }
-After reducing size:
 object(SplFixedArray)#1 (4) {
   [0]=>
   NULL

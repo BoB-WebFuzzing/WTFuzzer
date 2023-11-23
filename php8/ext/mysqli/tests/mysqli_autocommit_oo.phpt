@@ -15,9 +15,12 @@ mysqli
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once "connect.inc";
 
-    $mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket)) {
+        printf("[001] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+            $host, $user, $db, $port, $socket);
+    }
 
     if (!is_bool($tmp = $mysqli->autocommit(true)))
         printf("[002] Expecting boolean/any, got %s/%s\n", gettype($tmp), $tmp);
@@ -128,7 +131,7 @@ mysqli
 ?>
 --CLEAN--
 <?php
-require_once 'clean_table.inc';
+require_once "clean_table.inc";
 ?>
 --EXPECT--
 my_mysqli object is already closed

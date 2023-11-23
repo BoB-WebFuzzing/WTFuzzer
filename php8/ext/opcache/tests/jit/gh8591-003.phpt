@@ -40,7 +40,6 @@ new Model();
 var_dump($x);
 
 print "OK";
-?>
 --EXPECT--
 int(1)
 OK

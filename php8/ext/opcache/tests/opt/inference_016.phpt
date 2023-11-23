@@ -13,13 +13,11 @@ function test() {
     }
 }
 try {
-    test();
+    @test();
 } catch (Throwable $e) {
 	echo $e->getMessage(), "\n";
 }
 ?>
---EXPECTF--
+--EXPECT--
 NULL
-
-Warning: Decrement on type null has no effect, this will change in the next major version of PHP in %sinference_016.php on line %d
 Modulo by zero

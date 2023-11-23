@@ -145,6 +145,7 @@ int fpm_status_handle_request(void) /* {{{ */
 	bool encode_html, encode_json;
 	char *short_syntax, *short_post;
 	char *full_pre, *full_syntax, *full_post, *full_separator;
+	zend_string *_GET_str;
 
 	if (!SG(request_info).request_uri) {
 		return 0;
@@ -169,13 +170,11 @@ int fpm_status_handle_request(void) /* {{{ */
 
 	/* STATUS */
 	if (fpm_status_uri && !strcmp(fpm_status_uri, SG(request_info).request_uri)) {
-		zend_string *_GET_str;
-
 		fpm_request_executing();
 
 		/* full status ? */
-		_GET_str = ZSTR_INIT_LITERAL("_GET", 0);
-		full = fpm_php_is_key_in_table(_GET_str, ZEND_STRL("full"));
+		_GET_str = zend_string_init("_GET", sizeof("_GET")-1, 0);
+		full = (fpm_php_get_string_from_table(_GET_str, "full") != NULL);
 		short_syntax = short_post = NULL;
 		full_separator = full_pre = full_syntax = full_post = NULL;
 		encode_html = false;
@@ -219,7 +218,7 @@ int fpm_status_handle_request(void) /* {{{ */
 		}
 
 		/* HTML */
-		if (fpm_php_is_key_in_table(_GET_str, ZEND_STRL("html"))) {
+		if (fpm_php_get_string_from_table(_GET_str, "html")) {
 			sapi_add_header_ex(ZEND_STRL("Content-Type: text/html"), 1, 1);
 			time_format = "%d/%b/%Y:%H:%M:%S %z";
 			encode_html = true;
@@ -288,7 +287,7 @@ int fpm_status_handle_request(void) /* {{{ */
 			}
 
 		/* XML */
-		} else if (fpm_php_is_key_in_table(_GET_str, ZEND_STRL("xml"))) {
+		} else if (fpm_php_get_string_from_table(_GET_str, "xml")) {
 			sapi_add_header_ex(ZEND_STRL("Content-Type: text/xml"), 1, 1);
 			time_format = "%s";
 			encode_html = true;
@@ -336,7 +335,7 @@ int fpm_status_handle_request(void) /* {{{ */
 				}
 
 			/* JSON */
-		} else if (fpm_php_is_key_in_table(_GET_str, ZEND_STRL("json"))) {
+		} else if (fpm_php_get_string_from_table(_GET_str, "json")) {
 			sapi_add_header_ex(ZEND_STRL("Content-Type: application/json"), 1, 1);
 			time_format = "%s";
 
@@ -385,7 +384,7 @@ int fpm_status_handle_request(void) /* {{{ */
 			}
 
 			/* OpenMetrics */
-		} else if (fpm_php_is_key_in_table(_GET_str, ZEND_STRL("openmetrics"))) {
+		} else if (fpm_php_get_string_from_table(_GET_str, "openmetrics")) {
 			sapi_add_header_ex(ZEND_STRL("Content-Type: application/openmetrics-text; version=1.0.0; charset=utf-8"), 1, 1);
 			time_format = "%s";
 

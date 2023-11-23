@@ -1,12 +1,12 @@
 --TEST--
-FFI 035: FFI::cdef()->new() not-owned
+FFI 035: FFI::new() not-owned
 --EXTENSIONS--
 ffi
 --INI--
 ffi.enable=1
 --FILE--
 <?php
-$p = FFI::cdef()->new("uint16_t[2]", false);
+$p = FFI::new("uint16_t[2]", false);
 var_dump($p);
 
 FFI::free($p);

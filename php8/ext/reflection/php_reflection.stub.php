@@ -205,8 +205,6 @@ class ReflectionMethod extends ReflectionFunctionAbstract
 
     public function __construct(object|string $objectOrMethod, ?string $method = null) {}
 
-    public static function createFromMethodName(string $method): static {}
-
     public function __toString(): string {}
 
     /** @tentative-return-type */
@@ -348,7 +346,7 @@ class ReflectionClass implements Reflector
     public function getReflectionConstants(?int $filter = null): array {}
 
     /** @tentative-return-type */
-    public function getConstant(string $name): mixed {} // TODO throw exception when the constant doesn't exist
+    public function getConstant(string $name): mixed {}
 
     /** @tentative-return-type */
     public function getReflectionConstant(string $name): ReflectionClassConstant|false {}
@@ -406,7 +404,7 @@ class ReflectionClass implements Reflector
     public function isSubclassOf(ReflectionClass|string $class): bool {}
 
     /** @tentative-return-type */
-    public function getStaticProperties(): array {}
+    public function getStaticProperties(): ?array {}
 
     /** @tentative-return-type */
     public function getStaticPropertyValue(string $name, mixed $default = UNKNOWN): mixed {}
@@ -611,10 +609,6 @@ class ReflectionClassConstant implements Reflector
     public function getAttributes(?string $name = null, int $flags = 0): array {}
 
     public function isEnumCase(): bool {}
-
-    public function hasType(): bool {}
-
-    public function getType(): ?ReflectionType {}
 }
 
 /** @not-serializable */

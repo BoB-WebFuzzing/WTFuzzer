@@ -24,6 +24,7 @@ set_include_path($newpath);
 runtest();
 teardown_include_path();
 chdir("..");
+rmdir($thisTestDir);
 
 
 function runtest() {
@@ -36,12 +37,6 @@ function runtest() {
    unlink($scriptLocFile);
 }
 
-?>
---CLEAN--
-<?php
-$thisTestDir = "FileGetContentsVar2.dir";
-// TODO Clean up tmp files?
-rmdir($thisTestDir);
 ?>
 --EXPECT--
 *** Testing file_get_contents() : variation ***

@@ -57,7 +57,6 @@ eq(3.0, 3.0, true, false);
 eq(3.0,	2.0, true, false);
 eq(3.0, NAN, true, false);
 eq(NAN, NAN, true, false);
-?>
 --EXPECT--
 bool(false)
 bool(false)

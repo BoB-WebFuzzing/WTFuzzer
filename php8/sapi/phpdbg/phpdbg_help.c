@@ -38,9 +38,9 @@ const phpdbg_command_t phpdbg_help_commands[] = {
 };  /* }}} */
 
 /* {{{ pretty_print.  Formatting escapes and wrapping text in a string before printing it. */
-static void pretty_print(const char *text)
+void pretty_print(char *text)
 {
-	char *new, *q;
+	char *new, *p, *q;
 
 	const char  *prompt_escape = phpdbg_get_prompt();
 	size_t prompt_escape_len = strlen(prompt_escape);
@@ -60,7 +60,6 @@ static void pretty_print(const char *text)
 	uint32_t line_count = 0;          /* number printable chars on current line */
 
 	/* First pass calculates a safe size for the pretty print version */
-	const char *p;
 	for (p = text; *p; p++) {
 		if (UNEXPECTED(p[0] == '*') && p[1] == '*') {
 			size += bold_escape_len - 2;
@@ -144,9 +143,9 @@ void summary_print(phpdbg_command_t const * const cmd)
 }
 
 /* {{{ get_help. Retries and formats text from the phpdbg help text table */
-static const char *get_help(const char * const key)
+static char *get_help(const char * const key)
 {
-	const phpdbg_help_text_t *p;
+	phpdbg_help_text_t *p;
 
 	/* Note that phpdbg_help_text is not assumed to be collated in key order.  This is an
 	   inconvenience that means that help can't be logically grouped Not worth
@@ -202,8 +201,8 @@ static int get_command(
 
 } /* }}} */
 
-void phpdbg_do_help_cmd(const char *type) { /* {{{ */
-	const char *help;
+void phpdbg_do_help_cmd(char *type) { /* {{{ */
+	char *help;
 
 	if (!type) {
 		pretty_print(get_help("overview!"));
@@ -330,7 +329,7 @@ PHPDBG_HELP(aliases) /* {{{ */
  * has a key ending in !
  */
 #define CR "\n"
-const phpdbg_help_text_t phpdbg_help_text[] = {
+phpdbg_help_text_t phpdbg_help_text[] = {
 
 /******************************** General Help Topics ********************************/
 {"overview!", CR

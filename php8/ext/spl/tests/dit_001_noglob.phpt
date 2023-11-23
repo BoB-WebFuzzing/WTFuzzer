@@ -3,7 +3,6 @@ SPL: Problem with casting to string (no glob version)
 --SKIPIF--
 <?php
 if (defined('GLOB_ERR')) print "skip GLOB_ERR defined";
-?>
 --FILE--
 <?php
 $d = new DirectoryIterator('.');

@@ -6,14 +6,14 @@ $timezone = "Europe/Zurich\0Foo";
 try {
     var_dump(timezone_open($timezone));
 } catch (\ValueError $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage() . \PHP_EOL;
 }
 try {
     var_dump(new DateTimeZone($timezone));
 } catch (\ValueError $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage() . \PHP_EOL;
 }
 ?>
 --EXPECT--
-ValueError: timezone_open(): Argument #1 ($timezone) must not contain any null bytes
-ValueError: DateTimeZone::__construct(): Argument #1 ($timezone) must not contain any null bytes
+timezone_open(): Argument #1 ($timezone) must not contain any null bytes
+DateTimeZone::__construct(): Argument #1 ($timezone) must not contain any null bytes

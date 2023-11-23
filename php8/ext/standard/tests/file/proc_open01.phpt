@@ -4,7 +4,7 @@ proc_open() regression test 1 (proc_open() leak)
 <?php
 $pipes = array(1, 2, 3);
 $orig_pipes = $pipes;
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = getenv('TEST_PHP_EXECUTABLE');
 if ($php === false) {
     die("no php executable defined");
 }

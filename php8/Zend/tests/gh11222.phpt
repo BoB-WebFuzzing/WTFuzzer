@@ -1,5 +1,5 @@
 --TEST--
-GH-11222: foreach by-ref may jump over keys during a rehash
+GH-112222: foreach by-ref may jump over keys during a rehash
 --FILE--
 <?php
 

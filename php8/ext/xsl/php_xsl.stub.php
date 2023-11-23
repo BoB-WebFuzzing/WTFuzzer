@@ -71,10 +71,6 @@ const LIBEXSLT_DOTTED_VERSION = UNKNOWN;
 
 class XSLTProcessor
 {
-    public bool $doXInclude = false;
-
-    public bool $cloneDocument = false;
-
     /**
      * @param DOMDocument|SimpleXMLElement $stylesheet
      * @tentative-return-type
@@ -114,8 +110,8 @@ class XSLTProcessor
     /** @tentative-return-type */
     public function registerPHPFunctions(array|string|null $functions = null): void {}
 
-    /** @return true */
-    public function setProfiling(?string $filename) {} // TODO make return type void
+    /** @return bool */
+    public function setProfiling(?string $filename) {} // TODO make the return type void
 
     /** @tentative-return-type */
     public function setSecurityPrefs(int $preferences): int {}

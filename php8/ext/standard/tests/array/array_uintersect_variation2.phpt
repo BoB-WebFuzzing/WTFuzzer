@@ -131,16 +131,16 @@ array_uintersect(): Argument #2 must be of type array, null given
 array_uintersect(): Argument #2 must be of type array, null given
 
 --lowercase true--
-array_uintersect(): Argument #2 must be of type array, true given
+array_uintersect(): Argument #2 must be of type array, bool given
 
 --lowercase false--
-array_uintersect(): Argument #2 must be of type array, false given
+array_uintersect(): Argument #2 must be of type array, bool given
 
 --uppercase TRUE--
-array_uintersect(): Argument #2 must be of type array, true given
+array_uintersect(): Argument #2 must be of type array, bool given
 
 --uppercase FALSE--
-array_uintersect(): Argument #2 must be of type array, false given
+array_uintersect(): Argument #2 must be of type array, bool given
 
 --empty string DQ--
 array_uintersect(): Argument #2 must be of type array, string given

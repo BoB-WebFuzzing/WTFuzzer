@@ -10,10 +10,9 @@ if (substr(PHP_OS, 0, 3) == 'WIN') {
 --FILE--
 <?php
 
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = getenv('TEST_PHP_EXECUTABLE');
 
 $filename_txt = __DIR__."/010.test.txt";
-$filename_txt_escaped = escapeshellarg($filename_txt);
 
 $txt = '
 test
@@ -22,7 +21,7 @@ hello
 
 file_put_contents($filename_txt, $txt);
 
-var_dump(`cat $filename_txt_escaped | $php -n -R "var_dump(1);"`);
+var_dump(`cat "$filename_txt" | "$php" -n -R "var_dump(1);"`);
 
 @unlink($filename_txt);
 

@@ -39,7 +39,6 @@ unlink($file);  //Deleting the file
 fclose( fopen($file, "w") );  //Opening the non-existing file in "w" mode, which will be created
 var_dump( file_exists($file) );  //Check for the existence of file
 echo "*** Done ***\n";
-?>
 --CLEAN--
 <?php
 unlink(__DIR__."/007_variation3.tmp");

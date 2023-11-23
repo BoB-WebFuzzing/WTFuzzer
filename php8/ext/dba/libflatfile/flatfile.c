@@ -276,7 +276,7 @@ datum flatfile_nextkey(flatfile *dba) {
 /* }}} */
 
 /* {{{ flatfile_version */
-const char *flatfile_version(void)
+char *flatfile_version()
 {
 	return "1.0, $Id$";
 }

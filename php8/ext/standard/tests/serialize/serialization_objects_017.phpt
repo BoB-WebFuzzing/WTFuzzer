@@ -10,8 +10,8 @@ var_dump(unserialize('O:1:"A":1:xs:1:"a";N;}'));
                     //0123456789012345678901
 ?>
 --EXPECTF--
-Warning: unserialize(): Error at offset 9 of 22 bytes in %s on line %d
+Notice: unserialize(): Error at offset 9 of 22 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 10 of 22 bytes in %s on line %d
+Notice: unserialize(): Error at offset 10 of 22 bytes in %s on line %d
 bool(false)

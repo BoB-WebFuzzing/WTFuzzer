@@ -9,9 +9,6 @@ function test1() {
 }
 
 $rf = new ReflectionFunction('test1');
-var_dump($rf->getStaticVariables());
-test1();
-
 $s = $rf->getStaticVariables();
 var_dump($s['x'] === test1());
 
@@ -26,9 +23,5 @@ var_dump($rp->getDefaultValue() !== test2());
 
 ?>
 --EXPECT--
-array(1) {
-  ["x"]=>
-  NULL
-}
 bool(true)
 bool(true)

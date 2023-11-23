@@ -29,7 +29,6 @@ print libxml_get_external_entity_loader()[0] . "\n";
 libxml_set_external_entity_loader(null);
 var_dump(libxml_get_external_entity_loader());
 
-?>
 --EXPECT--
 NULL
 Handler#A

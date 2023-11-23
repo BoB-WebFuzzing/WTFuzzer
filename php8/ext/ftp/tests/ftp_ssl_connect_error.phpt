@@ -22,7 +22,6 @@ try {
 }
 
 echo "===DONE===\n";
-?>
 --EXPECTF--
 *** Testing ftp_ssl_connect() function : error conditions ***
 

@@ -6,9 +6,7 @@ ffi
 ffi.enable=1
 --FILE--
 <?php
-$ffi = FFI::cdef();
-
-$a = $ffi->new("int[3]");
+$a = FFI::new("int[3]");
 $a[1] = 10;
 $a[2] = 20;
 var_dump(count($a));
@@ -16,7 +14,7 @@ foreach ($a as $key => $val) {
     echo "$key => $val\n";
 }
 
-$a = $ffi->new("struct {int x,y;}");
+$a = FFI::new("struct {int x,y;}");
 try {
     var_dump(count($a));
 } catch (Throwable $e) {

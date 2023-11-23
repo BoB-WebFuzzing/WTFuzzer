@@ -2,10 +2,6 @@
 Bug #38161 (oci_bind_by_name() returns garbage when Oracle didn't set the variable)
 --EXTENSIONS--
 oci8
---SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
 --FILE--
 <?php
 

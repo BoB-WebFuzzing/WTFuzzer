@@ -332,7 +332,6 @@ PHP_FUNCTION( numfmt_set_pattern )
 	size_t      value_len = 0;
 	int32_t     slength = 0;
 	UChar*	    svalue  = NULL;
-	UParseError spattern_error = {0};
 	FORMATTER_METHOD_INIT_VARS;
 
 	/* Parse parameters. */
@@ -348,17 +347,12 @@ PHP_FUNCTION( numfmt_set_pattern )
 	intl_convert_utf8_to_utf16(&svalue, &slength, value, value_len, &INTL_DATA_ERROR_CODE(nfo));
 	INTL_METHOD_CHECK_STATUS( nfo, "Error converting pattern to UTF-16" );
 
-	unum_applyPattern(FORMATTER_OBJECT(nfo), 0, svalue, slength, &spattern_error, &INTL_DATA_ERROR_CODE(nfo));
+	/* TODO: add parse error information */
+	unum_applyPattern(FORMATTER_OBJECT(nfo), 0, svalue, slength, NULL, &INTL_DATA_ERROR_CODE(nfo));
 	if (svalue) {
 		efree(svalue);
 	}
-	if (U_FAILURE(INTL_DATA_ERROR_CODE(nfo))) {
-		char *msg;
-		spprintf(&msg, 0, "Error setting pattern value at line %d, offset %d", spattern_error.line, spattern_error.offset);
-		intl_errors_set_custom_msg(INTL_DATA_ERROR_P(nfo), msg, 1);
-		efree(msg);
-		RETURN_FALSE;
-	}
+	INTL_METHOD_CHECK_STATUS( nfo, "Error setting pattern value" );
 
 	RETURN_TRUE;
 }

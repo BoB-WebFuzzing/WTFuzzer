@@ -4,11 +4,16 @@ mysqli_fetch_object() - calling constructor on class wo constructor
 mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    require('table.inc');
     if (!$res = mysqli_query($link, "SELECT id AS ID, label FROM test AS TEST ORDER BY id LIMIT 5")) {
         printf("[001] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
     }
@@ -27,11 +32,11 @@ require_once 'skipifconnectfailure.inc';
     printf("No exception with PHP:\n");
     var_dump($obj = new mysqli_fetch_object_test(1, 2));
 
-    printf("\nValueError with mysqli. Note that at all other places we throws errors but no exceptions unless the error mode has been changed:\n");
+    printf("\nException with mysqli. Note that at all other places we throws errors but no exceptions unless the error mode has been changed:\n");
     try {
         var_dump($obj = mysqli_fetch_object($res, 'mysqli_fetch_object_test', array(1, 2)));
-    } catch (ValueError $e) {
-        printf("ValueError: %s\n", $e->getMessage());
+    } catch (Exception $e) {
+        printf("Exception: %s\n", $e->getMessage());
     }
 
     printf("\nFatal error with PHP (but no exception!):\n");
@@ -42,7 +47,7 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
 No exception with PHP:
@@ -57,8 +62,8 @@ object(mysqli_fetch_object_test)#%d (%d) {
   NULL
 }
 
-ValueError with mysqli. Note that at all other places we throws errors but no exceptions unless the error mode has been changed:
-ValueError: mysqli_fetch_object(): Argument #3 ($constructor_args) must be empty when the specified class (mysqli_fetch_object_test) does not have a constructor
+Exception with mysqli. Note that at all other places we throws errors but no exceptions unless the error mode has been changed:
+Exception: mysqli_fetch_object(): Argument #3 ($constructor_args) must be empty when the specified class (mysqli_fetch_object_test) does not have a constructor
 
 Fatal error with PHP (but no exception!):
 

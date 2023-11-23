@@ -12,5 +12,5 @@ try {
 
 ?>
 --EXPECTF--
-Warning: SplObjectStorage::unserialize(): Unexpected end of serialized data in %s on line %d
+Notice: SplObjectStorage::unserialize(): Unexpected end of serialized data in %s on line %d
 Error at offset 24 of 113 bytes

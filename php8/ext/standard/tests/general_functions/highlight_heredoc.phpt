@@ -16,12 +16,6 @@ DDDD;
 highlight_string($str);
 ?>
 --EXPECT--
-<pre><code style="color: #000000">
-$x=&lt;&lt;&lt;DD
-jhdsjkfhjdsh
-DD
-."";
-$a=&lt;&lt;&lt;DDDD
-jhdsjkfhjdsh
-DDDD;
-</code></pre>
+<code><span style="color: #000000">
+<br />$x=&lt;&lt;&lt;DD<br />jhdsjkfhjdsh<br />DD<br />."";<br />$a=&lt;&lt;&lt;DDDD<br />jhdsjkfhjdsh<br />DDDD;<br /></span>
+</code>

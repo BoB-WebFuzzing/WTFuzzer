@@ -4,12 +4,24 @@ mysqli_fetch_object()
 mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
-    $mysqli = $link;
+    require_once("connect.inc");
+    set_error_handler('handle_catchable_fatal');
+
+    $mysqli = new mysqli();
+    try {
+        new mysqli_result($mysqli);
+    } catch (Error $exception) {
+        echo $exception->getMessage() . "\n";
+    }
+
+    require('table.inc');
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket))
+        printf("[002] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+            $host, $user, $db, $port, $socket);
 
     if (!$res = $mysqli->query("SELECT id AS ID, label FROM test AS TEST ORDER BY id LIMIT 5")) {
         printf("[003] [%d] %s\n", $mysqli->errno, $mysqli->error);
@@ -18,16 +30,16 @@ require_once 'skipifconnectfailure.inc';
     try {
         if (!is_null($tmp = @$res->fetch_object($link, $link)))
             printf("[005] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (Throwable $e) {
-        echo $e::class, ': ', $e->getMessage(), "\n";
+    } catch (Error $e) {
+        handle_catchable_fatal($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
     }
 
 
     try {
         if (!is_null($tmp = @$res->fetch_object($link, $link, $link)))
             printf("[006] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (Throwable $e) {
-        echo $e::class, ': ', $e->getMessage(), "\n";
+    } catch (Error $e) {
+        handle_catchable_fatal($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
     }
 
     $obj = mysqli_fetch_object($res);
@@ -64,8 +76,8 @@ require_once 'skipifconnectfailure.inc';
 
     try {
         $res->fetch_object('mysqli_fetch_object_construct', null);
-    } catch (Throwable $e) {
-        echo $e::class, ': ', $e->getMessage(), "\n";
+    } catch (TypeError $exception) {
+        echo $exception->getMessage() . "\n";
         mysqli_fetch_object($res);
     }
 
@@ -76,7 +88,7 @@ require_once 'skipifconnectfailure.inc';
             var_dump($obj);
         }
     } catch (Throwable $e) {
-        echo $e::class, ': ', $e->getMessage(), "\n";
+        echo "Exception: " . $e->getMessage() . "\n";
     }
 
     $obj = $res->fetch_object('mysqli_fetch_object_construct', array('a', 'b'));
@@ -98,14 +110,14 @@ require_once 'skipifconnectfailure.inc';
 
     try {
         mysqli_fetch_object($res);
-    } catch (Throwable $e) {
-        echo $e::class, ': ', $e->getMessage(), "\n";
+    } catch (Error $exception) {
+        echo $exception->getMessage() . "\n";
     }
 
     try {
         var_dump($res->fetch_object('this_class_does_not_exist'));
-    } catch (Throwable $e) {
-        echo $e::class, ': ', $e->getMessage(), "\n";
+    } catch (TypeError $exception) {
+        echo $exception->getMessage() . "\n";
     }
 
     $mysqli->close();
@@ -113,15 +125,16 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
-Error: Object of class mysqli could not be converted to string
-ArgumentCountError: mysqli_result::fetch_object() expects at most 2 arguments, 3 given
-TypeError: mysqli_result::fetch_object(): Argument #2 ($constructor_args) must be of type array, null given
-ArgumentCountError: Too few arguments to function mysqli_fetch_object_construct::__construct(), 1 passed and exactly 2 expected
+--EXPECTF--
+mysqli object is not fully initialized
+[0] Object of class mysqli could not be converted to string in %s on line %d
+[0] mysqli_result::fetch_object() expects at most 2 arguments, 3 given in %s on line %d
+mysqli_result::fetch_object(): Argument #2 ($constructor_args) must be of type array, null given
+Exception: Too few arguments to function mysqli_fetch_object_construct::__construct(), 1 passed and exactly 2 expected
 NULL
 NULL
-Error: mysqli_result object is already closed
-TypeError: mysqli_result::fetch_object(): Argument #1 ($class) must be a valid class name, this_class_does_not_exist given
+mysqli_result object is already closed
+mysqli_result::fetch_object(): Argument #1 ($class) must be a valid class name, this_class_does_not_exist given
 done!

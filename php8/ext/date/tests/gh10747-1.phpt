@@ -1,7 +1,5 @@
 --TEST--
 Bug GH-10747 (Private fields in serialized DateTimeImmutable objects throw)
---INI--
-date.timezone=UTC
 --FILE--
 <?php
 class I extends DateTimeImmutable

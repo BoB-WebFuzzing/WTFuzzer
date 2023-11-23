@@ -129,7 +129,7 @@ bool(false)
 bool(false)
 
 -- Iteration 13 --
-Cannot access offset of type array on array
+Illegal offset type
 
 -- Iteration 14 --
 bool(true)
@@ -141,7 +141,7 @@ bool(true)
 bool(true)
 
 -- Iteration 17 --
-Cannot access offset of type classA on array
+Illegal offset type
 
 -- Iteration 18 --
 bool(false)

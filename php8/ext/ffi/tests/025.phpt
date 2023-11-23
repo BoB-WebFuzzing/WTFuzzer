@@ -6,9 +6,7 @@ ffi
 ffi.enable=1
 --FILE--
 <?php
-    $ffi = FFI::cdef();
-
-    $x = $ffi->new("int");
+    $x = FFI::new("int");
     $x->cdata = 5;
     var_dump($x);
     $x->cdata += 2;
@@ -16,7 +14,7 @@ ffi.enable=1
     echo "$x\n\n";
     unset($x);
 
-    $x = $ffi->new("char");
+    $x = FFI::new("char");
     $x->cdata = 'a';
     var_dump($x);
     $x->cdata++;

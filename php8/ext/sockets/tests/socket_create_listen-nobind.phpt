@@ -16,7 +16,6 @@ unlink($filename);
 if (@socket_create_listen(80)) {
     die('SKIP Test cannot be run in environment that will allow binding to port 80 (azure)');
 }
-?>
 --FILE--
 <?php
 $sock = socket_create_listen(80);

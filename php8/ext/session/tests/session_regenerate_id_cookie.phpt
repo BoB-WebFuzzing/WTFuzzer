@@ -2,8 +2,6 @@
 Test session_regenerate_id() function : basic functionality
 --EXTENSIONS--
 session
---INI--
-session.sid_length = 32
 --SKIPIF--
 <?php
 
@@ -54,8 +52,7 @@ var_dump(session_destroy());
 ob_end_flush();
 ?>');
 
-$extra_arguments = getenv('TEST_PHP_EXTRA_ARGS');
-var_dump(`$php $extra_arguments -d session.name=PHPSESSID $file`);
+var_dump(`$php -n -d session.name=PHPSESSID $file`);
 
 unlink($file);
 

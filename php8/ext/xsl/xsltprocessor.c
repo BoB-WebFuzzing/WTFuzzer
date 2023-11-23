@@ -21,29 +21,75 @@
 
 #include "php.h"
 #include "php_xsl.h"
-#include <libxslt/variables.h>
 #include "ext/libxml/php_libxml.h"
 
-
-static zend_result php_xsl_xslt_apply_params(xsltTransformContextPtr ctxt, HashTable *params)
+/* {{{ php_xsl_xslt_string_to_xpathexpr()
+   Translates a string to a XPath Expression */
+static char *php_xsl_xslt_string_to_xpathexpr(const char *str)
 {
-	zend_string *string_key;
+	const xmlChar *string = (const xmlChar *)str;
+
+	xmlChar *value;
+	int str_len;
+
+	str_len = xmlStrlen(string) + 3;
+
+	if (xmlStrchr(string, '"')) {
+		if (xmlStrchr(string, '\'')) {
+			php_error_docref(NULL, E_WARNING, "Cannot create XPath expression (string contains both quote and double-quotes)");
+			return NULL;
+		}
+		value = (xmlChar*) safe_emalloc (str_len, sizeof(xmlChar), 0);
+		snprintf((char*)value, str_len, "'%s'", string);
+	} else {
+		value = (xmlChar*) safe_emalloc (str_len, sizeof(xmlChar), 0);
+		snprintf((char *)value, str_len, "\"%s\"", string);
+	}
+	return (char *) value;
+}
+/* }}} */
+
+/* {{{ php_xsl_xslt_make_params()
+   Translates a PHP array to a libxslt parameters array */
+static char **php_xsl_xslt_make_params(HashTable *parht, int xpath_params)
+{
+
+	int parsize;
 	zval *value;
+	char *xpath_expr;
+	zend_string *string_key;
+	char **params = NULL;
+	int i = 0;
 
-	ZEND_HASH_MAP_FOREACH_STR_KEY_VAL(params, string_key, value) {
+	parsize = (2 * zend_hash_num_elements(parht) + 1) * sizeof(char *);
+	params = (char **)safe_emalloc((2 * zend_hash_num_elements(parht) + 1), sizeof(char *), 0);
+	memset((char *)params, 0, parsize);
+
+	ZEND_HASH_MAP_FOREACH_STR_KEY_VAL(parht, string_key, value) {
 		ZEND_ASSERT(string_key != NULL);
-		/* Already a string because of setParameter() */
-		ZEND_ASSERT(Z_TYPE_P(value) == IS_STRING);
+		if (Z_TYPE_P(value) != IS_STRING) {
+			if (!try_convert_to_string(value)) {
+				efree(params);
+				return NULL;
+			}
+		}
 
-		int result = xsltQuoteOneUserParam(ctxt, (const xmlChar *) ZSTR_VAL(string_key), (const xmlChar *) Z_STRVAL_P(value));
-		if (result < 0) {
-			php_error_docref(NULL, E_WARNING, "Could not apply parameter \"%s\"", ZSTR_VAL(string_key));
-			return FAILURE;
+		if (!xpath_params) {
+			xpath_expr = php_xsl_xslt_string_to_xpathexpr(Z_STRVAL_P(value));
+		} else {
+			xpath_expr = estrndup(Z_STRVAL_P(value), Z_STRLEN_P(value));
+		}
+		if (xpath_expr) {
+			params[i++] = estrndup(ZSTR_VAL(string_key), ZSTR_LEN(string_key));
+			params[i++] = xpath_expr;
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	return SUCCESS;
+	params[i++] = NULL;
+
+	return params;
 }
+/* }}} */
 
 static void xsl_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs, int type) /* {{{ */
 {
@@ -95,12 +141,17 @@ static void xsl_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs, int t
 		return;
 	}
 
+	if (UNEXPECTED(nargs == 0)) {
+		zend_throw_error(NULL, "Function name must be passed as the first argument");
+		return;
+	}
+
 	fci.param_count = nargs - 1;
 	if (fci.param_count > 0) {
 		args = safe_emalloc(fci.param_count, sizeof(zval), 0);
 	}
 	/* Reverse order to pop values off ctxt stack */
-	for (i = nargs - 2; i >= 0; i--) {
+	for (i = fci.param_count - 1; i >= 0; i--) {
 		obj = valuePop(ctxt);
 		if (obj == NULL) {
 			ZVAL_NULL(&args[i]);
@@ -148,19 +199,7 @@ static void xsl_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs, int t
 								node->parent = nsparent;
 								node->ns = curns;
 							} else {
-								/**
-								 * Upon freeing libxslt's context, every document which is not the *main* document will be freed by libxslt.
-								 * If a node of a document which is *not the main* document gets returned to userland, we'd free the node twice:
-								 * first by the cleanup of the xslt context, and then by our own refcounting mechanism.
-								 * To prevent this, we'll take a copy if the node is not from the main document.
-								 * It is important that we do not copy the node unconditionally, because that means that:
-								 *  - modifications to the node will only modify the copy, and not the original
-								 *  - accesses to the parent, path, ... will not work
-								 */
-								xsltTransformContextPtr transform_ctxt = (xsltTransformContextPtr) ctxt->context->extra;
-								if (node->doc != transform_ctxt->document->doc) {
-									node = xmlDocCopyNode(node, domintern->document->ptr, 1);
-								}
+								node = xmlDocCopyNode(node, domintern->document->ptr, 1);
 							}
 
 							php_dom_create_object(node, &child, domintern);
@@ -187,7 +226,7 @@ static void xsl_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs, int t
 		fci.params = NULL;
 	}
 
-
+	/* Last element of the stack is the function name */
 	obj = valuePop(ctxt);
 	if (obj == NULL || obj->stringval == NULL) {
 		php_error_docref(NULL, E_WARNING, "Handler name must be a string");
@@ -243,7 +282,7 @@ static void xsl_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs, int t
 		zval_ptr_dtor(&retval);
 	}
 	zend_string_release_ex(callable, 0);
-	zval_ptr_dtor_nogc(&handler);
+	zval_ptr_dtor(&handler);
 	if (fci.param_count > 0) {
 		for (i = 0; i < nargs - 1; i++) {
 			zval_ptr_dtor(&args[i]);
@@ -312,9 +351,12 @@ PHP_METHOD(XSLTProcessor, importStylesheet)
 
 	intern = Z_XSL_P(id);
 
-	member = ZSTR_INIT_LITERAL("cloneDocument", 0);
-	cloneDocu = zend_std_read_property(Z_OBJ_P(id), member, BP_VAR_R, NULL, &rv);
-	clone_docu = zend_is_true(cloneDocu);
+	member = zend_string_init("cloneDocument", sizeof("cloneDocument")-1, 0);
+	cloneDocu = zend_std_read_property(Z_OBJ_P(id), member, BP_VAR_IS, NULL, &rv);
+	if (Z_TYPE_P(cloneDocu) != IS_NULL) {
+		convert_to_long(cloneDocu);
+		clone_docu = Z_LVAL_P(cloneDocu);
+	}
 	zend_string_release_ex(member, 0);
 	if (clone_docu == 0) {
 		/* check if the stylesheet is using xsl:key, if yes, we have to clone the document _always_ before a transformation */
@@ -353,6 +395,8 @@ static xmlDocPtr php_xsl_apply_stylesheet(zval *id, xsl_object *intern, xsltStyl
 	xmlNodePtr node = NULL;
 	xsltTransformContextPtr ctxt;
 	php_libxml_node_object *object;
+	char **params = NULL;
+	int clone;
 	zval *doXInclude, rv;
 	zend_string *member;
 	FILE *f;
@@ -389,6 +433,10 @@ static xmlDocPtr php_xsl_apply_stylesheet(zval *id, xsl_object *intern, xsltStyl
 		f = NULL;
 	}
 
+	if (intern->parameter) {
+		params = php_xsl_xslt_make_params(intern->parameter, 0);
+	}
+
 	intern->doc = emalloc(sizeof(php_libxml_node_object));
 	memset(intern->doc, 0, sizeof(php_libxml_node_object));
 
@@ -404,16 +452,12 @@ static xmlDocPtr php_xsl_apply_stylesheet(zval *id, xsl_object *intern, xsltStyl
 	ctxt = xsltNewTransformContext(style, doc);
 	ctxt->_private = (void *) intern;
 
-	if (intern->parameter) {
-		zend_result status = php_xsl_xslt_apply_params(ctxt, intern->parameter);
-		if (UNEXPECTED(status != SUCCESS) && EG(exception)) {
-			goto out;
-		}
+	member = zend_string_init("doXInclude", sizeof("doXInclude")-1, 0);
+	doXInclude = zend_std_read_property(Z_OBJ_P(id), member, BP_VAR_IS, NULL, &rv);
+	if (Z_TYPE_P(doXInclude) != IS_NULL) {
+		convert_to_long(doXInclude);
+		ctxt->xinclude = Z_LVAL_P(doXInclude);
 	}
-
-	member = ZSTR_INIT_LITERAL("doXInclude", 0);
-	doXInclude = zend_std_read_property(Z_OBJ_P(id), member, BP_VAR_R, NULL, &rv);
-	ctxt->xinclude = zend_is_true(doXInclude);
 	zend_string_release_ex(member, 0);
 
 	secPrefsValue = intern->securityPrefs;
@@ -455,10 +499,8 @@ static xmlDocPtr php_xsl_apply_stylesheet(zval *id, xsl_object *intern, xsltStyl
 	if (secPrefsError == 1) {
 		php_error_docref(NULL, E_WARNING, "Can't set libxslt security properties, not doing transformation for security reasons");
 	} else {
-		newdocp = xsltApplyStylesheetUser(style, doc, /* params (handled manually) */ NULL, /* output */ NULL, f, ctxt);
+		newdocp = xsltApplyStylesheetUser(style, doc, (const char**) params,  NULL, f, ctxt);
 	}
-
-out:
 	if (f) {
 		fclose(f);
 	}
@@ -478,6 +520,14 @@ out:
 	efree(intern->doc);
 	intern->doc = NULL;
 
+	if (params) {
+		clone = 0;
+		while(params[clone]) {
+			efree(params[clone++]);
+		}
+		efree(params);
+	}
+
 	return newdocp;
 
 }
@@ -491,14 +541,14 @@ PHP_METHOD(XSLTProcessor, transformToDoc)
 	zval *id, *docp = NULL;
 	xmlDoc *newdocp;
 	xsltStylesheetPtr sheetp;
-	zend_class_entry *ret_class = NULL;
+	zend_string *ret_class = NULL;
 	xsl_object *intern;
 
 	id = ZEND_THIS;
 	intern = Z_XSL_P(id);
 	sheetp = (xsltStylesheetPtr) intern->ptr;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "o|C!", &docp, &ret_class) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "o|S!", &docp, &ret_class) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -507,7 +557,7 @@ PHP_METHOD(XSLTProcessor, transformToDoc)
 	if (newdocp) {
 		if (ret_class) {
 			zend_string *curclass_name;
-			zend_class_entry *curce;
+			zend_class_entry *curce, *ce;
 			php_libxml_node_object *interndoc;
 
 			curce = Z_OBJCE_P(docp);
@@ -516,15 +566,16 @@ PHP_METHOD(XSLTProcessor, transformToDoc)
 				curce = curce->parent;
 			}
 
-			if (!instanceof_function(ret_class, curce)) {
+			ce = zend_lookup_class(ret_class);
+			if (ce == NULL || !instanceof_function(ce, curce)) {
 				xmlFreeDoc(newdocp);
-				zend_argument_type_error(2, "must be a class name compatible with %s, %s given",
-					ZSTR_VAL(curclass_name), ZSTR_VAL(ret_class->name)
+				zend_argument_type_error(2, "must be a class name compatible with %s, \"%s\" given",
+					ZSTR_VAL(curclass_name), ZSTR_VAL(ret_class)
 				);
 				RETURN_THROWS();
 			}
 
-			object_init_ex(return_value, ret_class);
+			object_init_ex(return_value, ce);
 
 			interndoc = Z_LIBXML_NODE_P(return_value);
 			php_libxml_increment_doc_ref(interndoc, newdocp);
@@ -535,6 +586,7 @@ PHP_METHOD(XSLTProcessor, transformToDoc)
 	} else {
 		RETURN_FALSE;
 	}
+
 }
 /* }}} end XSLTProcessor::transformToDoc */
 
@@ -622,7 +674,7 @@ PHP_METHOD(XSLTProcessor, setParameter)
 		Z_PARAM_STRING(namespace, namespace_len)
 		Z_PARAM_ARRAY_HT_OR_STR(array_value, name)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_PATH_STR_OR_NULL(value)
+		Z_PARAM_STR_OR_NULL(value)
 	ZEND_PARSE_PARAMETERS_END();
 
 	intern = Z_XSL_P(id);
@@ -641,23 +693,10 @@ PHP_METHOD(XSLTProcessor, setParameter)
 				zend_argument_type_error(2, "must contain only string keys");
 				RETURN_THROWS();
 			}
-
-			if (UNEXPECTED(CHECK_NULL_PATH(ZSTR_VAL(string_key), ZSTR_LEN(string_key)))) {
-				zend_argument_value_error(3, "must not contain keys with any null bytes");
-				RETURN_THROWS();
-			}
-
 			str = zval_try_get_string(entry);
 			if (UNEXPECTED(!str)) {
 				RETURN_THROWS();
 			}
-
-			if (UNEXPECTED(CHECK_NULL_PATH(ZSTR_VAL(str), ZSTR_LEN(str)))) {
-				zend_string_release(str);
-				zend_argument_value_error(3, "must not contain values with any null bytes");
-				RETURN_THROWS();
-			}
-
 			ZVAL_STR(&tmp, str);
 			zend_hash_update(intern->parameter, string_key, &tmp);
 		} ZEND_HASH_FOREACH_END();
@@ -665,11 +704,6 @@ PHP_METHOD(XSLTProcessor, setParameter)
 	} else {
 		if (!value) {
 			zend_argument_value_error(3, "cannot be null when argument #2 ($name) is a string");
-			RETURN_THROWS();
-		}
-
-		if (UNEXPECTED(CHECK_NULL_PATH(ZSTR_VAL(name), ZSTR_LEN(name)))) {
-			zend_argument_value_error(2, "must not contain any null bytes");
 			RETURN_THROWS();
 		}
 
@@ -696,7 +730,7 @@ PHP_METHOD(XSLTProcessor, getParameter)
 	}
 	intern = Z_XSL_P(id);
 	if ((value = zend_hash_find(intern->parameter, name)) != NULL) {
-		RETURN_STR_COPY(Z_STR_P(value));
+		RETURN_STR(zval_get_string(value));
 	} else {
 		RETURN_FALSE;
 	}

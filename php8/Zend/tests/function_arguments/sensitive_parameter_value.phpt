@@ -31,8 +31,6 @@ object(SensitiveParameterValue)#%d (0) {
 object(SensitiveParameterValue)#%d (%d) refcount(%d){
 }
 SensitiveParameterValue Object
-(
-)
 
 # var_export()
 \SensitiveParameterValue::__set_state(array(

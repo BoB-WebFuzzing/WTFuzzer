@@ -7,14 +7,11 @@ dom
 
 $cdata = new DOMText;
 
-$cdata->before("string");
-$cdata->after("string");
-$cdata->replaceWith("string");
-
-$dom = new DOMDocument();
-$dom->adoptNode($cdata);
-var_dump($dom->saveXML($cdata));
-
+try {
+    $cdata->before("string");
+} catch (DOMException $e) {
+    echo $e->getMessage();
+}
 ?>
 --EXPECT--
-string(0) ""
+Hierarchy Request Error

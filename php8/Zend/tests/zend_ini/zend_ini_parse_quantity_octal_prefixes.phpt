@@ -28,7 +28,6 @@ foreach (['', ' '] as $leadingWS) {
     }
   }
 }
-?>
 --EXPECT--
 # "0o14"
 int(12)

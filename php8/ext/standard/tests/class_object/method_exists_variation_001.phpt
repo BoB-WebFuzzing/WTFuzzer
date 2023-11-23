@@ -140,16 +140,16 @@ Arg value
 method_exists(): Argument #1 ($object_or_class) must be of type object|string, null given
 
 Arg value 1 
-method_exists(): Argument #1 ($object_or_class) must be of type object|string, true given
+method_exists(): Argument #1 ($object_or_class) must be of type object|string, bool given
 
 Arg value  
-method_exists(): Argument #1 ($object_or_class) must be of type object|string, false given
+method_exists(): Argument #1 ($object_or_class) must be of type object|string, bool given
 
 Arg value 1 
-method_exists(): Argument #1 ($object_or_class) must be of type object|string, true given
+method_exists(): Argument #1 ($object_or_class) must be of type object|string, bool given
 
 Arg value  
-method_exists(): Argument #1 ($object_or_class) must be of type object|string, false given
+method_exists(): Argument #1 ($object_or_class) must be of type object|string, bool given
 
 Arg value  
 bool(false)

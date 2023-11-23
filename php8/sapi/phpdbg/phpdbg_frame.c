@@ -171,24 +171,24 @@ static void phpdbg_dump_prototype(zval *tmp) /* {{{ */
 {
 	zval *funcname, *class, class_zv, *args, *argstmp;
 
-	funcname = zend_hash_find(Z_ARRVAL_P(tmp), ZSTR_KNOWN(ZEND_STR_FUNCTION));
+	funcname = zend_hash_str_find(Z_ARRVAL_P(tmp), ZEND_STRL("function"));
 
-	if ((class = zend_hash_find(Z_ARRVAL_P(tmp), ZSTR_KNOWN(ZEND_STR_OBJECT)))) {
+	if ((class = zend_hash_str_find(Z_ARRVAL_P(tmp), ZEND_STRL("object")))) {
 		ZVAL_NEW_STR(&class_zv, Z_OBJCE_P(class)->name);
 		class = &class_zv;
 	} else {
-		class = zend_hash_find(Z_ARRVAL_P(tmp), ZSTR_KNOWN(ZEND_STR_CLASS));
+		class = zend_hash_str_find(Z_ARRVAL_P(tmp), ZEND_STRL("class"));
 	}
 
 	if (class) {
-		zval *type = zend_hash_find(Z_ARRVAL_P(tmp), ZSTR_KNOWN(ZEND_STR_TYPE));
+		zval *type = zend_hash_str_find(Z_ARRVAL_P(tmp), ZEND_STRL("type"));
 
 		phpdbg_out("%s%s%s(", Z_STRVAL_P(class), Z_STRVAL_P(type), Z_STRVAL_P(funcname));
 	} else {
 		phpdbg_out("%s(", Z_STRVAL_P(funcname));
 	}
 
-	args = zend_hash_find(Z_ARRVAL_P(tmp), ZSTR_KNOWN(ZEND_STR_ARGS));
+	args = zend_hash_str_find(Z_ARRVAL_P(tmp), ZEND_STRL("args"));
 
 	if (args) {
 		const zend_function *func = NULL;
@@ -287,8 +287,8 @@ void phpdbg_dump_backtrace(size_t num) /* {{{ */
 			phpdbg_out(" (internal function)\n");
 		}
 
-		file = zend_hash_find(Z_ARRVAL_P(tmp), ZSTR_KNOWN(ZEND_STR_FILE));
-		line = zend_hash_find(Z_ARRVAL_P(tmp), ZSTR_KNOWN(ZEND_STR_LINE));
+		file = zend_hash_str_find(Z_ARRVAL_P(tmp), ZEND_STRL("file"));
+		line = zend_hash_str_find(Z_ARRVAL_P(tmp), ZEND_STRL("line"));
 		zend_hash_move_forward_ex(Z_ARRVAL(zbacktrace), &position);
 	}
 

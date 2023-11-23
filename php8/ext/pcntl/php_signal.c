@@ -35,7 +35,7 @@ Sigfunc *php_signal4(int signo, Sigfunc *func, int restart, int mask_all)
 	} else {
 		sigemptyset(&act.sa_mask);
 	}
-	act.sa_flags = SA_ONSTACK;
+	act.sa_flags = 0;
 #ifdef HAVE_STRUCT_SIGINFO_T
 	act.sa_flags |= SA_SIGINFO;
 #endif

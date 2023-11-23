@@ -674,8 +674,10 @@ PS_CREATE_SID_FUNC(files)
 		/* Check collision */
 		/* FIXME: mod_data(data) should not be NULL (User handler could be NULL) */
 		if (data && ps_files_key_exists(data, sid) == SUCCESS) {
-			zend_string_release_ex(sid, 0);
-			sid = NULL;
+			if (sid) {
+				zend_string_release_ex(sid, 0);
+				sid = NULL;
+			}
 			if (--maxfail < 0) {
 				return NULL;
 			}

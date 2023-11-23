@@ -6,8 +6,8 @@ $d = new DateTime('2011-01-15 00:00:00');
 try {
     var_dump(strtotime('-1 month', $d));
 } catch (TypeError $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage(), "\n";
 }
 ?>
 --EXPECT--
-TypeError: strtotime(): Argument #2 ($baseTimestamp) must be of type ?int, DateTime given
+strtotime(): Argument #2 ($baseTimestamp) must be of type ?int, DateTime given

@@ -25,7 +25,7 @@ class fail extends same {
     protected function f4() {}
 }
 
-echo "Done\n";
+echo "Done\n"; // shouldn't be displayed
 ?>
 --EXPECT--
 Done

@@ -70,12 +70,17 @@ static void dom_xpath_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs,
 		return;
 	}
 
+	if (UNEXPECTED(nargs == 0)) {
+		zend_throw_error(NULL, "Function name must be passed as the first argument");
+		return;
+	}
+
 	fci.param_count = nargs - 1;
 	if (fci.param_count > 0) {
 		fci.params = safe_emalloc(fci.param_count, sizeof(zval), 0);
 	}
 	/* Reverse order to pop values off ctxt stack */
-	for (i = nargs - 2; i >= 0; i--) {
+	for (i = fci.param_count - 1; i >= 0; i--) {
 		obj = valuePop(ctxt);
 		switch (obj->type) {
 			case XPATH_STRING:
@@ -95,11 +100,11 @@ static void dom_xpath_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs,
 				} else if (type == 2) {
 					int j;
 					if (obj->nodesetval && obj->nodesetval->nodeNr > 0) {
-						array_init_size(&fci.params[i], obj->nodesetval->nodeNr);
-						zend_hash_real_init_packed(Z_ARRVAL_P(&fci.params[i]));
+						array_init(&fci.params[i]);
 						for (j = 0; j < obj->nodesetval->nodeNr; j++) {
 							xmlNodePtr node = obj->nodesetval->nodeTab[j];
 							zval child;
+							/* not sure, if we need this... it's copied from xpath.c */
 							if (node->type == XML_NAMESPACE_DECL) {
 								xmlNodePtr nsparent = node->_private;
 								xmlNsPtr original = (xmlNsPtr) node;
@@ -128,11 +133,12 @@ static void dom_xpath_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs,
 
 	fci.size = sizeof(fci);
 
+	/* Last element of the stack is the function name */
 	obj = valuePop(ctxt);
 	if (obj->stringval == NULL) {
 		zend_type_error("Handler name must be a string");
 		xmlXPathFreeObject(obj);
-		goto cleanup;
+		goto cleanup_no_callable;
 	}
 	ZVAL_STRING(&fci.function_name, (char *) obj->stringval);
 	xmlXPathFreeObject(obj);
@@ -177,6 +183,7 @@ static void dom_xpath_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs,
 cleanup:
 	zend_string_release_ex(callable, 0);
 	zval_ptr_dtor_nogc(&fci.function_name);
+cleanup_no_callable:
 	if (fci.param_count > 0) {
 		for (i = 0; i < nargs - 1; i++) {
 			zval_ptr_dtor(&fci.params[i]);
@@ -245,7 +252,7 @@ PHP_METHOD(DOMXPath, __construct)
 /* }}} end DOMXPath::__construct */
 
 /* {{{ document DOMDocument*/
-zend_result dom_xpath_document_read(dom_object *obj, zval *retval)
+int dom_xpath_document_read(dom_object *obj, zval *retval)
 {
 	xmlDoc *docp = NULL;
 	xmlXPathContextPtr ctx = (xmlXPathContextPtr) obj->ptr;
@@ -264,14 +271,14 @@ static inline dom_xpath_object *php_xpath_obj_from_dom_obj(dom_object *obj) {
 	return (dom_xpath_object*)((char*)(obj) - XtOffsetOf(dom_xpath_object, dom));
 }
 
-zend_result dom_xpath_register_node_ns_read(dom_object *obj, zval *retval)
+int dom_xpath_register_node_ns_read(dom_object *obj, zval *retval)
 {
 	ZVAL_BOOL(retval, php_xpath_obj_from_dom_obj(obj)->register_node_ns);
 
 	return SUCCESS;
 }
 
-zend_result dom_xpath_register_node_ns_write(dom_object *obj, zval *newval)
+int dom_xpath_register_node_ns_write(dom_object *obj, zval *newval)
 {
 	php_xpath_obj_from_dom_obj(obj)->register_node_ns = zend_is_true(newval);
 
@@ -408,8 +415,8 @@ static void php_xpath_eval(INTERNAL_FUNCTION_PARAMETERS, int type) /* {{{ */
 			xmlNodeSetPtr nodesetp;
 
 			if (xpathobjp->type == XPATH_NODESET && NULL != (nodesetp = xpathobjp->nodesetval) && nodesetp->nodeNr) {
-				array_init_size(&retval, nodesetp->nodeNr);
-				zend_hash_real_init_packed(Z_ARRVAL_P(&retval));
+
+				array_init(&retval);
 				for (i = 0; i < nodesetp->nodeNr; i++) {
 					xmlNodePtr node = nodesetp->nodeTab[i];
 					zval child;

@@ -30,6 +30,5 @@ function checkTree($treeNode) {
 
 $tree = createTree(12);
 var_dump(checkTree($tree));
-?>
 --EXPECT--
 int(8191)

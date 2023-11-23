@@ -22,7 +22,7 @@ abstract class AbstractClass {
 }
 
 $foo = new ReflectionMethod('TestClass', 'foo');
-$privateMethod = ReflectionMethod::createFromMethodName("TestClass::privateMethod");
+$privateMethod = new ReflectionMethod("TestClass::privateMethod");
 
 $testClassInstance = new TestClass();
 $testClassInstance->prop = "Hello";
@@ -45,7 +45,7 @@ echo "\nPrivate method:\n";
 var_dump($privateMethod->invoke($testClassInstance));
 
 echo "\nAbstract method:\n";
-$abstractMethod = ReflectionMethod::createFromMethodName("AbstractClass::foo");
+$abstractMethod = new ReflectionMethod("AbstractClass::foo");
 try {
     $abstractMethod->invoke(true);
 } catch (ReflectionException $e) {
@@ -55,7 +55,7 @@ try {
 ?>
 --EXPECT--
 invoke() on a non-object:
-string(85) "ReflectionMethod::invoke(): Argument #1 ($object) must be of type ?object, true given"
+string(85) "ReflectionMethod::invoke(): Argument #1 ($object) must be of type ?object, bool given"
 
 invoke() on a non-instance:
 string(72) "Given object is not an instance of the class this method was declared in"

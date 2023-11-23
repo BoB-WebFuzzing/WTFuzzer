@@ -4,11 +4,13 @@ mysqli_use_result()
 mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    require('table.inc');
 
     if (!$res = mysqli_real_query($link, "SELECT id, label FROM test ORDER BY id"))
         printf("[003] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -51,7 +53,7 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 mysqli_data_seek() cannot be used in MYSQLI_USE_RESULT mode

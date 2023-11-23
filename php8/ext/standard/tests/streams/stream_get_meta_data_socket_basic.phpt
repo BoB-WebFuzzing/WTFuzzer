@@ -9,7 +9,7 @@ fclose($tcp_socket);
 
 ?>
 --EXPECTF--
-array(8) {
+array(7) {
   ["timed_out"]=>
   bool(false)
   ["blocked"]=>
@@ -24,6 +24,4 @@ array(8) {
   int(0)
   ["seekable"]=>
   bool(false)
-  ["uri"]=>
-  string(21) "tcp://127.0.0.1:31330"
 }

@@ -13,14 +13,14 @@ $o = new MyDateTime;
 try {
     var_dump($o->format("d"));
 } catch (Error $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage(), "\n";
 }
 $x = clone $o;
 
 try {
     var_dump($x->format("d"));
 } catch (Error $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage(), "\n";
 }
 
 clone $o;
@@ -28,10 +28,10 @@ clone $o;
 try {
     var_dump(timezone_location_get(clone new MyDateTimezone));
 } catch (Error $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage(), "\n";
 }
 ?>
 --EXPECT--
-DateObjectError: Object of type MyDateTime (inheriting DateTime) has not been correctly initialized by calling parent::__construct() in its constructor
-DateObjectError: Object of type MyDateTime (inheriting DateTime) has not been correctly initialized by calling parent::__construct() in its constructor
-DateObjectError: Object of type MyDateTimeZone (inheriting DateTimeZone) has not been correctly initialized by calling parent::__construct() in its constructor
+The DateTime object has not been correctly initialized by its constructor
+The DateTime object has not been correctly initialized by its constructor
+The DateTimeZone object has not been correctly initialized by its constructor

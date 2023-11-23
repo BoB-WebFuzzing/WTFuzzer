@@ -20,7 +20,6 @@ $db = PDOTest::test_factory('ext/pdo_odbc/tests/common.phpt');
 // PDO::ATTR_SERVER_VERSION: 07.02.0015
 var_dump($db->getAttribute(PDO::ATTR_SERVER_INFO));
 var_dump($db->getAttribute(PDO::ATTR_SERVER_VERSION));
-?>
 --EXPECTF--
 string(%d) "%s"
 string(%d) "%s"

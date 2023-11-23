@@ -6,7 +6,7 @@ ffi
 ffi.enable=1
 --FILE--
 <?php
-$x = FFI::cdef()->new('int');
+$x = FFI::new('int');
 array_walk($x, function($x) { echo "test\n"; });
 ?>
 DONE

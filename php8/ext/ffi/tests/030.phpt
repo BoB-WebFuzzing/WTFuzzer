@@ -6,10 +6,8 @@ ffi
 ffi.enable=1
 --FILE--
 <?php
-$ffi = FFI::cdef();
-
-var_dump(FFI::sizeof($ffi->new("bool[2]")));
-$p = $ffi->new("bool[2]");
+var_dump(FFI::sizeof(FFI::new("bool[2]")));
+$p = FFI::new("bool[2]");
 var_dump($p);
 $p[1] = true;
 var_dump($p[0]);

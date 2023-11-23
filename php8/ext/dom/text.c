@@ -64,7 +64,7 @@ readonly=yes
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-Text3-wholeText
 Since: DOM Level 3
 */
-zend_result dom_text_whole_text_read(dom_object *obj, zval *retval)
+int dom_text_whole_text_read(dom_object *obj, zval *retval)
 {
 	xmlNodePtr node;
 	xmlChar *wholetext = NULL;
@@ -130,7 +130,7 @@ PHP_METHOD(DOMText, splitText)
 		RETURN_FALSE;
 	}
 
-	cur = node->content;
+	cur = xmlNodeGetContent(node);
 	if (cur == NULL) {
 		/* TODO Add warning? */
 		RETURN_FALSE;
@@ -139,11 +139,14 @@ PHP_METHOD(DOMText, splitText)
 
 	if (ZEND_LONG_INT_OVFL(offset) || (int)offset > length) {
 		/* TODO Add warning? */
+		xmlFree(cur);
 		RETURN_FALSE;
 	}
 
 	first = xmlUTF8Strndup(cur, (int)offset);
 	second = xmlUTF8Strsub(cur, (int)offset, (int)(length - offset));
+
+	xmlFree(cur);
 
 	xmlNodeSetContent(node, first);
 	nnode = xmlNewDocText(node->doc, second);

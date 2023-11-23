@@ -78,7 +78,6 @@ MySQLPDOTest::skip();
     }
 
     print "done!";
-?>
 --CLEAN--
 <?php
 require __DIR__ . '/mysql_pdo_test.inc';

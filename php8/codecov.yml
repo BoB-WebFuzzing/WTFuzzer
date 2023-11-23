@@ -1,2 +1,0 @@
-ignore:
-  - "ext/dom/lexbor/lexbor" # bundled library

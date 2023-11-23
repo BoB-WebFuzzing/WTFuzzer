@@ -16,12 +16,7 @@ function f1()
 var_dump($r2 = assert(0));
 var_dump($r2 = assert(1));
 ?>
---EXPECTF--
-Deprecated: PHP Startup: assert.warning INI setting is deprecated in Unknown on line 0
-
-Deprecated: PHP Startup: assert.callback INI setting is deprecated in Unknown on line 0
-
-Deprecated: PHP Startup: assert.exception INI setting is deprecated in Unknown on line 0
+--EXPECT--
 f1 called
 bool(false)
 bool(true)

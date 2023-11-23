@@ -7,6 +7,7 @@ precision=14
 --FILE--
 <?php
 $tests = array(
+    array(),
     array(0),
     array(3),
     array(3, 3),
@@ -21,6 +22,7 @@ foreach ($tests as $v) {
 }
 ?>
 --EXPECT--
+int(1)
 int(0)
 int(3)
 int(9)

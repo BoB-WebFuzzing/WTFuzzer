@@ -50,4 +50,4 @@ Serialization of 'class@anonymous' is not allowed
 Unserialization of 'MySplFileInfo' is not allowed
 Unserialization of 'MySplFileInfo' is not allowed
 
-Warning: unserialize(): Error at offset 0 of %d bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of %d bytes in %s on line %d

@@ -556,7 +556,7 @@ static bool php_openssl_matches_common_name(X509 *peer, const char *subject_name
 }
 /* }}} */
 
-static zend_result php_openssl_apply_peer_verification_policy(SSL *ssl, X509 *peer, php_stream *stream) /* {{{ */
+static int php_openssl_apply_peer_verification_policy(SSL *ssl, X509 *peer, php_stream *stream) /* {{{ */
 {
 	zval *val = NULL;
 	zval *peer_fingerprint;
@@ -883,7 +883,7 @@ static long php_openssl_load_stream_cafile(X509_STORE *cert_store, const char *c
 }
 /* }}} */
 
-static zend_result php_openssl_enable_peer_verification(SSL_CTX *ctx, php_stream *stream) /* {{{ */
+static int php_openssl_enable_peer_verification(SSL_CTX *ctx, php_stream *stream) /* {{{ */
 {
 	zval *val = NULL;
 	char *cafile = NULL;
@@ -943,7 +943,7 @@ static void php_openssl_disable_peer_verification(SSL_CTX *ctx, php_stream *stre
 }
 /* }}} */
 
-static zend_result php_openssl_set_local_cert(SSL_CTX *ctx, php_stream *stream) /* {{{ */
+static int php_openssl_set_local_cert(SSL_CTX *ctx, php_stream *stream) /* {{{ */
 {
 	zval *val = NULL;
 	char *certfile = NULL;
@@ -1247,7 +1247,7 @@ static RSA *php_openssl_tmp_rsa_cb(SSL *s, int is_export, int keylength)
 }
 #endif
 
-static zend_result php_openssl_set_server_dh_param(php_stream * stream, SSL_CTX *ctx) /* {{{ */
+static int php_openssl_set_server_dh_param(php_stream * stream, SSL_CTX *ctx) /* {{{ */
 {
 	zval *zdhpath = php_stream_context_get_option(PHP_STREAM_CONTEXT(stream), "ssl", "dh_param");
 	if (zdhpath == NULL) {
@@ -1308,7 +1308,7 @@ static zend_result php_openssl_set_server_dh_param(php_stream * stream, SSL_CTX 
 /* }}} */
 
 #if defined(HAVE_ECDH) && PHP_OPENSSL_API_VERSION < 0x10100
-static zend_result php_openssl_set_server_ecdh_curve(php_stream *stream, SSL_CTX *ctx) /* {{{ */
+static int php_openssl_set_server_ecdh_curve(php_stream *stream, SSL_CTX *ctx) /* {{{ */
 {
 	zval *zvcurve;
 	int curve_nid;
@@ -1344,7 +1344,7 @@ static zend_result php_openssl_set_server_ecdh_curve(php_stream *stream, SSL_CTX
 /* }}} */
 #endif
 
-static zend_result php_openssl_set_server_specific_opts(php_stream *stream, SSL_CTX *ctx) /* {{{ */
+static int php_openssl_set_server_specific_opts(php_stream *stream, SSL_CTX *ctx) /* {{{ */
 {
 	zval *zv;
 	long ssl_ctx_options = SSL_CTX_get_options(ctx);
@@ -1443,7 +1443,7 @@ static SSL_CTX *php_openssl_create_sni_server_ctx(char *cert_path, char *key_pat
 }
 /* }}} */
 
-static zend_result php_openssl_enable_server_sni(php_stream *stream, php_openssl_netstream_data_t *sslsock)  /* {{{ */
+static int php_openssl_enable_server_sni(php_stream *stream, php_openssl_netstream_data_t *sslsock)  /* {{{ */
 {
 	zval *val;
 	zval *current;
@@ -1654,7 +1654,7 @@ static int php_openssl_server_alpn_callback(SSL *ssl_handle,
 
 #endif
 
-zend_result php_openssl_setup_crypto(php_stream *stream,
+int php_openssl_setup_crypto(php_stream *stream,
 		php_openssl_netstream_data_t *sslsock,
 		php_stream_xport_crypto_param *cparam) /* {{{ */
 {
@@ -1679,7 +1679,7 @@ zend_result php_openssl_setup_crypto(php_stream *stream,
 	ERR_clear_error();
 
 	/* We need to do slightly different things based on client/server method
-	 * so let's remember which method was selected */
+	 * so lets remember which method was selected */
 	sslsock->is_client = cparam->inputs.method & STREAM_CRYPTO_IS_CLIENT;
 	method_flags = cparam->inputs.method & ~STREAM_CRYPTO_IS_CLIENT;
 

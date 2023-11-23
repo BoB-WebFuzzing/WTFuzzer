@@ -1,5 +1,5 @@
 --TEST--
-SPL: SplFixedArray: Non integer offset handling
+SPL: FixedArray: Non integer offset handling
 --FILE--
 <?php
 $o = new SplFixedArray(10);
@@ -168,55 +168,55 @@ try {
 Write context
 
 Deprecated: Implicit conversion from float 2.5 to int loses precision in %s on line %d
-Cannot access offset of type array on SplFixedArray
-Cannot access offset of type stdClass on SplFixedArray
+Illegal offset type
+Illegal offset type
 
 Warning: Resource ID#%d used as offset, casting to integer (%d) in %s on line %d
-Cannot access offset of type string on SplFixedArray
-Cannot access offset of type string on SplFixedArray
-Cannot access offset of type string on SplFixedArray
+Illegal offset type
+Illegal offset type
+Illegal offset type
 Read context
 string(1) "a"
 string(1) "b"
 
 Deprecated: Implicit conversion from float 2.5 to int loses precision in %s on line %d
 string(1) "c"
-Cannot access offset of type array on SplFixedArray
-Cannot access offset of type stdClass on SplFixedArray
+Illegal offset type
+Illegal offset type
 
 Warning: Resource ID#%d used as offset, casting to integer (%d) in %s on line %d
 string(1) "f"
 string(1) "g"
-Cannot access offset of type string on SplFixedArray
-Cannot access offset of type string on SplFixedArray
-Cannot access offset of type string on SplFixedArray
+Illegal offset type
+Illegal offset type
+Illegal offset type
 isset()
 bool(true)
 bool(true)
 
 Deprecated: Implicit conversion from float 2.5 to int loses precision in %s on line %d
 bool(true)
-Cannot access offset of type array on SplFixedArray
-Cannot access offset of type stdClass on SplFixedArray
+Illegal offset type
+Illegal offset type
 
 Warning: Resource ID#%d used as offset, casting to integer (%d) in %s on line %d
 bool(true)
 bool(true)
-Cannot access offset of type string on SplFixedArray
-Cannot access offset of type string on SplFixedArray
-Cannot access offset of type string on SplFixedArray
+Illegal offset type
+Illegal offset type
+Illegal offset type
 empty()
 bool(false)
 bool(false)
 
 Deprecated: Implicit conversion from float 2.5 to int loses precision in %s on line %d
 bool(false)
-Cannot access offset of type array on SplFixedArray
-Cannot access offset of type stdClass on SplFixedArray
+Illegal offset type
+Illegal offset type
 
 Warning: Resource ID#%d used as offset, casting to integer (%d) in %s on line %d
 bool(false)
 bool(false)
-Cannot access offset of type string on SplFixedArray
-Cannot access offset of type string on SplFixedArray
-Cannot access offset of type string on SplFixedArray
+Illegal offset type
+Illegal offset type
+Illegal offset type

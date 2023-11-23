@@ -2,16 +2,12 @@
 oci8.default_prefetch ini option
 --EXTENSIONS--
 oci8
---SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
 --INI--
 oci8.default_prefetch=20
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__."/connect.inc");
 
 // Initialize
 

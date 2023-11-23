@@ -4,11 +4,11 @@ mysqli->affected_rows
 mysqli
 --SKIPIF--
 <?php
-    require_once 'skipifconnectfailure.inc';
+    require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     $mysqli = new mysqli();
     try {
@@ -17,7 +17,10 @@ mysqli
         echo $exception->getMessage() . "\n";
     }
 
-    $mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket)) {
+        printf("[001] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+            $host, $user, $db, $port, $socket);
+    }
 
     if (0 !== ($tmp = $mysqli->affected_rows))
     printf("[002] Expecting int/0, got %s/%s\n", gettype($tmp), $tmp);
@@ -111,7 +114,7 @@ mysqli
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 Property access is not allowed yet

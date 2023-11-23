@@ -37,7 +37,6 @@ object(B)#3 (1) {
 
 Fatal error: Uncaught Exception: Thrown from S in %s:%d
 Stack trace:
-#0 %s(%d): [constant expression]()
-#1 %s(%d): S->__toString()
-#2 {main}
+#0 %s(%d): S->__toString()
+#1 {main}
   thrown in %s on line %d

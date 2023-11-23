@@ -159,20 +159,20 @@ array_intersect_uassoc(): Argument #1 ($array) must be of type array, null given
 array_intersect_uassoc(): Argument #1 ($array) must be of type array, null given
 
 --lowercase true--
-array_intersect_uassoc(): Argument #1 ($array) must be of type array, true given
-array_intersect_uassoc(): Argument #1 ($array) must be of type array, true given
+array_intersect_uassoc(): Argument #1 ($array) must be of type array, bool given
+array_intersect_uassoc(): Argument #1 ($array) must be of type array, bool given
 
 --lowercase false--
-array_intersect_uassoc(): Argument #1 ($array) must be of type array, false given
-array_intersect_uassoc(): Argument #1 ($array) must be of type array, false given
+array_intersect_uassoc(): Argument #1 ($array) must be of type array, bool given
+array_intersect_uassoc(): Argument #1 ($array) must be of type array, bool given
 
 --uppercase TRUE--
-array_intersect_uassoc(): Argument #1 ($array) must be of type array, true given
-array_intersect_uassoc(): Argument #1 ($array) must be of type array, true given
+array_intersect_uassoc(): Argument #1 ($array) must be of type array, bool given
+array_intersect_uassoc(): Argument #1 ($array) must be of type array, bool given
 
 --uppercase FALSE--
-array_intersect_uassoc(): Argument #1 ($array) must be of type array, false given
-array_intersect_uassoc(): Argument #1 ($array) must be of type array, false given
+array_intersect_uassoc(): Argument #1 ($array) must be of type array, bool given
+array_intersect_uassoc(): Argument #1 ($array) must be of type array, bool given
 
 --empty string DQ--
 array_intersect_uassoc(): Argument #1 ($array) must be of type array, string given

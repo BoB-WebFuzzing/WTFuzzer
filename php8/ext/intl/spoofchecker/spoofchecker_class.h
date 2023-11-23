@@ -28,10 +28,7 @@ typedef struct {
 	intl_error  err;
 
 	// ICU Spoofchecker
-	USpoofChecker*     uspoof;
-#if U_ICU_VERSION_MAJOR_NUM >= 58
-	USpoofCheckResult* uspoofres;
-#endif
+	USpoofChecker*      uspoof;
 
 	zend_object     zo;
 } Spoofchecker_object;

@@ -34,7 +34,7 @@ $testClassInstance = new TestClass();
 $testClassInstance->prop = "Hello";
 
 $foo = new ReflectionMethod($testClassInstance, 'foo');
-$staticMethod = ReflectionMethod::createFromMethodName('TestClass::staticMethod');
+$staticMethod = new ReflectionMethod('TestClass::staticMethod');
 $privateMethod = new ReflectionMethod("TestClass::privateMethod");
 
 echo "\nNon-instance:\n";

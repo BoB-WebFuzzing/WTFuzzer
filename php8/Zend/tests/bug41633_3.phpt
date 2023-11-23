@@ -11,6 +11,5 @@ echo Foo::A;
 --EXPECTF--
 Fatal error: Uncaught Error: Cannot declare self-referencing constant Foo::B in %s:%d
 Stack trace:
-#0 %s(%d): [constant expression]()
-#1 {main}
+#0 {main}
   thrown in %sbug41633_3.php on line %d

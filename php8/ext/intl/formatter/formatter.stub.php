@@ -392,7 +392,6 @@ class NumberFormatter
     public const TYPE_DOUBLE = UNKNOWN;
     /**
      * @var int
-     * @deprecated
      * @cvalue FORMAT_TYPE_CURRENCY
      */
     public const TYPE_CURRENCY = UNKNOWN;

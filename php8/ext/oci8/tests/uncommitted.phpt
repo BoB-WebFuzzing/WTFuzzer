@@ -2,10 +2,6 @@
 uncommitted connection
 --EXTENSIONS--
 oci8
---SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
 --FILE--
 <?php
 

@@ -39,7 +39,7 @@ static unsigned long getauxval(unsigned long key) {
 }
 # endif
 
-static inline int has_crc32_insn(void) {
+static inline int has_crc32_insn() {
 	/* Only go through the runtime detection once. */
 	static int res = -1;
 	if (res != -1)
@@ -68,8 +68,6 @@ static inline int has_crc32_insn(void) {
 #  if!defined(__clang__)
 #   pragma GCC push_options
 #   pragma GCC target ("+nothing+crc")
-#  elif defined(__APPLE__)
-#   pragma clang attribute push(__attribute__((target("crc"))), apply_to=function)
 #  else
 #   pragma clang attribute push(__attribute__((target("+nothing+crc"))), apply_to=function)
 #  endif
@@ -98,8 +96,6 @@ static uint32_t crc32_aarch64(uint32_t crc, const char *p, size_t nr) {
 # if defined(__GNUC__)
 #  if !defined(__clang__)
 #   pragma GCC pop_options
-#  elif defined(__APPLE__)
-#   pragma clang attribute pop
 #  else
 #   pragma clang attribute pop
 #  endif

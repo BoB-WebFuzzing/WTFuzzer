@@ -10,6 +10,5 @@ try {
 } catch (Error $ex) {
     echo "Exception: ", $ex->getMessage(), "\n";
 }
-?>
 --EXPECT--
 Exception: Cannot directly construct IMAP\Connection, use imap_open() instead

@@ -6,7 +6,6 @@ zlib
 <?php
 
 gzopen('someFile', 'c');
-?>
 --CLEAN--
 <?php
     unlink('someFile');

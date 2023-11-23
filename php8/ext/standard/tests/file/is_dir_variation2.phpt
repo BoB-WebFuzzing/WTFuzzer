@@ -5,7 +5,6 @@ Test is_dir() function: usage variations - links
 if (substr(PHP_OS, 0, 3) == 'WIN') {
     die('skip Do not run on Windows');
 }
-?>
 --FILE--
 <?php
 /* Testing is_dir() with dir, soft & hard link to dir,

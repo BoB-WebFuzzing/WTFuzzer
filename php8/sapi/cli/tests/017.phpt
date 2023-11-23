@@ -8,12 +8,13 @@ include "skipif.inc";
 if (readline_info('done') !== NULL) {
     die ("skip need readline support using libedit");
 }
+if(substr(PHP_OS, 0, 3) == 'WIN' ) {
+    die('skip not for Windows');
+}
 ?>
 --FILE--
 <?php
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
-$ini = getenv('TEST_PHP_EXTRA_ARGS');
-$descriptorspec = [['pipe', 'r'], STDOUT, STDERR];
+$php = getenv('TEST_PHP_EXECUTABLE');
 
 $codes = array();
 
@@ -54,10 +55,8 @@ EOT;
 
 foreach ($codes as $key => $code) {
     echo "\n--------------\nSnippet no. $key:\n--------------\n";
-    $proc = proc_open("$php $ini -a", $descriptorspec, $pipes);
-    fwrite($pipes[0], $code);
-    fclose($pipes[0]);
-    proc_close($proc);
+    $code = escapeshellarg($code);
+    echo `echo $code | "$php" -a`, "\n";
 }
 
 echo "\nDone\n";
@@ -70,6 +69,7 @@ Interactive shell
 
 Hello world
 
+
 --------------
 Snippet no. 2:
 --------------
@@ -78,6 +78,7 @@ Interactive shell
 multine
 single
 quote
+
 
 --------------
 Snippet no. 3:
@@ -89,12 +90,14 @@ comes
 the
 doc
 
+
 --------------
 Snippet no. 4:
 --------------
 Interactive shell
 
 Done
+
 
 --------------
 Snippet no. 5:
@@ -103,5 +106,6 @@ Interactive shell
 
 
 Parse error: Unmatched ')' in php shell code on line 1
+
 
 Done

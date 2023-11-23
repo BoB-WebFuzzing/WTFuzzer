@@ -2,10 +2,6 @@
 Test error handling when persistent connection is passed to oci_error()
 --EXTENSIONS--
 oci8
---SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
 --FILE--
 <?php
 
@@ -14,7 +10,7 @@ require_once 'skipifconnectfailure.inc';
 // was fixed and the behavior of oci_error() for all connections types
 // was made consistent.
 
-require __DIR__.'/details.inc';
+require(__DIR__.'/details.inc');
 
 // Test parse error for normal connection
 

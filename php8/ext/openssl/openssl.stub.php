@@ -161,11 +161,6 @@ const PKCS7_BINARY = UNKNOWN;
  * @cvalue PKCS7_NOSIGS
  */
 const PKCS7_NOSIGS = UNKNOWN;
-/**
- * @var int
- * @cvalue PKCS7_NOOLDMIMETYPE
- */
-const PKCS7_NOOLDMIMETYPE = UNKNOWN;
 
 /**
  * @var int
@@ -207,11 +202,6 @@ const OPENSSL_CMS_BINARY = UNKNOWN;
  * @cvalue CMS_NOSIGS
  */
 const OPENSSL_CMS_NOSIGS = UNKNOWN;
-/**
- * @var int
- * @cvalue CMS_NOOLDMIMETYPE
- */
-const OPENSSL_CMS_OLDMIMETYPE = UNKNOWN;
 
 /**
  * @var int

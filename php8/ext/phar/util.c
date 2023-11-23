@@ -239,11 +239,11 @@ int phar_mount_entry(phar_archive_data *phar, char *filename, size_t filename_le
 }
 /* }}} */
 
-zend_string *phar_find_in_include_path(zend_string *filename, phar_archive_data **pphar) /* {{{ */
+zend_string *phar_find_in_include_path(char *filename, size_t filename_len, phar_archive_data **pphar) /* {{{ */
 {
 	zend_string *ret;
-	char *path, *arch, *entry, *test;
-	size_t arch_len, entry_len;
+	char *path, *fname, *arch, *entry, *test;
+	size_t arch_len, entry_len, fname_len;
 	phar_archive_data *phar;
 
 	if (pphar) {
@@ -256,33 +256,23 @@ zend_string *phar_find_in_include_path(zend_string *filename, phar_archive_data 
 		return NULL;
 	}
 
-	zend_string *fname = zend_get_executed_filename_ex();
-	if (!fname) {
-		return NULL;
-	}
+	fname = (char*)zend_get_executed_filename();
+	fname_len = strlen(fname);
 
-	bool is_file_a_phar_wrapper = zend_string_starts_with_literal_ci(fname, "phar://");
-	size_t length_phar_protocol = strlen("phar://");
-
-	if (
-		PHAR_G(last_phar)
-		&& is_file_a_phar_wrapper
-		&& ZSTR_LEN(fname) - length_phar_protocol >= PHAR_G(last_phar_name_len)
-		&& !memcmp(ZSTR_VAL(fname) + length_phar_protocol, PHAR_G(last_phar_name), PHAR_G(last_phar_name_len))
-	) {
+	if (PHAR_G(last_phar) && !memcmp(fname, "phar://", 7) && fname_len - 7 >= PHAR_G(last_phar_name_len) && !memcmp(fname + 7, PHAR_G(last_phar_name), PHAR_G(last_phar_name_len))) {
 		arch = estrndup(PHAR_G(last_phar_name), PHAR_G(last_phar_name_len));
 		arch_len = PHAR_G(last_phar_name_len);
 		phar = PHAR_G(last_phar);
 		goto splitted;
 	}
 
-	if (!is_file_a_phar_wrapper || SUCCESS != phar_split_fname(ZSTR_VAL(fname), ZSTR_LEN(fname), &arch, &arch_len, &entry, &entry_len, 1, 0)) {
+	if (fname_len < 7 || memcmp(fname, "phar://", 7) || SUCCESS != phar_split_fname(fname, strlen(fname), &arch, &arch_len, &entry, &entry_len, 1, 0)) {
 		return NULL;
 	}
 
 	efree(entry);
 
-	if (*ZSTR_VAL(filename) == '.') {
+	if (*filename == '.') {
 		size_t try_len;
 
 		if (FAILURE == phar_get_archive(&phar, arch, arch_len, NULL, 0, NULL)) {
@@ -294,8 +284,8 @@ splitted:
 			*pphar = phar;
 		}
 
-		try_len = ZSTR_LEN(filename);
-		test = phar_fix_filepath(estrndup(ZSTR_VAL(filename), ZSTR_LEN(filename)), &try_len, 1);
+		try_len = filename_len;
+		test = phar_fix_filepath(estrndup(filename, filename_len), &try_len, 1);
 
 		if (*test == '/') {
 			if (zend_hash_str_exists(&(phar->manifest), test + 1, try_len - 1)) {
@@ -317,10 +307,10 @@ splitted:
 
 	spprintf(&path, MAXPATHLEN + 1 + strlen(PG(include_path)), "phar://%s/%s%c%s", arch, PHAR_G(cwd), DEFAULT_DIR_SEPARATOR, PG(include_path));
 	efree(arch);
-	ret = php_resolve_path(ZSTR_VAL(filename), ZSTR_LEN(filename), path);
+	ret = php_resolve_path(filename, filename_len, path);
 	efree(path);
 
-	if (ret && zend_string_starts_with_literal_ci(ret, "phar://")) {
+	if (ret && ZSTR_LEN(ret) > 8 && !strncmp(ZSTR_VAL(ret), "phar://", 7)) {
 		/* found phar:// */
 		if (SUCCESS != phar_split_fname(ZSTR_VAL(ret), ZSTR_LEN(ret), &arch, &arch_len, &entry, &entry_len, 1, 0)) {
 			return ret;
@@ -1257,7 +1247,7 @@ phar_entry_info *phar_get_entry_info_dir(phar_archive_data *phar, char *path, si
 	}
 
 	if (is_dir) {
-		if (path_len <= 1) {
+		if (!path_len || path_len == 1) {
 			return NULL;
 		}
 		path_len--;
@@ -1549,8 +1539,10 @@ int phar_verify_signature(php_stream *fp, size_t end_of_phar, uint32_t sig_type,
 #ifndef PHAR_HAVE_OPENSSL
 			tempsig = sig_len;
 
-			if (FAILURE == phar_call_openssl_signverify(0, fp, end_of_phar, ZSTR_VAL(pubkey), ZSTR_LEN(pubkey), &sig, &tempsig, sig_type)) {
-				zend_string_release_ex(pubkey, 0);
+			if (FAILURE == phar_call_openssl_signverify(0, fp, end_of_phar, pubkey ? ZSTR_VAL(pubkey) : NULL, pubkey ? ZSTR_LEN(pubkey) : 0, &sig, &tempsig, sig_type)) {
+				if (pubkey) {
+					zend_string_release_ex(pubkey, 0);
+				}
 
 				if (error) {
 					spprintf(error, 0, "openssl signature could not be verified");
@@ -1559,11 +1551,13 @@ int phar_verify_signature(php_stream *fp, size_t end_of_phar, uint32_t sig_type,
 				return FAILURE;
 			}
 
-			zend_string_release_ex(pubkey, 0);
+			if (pubkey) {
+				zend_string_release_ex(pubkey, 0);
+			}
 
 			sig_len = tempsig;
 #else
-			in = BIO_new_mem_buf(ZSTR_VAL(pubkey), ZSTR_LEN(pubkey));
+			in = BIO_new_mem_buf(pubkey ? ZSTR_VAL(pubkey) : NULL, pubkey ? ZSTR_LEN(pubkey) : 0);
 
 			if (NULL == in) {
 				zend_string_release_ex(pubkey, 0);

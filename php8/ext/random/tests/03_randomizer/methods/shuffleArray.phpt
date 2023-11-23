@@ -20,7 +20,6 @@ $engines[] = new PcgOneseq128XslRr64();
 $engines[] = new Xoshiro256StarStar();
 $engines[] = new Secure();
 $engines[] = new TestShaEngine();
-$length = getenv("SKIP_SLOW_TESTS") ? 1_000 : 5_000;
 
 foreach ($engines as $engine) {
     echo $engine::class, PHP_EOL;
@@ -28,7 +27,7 @@ foreach ($engines as $engine) {
     $randomizer = new Randomizer($engine);
 
     // This test is slow, test all numbers smaller than 50 and then in steps of 677 (which is prime).
-    for ($i = 1; $i < $length; $i += ($i < 50 ? 1 : 677)) {
+    for ($i = 1; $i < 5_000; $i += ($i < 50 ? 1 : 677)) {
         $array = range(1, $i);
 
         $result = $randomizer->shuffleArray($array);
@@ -44,10 +43,7 @@ foreach ($engines as $engine) {
 die('success');
 
 ?>
---EXPECTF--
-Deprecated: Constant MT_RAND_PHP is deprecated in %s on line %d
-
-Deprecated: The MT_RAND_PHP variant of Mt19937 is deprecated in %s on line %d
+--EXPECT--
 Random\Engine\Mt19937
 Random\Engine\Mt19937
 Random\Engine\PcgOneseq128XslRr64

@@ -5,7 +5,7 @@ version string
 --FILE--
 <?php
 
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = getenv('TEST_PHP_EXECUTABLE');
 
 var_dump(`$php -n -v`);
 

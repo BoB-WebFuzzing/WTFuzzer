@@ -36,7 +36,7 @@ fclose($client);
 ?>
 --EXPECTF--
 Write some data:
-array(8) {
+array(7) {
   ["timed_out"]=>
   bool(false)
   ["blocked"]=>
@@ -51,13 +51,11 @@ array(8) {
   int(%i)
   ["seekable"]=>
   bool(false)
-  ["uri"]=>
-  string(21) "tcp://127.0.0.1:31334"
 }
 
 
 Read a line from the client:
-array(8) {
+array(7) {
   ["timed_out"]=>
   bool(false)
   ["blocked"]=>
@@ -72,13 +70,11 @@ array(8) {
   int(%i)
   ["seekable"]=>
   bool(false)
-  ["uri"]=>
-  string(21) "tcp://127.0.0.1:31334"
 }
 
 
 Close the server side socket and read the remaining data from the client:
-array(8) {
+array(7) {
   ["timed_out"]=>
   bool(false)
   ["blocked"]=>
@@ -93,6 +89,4 @@ array(8) {
   int(%i)
   ["seekable"]=>
   bool(false)
-  ["uri"]=>
-  string(21) "tcp://127.0.0.1:31334"
 }

@@ -9,8 +9,7 @@ class C1 { }
 class C2 { use T1; }
 class C3 { use T1; use T2; }
 
-$classes  = ['C1', 'C2', 'C3'];
-foreach ($classes as $c) {
+for ($c = "C1"; $c <= "C3"; $c++) {
     echo "class $c:\n";
     $r = new ReflectionClass($c);
     var_dump($r->getTraitNames());

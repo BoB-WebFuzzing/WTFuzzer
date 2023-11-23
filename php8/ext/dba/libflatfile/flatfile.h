@@ -39,6 +39,6 @@ int flatfile_delete(flatfile *dba, datum key_datum);
 int flatfile_findkey(flatfile *dba, datum key_datum);
 datum flatfile_firstkey(flatfile *dba);
 datum flatfile_nextkey(flatfile *dba);
-const char *flatfile_version(void);
+char *flatfile_version(void);
 
 #endif

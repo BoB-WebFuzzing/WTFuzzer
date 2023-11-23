@@ -100,31 +100,31 @@ PHP_FUNCTION(settype)
 	} else {
 		ptr = Z_REFVAL_P(var);
 	}
-	if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_INTEGER))) {
+	if (zend_string_equals_literal_ci(type, "integer")) {
 		convert_to_long(ptr);
-	} else if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_INT))) {
+	} else if (zend_string_equals_literal_ci(type, "int")) {
 		convert_to_long(ptr);
-	} else if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_FLOAT))) {
+	} else if (zend_string_equals_literal_ci(type, "float")) {
 		convert_to_double(ptr);
-	} else if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_DOUBLE))) { /* deprecated */
+	} else if (zend_string_equals_literal_ci(type, "double")) { /* deprecated */
 		convert_to_double(ptr);
-	} else if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_STRING))) {
+	} else if (zend_string_equals_literal_ci(type, "string")) {
 		convert_to_string(ptr);
-	} else if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_ARRAY))) {
+	} else if (zend_string_equals_literal_ci(type, "array")) {
 		convert_to_array(ptr);
-	} else if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_OBJECT))) {
+	} else if (zend_string_equals_literal_ci(type, "object")) {
 		convert_to_object(ptr);
-	} else if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_BOOL))) {
+	} else if (zend_string_equals_literal_ci(type, "bool")) {
 		convert_to_boolean(ptr);
-	} else if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_BOOLEAN))) {
+	} else if (zend_string_equals_literal_ci(type, "boolean")) {
 		convert_to_boolean(ptr);
-	} else if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_NULL_LOWERCASE))) {
+	} else if (zend_string_equals_literal_ci(type, "null")) {
 		convert_to_null(ptr);
 	} else {
 		if (ptr == &tmp) {
 			zval_ptr_dtor(&tmp);
 		}
-		if (zend_string_equals_ci(type, ZSTR_KNOWN(ZEND_STR_RESOURCE))) {
+		if (zend_string_equals_literal_ci(type, "resource")) {
 			zend_value_error("Cannot convert to resource type");
 		} else {
 			zend_argument_value_error(2, "must be a valid type");

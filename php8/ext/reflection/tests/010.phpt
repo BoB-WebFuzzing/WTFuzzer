@@ -10,7 +10,7 @@ class Bar extends Foo {
     function func() {
     }
 }
-$m = ReflectionMethod::createFromMethodName("Bar::func");
+$m = new ReflectionMethod("Bar::func");
 echo $m;
 ?>
 --EXPECTF--

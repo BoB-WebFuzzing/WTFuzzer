@@ -19,18 +19,10 @@ pg_query($db, "CREATE TABLE bug77047 (
         t TIME WITHOUT TIME ZONE
     )");
 
-try {
-    pg_insert($db, "bug77047", array("t" => "13:31"));
-} catch (\TypeError $e) {
-    echo $e->getMessage();
-}
+pg_insert($db, "bug77047", array("t" => "13:31"));
 pg_insert($db, "bug77047", array("t" => "13:31:13"));
 pg_insert($db, "bug77047", array("t" => "1:2:3"));
-try {
-    pg_insert($db, "bug77047", array("t" => "xyz"));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . PHP_EOL;
-}
+pg_insert($db, "bug77047", array("t" => "xyz"));
 pg_insert($db, "bug77047", array("t" => NULL));
 pg_insert($db, "bug77047", array("t" => ""));
 
@@ -41,9 +33,10 @@ while (false !== ($row = pg_fetch_row($res))) {
 
 ?>
 --EXPECTF--
-pg_insert(): Field "t" must be of type string|null, time given
+Notice: pg_insert(): Expects NULL or string for PostgreSQL time field (t) in %s on line %d
 string(8) "13:31:00"
 string(8) "13:31:13"
 string(8) "01:02:03"
 NULL
 NULL
+

@@ -22,8 +22,6 @@
 #ifndef ZEND_PERSIST_H
 #define ZEND_PERSIST_H
 
-BEGIN_EXTERN_C()
-
 uint32_t zend_accel_script_persist_calc(zend_persistent_script *script, int for_shm);
 zend_persistent_script *zend_accel_script_persist(zend_persistent_script *script, int for_shm);
 
@@ -32,7 +30,5 @@ zend_class_entry *zend_persist_class_entry(zend_class_entry *ce);
 void zend_update_parent_ce(zend_class_entry *ce);
 void zend_persist_warnings_calc(uint32_t num_warnings, zend_error_info **warnings);
 zend_error_info **zend_persist_warnings(uint32_t num_warnings, zend_error_info **warnings);
-
-END_EXTERN_C()
 
 #endif /* ZEND_PERSIST_H */

@@ -52,7 +52,6 @@ PHP_FUNCTION( msgfmt_set_pattern )
 	size_t      value_len = 0;
 	int32_t     spattern_len = 0;
 	UChar*	    spattern  = NULL;
-	UParseError spattern_error = {0};
 	MSG_FORMAT_METHOD_INIT_VARS;
 
 	/* Parse parameters. */
@@ -76,17 +75,12 @@ PHP_FUNCTION( msgfmt_set_pattern )
 	}
 #endif
 
-	umsg_applyPattern(MSG_FORMAT_OBJECT(mfo), spattern, spattern_len, &spattern_error, &INTL_DATA_ERROR_CODE(mfo));
+	/* TODO: add parse error information */
+	umsg_applyPattern(MSG_FORMAT_OBJECT(mfo), spattern, spattern_len, NULL, &INTL_DATA_ERROR_CODE(mfo));
 	if (spattern) {
 		efree(spattern);
 	}
-	if (U_FAILURE(INTL_DATA_ERROR_CODE(mfo))) {
-		char *msg;
-		spprintf(&msg, 0, "Error setting symbol value at line %d, offset %d", spattern_error.line, spattern_error.offset);
-		intl_errors_set_custom_msg(INTL_DATA_ERROR_P(mfo), msg, 1);
-		efree(msg);
-		RETURN_FALSE;
-	}
+	INTL_METHOD_CHECK_STATUS(mfo, "Error setting symbol value");
 
 	if(mfo->mf_data.orig_format) {
 		efree(mfo->mf_data.orig_format);

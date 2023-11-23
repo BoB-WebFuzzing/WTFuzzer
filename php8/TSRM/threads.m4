@@ -73,7 +73,7 @@ void *thread_routine(void *data) {
     return data;
 }
 
-int main(void) {
+int main() {
     pthread_t thd;
     pthread_mutexattr_t mattr;
     int data = 1;

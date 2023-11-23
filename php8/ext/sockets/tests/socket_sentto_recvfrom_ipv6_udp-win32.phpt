@@ -9,7 +9,6 @@ if (substr(PHP_OS, 0, 3) != 'WIN') {
     die('skip only for Windows');
 }
 require 'ipv6_skipif.inc';
-?>
 --FILE--
 <?php
     $socket = socket_create(AF_INET6, SOCK_DGRAM, SOL_UDP);

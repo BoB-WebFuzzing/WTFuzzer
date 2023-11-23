@@ -7,7 +7,6 @@ sockets
 if (strtolower(substr(PHP_OS, 0, 3)) === 'win') {
     die('skip not valid for Windows.');
 }
-?>
 --FILE--
 <?php
 

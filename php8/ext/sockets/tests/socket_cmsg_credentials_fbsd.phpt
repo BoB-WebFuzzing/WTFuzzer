@@ -8,7 +8,6 @@ sockets
 if (!str_contains(PHP_OS, 'FreeBSD')) {
     die('skipped supported only on FreeBSD');
 }
-?>
 --FILE--
 <?php
 include __DIR__."/mcast_helpers.php.inc";
@@ -49,7 +48,6 @@ var_dump($data['control'][0]['data']['pid'] === $pid);
 <?php
 $path = __DIR__ . "/socket_cmsg_credentials_fbsd.sock";
 @unlink($path);
-?>
 --EXPECTF--
 creating send socket
 object(Socket)#%d (0) {

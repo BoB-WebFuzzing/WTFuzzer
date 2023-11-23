@@ -9,8 +9,8 @@ $start = microtime(true);
 try {
     $a = mktime(1, 1, 1, 1, 1, 11111111111);
 } catch (TypeError $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage(), "\n";
 }
 ?>
 --EXPECT--
-TypeError: mktime(): Argument #6 ($year) must be of type ?int, float given
+mktime(): Argument #6 ($year) must be of type ?int, float given

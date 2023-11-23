@@ -6,10 +6,8 @@ ffi
 ffi.enable=1
 --FILE--
 <?php
-$ffi = FFI::cdef();
-
-$v = $ffi->new("int*[2]");
-$v[1] = $ffi->new("int[1]", false);
+$v = FFI::new("int*[2]");
+$v[1] = FFI::new("int[1]", false);
 $v[1][0] = 42;
 var_dump($v);
 FFI::free($v[1]);

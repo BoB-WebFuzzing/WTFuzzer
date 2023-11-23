@@ -227,8 +227,7 @@ PHP_METHOD(DOMImplementation, getFeature)
 		RETURN_THROWS();
 	}
 
-	zend_throw_error(NULL, "Not yet implemented");
-	RETURN_THROWS();
+	DOM_NOT_IMPLEMENTED();
 }
 /* }}} end dom_domimplementation_get_feature */
 

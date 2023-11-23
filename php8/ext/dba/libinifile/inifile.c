@@ -38,7 +38,7 @@
  */
 
 /* {{{ inifile_version */
-const char *inifile_version(void)
+char *inifile_version()
 {
 	return "1.0, $Id$";
 }

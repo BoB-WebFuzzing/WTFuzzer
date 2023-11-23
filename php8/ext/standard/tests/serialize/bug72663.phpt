@@ -49,10 +49,10 @@ try {
 
 ?>
 --EXPECTF--
-Warning: unserialize(): Error at offset 17 of 24 bytes in %s on line %d
+Notice: unserialize(): Error at offset 17 of 24 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 25 of 32 bytes in %s on line %d
+Notice: unserialize(): Error at offset 25 of 32 bytes in %s on line %d
 bool(false)
 Caught
 Caught

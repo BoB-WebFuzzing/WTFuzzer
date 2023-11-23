@@ -18,10 +18,10 @@ class B extends A {
 
 }
 
-$method = ReflectionMethod::createFromMethodName("b::call");
+$method = new ReflectionMethod("b::call");
 $method->invoke(null);
 $method->invokeArgs(null, array());
-$method = ReflectionMethod::createFromMethodName("A::call");
+$method = new ReflectionMethod("A::call");
 $method->invoke(null);
 $method->invokeArgs(null, array());
 ?>

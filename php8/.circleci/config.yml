@@ -111,6 +111,7 @@ jobs:
               --enable-exif \
               --with-zip \
               --with-zlib \
+              --with-zlib-dir=/usr \
               --enable-soap \
               --enable-xmlreader \
               --with-xsl \
@@ -181,10 +182,7 @@ jobs:
             sapi/cli/php run-tests.php \
               -d zend_extension=opcache.so \
               -d opcache.enable_cli=1 \
-              -d opcache.jit_buffer_size=64M \
-              -d opcache.jit_max_root_traces=100000 \
-              -d opcache.jit_max_side_traces=100000 \
-              -d opcache.jit_max_exit_counters=100000 \
+              -d opcache.jit_buffer_size=16M \
               -d opcache.jit=tracing \
               -P -q -x -j2 \
               -g FAIL,BORK,LEAK,XLEAK \

@@ -67,17 +67,11 @@ on input and is used to verify the PHP parameter is an instance of that class.
 ```txt
 a  - array (zval*)
 A  - array or object (zval*)
-b  - boolean (bool)
+b  - boolean (zend_bool)
 C  - class (zend_class_entry*)
 d  - double (double)
-f  - PHP callable containing php function/method call info (returned as
-     zend_fcall_info and zend_fcall_info_cache).
-     The FCC may be uninitialized if the callable is a trampoline.
-F  - PHP callable containing php function/method call info (returned as
-     zend_fcall_info and zend_fcall_info_cache).
-     The FCC will *always* be initialized, even if the callable is a trampoline.
-     A trampoline *must* be consumed or released with
-     zend_release_fcall_info_cache().
+f  - function or array containing php method call info (returned as
+     zend_fcall_info and zend_fcall_info_cache)
 h  - array (returned as HashTable*)
 H  - array or HASH_OF(object) (returned as HashTable*)
 l  - long (zend_long)
@@ -103,9 +97,9 @@ The following characters also have a meaning in the specifier string:
 * `!` - the parameter it follows can be of specified type or NULL. If NULL is
   passed, and the output for such type is a pointer, then the output pointer is
   set to a native NULL pointer. For 'b', 'l' and 'd', an extra argument of type
-  bool* must be passed after the corresponding bool*, zend_long* or
+  zend_bool* must be passed after the corresponding bool*, zend_long* or
   double* arguments, respectively. A non-zero value will be written to the
-  bool if a PHP NULL is passed.
+  zend_bool if a PHP NULL is passed.
   For `f` use the ``ZEND_FCI_INITIALIZED(fci)`` macro to check if a callable
   has been provided and ``!ZEND_FCI_INITIALIZED(fci)`` to check if a PHP NULL
   is passed.

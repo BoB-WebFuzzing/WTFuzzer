@@ -531,14 +531,11 @@ zend_result php_json_escape_string(
 static zend_result php_json_encode_serializable_object(smart_str *buf, zval *val, int options, php_json_encoder *encoder) /* {{{ */
 {
 	zend_class_entry *ce = Z_OBJCE_P(val);
-	zend_object *obj = Z_OBJ_P(val);
-	uint32_t *guard = zend_get_recursion_guard(obj);
+	HashTable* myht = Z_OBJPROP_P(val);
 	zval retval, fname;
 	zend_result return_code;
 
-	ZEND_ASSERT(guard != NULL);
-
-	if (ZEND_GUARD_IS_RECURSIVE(guard, JSON)) {
+	if (myht && GC_IS_RECURSIVE(myht)) {
 		encoder->error_code = PHP_JSON_ERROR_RECURSION;
 		if (options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR) {
 			smart_str_appendl(buf, "null", 4);
@@ -546,7 +543,7 @@ static zend_result php_json_encode_serializable_object(smart_str *buf, zval *val
 		return FAILURE;
 	}
 
-	ZEND_GUARD_PROTECT_RECURSION(guard, JSON);
+	PHP_JSON_HASH_PROTECT_RECURSION(myht);
 
 	ZVAL_STRING(&fname, "jsonSerialize");
 
@@ -559,7 +556,7 @@ static zend_result php_json_encode_serializable_object(smart_str *buf, zval *val
 		if (options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR) {
 			smart_str_appendl(buf, "null", 4);
 		}
-		ZEND_GUARD_UNPROTECT_RECURSION(guard, JSON);
+		PHP_JSON_HASH_UNPROTECT_RECURSION(myht);
 		return FAILURE;
 	}
 
@@ -571,19 +568,19 @@ static zend_result php_json_encode_serializable_object(smart_str *buf, zval *val
 		if (options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR) {
 			smart_str_appendl(buf, "null", 4);
 		}
-		ZEND_GUARD_UNPROTECT_RECURSION(guard, JSON);
+		PHP_JSON_HASH_UNPROTECT_RECURSION(myht);
 		return FAILURE;
 	}
 
 	if ((Z_TYPE(retval) == IS_OBJECT) &&
 		(Z_OBJ(retval) == Z_OBJ_P(val))) {
 		/* Handle the case where jsonSerialize does: return $this; by going straight to encode array */
-		ZEND_GUARD_UNPROTECT_RECURSION(guard, JSON);
+		PHP_JSON_HASH_UNPROTECT_RECURSION(myht);
 		return_code = php_json_encode_array(buf, &retval, options, encoder);
 	} else {
 		/* All other types, encode as normal */
 		return_code = php_json_encode_zval(buf, &retval, options, encoder);
-		ZEND_GUARD_UNPROTECT_RECURSION(guard, JSON);
+		PHP_JSON_HASH_UNPROTECT_RECURSION(myht);
 	}
 
 	zval_ptr_dtor(&retval);

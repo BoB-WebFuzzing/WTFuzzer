@@ -13,6 +13,30 @@ AC_DEFUN([AC_FPM_STDLIBS],
   AC_SEARCH_LIBS(inet_addr, nsl)
 ])
 
+AC_DEFUN([AC_FPM_PRCTL],
+[
+  AC_MSG_CHECKING([for prctl])
+
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/prctl.h>]], [[prctl(0, 0, 0, 0, 0);]])], [
+    AC_DEFINE([HAVE_PRCTL], 1, [do we have prctl?])
+    AC_MSG_RESULT([yes])
+  ], [
+    AC_MSG_RESULT([no])
+  ])
+])
+
+AC_DEFUN([AC_FPM_PROCCTL],
+[
+  AC_MSG_CHECKING([for procctl])
+
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/procctl.h>]], [[procctl(0, 0, 0, 0);]])], [
+    AC_DEFINE([HAVE_PROCCTL], 1, [do we have procctl?])
+    AC_MSG_RESULT([yes])
+  ], [
+    AC_MSG_RESULT([no])
+  ])
+])
+
 AC_DEFUN([AC_FPM_SETPFLAGS],
 [
   AC_MSG_CHECKING([for setpflags])
@@ -66,7 +90,7 @@ AC_DEFUN([AC_FPM_CLOCK],
       #include <mach/clock.h>
       #include <mach/mach_error.h>
 
-      int main(void)
+      int main()
       {
         kern_return_t ret; clock_serv_t aClock; mach_timespec_t aTime;
         ret = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &aClock);
@@ -134,7 +158,7 @@ AC_DEFUN([AC_FPM_TRACE],
       #define PTRACE_PEEKDATA PT_READ_D
       #endif
 
-      int main(void)
+      int main()
       {
         long v1 = (unsigned int) -1; /* copy will fail if sizeof(long) == 8 and we've got "int ptrace()" */
         long v2;
@@ -239,7 +263,7 @@ AC_DEFUN([AC_FPM_TRACE],
       #include <sys/stat.h>
       #include <fcntl.h>
       #include <stdio.h>
-      int main(void)
+      int main()
       {
         long v1 = (unsigned int) -1, v2 = 0;
         char buf[128];
@@ -506,6 +530,8 @@ if test "$PHP_FPM" != "no"; then
   AC_MSG_RESULT($PHP_FPM)
 
   AC_FPM_STDLIBS
+  AC_FPM_PRCTL
+  AC_FPM_PROCCTL
   AC_FPM_SETPFLAGS
   AC_FPM_CLOCK
   AC_FPM_TRACE
@@ -578,7 +604,7 @@ if test "$PHP_FPM" != "no"; then
     AC_CHECK_HEADERS([sys/acl.h])
 
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <sys/acl.h>
-      int main(void)
+      int main()
       {
         acl_t acl;
         acl_entry_t user, group;
@@ -591,13 +617,13 @@ if test "$PHP_FPM" != "no"; then
         return 0;
       }
     ]])], [
-      AC_CHECK_LIB(acl, acl_free,
+      AC_CHECK_LIB(acl, acl_free, 
         [PHP_ADD_LIBRARY(acl)
           have_fpm_acl=yes
           AC_MSG_RESULT([yes])
         ],[
           AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <sys/acl.h>
-            int main(void)
+            int main()
             {
               acl_t acl;
               acl_entry_t user, group;
@@ -615,12 +641,12 @@ if test "$PHP_FPM" != "no"; then
           ], [
             have_fpm_acl=no
             AC_MSG_RESULT([no])
-          ], [AC_MSG_RESULT([skipped (cross-compiling)])])
+          ], [AC_MSG_RESULT([skipped])])
         ])
     ], [
       have_fpm_acl=no
       AC_MSG_RESULT([no])
-    ])
+    ], [AC_MSG_RESULT([skipped (cross-compiling)])])
 
     if test "$have_fpm_acl" = "yes"; then
       AC_DEFINE([HAVE_FPM_ACL], 1, [do we have acl support?])

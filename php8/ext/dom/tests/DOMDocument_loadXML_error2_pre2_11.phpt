@@ -12,6 +12,8 @@ Environment variables used in the test:
 - EXPECTED_RESULT: the expected result
 --CREDITS--
 Antonio Diaz Ruiz <dejalatele@gmail.com>
+--INI--
+assert.bail=true
 --EXTENSIONS--
 dom
 --ENV--

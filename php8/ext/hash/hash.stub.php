@@ -45,14 +45,12 @@ function hash_copy(HashContext $context): HashContext {}
 
 /**
  * @return array<int, string>
- * @compile-time-eval
  * @refcount 1
  */
 function hash_algos(): array {}
 
 /**
  * @return array<int, string>
- * @compile-time-eval
  * @refcount 1
  */
 function hash_hmac_algos(): array {}

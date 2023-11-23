@@ -2,10 +2,6 @@
 Bug #27303 (OCIBindByName binds numeric PHP values as characters)
 --EXTENSIONS--
 oci8
---SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
 --FILE--
 <?php
 

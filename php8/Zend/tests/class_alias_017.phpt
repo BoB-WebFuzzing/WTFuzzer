@@ -26,12 +26,8 @@ baz::test();
 bar::test();
 
 ?>
---EXPECTF--
+--EXPECT--
 foo
 baz
-
-Deprecated: Calling get_class() without arguments is deprecated in %s on line %d
 foo
-
-Deprecated: Calling get_class() without arguments is deprecated in %s on line %d
 foo

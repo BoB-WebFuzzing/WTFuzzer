@@ -49,7 +49,6 @@ do_test('1.1', 'close');
 echo "HTTP/1.1, connection: keep-alive:\n";
 do_test('1.1', 'keep-alive');
 
-?>
 --EXPECTF--
 HTTP/1.0, default behaviour:
 GET / HTTP/1.0

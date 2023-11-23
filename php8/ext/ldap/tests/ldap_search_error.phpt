@@ -11,7 +11,7 @@ ldap
 <?php
 include "connect.inc";
 
-$link = ldap_connect($uri);
+$link = ldap_connect($host, $port);
 
 $dn = "dc=not-found,$base";
 $filter = "(dc=*)";

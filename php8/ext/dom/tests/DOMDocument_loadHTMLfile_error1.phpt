@@ -4,6 +4,8 @@ Test DOMDocument::loadHTMLFile when the file doesn't exist
 Verifies that an error message is showed if the file doesn't exist
 --CREDITS--
 Antonio Diaz Ruiz <dejalatele@gmail.com>
+--INI--
+assert.bail=true
 --EXTENSIONS--
 dom
 --FILE--

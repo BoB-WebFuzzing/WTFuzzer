@@ -9,13 +9,13 @@ odbc
 
 include __DIR__ . "/config.inc";
 
-$create_table = "CREATE TABLE bug47803(
+$create_table = "CREATE TABLE FOO(
         [PAR_ID] [int] NOT NULL,
         [PAR_INT] [int] NULL,
         [PAR_CHR] [varchar](500) NULL
 )";
 
-$inserts = "INSERT INTO bug47803
+$inserts = "INSERT INTO FOO
            ([PAR_ID]
            ,[PAR_INT]
            ,[PAR_CHR])
@@ -37,6 +37,7 @@ date_default_timezone_set('Europe/Warsaw');
 
 $link = odbc_connect($dsn, $user, $pass);
 
+odbc_exec($link, 'CREATE DATABASE odbcTEST');
 odbc_exec($link, $create_table);
 odbc_exec($link, $inserts);
 
@@ -52,7 +53,7 @@ $upd_params = array(
     array('id'=>7, 'name'=>'test 7'),
     array('id'=>6, 'name'=>'test 6'),
 );
-$sql = "UPDATE bug47803
+$sql = "UPDATE FOO
      SET [PAR_CHR] = ?
      WHERE [PAR_ID] = ?";
 $result = odbc_prepare($link, $sql);
@@ -68,7 +69,7 @@ foreach ($upd_params as &$k) {
 }
 odbc_free_result($result);
 
-$sql = "SELECT * FROM bug47803 WHERE [PAR_ID] = ?";
+$sql = "SELECT * FROM FOO WHERE [PAR_ID] = ?";
 $result = odbc_prepare($link, $sql);
 if (!$result) {
     print ('[sql] prep: '.$sql);
@@ -87,17 +88,6 @@ foreach ($upd_params as $k) {
 out:
 if ($result) odbc_free_result($result);
 odbc_close($link);
-
-?>
---CLEAN--
-<?php
-include 'config.inc';
-
-$conn = odbc_connect($dsn, $user, $pass);
-
-odbc_exec($conn, 'DROP TABLE bug47803');
-
-odbc_close($conn);
 
 ?>
 --EXPECT--
@@ -181,3 +171,15 @@ array(3) {
   ["PAR_CHR"]=>
   string(6) "test 7"
 }
+--CLEAN--
+<?php
+include 'config.inc';
+
+$conn = odbc_connect($dsn, $user, $pass);
+
+odbc_exec($conn, 'DROP TABLE FOO');
+odbc_exec($conn, 'DROP DATABASE odbcTEST');
+
+odbc_close($conn);
+
+?>

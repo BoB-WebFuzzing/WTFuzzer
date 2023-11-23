@@ -652,7 +652,6 @@ static void zend_ssa_replace_control_link(zend_op_array *op_array, zend_ssa *ssa
 			case ZEND_COALESCE:
 			case ZEND_ASSERT_CHECK:
 			case ZEND_JMP_NULL:
-			case ZEND_BIND_INIT_STATIC_OR_JMP:
 				if (ZEND_OP2_JMP_ADDR(opline) == op_array->opcodes + old->start) {
 					ZEND_SET_OP_JMP_ADDR(opline, opline->op2, op_array->opcodes + dst->start);
 				}
@@ -848,7 +847,7 @@ optimize_jmpnz:
 						goto optimize_jmpz;
 					} else if (opline->op1_type == IS_CONST) {
 						if (zend_is_true(CT_CONSTANT_EX(op_array, opline->op1.constant))) {
-							opline->opcode = ZEND_BOOL;
+							opline->opcode = ZEND_QM_ASSIGN;
 							take_successor_1(ssa, block_num, block);
 						}
 					}
@@ -862,7 +861,7 @@ optimize_jmpnz:
 						goto optimize_jmpnz;
 					} else if (opline->op1_type == IS_CONST) {
 						if (!zend_is_true(CT_CONSTANT_EX(op_array, opline->op1.constant))) {
-							opline->opcode = ZEND_BOOL;
+							opline->opcode = ZEND_QM_ASSIGN;
 							take_successor_1(ssa, block_num, block);
 						}
 					}
@@ -933,7 +932,7 @@ optimize_jmpnz:
 				case ZEND_MATCH:
 					if (opline->op1_type == IS_CONST) {
 						zval *zv = CT_CONSTANT_EX(op_array, opline->op1.constant);
-						uint8_t type = Z_TYPE_P(zv);
+						zend_uchar type = Z_TYPE_P(zv);
 						bool correct_type =
 							(opline->opcode == ZEND_SWITCH_LONG && type == IS_LONG)
 							|| (opline->opcode == ZEND_SWITCH_STRING && type == IS_STRING)

@@ -32,11 +32,7 @@ var_dump($d);
 echo "\n\nUsed serialised interval:\n";
 $now = new DateTimeImmutable("2022-04-22 16:25:11 BST");
 var_dump($now->add($e));
-try {
-	var_dump($now->sub($e));
-} catch (DateInvalidOperationException $e) {
-	echo $e::class, ': ', $e->getMessage(), "\n";
-}
+var_dump($now->sub($e));
 ?>
 --EXPECTF--
 Original object:
@@ -88,4 +84,13 @@ object(DateTimeImmutable)#4 (3) {
   ["timezone"]=>
   string(3) "BST"
 }
-DateInvalidOperationException: DateTimeImmutable::sub(): Only non-special relative time specifications are supported for subtraction
+
+Warning: DateTimeImmutable::sub(): Only non-special relative time specifications are supported for subtraction in %s on line %d
+object(DateTimeImmutable)#4 (3) {
+  ["date"]=>
+  string(26) "2022-04-22 16:25:11.000000"
+  ["timezone_type"]=>
+  int(2)
+  ["timezone"]=>
+  string(3) "BST"
+}

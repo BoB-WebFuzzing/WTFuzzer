@@ -21,7 +21,6 @@ register_shutdown_function(function () {
 });
 
 new BadClass();
-?>
 --EXPECTF--
 Autoloading BadClass
 Autoloading Foo

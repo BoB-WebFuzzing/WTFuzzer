@@ -8,10 +8,10 @@ ffi.enable=1
 <?php
 function test_new_ownership($str, $transfer) {
     if ($transfer) {
-        return FFI::cdef()->new(FFI::cdef()->type($str));
+        return FFI::new(FFI::type($str));
     } else {
-        $type = FFI::cdef()->type($str);
-        return FFI::cdef()->new($type);
+        $type = FFI::type($str);
+        return FFI::new($type);
     }
 }
 var_dump(test_new_ownership("int", 1));
@@ -21,9 +21,9 @@ var_dump(test_new_ownership("int[2]", 0));
 
 function test_type_ownership($str, $transfer) {
     if ($transfer) {
-        return FFI::typeof(FFI::cdef()->new($str));
+        return FFI::typeof(FFI::new($str));
     } else {
-        $data = FFI::cdef()->new($str);
+        $data = FFI::new($str);
         return FFI::typeof($data);
     }
 }
@@ -34,10 +34,10 @@ var_dump(test_type_ownership("int[2]", 0));
 
 function test_cast_ownership($str, $transfer) {
     if ($transfer) {
-        return FFI::cdef()->cast(FFI::cdef()->type($str), FFI::cdef()->new($str));
+        return FFI::cast(FFI::type($str), FFI::new($str));
     } else {
-        $type = FFI::cdef()->type($str);
-        return FFI::cdef()->cast($type, FFI::cdef()->new($str));
+        $type = FFI::type($str);
+        return FFI::cast($type, FFI::new($str));
     }
 }
 var_dump(test_cast_ownership("int", 1));
@@ -47,9 +47,9 @@ var_dump(test_cast_ownership("int[2]", 0));
 
 function test_array_ownership($str, $transfer) {
     if ($transfer) {
-        return FFI::arrayType(FFI::cdef()->type($str), [2]);
+        return FFI::arrayType(FFI::type($str), [2]);
     } else {
-        $type = FFI::cdef()->type($str);
+        $type = FFI::type($str);
         return FFI::arrayType($type, [2]);
     }
 }

@@ -35,35 +35,44 @@ readonly=no
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-72AB8359
 Since:
 */
-zend_result dom_characterdata_data_read(dom_object *obj, zval *retval)
+int dom_characterdata_data_read(dom_object *obj, zval *retval)
 {
 	xmlNodePtr nodep = dom_object_get_node(obj);
+	xmlChar *content;
 
 	if (nodep == NULL) {
 		php_dom_throw_error(INVALID_STATE_ERR, 1);
 		return FAILURE;
 	}
 
-	php_dom_get_content_into_zval(nodep, retval, false);
+	if ((content = xmlNodeGetContent(nodep)) != NULL) {
+		ZVAL_STRING(retval, (char *) content);
+		xmlFree(content);
+	} else {
+		ZVAL_EMPTY_STRING(retval);
+	}
 
 	return SUCCESS;
 }
 
-zend_result dom_characterdata_data_write(dom_object *obj, zval *newval)
+int dom_characterdata_data_write(dom_object *obj, zval *newval)
 {
 	xmlNode *nodep = dom_object_get_node(obj);
+	zend_string *str;
 
 	if (nodep == NULL) {
 		php_dom_throw_error(INVALID_STATE_ERR, 1);
 		return FAILURE;
 	}
 
-	/* Typed property, this is already a string */
-	ZEND_ASSERT(Z_TYPE_P(newval) == IS_STRING);
-	zend_string *str = Z_STR_P(newval);
+	str = zval_try_get_string(newval);
+	if (UNEXPECTED(!str)) {
+		return FAILURE;
+	}
 
-	xmlNodeSetContentLen(nodep, (xmlChar *) ZSTR_VAL(str), ZSTR_LEN(str));
+	xmlNodeSetContentLen(nodep, (xmlChar *) ZSTR_VAL(str), ZSTR_LEN(str) + 1);
 
+	zend_string_release_ex(str, 0);
 	return SUCCESS;
 }
 
@@ -74,9 +83,10 @@ readonly=yes
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-7D61178C
 Since:
 */
-zend_result dom_characterdata_length_read(dom_object *obj, zval *retval)
+int dom_characterdata_length_read(dom_object *obj, zval *retval)
 {
 	xmlNodePtr nodep = dom_object_get_node(obj);
+	xmlChar *content;
 	long length = 0;
 
 	if (nodep == NULL) {
@@ -84,8 +94,11 @@ zend_result dom_characterdata_length_read(dom_object *obj, zval *retval)
 		return FAILURE;
 	}
 
-	if (nodep->content) {
-		length = xmlUTF8Strlen(nodep->content);
+	content = xmlNodeGetContent(nodep);
+
+	if (content) {
+		length = xmlUTF8Strlen(content);
+		xmlFree(content);
 	}
 
 	ZVAL_LONG(retval, length);
@@ -115,7 +128,7 @@ PHP_METHOD(DOMCharacterData, substringData)
 
 	DOM_GET_OBJ(node, id, xmlNodePtr, intern);
 
-	cur = node->content;
+	cur = xmlNodeGetContent(node);
 	if (cur == NULL) {
 		RETURN_FALSE;
 	}
@@ -123,6 +136,7 @@ PHP_METHOD(DOMCharacterData, substringData)
 	length = xmlUTF8Strlen(cur);
 
 	if (offset < 0 || count < 0 || ZEND_LONG_INT_OVFL(offset) || ZEND_LONG_INT_OVFL(count) || offset > length) {
+		xmlFree(cur);
 		php_dom_throw_error(INDEX_SIZE_ERR, dom_get_strict_error(intern->document));
 		RETURN_FALSE;
 	}
@@ -132,6 +146,7 @@ PHP_METHOD(DOMCharacterData, substringData)
 	}
 
 	substring = xmlUTF8Strsub(cur, (int)offset, (int)count);
+	xmlFree(cur);
 
 	if (substring) {
 		RETVAL_STRING((char *) substring);
@@ -185,7 +200,7 @@ PHP_METHOD(DOMCharacterData, insertData)
 
 	DOM_GET_OBJ(node, id, xmlNodePtr, intern);
 
-	cur = node->content;
+	cur = xmlNodeGetContent(node);
 	if (cur == NULL) {
 		RETURN_FALSE;
 	}
@@ -193,12 +208,14 @@ PHP_METHOD(DOMCharacterData, insertData)
 	length = xmlUTF8Strlen(cur);
 
 	if (offset < 0 || ZEND_LONG_INT_OVFL(offset) || offset > length) {
+		xmlFree(cur);
 		php_dom_throw_error(INDEX_SIZE_ERR, dom_get_strict_error(intern->document));
 		RETURN_FALSE;
 	}
 
 	first = xmlUTF8Strndup(cur, (int)offset);
 	second = xmlUTF8Strsub(cur, (int)offset, length - (int)offset);
+	xmlFree(cur);
 
 	xmlNodeSetContent(node, first);
 	xmlNodeAddContent(node, (xmlChar *) arg);
@@ -230,7 +247,7 @@ PHP_METHOD(DOMCharacterData, deleteData)
 
 	DOM_GET_OBJ(node, id, xmlNodePtr, intern);
 
-	cur = node->content;
+	cur = xmlNodeGetContent(node);
 	if (cur == NULL) {
 		RETURN_FALSE;
 	}
@@ -238,6 +255,7 @@ PHP_METHOD(DOMCharacterData, deleteData)
 	length = xmlUTF8Strlen(cur);
 
 	if (offset < 0 || count < 0 || ZEND_LONG_INT_OVFL(offset) || ZEND_LONG_INT_OVFL(count) || offset > length) {
+		xmlFree(cur);
 		php_dom_throw_error(INDEX_SIZE_ERR, dom_get_strict_error(intern->document));
 		RETURN_FALSE;
 	}
@@ -257,6 +275,7 @@ PHP_METHOD(DOMCharacterData, deleteData)
 
 	xmlNodeSetContent(node, substring);
 
+	xmlFree(cur);
 	xmlFree(second);
 	xmlFree(substring);
 
@@ -285,7 +304,7 @@ PHP_METHOD(DOMCharacterData, replaceData)
 
 	DOM_GET_OBJ(node, id, xmlNodePtr, intern);
 
-	cur = node->content;
+	cur = xmlNodeGetContent(node);
 	if (cur == NULL) {
 		RETURN_FALSE;
 	}
@@ -293,6 +312,7 @@ PHP_METHOD(DOMCharacterData, replaceData)
 	length = xmlUTF8Strlen(cur);
 
 	if (offset < 0 || count < 0 || ZEND_LONG_INT_OVFL(offset) || ZEND_LONG_INT_OVFL(count) || offset > length) {
+		xmlFree(cur);
 		php_dom_throw_error(INDEX_SIZE_ERR, dom_get_strict_error(intern->document));
 		RETURN_FALSE;
 	}
@@ -316,6 +336,7 @@ PHP_METHOD(DOMCharacterData, replaceData)
 
 	xmlNodeSetContent(node, substring);
 
+	xmlFree(cur);
 	if (second) {
 		xmlFree(second);
 	}
@@ -324,5 +345,72 @@ PHP_METHOD(DOMCharacterData, replaceData)
 	RETURN_TRUE;
 }
 /* }}} end dom_characterdata_replace_data */
+
+PHP_METHOD(DOMCharacterData, remove)
+{
+	zval *id = ZEND_THIS;
+	xmlNodePtr child;
+	dom_object *intern;
+
+	if (zend_parse_parameters_none() == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	DOM_GET_OBJ(child, id, xmlNodePtr, intern);
+
+	dom_child_node_remove(intern);
+	RETURN_NULL();
+}
+
+PHP_METHOD(DOMCharacterData, after)
+{
+	int argc = 0;
+	zval *args, *id;
+	dom_object *intern;
+	xmlNode *context;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "*", &args, &argc) == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	id = ZEND_THIS;
+	DOM_GET_OBJ(context, id, xmlNodePtr, intern);
+
+	dom_parent_node_after(intern, args, argc);
+}
+
+PHP_METHOD(DOMCharacterData, before)
+{
+	int argc = 0;
+	zval *args, *id;
+	dom_object *intern;
+	xmlNode *context;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "*", &args, &argc) == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	id = ZEND_THIS;
+	DOM_GET_OBJ(context, id, xmlNodePtr, intern);
+
+	dom_parent_node_before(intern, args, argc);
+}
+
+PHP_METHOD(DOMCharacterData, replaceWith)
+{
+	int argc = 0;
+	zval *args, *id;
+	dom_object *intern;
+	xmlNode *context;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "*", &args, &argc) == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	id = ZEND_THIS;
+	DOM_GET_OBJ(context, id, xmlNodePtr, intern);
+
+	dom_child_replace_with(intern, args, argc);
+}
 
 #endif

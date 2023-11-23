@@ -20,5 +20,5 @@ test();
 ?>
 --EXPECT--
 Undefined variable $data
-Trying to access array offset on null
+Trying to access array offset on value of type null
 Undefined index here: ''

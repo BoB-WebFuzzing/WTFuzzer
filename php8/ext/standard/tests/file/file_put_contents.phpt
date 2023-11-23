@@ -25,12 +25,9 @@ try {
     echo $e->getMessage(), "\n";
 }
 
+@unlink($file);
+
 echo "Done\n";
-?>
---CLEAN--
-<?php
-$file = __DIR__."/file_put_contents.txt";
-unlink($file);
 ?>
 --EXPECT--
 file_put_contents(): supplied resource is not a valid stream resource

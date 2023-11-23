@@ -10,7 +10,7 @@ if (substr(PHP_OS, 0, 3) == 'WIN') {
 --FILE--
 <?php
 
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = getenv('TEST_PHP_EXECUTABLE');
 
 $filename = __DIR__.'/008.test.php';
 $code ='
@@ -41,6 +41,6 @@ Stack trace:
 #0 {main}
   thrown in %s on line %d
 "
-Could not open input file: wrong
-NULL
+string(33) "Could not open input file: wrong
+"
 Done

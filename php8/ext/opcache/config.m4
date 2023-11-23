@@ -18,12 +18,6 @@ PHP_ARG_ENABLE([opcache-jit],
   [yes],
   [no])
 
-PHP_ARG_WITH([capstone],,
-  [AS_HELP_STRING([--with-capstone],
-    [support opcache JIT disassembly through capstone])],
-  [no],
-  [no])
-
 if test "$PHP_OPCACHE" != "no"; then
 
   dnl Always build as shared extension
@@ -35,7 +29,7 @@ if test "$PHP_OPCACHE" != "no"; then
 
   if test "$PHP_OPCACHE_JIT" = "yes"; then
     case $host_cpu in
-      i[[34567]]86*|x86*|aarch64)
+      i[[34567]]86*|x86*|aarch64|amd64)
         ;;
       *)
         AC_MSG_WARN([JIT not supported by host architecture])
@@ -44,62 +38,75 @@ if test "$PHP_OPCACHE" != "no"; then
     esac
   fi
 
-  if test "$PHP_OPCACHE_JIT" = "yes" ; then
+  if test "$PHP_OPCACHE_JIT" = "yes"; then
     AC_DEFINE(HAVE_JIT, 1, [Define to enable JIT])
-    AC_DEFINE(ZEND_JIT_IR, 1, [Use JIT IR framework])
-    ZEND_JIT_SRC="jit/zend_jit.c jit/zend_jit_vm_helpers.c jit/ir/ir.c jit/ir/ir_strtab.c \
-		jit/ir/ir_cfg.c	jit/ir/ir_sccp.c jit/ir/ir_gcm.c jit/ir/ir_ra.c jit/ir/ir_save.c \
-		jit/ir/ir_dump.c jit/ir/ir_gdb.c jit/ir/ir_perf.c jit/ir/ir_check.c \
-		jit/ir/ir_patch.c jit/ir/ir_emit.c"
+    ZEND_JIT_SRC="jit/zend_jit.c jit/zend_jit_gdb.c jit/zend_jit_vm_helpers.c"
 
     dnl Find out which ABI we are using.
     case $host_alias in
       x86_64-*-darwin*)
-        IR_TARGET=IR_TARGET_X64
         DASM_FLAGS="-D X64APPLE=1 -D X64=1"
         DASM_ARCH="x86"
         ;;
-      x86_64*)
+      *x86_64*|amd64-*-freebsd*)
         IR_TARGET=IR_TARGET_X64
         DASM_FLAGS="-D X64=1"
         DASM_ARCH="x86"
         ;;
       i[[34567]]86*)
-        IR_TARGET=IR_TARGET_X86
         DASM_ARCH="x86"
         ;;
       x86*)
-        IR_TARGET=IR_TARGET_X86
         DASM_ARCH="x86"
         ;;
       aarch64*)
-        IR_TARGET=IR_TARGET_AARCH64
-        DASM_ARCH="aarch64"
+        DASM_FLAGS="-D ARM64=1"
+        DASM_ARCH="arm64"
         ;;
-     esac
+    esac
 
-    AS_IF([test x"$with_capstone" = "xyes"],[
-      PKG_CHECK_MODULES([CAPSTONE],[capstone >= 3.0.0],[
-        AC_DEFINE([HAVE_CAPSTONE], [1], [Capstone is available])
+    if test "$PHP_THREAD_SAFETY" = "yes"; then
+      DASM_FLAGS="$DASM_FLAGS -D ZTS=1"
+    fi
+
+    PKG_CHECK_MODULES([CAPSTONE], [capstone >= 3.0.0],
+        [have_capstone="yes"], [have_capstone="no"])
+    if test "$have_capstone" = "yes"; then
+        AC_DEFINE(HAVE_CAPSTONE, 1, [ ])
         PHP_EVAL_LIBLINE($CAPSTONE_LIBS, OPCACHE_SHARED_LIBADD)
         PHP_EVAL_INCLINE($CAPSTONE_CFLAGS)
-        ZEND_JIT_SRC+=" jit/ir/ir_disasm.c"
-      ],[
-        AC_MSG_ERROR([capstone >= 3.0 required but not found])
-      ])
-    ])
+    fi
 
-    PHP_SUBST(IR_TARGET)
     PHP_SUBST(DASM_FLAGS)
     PHP_SUBST(DASM_ARCH)
 
-    JIT_CFLAGS="-I@ext_builddir@/jit/ir -D${IR_TARGET} -DIR_PHP"
-    if test "$ZEND_DEBUG" = "yes"; then
-      JIT_CFLAGS="${JIT_CFLAGS} -DIR_DEBUG"
+    AC_MSG_CHECKING(for opagent in default path)
+    for i in /usr/local /usr; do
+      if test -r $i/include/opagent.h; then
+        OPAGENT_DIR=$i
+        AC_MSG_RESULT(found in $i)
+        break
+      fi
+    done
+    if test -z "$OPAGENT_DIR"; then
+      AC_MSG_RESULT(not found)
+    else
+      PHP_CHECK_LIBRARY(opagent, op_write_native_code,
+      [
+        AC_DEFINE(HAVE_OPROFILE,1,[ ])
+        PHP_ADD_INCLUDE($OPAGENT_DIR/include)
+        PHP_ADD_LIBRARY_WITH_PATH(opagent, $OPAGENT_DIR/$PHP_LIBDIR/oprofile, OPCACHE_SHARED_LIBADD)
+        PHP_SUBST(OPCACHE_SHARED_LIBADD)
+      ],[
+        AC_MSG_RESULT(not found)
+      ],[
+        -L$OPAGENT_DIR/$PHP_LIBDIR/oprofile
+      ])
     fi
+
   fi
 
-  AC_CHECK_FUNCS([mprotect memfd_create shm_create_largepage])
+  AC_CHECK_FUNCS([mprotect])
 
   AC_MSG_CHECKING(for sysvipc shared memory support)
   AC_RUN_IFELSE([AC_LANG_SOURCE([[
@@ -110,7 +117,7 @@ if test "$PHP_OPCACHE" != "no"; then
 #include <unistd.h>
 #include <string.h>
 
-int main(void) {
+int main() {
   pid_t pid;
   int status;
   int ipc_id;
@@ -189,7 +196,7 @@ int main(void) {
 # define MAP_FAILED ((void*)-1)
 #endif
 
-int main(void) {
+int main() {
   pid_t pid;
   int status;
   char *shm;
@@ -251,7 +258,7 @@ int main(void) {
 # define MAP_FAILED ((void*)-1)
 #endif
 
-int main(void) {
+int main() {
   pid_t pid;
   int status;
   int fd;
@@ -321,7 +328,7 @@ int main(void) {
 	shared_alloc_mmap.c \
 	shared_alloc_posix.c \
 	$ZEND_JIT_SRC,
-	shared,,"-Wno-implicit-fallthrough -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 ${JIT_CFLAGS}",,yes)
+	shared,,"-Wno-implicit-fallthrough -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1",,yes)
 
   PHP_ADD_EXTENSION_DEP(opcache, pcre)
 
@@ -331,7 +338,6 @@ int main(void) {
 
   if test "$PHP_OPCACHE_JIT" = "yes"; then
     PHP_ADD_BUILD_DIR([$ext_builddir/jit], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/jit/ir], 1)
     PHP_ADD_MAKEFILE_FRAGMENT($ext_srcdir/jit/Makefile.frag)
   fi
   PHP_SUBST(OPCACHE_SHARED_LIBADD)

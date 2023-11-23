@@ -8,7 +8,6 @@ sockets
 if (str_contains(PHP_OS, 'FreeBSD')) {
     die('skip option not supported on FreeBSD');
 }
-?>
 --FILE--
 <?php
 $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);

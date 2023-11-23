@@ -6,7 +6,7 @@ include "skipif.inc";
 ?>
 --FILE--
 <?php
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = getenv('TEST_PHP_EXECUTABLE');
 
 // There are 3 types of option errors:
 // 1 : in flags

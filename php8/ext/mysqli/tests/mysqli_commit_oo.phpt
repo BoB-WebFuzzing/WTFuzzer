@@ -15,6 +15,9 @@ if (!have_innodb($link))
 <?php
     require_once 'connect.inc';
 
+    $tmp    = NULL;
+    $link   = NULL;
+
     $mysqli = new mysqli();
     try {
         $mysqli->commit();
@@ -22,7 +25,10 @@ if (!have_innodb($link))
         echo $exception->getMessage() . "\n";
     }
 
-    $mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket)) {
+        printf("[001] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+            $host, $user, $db, $port, $socket);
+    }
 
     if (true !== ($tmp = $mysqli->commit())) {
         printf("[002] Expecting boolean/true got %s/%s\n", gettype($tmp), $tmp);
@@ -92,7 +98,7 @@ if (!have_innodb($link))
 ?>
 --CLEAN--
 <?php
-require_once 'clean_table.inc';
+require_once "clean_table.inc";
 ?>
 --EXPECTF--
 mysqli object is not fully initialized

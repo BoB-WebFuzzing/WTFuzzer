@@ -6,7 +6,7 @@ ffi
 ffi.enable=1
 --FILE--
 <?php
-$p = FFI::cdef()->new("
+$p = FFI::new("
     union {
         struct __attribute__((packed)) {
             int a:2;

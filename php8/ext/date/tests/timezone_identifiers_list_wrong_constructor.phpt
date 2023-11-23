@@ -10,15 +10,15 @@ date.timezone=UTC
 try {
     var_dump(timezone_identifiers_list(DateTimeZone::PER_COUNTRY));
 } catch (\ValueError $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage() . \PHP_EOL;
 }
 try {
     var_dump(timezone_identifiers_list(DateTimeZone::PER_COUNTRY, 'A'));
 } catch (\ValueError $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo $e->getMessage() . \PHP_EOL;
 }
 
 ?>
 --EXPECT--
-ValueError: timezone_identifiers_list(): Argument #2 ($countryCode) must be a two-letter ISO 3166-1 compatible country code when argument #1 ($timezoneGroup) is DateTimeZone::PER_COUNTRY
-ValueError: timezone_identifiers_list(): Argument #2 ($countryCode) must be a two-letter ISO 3166-1 compatible country code when argument #1 ($timezoneGroup) is DateTimeZone::PER_COUNTRY
+timezone_identifiers_list(): Argument #2 ($countryCode) must be a two-letter ISO 3166-1 compatible country code when argument #1 ($timezoneGroup) is DateTimeZone::PER_COUNTRY
+timezone_identifiers_list(): Argument #2 ($countryCode) must be a two-letter ISO 3166-1 compatible country code when argument #1 ($timezoneGroup) is DateTimeZone::PER_COUNTRY

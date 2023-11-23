@@ -132,16 +132,16 @@ array_udiff_uassoc(): Argument #1 ($array) must be of type array, null given
 array_udiff_uassoc(): Argument #1 ($array) must be of type array, null given
 
 --lowercase true--
-array_udiff_uassoc(): Argument #1 ($array) must be of type array, true given
+array_udiff_uassoc(): Argument #1 ($array) must be of type array, bool given
 
 --lowercase false--
-array_udiff_uassoc(): Argument #1 ($array) must be of type array, false given
+array_udiff_uassoc(): Argument #1 ($array) must be of type array, bool given
 
 --uppercase TRUE--
-array_udiff_uassoc(): Argument #1 ($array) must be of type array, true given
+array_udiff_uassoc(): Argument #1 ($array) must be of type array, bool given
 
 --uppercase FALSE--
-array_udiff_uassoc(): Argument #1 ($array) must be of type array, false given
+array_udiff_uassoc(): Argument #1 ($array) must be of type array, bool given
 
 --empty string DQ--
 array_udiff_uassoc(): Argument #1 ($array) must be of type array, string given

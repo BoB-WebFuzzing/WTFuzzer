@@ -153,15 +153,6 @@ encodePtr get_encoder(sdlPtr sdl, const char *ns, const char *type)
 				new_enc->details.ns = estrndup(ns, ns_len);
 				new_enc->details.type_str = estrdup(new_enc->details.type_str);
 			}
-			if (new_enc->details.clark_notation) {
-				/* If it was persistent or becomes persistent, we must dup. Otherwise we can copy. */
-				bool was_persistent = GC_FLAGS(new_enc->details.clark_notation) & IS_STR_PERSISTENT;
-				if (was_persistent || sdl->is_persistent) {
-					new_enc->details.clark_notation = zend_string_dup(new_enc->details.clark_notation, sdl->is_persistent);
-				} else {
-					zend_string_addref(new_enc->details.clark_notation);
-				}
-			}
 			if (sdl->encoders == NULL) {
 				sdl->encoders = pemalloc(sizeof(HashTable), sdl->is_persistent);
 				zend_hash_init(sdl->encoders, 0, NULL, sdl->is_persistent ? delete_encoder_persistent : delete_encoder, sdl->is_persistent);
@@ -1428,9 +1419,6 @@ static void sdl_deserialize_encoder(encodePtr enc, sdlTypePtr *types, char **in)
 	WSDL_CACHE_GET_INT(enc->details.type, in);
 	enc->details.type_str = sdl_deserialize_string(in);
 	enc->details.ns = sdl_deserialize_string(in);
-	if (enc->details.ns) {
-		enc->details.clark_notation = zend_strpprintf(0, "{%s}%s", enc->details.ns, enc->details.type_str);
-	}
 	WSDL_CACHE_GET_INT(i, in);
 	enc->details.sdl_type = types[i];
 	enc->to_xml = sdl_guess_convert_xml;
@@ -2857,7 +2845,6 @@ static encodePtr make_persistent_sdl_encoder(encodePtr enc, HashTable *ptr_map, 
 	}
 	if (penc->details.ns) {
 		penc->details.ns = strdup(penc->details.ns);
-		penc->details.clark_notation = zend_string_dup(penc->details.clark_notation, 1);
 	}
 
 	if (penc->details.sdl_type) {
@@ -3268,6 +3255,9 @@ sdlPtr get_sdl(zval *this_ptr, char *uri, zend_long cache_wsdl)
 		tmp = Z_CLIENT_STREAM_CONTEXT_P(this_ptr);
 		if (Z_TYPE_P(tmp) == IS_RESOURCE) {
 			context = php_stream_context_from_zval(tmp, 0);
+			/* Share a reference with new_context down below.
+			 * For new contexts, the reference is only in new_context so that doesn't need extra refcounting. */
+			GC_ADDREF(context->res);
 		}
 
 		tmp = Z_CLIENT_USER_AGENT_P(this_ptr);
@@ -3334,7 +3324,7 @@ sdlPtr get_sdl(zval *this_ptr, char *uri, zend_long cache_wsdl)
 	}
 
 	if (context) {
-		php_stream_context_to_zval(context, &new_context);
+		ZVAL_RES(&new_context, context->res);
 		php_libxml_switch_context(&new_context, &orig_context);
 	}
 

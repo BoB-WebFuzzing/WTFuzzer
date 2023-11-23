@@ -23,6 +23,7 @@ set_include_path($newpath);
 runtest();
 teardown_include_path();
 chdir("..");
+rmdir($thisTestDir);
 
 
 function runtest() {
@@ -35,12 +36,6 @@ function runtest() {
    unlink($secondFile);
 }
 
-?>
---CLEAN--
-<?php
-// TODO Clean up tmp files
-$thisTestDir = "fileGetContentsVar1.dir";
-rmdir($thisTestDir);
 ?>
 --EXPECT--
 *** Testing file_get_contents() : variation ***

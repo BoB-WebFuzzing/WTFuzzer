@@ -224,13 +224,6 @@ const SIGIO = UNKNOWN;
  */
 const SIGPWR = UNKNOWN;
 #endif
-#ifdef SIGINFO
-/**
- * @var int
- * @cvalue LONG_CONST(SIGINFO)
- */
-const SIGINFO = UNKNOWN;
-#endif
 #ifdef SIGSYS
 /**
  * @var int

@@ -46,7 +46,6 @@ foreach ($tests as $name => $value) {
     print "----------\n";
 }
 
-?>
 --EXPECTF--
 # No overflow 001: "0"
 0

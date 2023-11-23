@@ -47,12 +47,10 @@ var_dump($phar->getStub() == $sexp);
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.php');
 __HALT_COMPILER();
 ?>
---EXPECTF--
+--EXPECT--
 string(48) "<?php echo "first stub\n"; __HALT_COMPILER(); ?>"
 string(48) "<?php echo "first stub\n"; __HALT_COMPILER(); ?>"
 bool(true)
-
-Deprecated: Calling Phar::setStub(resource $stub, int $length) is deprecated in %s on line %d
 string(51) "<?php echo "second stub\n"; __HALT_COMPILER(); ?>
 "
 bool(false)

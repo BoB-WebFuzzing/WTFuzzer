@@ -19,7 +19,6 @@ class C extends A {
 A::out();
 B::out();
 C::out();
-?>
 --EXPECT--
 A
 B

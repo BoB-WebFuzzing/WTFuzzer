@@ -4,6 +4,8 @@ Test DOMDocument::loadHTMLFile
 Verifies the basic behaviour of the method
 --CREDITS--
 Antonio Diaz Ruiz <dejalatele@gmail.com>
+--INI--
+assert.bail=true
 --EXTENSIONS--
 dom
 --FILE--

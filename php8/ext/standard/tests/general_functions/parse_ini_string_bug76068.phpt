@@ -21,7 +21,7 @@ array(1) {
   ["foo"]=>
   array(1) {
     ["bar"]=>
-    int(1)
+    string(1) "1"
   }
 }
 array(1) {
@@ -42,6 +42,6 @@ array(1) {
   ["foo"]=>
   array(1) {
     ["bar"]=>
-    int(42)
+    string(2) "42"
   }
 }

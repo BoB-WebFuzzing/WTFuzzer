@@ -28,6 +28,11 @@
 #include "Optimizer/zend_func_info.h"
 #include "Optimizer/zend_call_graph.h"
 #include "zend_jit.h"
+#if ZEND_JIT_TARGET_X86
+# include "zend_jit_x86.h"
+#elif ZEND_JIT_TARGET_ARM64
+# include "zend_jit_arm64.h"
+#endif
 
 #include "zend_jit_internal.h"
 
@@ -178,7 +183,7 @@ bool ZEND_FASTCALL zend_jit_deprecated_helper(OPLINE_D)
 		zend_execute_data *execute_data = EG(current_execute_data);
 #endif
 		const zend_op *opline = EG(opline_before_exception);
-		if (opline && RETURN_VALUE_USED(opline)) {
+		if (RETURN_VALUE_USED(opline)) {
 			ZVAL_UNDEF(EX_VAR(opline->result.var));
 		}
 
@@ -355,7 +360,7 @@ ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL zend_jit_loop_trace_helper(ZEND_OPCODE_HAN
 	trace_buffer[idx].info = _op | (_info); \
 	trace_buffer[idx].ptr = _ptr; \
 	idx++; \
-	if (idx >= JIT_G(max_trace_length) - 2) { \
+	if (idx >= ZEND_JIT_TRACE_MAX_LENGTH - 2) { \
 		stop = ZEND_JIT_TRACE_STOP_TOO_LONG; \
 		break; \
 	}
@@ -367,7 +372,7 @@ ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL zend_jit_loop_trace_helper(ZEND_OPCODE_HAN
 	trace_buffer[idx].op3_type = _op3_type; \
 	trace_buffer[idx].ptr = _ptr; \
 	idx++; \
-	if (idx >= JIT_G(max_trace_length) - 2) { \
+	if (idx >= ZEND_JIT_TRACE_MAX_LENGTH - 2) { \
 		stop = ZEND_JIT_TRACE_STOP_TOO_LONG; \
 		break; \
 	}

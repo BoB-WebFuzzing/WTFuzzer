@@ -4,7 +4,6 @@
 class CliServerInfo {
     public function __construct(
         public string $docRoot,
-        public $processHandle,
     ) {}
 }
 
@@ -114,7 +113,7 @@ function php_cli_server_start(
     define("PHP_CLI_SERVER_PORT", $port);
     define("PHP_CLI_SERVER_ADDRESS", PHP_CLI_SERVER_HOSTNAME.":".PHP_CLI_SERVER_PORT);
 
-    return new CliServerInfo($doc_root, $handle);
+    return new CliServerInfo($doc_root);
 }
 
 function php_cli_server_connect() {

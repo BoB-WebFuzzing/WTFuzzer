@@ -9,7 +9,7 @@ ldap
 <?php
 require "connect.inc";
 
-$link = ldap_connect($uri);
+$link = ldap_connect($host, $port);
 $controls = array(
     array(
         array("xid" => "1.2.752.58.10.1", "iscritical" => true),

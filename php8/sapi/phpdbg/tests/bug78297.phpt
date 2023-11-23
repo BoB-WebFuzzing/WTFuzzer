@@ -6,7 +6,6 @@ q
 --FILE--
 <?php
 include "does_not_exist.php";
-?>
 --EXPECTF--
 [Successful compilation of %s]
 prompt> 

@@ -29,7 +29,11 @@ var_dump($spaceNode->nodeType);
 var_dump($spaceNode->nodeValue);
 
 $dom->documentElement->firstElementChild->remove();
-var_dump($spaceNode->parentNode);
+try {
+    print_r($spaceNode->parentNode);
+} catch (\Error $e) {
+    echo $e->getMessage(), "\n";
+}
 
 echo "-- Test with parent and ns attribute --\n";
 
@@ -57,15 +61,13 @@ DOMNameSpaceNode Object
     [prefix] => 
     [localName] => xmlns
     [namespaceURI] => http://www.sitemaps.org/schemas/sitemap/0.9
-    [isConnected] => 1
     [ownerDocument] => (object value omitted)
     [parentNode] => (object value omitted)
-    [parentElement] => (object value omitted)
 )
 -- Test with parent and non-ns attribute --
 int(2)
 string(3) "bar"
-NULL
+Couldn't fetch DOMAttr. Node no longer exists
 -- Test with parent and ns attribute --
 DOMNameSpaceNode Object
 (
@@ -75,9 +77,7 @@ DOMNameSpaceNode Object
     [prefix] => xsi
     [localName] => xsi
     [namespaceURI] => fooooooooooooooooooooo
-    [isConnected] => 1
     [ownerDocument] => (object value omitted)
     [parentNode] => (object value omitted)
-    [parentElement] => (object value omitted)
 )
 string(3) "url"

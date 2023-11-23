@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include "../TSRM/TSRM.h"
+#include "zend.h"
 
 #ifndef ZEND_MM_ALIGNMENT
 # error "ZEND_MM_ALIGNMENT was not defined during configure"

@@ -100,12 +100,8 @@ foreach($inputs as $key =>$value) {
       file_put_contents($filename, $value);
       readfile($filename);
 };
-
-?>
---CLEAN--
-<?php
-$filename = __DIR__ . '/fwriteVar5.tmp';
 unlink($filename);
+
 ?>
 --EXPECT--
 *** Testing file_put_contents() : usage variation ***

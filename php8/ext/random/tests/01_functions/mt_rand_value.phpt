@@ -37,10 +37,7 @@ echo $x.PHP_EOL;
  */
 
 ?>
---EXPECTF--
-Deprecated: Constant MT_RAND_PHP is deprecated in %s on line %d
-
-Deprecated: The MT_RAND_PHP variant of Mt19937 is deprecated in %s on line %d
+--EXPECT--
 1614640687
 1711027313
 857485497

@@ -2,10 +2,6 @@
 oci_bind_array_by_name() and invalid values 8
 --EXTENSIONS--
 oci8
---SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
 --FILE--
 <?php
 
