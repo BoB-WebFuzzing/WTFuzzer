@@ -5979,10 +5979,10 @@ skip_interest:
   const char* svuln = "";
 
   for (int i = 0; i < vulnsMap.size; i++) {
-    totalValue += vulnsMap.data[i]->value;
+    totalValue += (vulnsMap.data[i]->value * 100);
 
     for (int j = 4; i <= j; j--) {
-      vulnScore[j] += vulnsMap.data[i]->value;
+      vulnScore[j] += (vulnsMap.data[i]->value * 100);
     }
   }
 
