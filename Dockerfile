@@ -8,6 +8,12 @@ RUN apt-get update --fix-missing && apt-get install -y  nodejs npm aria2 curl wg
     /bin/bash -c "$(curl -sL https://git.io/vokNn) " && \
     apt-fast update && apt-fast -y upgrade && apt-fast update --fix-missing
 
+###### Download Chromium ######
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
+RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+RUN apt update -y
+RUN apt-get install google-chrome-stable -y
+
 RUN apt-fast install -y git build-essential  \
                         libxml2-dev libxslt1-dev libffi-dev cmake libreadline-dev \
                         libtool debootstrap debian-archive-keyring libglib2.0-dev libpixman-1-dev \
@@ -126,10 +132,6 @@ RUN chmod 777 -R /home/tmp
 COPY hook.php /lib/hook.php
 
 RUN printf '\nauto_prepend_file=/lib/hook.php\nextension=uopz\nuopz.exit=1\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
-
-COPY config/codecov_conversion.py config/enable_cc.php /
-
-RUN mkdir /tmp/coverages
 
 ######## WORDPRESS INSTALL ######
 
