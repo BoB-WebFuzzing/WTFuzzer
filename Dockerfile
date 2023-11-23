@@ -19,7 +19,7 @@ RUN apt-fast install -y git build-essential  \
                         libtool debootstrap debian-archive-keyring libglib2.0-dev libpixman-1-dev \
                         libssl-dev qtdeclarative5-dev libcapnp-dev libtool-bin \
                         libsqlite3-dev autoconf re2c  libonig-dev libcurl4-openssl-dev \
-                        libcurl4-openssl-dev libpng-dev libgmp-dev libzip-dev \
+                        libcurl4-openssl-dev libpng-dev libgmp-dev libzip-dev libjpeg-dev \
                         python3-pip python3-pexpect ipython3 \
                         sudo openssh-server automake rsync net-tools netcat  \
                         ccache make g++-multilib pkg-config coreutils rsyslog \
@@ -89,6 +89,7 @@ RUN cd /phpsrc &&         \
         --enable-exif \
         --enable-intl \
 		--enable-gd         \
+        --with-jpeg \
 		--with-gettext \
 		--with-openssl \
 		--with-curl \
