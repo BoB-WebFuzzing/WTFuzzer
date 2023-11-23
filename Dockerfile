@@ -76,7 +76,7 @@ RUN rm -f /wclibs/lib_db_fault_escalator.so && \
     ln -s /lib/lib_db_fault_escalator.so /lib/libcgiwrapper.so && \
     ln -s /lib/lib_db_fault_escalator.so /wclibs/lib_db_fault_escalator.so
 
-COPY php8 /phpsrc 
+COPY php7 /phpsrc 
 
 RUN cd /phpsrc && ./buildconf --force
 

@@ -1,0 +1,82 @@
+PHP                                                                        NEWS
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+?? ??? ????, PHP 8.4.0alpha1
+
+Core:
+  . Added zend_call_stack_get implementation for NetBSD. (David Carlier)
+
+Date:
+  . Added DateTime[Immutable]::createFromTimestamp. (Marc Bennewitz)
+
+DOM:
+  . Added DOMNode::compareDocumentPosition(). (nielsdos)
+  . Implement #53655 (Improve speed of DOMNode::C14N() on large XML documents).
+    (nielsdos)
+  . Fix cloning attribute with namespace disappearing namespace. (nielsdos)
+  . Implement DOM HTML5 parsing and serialization RFC. (nielsdos)
+
+FTP:
+  . Removed the deprecated inet_ntoa call support. (David Carlier)
+
+Intl:
+  . Added IntlDateFormatter::PATTERN constant. (David Carlier)
+
+Opcache:
+  . Added large shared segments support for FreeBSD. (David Carlier)
+
+PDO_PGSQL:
+  . Fixed GH-12423, DSN credentials being prioritized over the user/password
+    PDO constructor arguments. (SakiTakamachi)
+  . Fixed native float support with pdo_pgsql query results. (Yurunsoft)
+
+PGSQL:
+  . Added the possibility to have no conditions for pg_select. (OmarEmaraDev)
+
+Phar:
+  . Fixed bug GH-12532 (PharData created from zip has incorrect timestamp).
+    (nielsdos)
+
+POSIX:
+  . Added POSIX_SC_CHILD_MAX and POSIX_SC_CLK_TCK constants. (Jakub Zelenka)
+
+PSpell:
+  . Moved to PECL. (Derick Rethans)
+
+SimpleXML:
+  . Fixed bug GH-12192 (SimpleXML infinite loop when getName() is called
+    within foreach). (nielsdos)
+  . Fixed bug GH-12208 (SimpleXML infinite loop when a cast is used inside a
+    foreach). (nielsdos)
+  . Fixed bug #55098 (SimpleXML iteration produces infinite loop). (nielsdos)
+
+SNMP:
+  . Removed the deprecated inet_ntoa call support. (David Carlier)
+
+SOAP:
+  . Add support for clark notation for namespaces in class map. (lxShaDoWxl)
+  . Mitigate #51561 (SoapServer with a extented class and using sessions,
+    lost the setPersistence()). (nielsdos)
+  . Fixed bug #49278 (SoapClient::__getLastResponseHeaders returns NULL if
+    wsdl operation !has output). (nielsdos)
+
+Sockets:
+  . Removed the deprecated inet_ntoa call support. (David Carlier)
+
+Standard:
+  . Implement GH-12188 (Indication for the int size in phpinfo()). (timwolla)
+  . Partly fix GH-12143 (Incorrect round() result for 0.49999999999999994).
+    (timwolla)
+  . Fix GH-12252 (round(): Validate the rounding mode). (timwolla)
+  . Increase the default BCrypt cost to 12. (timwolla)
+  . Fixed bug GH-12592 (strcspn() odd behaviour with NUL bytes and empty mask).
+    (nielsdos)
+  . Removed the deprecated inet_ntoa call support. (David Carlier)
+
+XML:
+  . Added XML_OPTION_PARSE_HUGE parser option. (nielsdos)
+
+XSL:
+  . Implement request #64137 (XSLTProcessor::setParameter() should allow both
+    quotes to be used). (nielsdos)
+
+<<< NOTE: Insert NEWS from last stable release here prior to actual release! >>>
