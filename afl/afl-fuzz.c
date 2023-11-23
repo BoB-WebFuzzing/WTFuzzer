@@ -445,10 +445,22 @@ typedef struct {
     size_t size;
 } Map;
 
+unsigned int mapidx = 0;
+
+int compare(const void *a, const void *b) {
+    const KeyValuePair *kv1 = *(const KeyValuePair **)a;
+    const KeyValuePair *kv2 = *(const KeyValuePair **)b;
+    
+    return kv2->value - kv1->value;
+}
+
+void sortMap(Map *map) {
+    qsort(map->data, map->size, sizeof(KeyValuePair *), compare);
+}
+
 char* insertString(const char* original, const char* insertion, size_t position) {
     size_t originalLen = strlen(original);
     size_t insertionLen = strlen(insertion);
-
 
     char* result = (char*)malloc(originalLen + insertionLen + 1);
     if (result == NULL)
@@ -457,25 +469,24 @@ char* insertString(const char* original, const char* insertion, size_t position)
     memcpy(result, original, position);
     memcpy(result + position, insertion, insertionLen);
     memcpy(result + position + insertionLen, original + position, originalLen - position + 1);
+
     return result;
 }
 
 void mutateSQLI(char* value) {
-	
     int targetIndex = rand() % strlen(value);
     char* mutateSet[8] = {"\'", "\"", "\\", "#", "-- -", "--%20-", "%23", ""};
-     strcpy(value, insertString(value, mutateSet[rand() % 8], targetIndex));
+    strcpy(value, insertString(value, mutateSet[rand() % 8], targetIndex));
 }
 
 void mutateSSRF(char* value) {
-    char* mutateSet[3] = {"http://localhost:5000", "http://127.0.0.1:5000", "file:///etc/passwd"};
-    // strcpy(value, insertString(value, mutateSet[rand() % 3], targetIndex));
-    strcpy(value, mutateSet[rand() % 3]);
+    char* mutateSet[4] = {value, "http://localhost", "http://127.0.0.1", "file:///etc/passwd"};
+    strcpy(value, mutateSet[rand() % 4]);
 }
 
 void mutateFILE(char* value) {
-    char* mutateSet[3] = {"/", "/../../../etc/passwd", "/etc/passwd"};
-    strcpy(value, mutateSet[rand() % 3]);
+    char* mutateSet[4] = {value, "/", "/../../../etc/passwd", "/etc/passwd"};
+    strcpy(value, mutateSet[rand() % 4]);
 }
 
 int mutate(char* ret, const char* vuln, char* seed, int length);
@@ -652,23 +663,22 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
     }
     for (int i = 0; i < postCount; i++) {
         if (postArray[i]) {
-	    char* tempKey = strdup(strtok(postArray[i], "="));
-	    char* tempValue = (strtok(NULL, "="));
-char blank[100] = "  ";
-	    if ((tempKey != NULL) && (tempValue != NULL)) {
+            char* tempKey = strdup(strtok(postArray[i], "="));
+            char* tempValue = (strtok(NULL, "="));
+            char blank[100] = "  ";
+            if ((tempKey != NULL) && (tempValue != NULL)) {
                 postKey[i] = tempKey;
                 postValue[i] = tempValue;
-	    } else if ((tempKey != NULL) && (tempValue == NULL)) {
-		postKey[i] = tempKey;
+            } else if ((tempKey != NULL) && (tempValue == NULL)) {
+                postKey[i] = tempKey;
                 postValue[i] = blank;
-	    } else if ((tempKey == NULL) && (tempValue != NULL)) {
-		postKey[i] = blank;
+            } else if ((tempKey == NULL) && (tempValue != NULL)) {
+                postKey[i] = blank;
                 postValue[i] = tempValue;
-	    } else if ((tempKey == NULL) && (tempValue == NULL)) {
-		postKey[i] = blank;
+            } else if ((tempKey == NULL) && (tempValue == NULL)) {
+                postKey[i] = blank;
                 postValue[i] = blank;
-	    }
-	    
+            }
         }
     }
 
@@ -682,14 +692,12 @@ char blank[100] = "  ";
             }
             if (postCount) {
                 for (int i = 0; i < postCount; i++) {
-
                     mutateSQLI(postValue[i]);
                 }
             }
 
             break;
         case 1:
-
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
                     mutateSSRF(getValue[i]);
@@ -703,7 +711,6 @@ char blank[100] = "  ";
 
             break;
         case 2:
-
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
                     mutateFILE(getValue[i]);
@@ -717,7 +724,6 @@ char blank[100] = "  ";
 
             break;
         case 3:
-
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
                     mutateFILE(getValue[i]);
@@ -731,7 +737,6 @@ char blank[100] = "  ";
 
             break;
         case 4:
-
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
                     mutateFILE(getValue[i]);
@@ -745,7 +750,7 @@ char blank[100] = "  ";
 
             break;
         default:
-          break;
+            break;
             // printf("%s is not in vulns\n", vuln);
     }
 
@@ -773,6 +778,7 @@ char blank[100] = "  ";
             strcat(strcat(post, "&"), postArray[i]);
         }
     }
+
     if (strcmp(get, "") && strcmp(post, "")) {
         ret[0] = '\x00';
         strcat(ret + 1, get);
@@ -5965,8 +5971,50 @@ skip_interest:
     // printf("key : %s, value : %d\n------------\n", vuln, getFromMap(&vulnsMap, vuln));
     i++;
   }
-  const char* svuln = randomSelection(vulnsMap);
-  stage_name = svuln;
+
+  sortMap(&vulnsMap);
+
+  int totalValue = 0;
+  int vulnScore[5] = {0};
+  const char* svuln = "";
+
+  for (int i = 0; i < vulnsMap.size; i++) {
+    totalValue += vulnsMap.data[i]->value;
+
+    for (int j = 4; i <= j; j--) {
+      vulnScore[j] += vulnsMap.data[i]->value;
+    }
+  }
+
+  if ((mapidx % totalValue) < vulnScore[0]) {
+    mapidx++;
+    svuln = vulnsMap.data[0]->key;
+    stage_name = svuln;
+  }
+  else if ((mapidx % totalValue) < vulnScore[1]) {
+    mapidx++;
+    svuln = vulnsMap.data[1]->key;
+    stage_name = svuln;
+  }
+  else if ((mapidx % totalValue) < vulnScore[2]) {
+    mapidx++;
+    svuln = vulnsMap.data[2]->key;
+    stage_name = svuln;
+  }
+  else if ((mapidx % totalValue) < vulnScore[3]) {
+    mapidx++;
+    svuln = vulnsMap.data[3]->key;
+    stage_name = svuln;
+  }
+  else if ((mapidx % totalValue) < vulnScore[4]) {
+    mapidx++;
+    svuln = vulnsMap.data[4]->key;
+    stage_name = svuln;
+  }
+
+  // const char* svuln = vulnsMap.data[mapidx++ % 5]->key;
+  // stage_name = svuln;
+  // const char* svuln = randomSelection(vulnsMap);
 
   char buffer[1 * 1024 * 1024];
   char * mutatedSeed;
