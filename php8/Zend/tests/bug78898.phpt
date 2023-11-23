@@ -30,9 +30,5 @@ $b = new B;
 $b->x();
 
 ?>
---EXPECTF--
-a
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
-a
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
-a
+--EXPECT--
+aaa

@@ -1,7 +1,7 @@
 --TEST--
 numfmt_format() with type conversion
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

@@ -1,9 +1,8 @@
 --TEST--
 PDO::ATTR_STATEMENT_CLASS
---EXTENSIONS--
-pdo_mysql
 --SKIPIF--
 <?php
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'skipif.inc');
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
 MySQLPDOTest::skip();
 $db = MySQLPDOTest::factory();
@@ -12,7 +11,6 @@ $db = MySQLPDOTest::factory();
 <?php
     require_once(__DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
     $db = MySQLPDOTest::factory();
-    $db->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
     MySQLPDOTest::createTestTable($db);
 
     $default =  $db->getAttribute(PDO::ATTR_STATEMENT_CLASS);
@@ -97,8 +95,8 @@ $db = MySQLPDOTest::factory();
     $stmt = $db->query('SELECT id, label FROM test ORDER BY id ASC LIMIT 2');
 
     class mystatement5 extends mystatement4 {
-        public function fetchAll($fetch_style = 1, ...$fetch_args): array {
-            return [];
+        public function fetchAll($fetch_style = 1, ...$fetch_args) {
+            return "no data :)";
         }
     }
 
@@ -147,8 +145,7 @@ mystatement4
 string(6) "param1"
 mystatement5
 string(12) "mystatement5"
-array(0) {
-}
+string(10) "no data :)"
 array(1) {
   [0]=>
   array(4) {

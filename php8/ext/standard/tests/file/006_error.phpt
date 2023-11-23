@@ -29,6 +29,10 @@ echo "\n";
 
 echo "\n*** Done ***\n";
 ?>
+--CLEAN--
+<?php
+unlink( __DIR__."/006_error.tmp");
+?>
 --EXPECTF--
 *** Testing error conditions for fileperms(), chmod() ***
 

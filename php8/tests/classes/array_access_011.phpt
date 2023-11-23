@@ -19,22 +19,22 @@ class ArrayAccessReferenceProxy implements ArrayAccess
         $this->element = $element;
     }
 
-    function offsetExists($index): bool {
+    function offsetExists($index) {
         echo __METHOD__ . "($this->element, $index)\n";
         return array_key_exists($index, $this->oarray[$this->element]);
     }
 
-    function offsetGet($index): mixed {
+    function offsetGet($index) {
         echo __METHOD__ . "($this->element, $index)\n";
         return isset($this->oarray[$this->element][$index]) ? $this->oarray[$this->element][$index] : NULL;
     }
 
-    function offsetSet($index, $value): void {
+    function offsetSet($index, $value) {
         echo __METHOD__ . "($this->element, $index, $value)\n";
         $this->oarray[$this->element][$index] = $value;
     }
 
-    function offsetUnset($index): void {
+    function offsetUnset($index) {
         echo __METHOD__ . "($this->element, $index)\n";
         unset($this->oarray[$this->element][$index]);
     }
@@ -49,12 +49,12 @@ class Peoples implements ArrayAccess
         $this->person = array(array('name'=>'Foo'));
     }
 
-    function offsetExists($index): bool
+    function offsetExists($index)
     {
         return array_key_exists($index, $this->person);
     }
 
-    function offsetGet($index): mixed
+    function offsetGet($index)
     {
         if (is_array($this->person[$index]))
         {
@@ -66,12 +66,12 @@ class Peoples implements ArrayAccess
         }
     }
 
-    function offsetSet($index, $value): void
+    function offsetSet($index, $value)
     {
         $this->person[$index] = $value;
     }
 
-    function offsetUnset($index): void
+    function offsetUnset($index)
     {
         unset($this->person[$index]);
     }

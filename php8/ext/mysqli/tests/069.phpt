@@ -1,9 +1,8 @@
 --TEST--
 mysqli multi_query, next_result, more_results
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

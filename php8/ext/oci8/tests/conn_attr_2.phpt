@@ -1,10 +1,7 @@
 --TEST--
 Set and get of connection attributes across persistent connections and sysdba connection.
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-if (getenv('SKIP_REPEAT')) die('skip fails with repeat');
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
 require(__DIR__.'/skipif.inc');
 

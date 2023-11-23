@@ -57,20 +57,14 @@ echo "-\n";
 C::test3();
 
 ?>
---EXPECTF--
+--EXPECT--
 A
 -
 B
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
 B
 -
 B
-
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
 B
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
 B
 -
 B
@@ -80,11 +74,7 @@ C
 C
 -
 B
-
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
 B
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
 C
 -
 B

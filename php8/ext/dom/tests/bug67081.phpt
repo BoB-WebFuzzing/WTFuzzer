@@ -1,7 +1,9 @@
 --TEST--
 Bug #67081 DOMDocumentType->internalSubset returns entire DOCTYPE tag, not only the subset
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
     $domDocument = new DOMDocument();

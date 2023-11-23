@@ -1,7 +1,7 @@
 --TEST--
 Bug #44686 (SOAP-ERROR: Parsing WSDL with references)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once 'skipif.inc'; ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--

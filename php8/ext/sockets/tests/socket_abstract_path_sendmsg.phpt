@@ -1,9 +1,10 @@
 --TEST--
 Support for paths in the abstract namespace (bind, sendmsg, recvmsg)
---EXTENSIONS--
-sockets
 --SKIPIF--
 <?php
+if (!extension_loaded('sockets'))
+    die('skip sockets extension not available.');
+
 if (PHP_OS != 'Linux') {
     die('skip For Linux only');
 }

@@ -2,7 +2,6 @@
 ReflectionParameter::isDefault()
 --FILE--
 <?php
-#[AllowDynamicProperties]
 class A {
 public $defprop;
 }

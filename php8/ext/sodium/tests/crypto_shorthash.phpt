@@ -1,7 +1,7 @@
 --TEST--
 Check for libsodium shorthash
---EXTENSIONS--
-sodium
+--SKIPIF--
+<?php if (!extension_loaded("sodium")) print "skip"; ?>
 --FILE--
 <?php
 $m1 = 'message';

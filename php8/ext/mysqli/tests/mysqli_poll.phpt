@@ -1,10 +1,13 @@
 --TEST--
 int mysqli_poll() simple
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('connect.inc');
+require_once('skipifconnectfailure.inc');
+
+if (!$IS_MYSQLND)
+    die("skip mysqlnd only feature, compile PHP using --with-mysqli=mysqlnd");
 ?>
 --FILE--
 <?php
@@ -77,7 +80,7 @@ require_once 'skipifconnectfailure.inc';
 
     }
 
-    // Connections on which no query has been sent - 1
+    // Connections on which no query has been send - 1
     $link = get_connection();
     $links = array($link);
     $errors = array($link);
@@ -92,7 +95,7 @@ require_once 'skipifconnectfailure.inc';
     poll_async(13, $link, $links, $errors, $reject, 0, true);
     mysqli_close($link);
 
-    // Connections on which no query has been sent - 2
+    // Connections on which no query has been send - 2
     // Difference: pass $links twice
     $link = get_connection();
     $links = array($link, $link);
@@ -100,7 +103,7 @@ require_once 'skipifconnectfailure.inc';
     $reject = array();
     poll_async(14, $link, $links, $errors, $reject, 0, false);
 
-    // Connections on which no query has been sent - 3
+    // Connections on which no query has been send - 3
     // Difference: pass two connections
     $link = get_connection();
     $links = array($link, get_connection());

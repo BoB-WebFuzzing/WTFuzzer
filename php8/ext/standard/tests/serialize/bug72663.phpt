@@ -3,7 +3,6 @@ Bug #72663 (1): Don't call __destruct if __wakeup not called or fails
 --FILE--
 <?php
 
-#[AllowDynamicProperties]
 class Test1 {
     public function __wakeup() {
         echo "Wakeup\n";
@@ -13,7 +12,6 @@ class Test1 {
     }
 }
 
-#[AllowDynamicProperties]
 class Test2 {
     public function __wakeup() {
         throw new Exception('Unserialization forbidden');

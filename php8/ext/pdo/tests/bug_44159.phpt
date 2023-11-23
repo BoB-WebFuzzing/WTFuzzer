@@ -1,9 +1,8 @@
 --TEST--
 PDO Common: Bug #44159 (Crash: $pdo->setAttribute(PDO::STATEMENT_ATTR_CLASS, NULL))
---EXTENSIONS--
-pdo
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo')) die('skip');
 $dir = getenv('REDIR_TEST_DIR');
 if (false == $dir) die('skip no driver');
 require_once $dir . 'pdo_test.inc';
@@ -43,6 +42,6 @@ foreach ($attrs as $attr) {
 TypeError: PDO::ATTR_STATEMENT_CLASS value must be of type array, null given
 TypeError: PDO::ATTR_STATEMENT_CLASS value must be of type array, int given
 TypeError: PDO::ATTR_STATEMENT_CLASS value must be of type array, string given
-TypeError: Attribute value must be of type bool for selected attribute, null given
+TypeError: Attribute value must be of type int for selected attribute, null given
 bool(true)
-TypeError: Attribute value must be of type bool for selected attribute, string given
+bool(true)

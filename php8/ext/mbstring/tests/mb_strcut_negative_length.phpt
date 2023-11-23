@@ -1,7 +1,7 @@
 --TEST--
 mb_strcut() negative length test
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip');
 --FILE--
 <?php
 var_dump(mb_strcut('Déjà vu', 1, -3));

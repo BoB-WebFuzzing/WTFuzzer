@@ -1,31 +1,31 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
 class EmptyIterator implements Iterator
 {
-    /** @tentative-return-type */
-    public function current(): never {}
+    /** @return mixed */
+    public function current() {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 
-    /** @tentative-return-type */
-    public function key(): never {}
+    /** @return mixed */
+    public function key() {}
 
-    /** @tentative-return-type */
-    public function valid(): false {}
+    /** @return bool */
+    public function valid() {}
 
-    /** @tentative-return-type */
-    public function rewind(): void {}
+    /** @return void */
+    public function rewind() {}
 }
 
 class CallbackFilterIterator extends FilterIterator
 {
     public function __construct(Iterator $iterator, callable $callback) {}
 
-    /** @tentative-return-type */
-    public function accept(): bool {}
+    /** @return bool */
+    public function accept() {}
 }
 
 class RecursiveCallbackFilterIterator extends CallbackFilterIterator implements RecursiveIterator
@@ -33,153 +33,132 @@ class RecursiveCallbackFilterIterator extends CallbackFilterIterator implements 
     public function __construct(RecursiveIterator $iterator, callable $callback) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @implementation-alias RecursiveFilterIterator::hasChildren
      */
-    public function hasChildren(): bool {}
+    public function hasChildren() {}
 
-    /** @tentative-return-type */
-    public function getChildren(): RecursiveCallbackFilterIterator {}
+    /** @return RecursiveCallbackFilterIterator */
+    public function getChildren() {}
 }
 
 interface RecursiveIterator extends Iterator
 {
-    /** @tentative-return-type */
-    public function hasChildren(): bool;
+    /** @return bool */
+    public function hasChildren();
 
-    /** @tentative-return-type */
-    public function getChildren(): ?RecursiveIterator;
+    /** @return RecursiveIterator|null */
+    public function getChildren();
 }
 
 class RecursiveIteratorIterator implements OuterIterator
 {
-    /**
-     * @var int
-     * @cvalue RIT_LEAVES_ONLY
-     */
-    public const LEAVES_ONLY = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue RIT_SELF_FIRST
-     */
-    public const SELF_FIRST = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue RIT_CHILD_FIRST
-     */
-    public const CHILD_FIRST = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue RIT_CATCH_GET_CHILD
-     */
-    public const CATCH_GET_CHILD = UNKNOWN;
-
     public function __construct(Traversable $iterator, int $mode = RecursiveIteratorIterator::LEAVES_ONLY, int $flags = 0) {}
 
-    /** @tentative-return-type */
-    public function rewind(): void {}
+    /** @return void */
+    public function rewind() {}
 
-    /** @tentative-return-type */
-    public function valid(): bool {}
+    /** @return bool */
+    public function valid() {}
 
-    /** @tentative-return-type */
-    public function key(): mixed {}
+    /** @return mixed */
+    public function key() {}
 
-    /** @tentative-return-type */
-    public function current(): mixed {}
+    /** @return mixed */
+    public function current() {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 
-    /** @tentative-return-type */
-    public function getDepth(): int {}
+    /** @return int */
+    public function getDepth() {}
 
-    /** @tentative-return-type */
-    public function getSubIterator(?int $level = null): ?RecursiveIterator {}
+    /** @return RecursiveIterator|null */
+    public function getSubIterator(?int $level = null) {}
 
-    /** @tentative-return-type */
-    public function getInnerIterator(): RecursiveIterator {}
+    /** @return RecursiveIterator */
+    public function getInnerIterator() {}
 
-    /** @tentative-return-type */
-    public function beginIteration(): void {}
+    /** @return void */
+    public function beginIteration() {}
 
-    /** @tentative-return-type */
-    public function endIteration(): void {}
+    /** @return void */
+    public function endIteration() {}
 
-    /** @tentative-return-type */
-    public function callHasChildren(): bool {}
+    /** @return bool|null */
+    public function callHasChildren() {}
 
-    /** @tentative-return-type */
-    public function callGetChildren(): ?RecursiveIterator {}
+    /** @return RecursiveIterator|null */
+    public function callGetChildren() {}
 
-    /** @tentative-return-type */
-    public function beginChildren(): void {}
+    /** @return void */
+    public function beginChildren() {}
 
-    /** @tentative-return-type */
-    public function endChildren(): void {}
+    /** @return void */
+    public function endChildren() {}
 
-    /** @tentative-return-type */
-    public function nextElement(): void {}
+    /** @return void */
+    public function nextElement() {}
 
-    /** @tentative-return-type */
-    public function setMaxDepth(int $maxDepth = -1): void {}
+    /** @return void */
+    public function setMaxDepth(int $maxDepth = -1) {}
 
-    /** @tentative-return-type */
-    public function getMaxDepth(): int|false {}
+    /** @return int|false */
+    public function getMaxDepth() {}
 }
 
 interface OuterIterator extends Iterator
 {
-    /** @tentative-return-type */
-    public function getInnerIterator(): ?Iterator;
+    /** @return Iterator|null */
+    public function getInnerIterator();
 }
 
 class IteratorIterator implements OuterIterator
 {
     public function __construct(Traversable $iterator, ?string $class = null) {}
 
-    /** @tentative-return-type */
-    public function getInnerIterator(): ?Iterator {}
+    /** @return Iterator|null */
+    public function getInnerIterator() {}
 
-    /** @tentative-return-type */
-    public function rewind(): void {}
+    /** @return void */
+    public function rewind() {}
 
-    /** @tentative-return-type */
-    public function valid(): bool {}
+    /** @return bool */
+    public function valid() {}
 
-    /** @tentative-return-type */
-    public function key(): mixed {}
+    /** @return mixed */
+    public function key() {}
 
-    /** @tentative-return-type */
-    public function current(): mixed {}
+    /** @return mixed */
+    public function current() {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 }
 
 abstract class FilterIterator extends IteratorIterator
 {
-    /** @tentative-return-type */
-    abstract public function accept(): bool;
+    /** @return bool */
+    abstract public function accept();
 
     public function __construct(Iterator $iterator) {}
 
-    /** @tentative-return-type */
-    public function rewind(): void {}
+    /** @return void */
+    public function rewind() {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 }
 
 abstract class RecursiveFilterIterator extends FilterIterator implements RecursiveIterator
 {
     public function __construct(RecursiveIterator $iterator) {}
 
-    /** @tentative-return-type */
-    public function hasChildren(): bool {}
+    /** @return bool */
+    public function hasChildren() {}
 
-    /** @tentative-return-type */
-    public function getChildren(): ?RecursiveFilterIterator {}
+    /** @return RecursiveFilterIterator|null */
+    public function getChildren() {}
 }
 
 class ParentIterator extends RecursiveFilterIterator
@@ -187,298 +166,206 @@ class ParentIterator extends RecursiveFilterIterator
     public function __construct(RecursiveIterator $iterator) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @implementation-alias RecursiveFilterIterator::hasChildren
      */
-    public function accept(): bool {}
+    public function accept() {}
 }
 
 interface SeekableIterator extends Iterator
 {
-    /** @tentative-return-type */
-    public function seek(int $offset): void;
+    /** @return void */
+    public function seek(int $offset);
 }
 
 class LimitIterator extends IteratorIterator
 {
     public function __construct(Iterator $iterator, int $offset = 0, int $limit = -1) {}
 
-    /** @tentative-return-type */
-    public function rewind(): void {}
+    /** @return void */
+    public function rewind() {}
 
-    /** @tentative-return-type */
-    public function valid(): bool {}
+    /** @return bool */
+    public function valid() {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 
-    /** @tentative-return-type */
-    public function seek(int $offset): int {}
+    /** @return int */
+    public function seek(int $offset) {}
 
-    /** @tentative-return-type */
-    public function getPosition(): int {}
+    /** @return int */
+    public function getPosition() {}
 }
 
-class CachingIterator extends IteratorIterator implements ArrayAccess, Countable, Stringable
+class CachingIterator extends IteratorIterator implements ArrayAccess, Countable
 {
-    /**
-     * @var int
-     * @cvalue CIT_CALL_TOSTRING
-     */
-    public const CALL_TOSTRING = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue CIT_CATCH_GET_CHILD
-     */
-    public const CATCH_GET_CHILD = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue CIT_TOSTRING_USE_KEY
-     */
-    public const TOSTRING_USE_KEY = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue CIT_TOSTRING_USE_CURRENT
-     */
-    public const TOSTRING_USE_CURRENT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue CIT_TOSTRING_USE_INNER
-     */
-    public const TOSTRING_USE_INNER = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue CIT_FULL_CACHE
-     */
-    public const FULL_CACHE = UNKNOWN;
-
     public function __construct(Iterator $iterator, int $flags = CachingIterator::CALL_TOSTRING) {}
 
-    /** @tentative-return-type */
-    public function rewind(): void {}
+    /** @return void */
+    public function rewind() {}
 
-    /** @tentative-return-type */
-    public function valid(): bool {}
+    /** @return bool */
+    public function valid() {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 
-    /** @tentative-return-type */
-    public function hasNext(): bool {}
+    /** @return bool */
+    public function hasNext() {}
 
     public function __toString(): string {}
 
-    /** @tentative-return-type */
-    public function getFlags(): int {}
+    /** @return int */
+    public function getFlags() {}
 
-    /** @tentative-return-type */
-    public function setFlags(int $flags): void {}
-
-    /**
-     * @param string $key
-     * @tentative-return-type
-     */
-    public function offsetGet($key): mixed {}
+    /** @return void */
+    public function setFlags(int $flags) {}
 
     /**
      * @param string $key
-     * @tentative-return-type
+     * @return mixed
      */
-    public function offsetSet($key, mixed $value): void {}
+    public function offsetGet($key) {}
 
     /**
      * @param string $key
-     * @tentative-return-type
+     * @return void
      */
-    public function offsetUnset($key): void {}
+    public function offsetSet($key, mixed $value) {}
 
     /**
      * @param string $key
-     * @tentative-return-type
+     * @return void
      */
-    public function offsetExists($key): bool {}
+    public function offsetUnset($key) {}
 
-    /** @tentative-return-type */
-    public function getCache(): array {}
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function offsetExists($key) {}
 
-    /** @tentative-return-type */
-    public function count(): int {}
+    /** @return array */
+    public function getCache() {}
+
+    /** @return int */
+    public function count() {}
 }
 
 class RecursiveCachingIterator extends CachingIterator implements RecursiveIterator
 {
     public function __construct(Iterator $iterator, int $flags = RecursiveCachingIterator::CALL_TOSTRING) {}
 
-    /** @tentative-return-type */
-    public function hasChildren(): bool {}
+    /** @return bool */
+    public function hasChildren() {}
 
-    /** @tentative-return-type */
-    public function getChildren(): ?RecursiveCachingIterator {}
+    /** @return RecursiveCachingIterator|null */
+    public function getChildren() {}
 }
 
 class NoRewindIterator extends IteratorIterator
 {
     public function __construct(Iterator $iterator) {}
 
-    /** @tentative-return-type */
-    public function rewind(): void {}
+    /** @return void */
+    public function rewind() {}
 
-    /** @tentative-return-type */
-    public function valid(): bool {}
+    /** @return bool */
+    public function valid() {}
 
-    /** @tentative-return-type */
-    public function key(): mixed {}
+    /** @return mixed */
+    public function key() {}
 
-    /** @tentative-return-type */
-    public function current(): mixed {}
+    /** @return mixed */
+    public function current() {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 }
 
 class AppendIterator extends IteratorIterator
 {
     public function __construct() {}
 
-    /** @tentative-return-type */
-    public function append(Iterator $iterator): void {}
+    /** @return void */
+    public function append(Iterator $iterator) {}
 
-    /** @tentative-return-type */
-    public function rewind(): void {}
+    /** @return void */
+    public function rewind() {}
 
-    /** @tentative-return-type */
-    public function valid(): bool {}
+    /** @return bool */
+    public function valid() {}
 
-    /** @tentative-return-type */
-    public function current(): mixed {}
+    /** @return mixed */
+    public function current() {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 
-    /** @tentative-return-type */
-    public function getIteratorIndex(): ?int {}
+    /** @return int|null */
+    public function getIteratorIndex() {}
 
-    /** @tentative-return-type */
-    public function getArrayIterator(): ArrayIterator {}
+    /** @return ArrayIterator */
+    public function getArrayIterator() {}
 }
 
 class InfiniteIterator extends IteratorIterator
 {
     public function __construct(Iterator $iterator) {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 }
 
 class RegexIterator extends FilterIterator
 {
-    /**
-     * @var int
-     * @cvalue REGIT_USE_KEY
-     */
-    public const USE_KEY = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue REGIT_INVERTED
-     */
-    public const INVERT_MATCH = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue REGIT_MODE_MATCH
-     */
-    public const MATCH = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue REGIT_MODE_GET_MATCH
-     */
-    public const GET_MATCH = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue REGIT_MODE_ALL_MATCHES
-     */
-    public const ALL_MATCHES = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue REGIT_MODE_SPLIT
-     */
-    public const SPLIT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue REGIT_MODE_REPLACE
-     */
-    public const REPLACE = UNKNOWN;
-
-    public ?string $replacement = null;
-
     public function __construct(Iterator $iterator, string $pattern, int $mode = RegexIterator::MATCH, int $flags = 0, int $pregFlags = 0) {}
 
-    /** @tentative-return-type */
-    public function accept(): bool {}
+    /** @return bool */
+    public function accept() {}
 
-    /** @tentative-return-type */
-    public function getMode(): int {}
+    /** @return int */
+    public function getMode() {}
 
-    /** @tentative-return-type */
-    public function setMode(int $mode): void {}
+    /** @return void */
+    public function setMode(int $mode) {}
 
-    /** @tentative-return-type */
-    public function getFlags(): int {}
+    /** @return int */
+    public function getFlags() {}
 
-    /** @tentative-return-type */
-    public function setFlags(int $flags): void {}
+    /** @return void */
+    public function setFlags(int $flags) {}
 
-    /** @tentative-return-type */
-    public function getRegex(): string {}
+    /** @return string */
+    public function getRegex() {}
 
-    /** @tentative-return-type */
-    public function getPregFlags(): int {}
+    /** @return int */
+    public function getPregFlags() {}
 
-    /** @tentative-return-type */
-    public function setPregFlags(int $pregFlags): void {}
+    /** @return void */
+    public function setPregFlags(int $pregFlags) {}
 }
 
 class RecursiveRegexIterator extends RegexIterator implements RecursiveIterator
 {
     public function __construct(RecursiveIterator $iterator, string $pattern, int $mode = RecursiveRegexIterator::MATCH, int $flags = 0, int $pregFlags = 0) {}
 
-    /** @tentative-return-type */
-    public function accept(): bool {}
+    /** @return bool */
+    public function accept() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @implementation-alias RecursiveFilterIterator::hasChildren
      */
-    public function hasChildren(): bool {}
+    public function hasChildren() {}
 
-    /** @tentative-return-type */
-    public function getChildren(): RecursiveRegexIterator {}
+    /** @return RecursiveRegexIterator */
+    public function getChildren() {}
 }
 
 class RecursiveTreeIterator extends RecursiveIteratorIterator
 {
-    /**
-     * @var int
-     * @cvalue RTIT_BYPASS_CURRENT
-     */
-    public const BYPASS_CURRENT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue RTIT_BYPASS_KEY
-     */
-    public const BYPASS_KEY = UNKNOWN;
-    /** @var int */
-    public const PREFIX_LEFT = 0;
-    /** @var int */
-    public const PREFIX_MID_HAS_NEXT = 1;
-    /** @var int */
-    public const PREFIX_MID_LAST = 2;
-    /** @var int */
-    public const PREFIX_END_HAS_NEXT = 3;
-    /** @var int */
-    public const PREFIX_END_LAST = 4;
-    /** @var int */
-    public const PREFIX_RIGHT = 5;
-
     /** @param RecursiveIterator|IteratorAggregate $iterator */
     public function __construct(
         $iterator,
@@ -487,24 +374,24 @@ class RecursiveTreeIterator extends RecursiveIteratorIterator
         int $mode = RecursiveTreeIterator::SELF_FIRST
     ) {}
 
-    /** @tentative-return-type */
-    public function key(): mixed {}
+    /** @return mixed */
+    public function key() {}
 
-    /** @tentative-return-type */
-    public function current(): mixed {}
+    /** @return mixed */
+    public function current() {}
 
-    /** @tentative-return-type */
-    public function getPrefix(): string {}
+    /** @return string */
+    public function getPrefix() {}
 
-    /** @tentative-return-type */
-    public function setPostfix(string $postfix): void {}
+    /** @return void */
+    public function setPostfix(string $postfix) {}
 
-    /** @tentative-return-type */
-    public function setPrefixPart(int $part, string $value): void {}
+    /** @return void */
+    public function setPrefixPart(int $part, string $value) {}
 
-    /** @tentative-return-type */
-    public function getEntry(): string {}
+    /** @return string */
+    public function getEntry() {}
 
-    /** @tentative-return-type */
-    public function getPostfix(): string {}
+    /** @return string */
+    public function getPostfix() {}
 }

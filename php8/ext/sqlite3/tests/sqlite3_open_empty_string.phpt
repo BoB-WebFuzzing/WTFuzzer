@@ -3,8 +3,8 @@ SQLite3::open test with empty string argument via the constructor
 --CREDITS--
 Thijs Feryn <thijs@feryn.eu>
 #TestFest PHPBelgium 2009
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 $db = new SQLite3('');

@@ -1,7 +1,5 @@
 --TEST--
 PDO_Firebird: ingnore parameter marks in comments
---EXTENSIONS--
-pdo_firebird
 --SKIPIF--
 <?php require('skipif.inc'); 	
 ?>

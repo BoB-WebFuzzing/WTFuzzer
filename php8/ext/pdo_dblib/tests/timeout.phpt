@@ -1,9 +1,8 @@
 --TEST--
 PDO_DBLIB: Set query timeouts
---EXTENSIONS--
-pdo_dblib
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo_dblib')) die('skip not loaded');
 if (getenv("SKIP_SLOW_TESTS")) die("skip slow test");
 require __DIR__ . '/config.inc';
 ?>
@@ -12,6 +11,12 @@ require __DIR__ . '/config.inc';
 require __DIR__ . '/config.inc';
 
 $sql = 'WAITFOR DELAY \'00:00:02\'';
+
+// querying without a timeout will succeed
+$stmt = $db->prepare($sql);
+if ($stmt->execute()) {
+    echo "OK\n";
+}
 
 // regular timeout attribute, set after instance created, will affect query timeout, causing this query to fail
 $db = new PDO($dsn, $user, $pass);
@@ -67,6 +72,7 @@ if (!$stmt->execute()) {
 
 ?>
 --EXPECT--
+OK
 OK
 OK
 OK

@@ -3,8 +3,8 @@ SQLite3::re-initialize object tests
 --CREDITS--
 Jelle Lampaert
 #Belgian Testfest 2009
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 

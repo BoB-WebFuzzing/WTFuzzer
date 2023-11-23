@@ -1,7 +1,11 @@
 --TEST--
 Test function gztell() by calling it with its expected arguments when writing
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 $f = "gztell_basic2.txt.gz";

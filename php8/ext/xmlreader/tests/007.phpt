@@ -1,7 +1,7 @@
 --TEST--
 XMLReader: libxml2 XML Reader, setRelaxNGSchema
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 

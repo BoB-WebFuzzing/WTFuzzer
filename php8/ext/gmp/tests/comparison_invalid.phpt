@@ -1,7 +1,7 @@
 --TEST--
 Invalid comparison with a GMP object
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 

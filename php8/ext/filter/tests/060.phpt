@@ -2,8 +2,8 @@
 filter_var() - tests for the range options of filter FILTER_VALIDATE_FLOAT
 --INI--
 precision=14
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 

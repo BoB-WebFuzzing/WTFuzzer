@@ -1,9 +1,8 @@
 --TEST--
 GH-7972 (MariaDB version prefix not always stripped)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once 'skipif.inc';
 require_once 'skipifconnectfailure.inc';
 ?>
 --FILE--

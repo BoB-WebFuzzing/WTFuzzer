@@ -1,7 +1,7 @@
 --TEST--
 Bug #66873 - crash in UConverter with invalid encoding
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
     $o = new UConverter(1, 1);

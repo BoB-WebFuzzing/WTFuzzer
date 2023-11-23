@@ -1,8 +1,10 @@
 --TEST--
 bug#53872 (internal corruption of phar)
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+if (!extension_loaded("zlib")) die("skip Test needs ext/zlib");
+?>
 --INI--
 phar.readonly=0
 --FILE--

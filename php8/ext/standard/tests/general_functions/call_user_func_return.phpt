@@ -23,20 +23,20 @@ function & test2($arg1, $arg2)
 
 function test($func)
 {
-    var_dump($func('Direct', 'Call'));
-    var_dump(call_user_func_array($func, array('User', 'Func')));
+    debug_zval_dump($func('Direct', 'Call'));
+    debug_zval_dump(call_user_func_array($func, array('User', 'Func')));
 }
 
 test('test1');
 test('test2');
 
 ?>
---EXPECT--
+--EXPECTF--
 Direct Call
-string(5) "test1"
+string(5) "test1" refcount(%d)
 User Func
-string(5) "test1"
+string(5) "test1" refcount(%d)
 Direct Call
-string(5) "test2"
+string(5) "test2" refcount(%d)
 User Func
-string(5) "test2"
+string(5) "test2" refcount(%d)

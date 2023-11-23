@@ -1,7 +1,7 @@
 --TEST--
 dom: Bug #79968 - Crash when calling before without valid hierachy
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

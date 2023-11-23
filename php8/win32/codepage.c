@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -18,11 +18,7 @@
 
 #include "php.h"
 #include "SAPI.h"
-#ifdef _M_ARM64
-# include <arm_neon.h>
-#else
-# include <emmintrin.h>
-#endif // _M_ARM64
+#include <emmintrin.h>
 
 #include "win32/console.h"
 
@@ -138,18 +134,6 @@ PW32CP wchar_t *php_win32_cp_conv_ascii_to_w(const char* in, size_t in_len, size
 		}
 
 		/* Process aligned chunk. */
-#ifdef _M_ARM64
-		uint8x16_t ver_err = {0};
-		while (end - idx > 15) {
-			const uint8x16_t block = vld1q_u8((const void*)idx);
-			ver_err = vorrq_u8(ver_err, block);
-			idx += 16;
-		}
-		ver_err = vshrq_n_u8(ver_err, 7);
-		if (vmaxvq_u8(ver_err)) {
-			ASCII_FAIL_RETURN()
-		}
-#else
 		__m128i vec_err = _mm_setzero_si128();
 		while (end - idx > 15) {
 			const __m128i block = _mm_load_si128((__m128i *)idx);
@@ -159,7 +143,6 @@ PW32CP wchar_t *php_win32_cp_conv_ascii_to_w(const char* in, size_t in_len, size
 		if (_mm_movemask_epi8(vec_err)) {
 			ASCII_FAIL_RETURN()
 		}
-#endif // _M_ARM64
 	}
 
 	/* Process the trailing part, or otherwise process string < 16 bytes. */
@@ -190,22 +173,6 @@ PW32CP wchar_t *php_win32_cp_conv_ascii_to_w(const char* in, size_t in_len, size
 
 		/* Process aligned chunk. */
 		if (end - idx > 15) {
-#ifdef _M_ARM64
-			while (end - idx > 15) {
-				/*
-				vst2q_u8 below will store interlaced vector by 8bits, so this will be little endian wchar
-				at wrote time all windows arm64 is little endian
-				 */
-				uint8x16x2_t vec = {/* .val = */{
-					vld1q_u8((const void*)idx),
-					{0},
-				}};
-
-				vst2q_u8((void*)ret_idx, vec);
-				idx += 16;
-				ret_idx += 16;
-			}
-#else
 			const __m128i mask = _mm_set1_epi32(0);
 			while (end - idx > 15) {
 				const __m128i block = _mm_load_si128((__m128i *)idx);
@@ -220,7 +187,6 @@ PW32CP wchar_t *php_win32_cp_conv_ascii_to_w(const char* in, size_t in_len, size
 				idx += 16;
 				ret_idx += 8;
 			}
-#endif // _M_ARM64
 		}
 	}
 
@@ -621,21 +587,18 @@ PHP_FUNCTION(sapi_windows_cp_set)
 /* {{{ Get process codepage. */
 PHP_FUNCTION(sapi_windows_cp_get)
 {
-	zend_string *kind = NULL;
+	char *kind;
+	size_t kind_len = 0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|S", &kind) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|s", &kind, &kind_len) == FAILURE) {
 		RETURN_THROWS();
 	}
 
-	if (!kind) {
-		const struct php_win32_cp *cp = php_win32_cp_get_current();
-		RETURN_LONG(cp->id);
-	} else if (zend_string_equals_literal_ci(kind, "ansi")) {
+	if (kind_len == sizeof("ansi")-1 && !strncasecmp(kind, "ansi", kind_len)) {
 		RETURN_LONG(GetACP());
-	} else if (zend_string_equals_literal_ci(kind, "oem")) {
+	} else if (kind_len == sizeof("oem")-1 && !strncasecmp(kind, "oem", kind_len)) {
 		RETURN_LONG(GetOEMCP());
 	} else {
-		/* TODO Warn/ValueError for invalid kind? */
 		const struct php_win32_cp *cp = php_win32_cp_get_current();
 		RETURN_LONG(cp->id);
 	}
@@ -668,10 +631,10 @@ PHP_FUNCTION(sapi_windows_cp_conv)
 	zend_string *subject;
 
 	ZEND_PARSE_PARAMETERS_START(3, 3)
-		Z_PARAM_STR_OR_LONG(string_in_codepage, int_in_codepage)
-		Z_PARAM_STR_OR_LONG(string_out_codepage, int_out_codepage)
-		Z_PARAM_STR(subject)
-	ZEND_PARSE_PARAMETERS_END();
+    	Z_PARAM_STR_OR_LONG(string_in_codepage, int_in_codepage)
+    	Z_PARAM_STR_OR_LONG(string_out_codepage, int_out_codepage)
+    	Z_PARAM_STR(subject)
+    ZEND_PARSE_PARAMETERS_END();
 
 	if (ZEND_SIZE_T_INT_OVFL(ZSTR_LEN(subject))) {
 		zend_argument_value_error(1, "is too long");

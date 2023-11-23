@@ -1,8 +1,8 @@
 --TEST--
 Interop Test: Import from SimpleXML
---EXTENSIONS--
-dom
-simplexml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
+<?php	if (!extension_loaded('simplexml')) die('skip simplexml extension not available');?>
 --FILE--
 <?php
 $s = simplexml_load_file(__DIR__."/book.xml");

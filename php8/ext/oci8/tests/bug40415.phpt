@@ -1,7 +1,5 @@
 --TEST--
 Bug #40415 (Using oci_fetchall with nested cursors)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs

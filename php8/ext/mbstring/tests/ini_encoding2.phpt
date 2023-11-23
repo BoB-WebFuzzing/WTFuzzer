@@ -1,7 +1,7 @@
 --TEST--
 Encoding INI test
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --INI--
 error_reporting=E_ALL & ~E_DEPRECATED
 default_charset=

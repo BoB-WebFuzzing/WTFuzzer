@@ -1,7 +1,5 @@
 --TEST--
 imap_search() with unique ID (SE_UID) flag
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

@@ -1,7 +1,7 @@
 --TEST--
 Observer: Function calls from a __destruct during shutdown are observable
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip: zend-test extension required'); ?>
 --INI--
 zend_test.observer.enabled=1
 zend_test.observer.observe_all=1

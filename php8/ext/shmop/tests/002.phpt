@@ -2,8 +2,12 @@
 shmop extension error messages
 --CREDITS--
 edgarsandi - <edgar.r.sandi@gmail.com>
---EXTENSIONS--
-shmop
+--SKIPIF--
+<?php
+    if (!extension_loaded("shmop")) {
+        die("skip shmop() extension not available");
+    }
+?>
 --FILE--
 <?php
 
@@ -23,11 +27,11 @@ try {
 }
 
 // Warning outputs: Unable to attach or create shared memory segment
-var_dump(shmop_open(0, 'a', 0644, 1024));
+var_dump(shmop_open(null, 'a', 0644, 1024));
 
 // Shared memory segment size must be greater than zero
 try {
-    shmop_open(0, 'a', 0644, 1024);
+    shmop_open(null, 'a', 0644, 1024);
 } catch (ValueError $exception) {
     echo $exception->getMessage() . "\n";
 }

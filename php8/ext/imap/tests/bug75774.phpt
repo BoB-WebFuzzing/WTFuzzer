@@ -1,7 +1,9 @@
 --TEST--
 Bug #75774 imap_append HeapCorruction
---EXTENSIONS--
-imap
+--SKIPIF--
+<?php
+extension_loaded('imap') or die('skip imap extension not available in this build');
+?>
 --FILE--
 <?php
 
@@ -18,5 +20,6 @@ fclose($var1);
 unlink($fn);
 
 ?>
---EXPECT--
-imap_append(): Argument #1 ($imap) must be of type IMAP\Connection, resource given
+--EXPECTF--
+Warning: imap_append(): Internal date not correctly formatted in %s on line %d
+imap_append(): supplied resource is not a valid imap resource

@@ -1,10 +1,8 @@
 --TEST--
 PDO PgSQL Bug #75402 Possible Memory Leak using PDO::CURSOR_SCROLL option
---EXTENSIONS--
-pdo
-pdo_pgsql
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo') || !extension_loaded('pdo_pgsql')) die('skip not loaded');
 require __DIR__ . '/config.inc';
 require __DIR__ . '/../../../ext/pdo/tests/pdo_test.inc';
 PDOTest::skip();
@@ -107,7 +105,7 @@ object(stdClass)#2 (1) {
       ["sprogress"]=>
       string(3) "100"
       ["bhidden"]=>
-      string(1) "0"
+      bool(false)
       ["sdatetime"]=>
       string(19) "2017.10.16 08:36:45"
     }

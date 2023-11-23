@@ -1,7 +1,10 @@
 --TEST--
 Test iconv_strlen() function : error conditions - pass an unknown encoding
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+extension_loaded('iconv') or die('skip');
+function_exists('iconv_strlen') or die("skip iconv_strlen() is not available in this build");
+?>
 --FILE--
 <?php
 /*

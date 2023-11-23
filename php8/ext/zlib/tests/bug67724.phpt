@@ -1,7 +1,9 @@
 --TEST--
 Bug #67724 (chained zlib filters silently fail with large amounts of data)
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+extension_loaded("zlib") or die("skip need ext/zlib");
+?>
 --FILE--
 <?php
 echo "Test\n";

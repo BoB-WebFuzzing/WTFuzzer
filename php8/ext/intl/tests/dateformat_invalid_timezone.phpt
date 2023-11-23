@@ -2,8 +2,9 @@
 IntlDateFormat constructor failure
 --INI--
 date.timezone=Mars/Utopia_Planitia
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+extension_loaded('intl') || print 'skip';
 --FILE--
 <?php
 
@@ -14,6 +15,5 @@ try {
   echo $e->getMessage();
 }
 ?>
---EXPECTF--
-Warning: PHP Startup: Invalid date.timezone value 'Mars/Utopia_Planitia', using 'UTC' instead in %s on line %d
-Wat?
+--EXPECT--
+IntlDateFormatter::__construct(): Invalid date.timezone value 'Mars/Utopia_Planitia', we selected the timezone 'UTC' for now.

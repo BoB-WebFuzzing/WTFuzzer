@@ -1,37 +1,7 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
-/**
- * @var int
- * @cvalue PHP_MSG_IPC_NOWAIT
- */
-const MSG_IPC_NOWAIT = UNKNOWN;
-/**
- * @var int
- * @cvalue EAGAIN
- */
-const MSG_EAGAIN = UNKNOWN;
-/**
- * @var int
- * @cvalue ENOMSG
- */
-const MSG_ENOMSG = UNKNOWN;
-/**
- * @var int
- * @cvalue PHP_MSG_NOERROR
- */
-const MSG_NOERROR = UNKNOWN;
-/**
- * @var int
- * @cvalue PHP_MSG_EXCEPT
- */
-const MSG_EXCEPT = UNKNOWN;
-
-/**
- * @strict-properties
- * @not-serializable
- */
 final class SysvMessageQueue
 {
 }

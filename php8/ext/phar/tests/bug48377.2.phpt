@@ -1,7 +1,7 @@
 --TEST--
 Phar: PHP bug #48377 "error message unclear on converting phar with existing file" test #2
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0

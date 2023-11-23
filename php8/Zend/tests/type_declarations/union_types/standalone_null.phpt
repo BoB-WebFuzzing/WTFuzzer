@@ -1,11 +1,10 @@
 --TEST--
-Null can be used as a standalone type
+Null cannot be used as a standalone type
 --FILE--
 <?php
 
 function test(): null {}
 
 ?>
-===DONE===
---EXPECT--
-===DONE===
+--EXPECTF--
+Fatal error: Null can not be used as a standalone type in %s on line %d

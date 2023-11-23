@@ -3,7 +3,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -35,51 +35,51 @@ namespace PHP {
 
 		CodePointBreakIterator& operator=(const CodePointBreakIterator& that);
 
-		~CodePointBreakIterator() override;
+		virtual ~CodePointBreakIterator();
 
 #if U_ICU_VERSION_MAJOR_NUM >= 70
-		bool operator==(const BreakIterator& that) const override;
+		virtual bool operator==(const BreakIterator& that) const;
 #else
-		UBool operator==(const BreakIterator& that) const override;
+		virtual UBool operator==(const BreakIterator& that) const;
 #endif
 
-		CodePointBreakIterator* clone(void) const override;
+		virtual CodePointBreakIterator* clone(void) const;
 
-		UClassID getDynamicClassID(void) const override;
+		virtual UClassID getDynamicClassID(void) const;
 
-		CharacterIterator& getText(void) const override;
+		virtual CharacterIterator& getText(void) const;
 
-		UText *getUText(UText *fillIn, UErrorCode &status) const override;
+		virtual UText *getUText(UText *fillIn, UErrorCode &status) const;
 
-		void setText(const UnicodeString &text) override;
+		virtual void setText(const UnicodeString &text);
 
-		void setText(UText *text, UErrorCode &status) override;
+		virtual void setText(UText *text, UErrorCode &status);
 
-		void adoptText(CharacterIterator* it) override;
+		virtual void adoptText(CharacterIterator* it);
 
-		int32_t first(void) override;
+		virtual int32_t first(void);
 
-		int32_t last(void) override;
+		virtual int32_t last(void);
 
-		int32_t previous(void) override;
+		virtual int32_t previous(void);
 
-		int32_t next(void) override;
+		virtual int32_t next(void);
 
-		int32_t current(void) const override;
+		virtual int32_t current(void) const;
 
-		int32_t following(int32_t offset) override;
+		virtual int32_t following(int32_t offset);
 
-		int32_t preceding(int32_t offset) override;
+		virtual int32_t preceding(int32_t offset);
 
-		UBool isBoundary(int32_t offset) override;
+		virtual UBool isBoundary(int32_t offset);
 
-		int32_t next(int32_t n) override;
+		virtual int32_t next(int32_t n);
 
-		CodePointBreakIterator *createBufferClone(void *stackBuffer,
+		virtual CodePointBreakIterator *createBufferClone(void *stackBuffer,
 														  int32_t &BufferSize,
-														  UErrorCode &status) override;
+														  UErrorCode &status);
 
-		CodePointBreakIterator &refreshInputText(UText *input, UErrorCode &status) override;
+		virtual CodePointBreakIterator &refreshInputText(UText *input, UErrorCode &status);
 
 		inline UChar32 getLastCodePoint()
 		{

@@ -1,7 +1,9 @@
 --TEST--
 Bug #48221 (memory leak when passing invalid xslt parameter)
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+if (!extension_loaded('xsl')) die("skip Extension XSL is required\n");
+?>
 --FILE--
 <?php
 include('prepare.inc');

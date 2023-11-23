@@ -7,31 +7,31 @@ class MealIterator implements Iterator {
     private $pos=0;
     private $myContent=array("breakfast", "lunch", "dinner");
 
-    public function valid(): bool {
+    public function valid() {
         global $indent;
         echo "$indent--> " . __METHOD__ . " ($this->pos)\n";
         return $this->pos<3;
     }
 
-    public function next(): void {
+    public function next() {
         global $indent;
         echo "$indent--> " . __METHOD__ . " ($this->pos)\n";
-        $this->myContent[$this->pos++];
+        return $this->myContent[$this->pos++];
     }
 
-    public function rewind(): void {
+    public function rewind() {
         global $indent;
         echo "$indent--> " . __METHOD__ . " ($this->pos)\n";
         $this->pos=0;
     }
 
-    public function current(): mixed {
+    public function current() {
         global $indent;
         echo "$indent--> " . __METHOD__ . " ($this->pos)\n";
         return $this->myContent[$this->pos];
     }
 
-    public function key(): mixed {
+    public function key() {
         global $indent;
         echo "$indent--> " . __METHOD__ . " ($this->pos)\n";
         return "meal " . $this->pos;

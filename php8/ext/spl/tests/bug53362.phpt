@@ -4,7 +4,7 @@ Bug #53362 (Segmentation fault when extending SplFixedArray)
 <?php
 
 class obj extends SplFixedArray{
-    public function offsetSet($offset, $value): void {
+    public function offsetSet($offset, $value) {
         var_dump($offset);
     }
 }

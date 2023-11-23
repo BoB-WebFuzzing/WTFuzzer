@@ -4,7 +4,6 @@ Closure 026: Assigning a closure object to an array in $this
 <?php
 
 class foo {
-    public $a;
     public function __construct() {
         $a =& $this;
 

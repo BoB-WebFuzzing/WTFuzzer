@@ -53,6 +53,6 @@ void phpdbg_clear_sigsafe_mem(void) {
 	PHPDBG_G(sigsafe_mem).mem = NULL;
 }
 
-bool phpdbg_active_sigsafe_mem(void) {
+zend_bool phpdbg_active_sigsafe_mem(void) {
 	return !!PHPDBG_G(sigsafe_mem).mem;
 }

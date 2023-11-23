@@ -1,7 +1,7 @@
 --TEST--
 Bug #71331 (Uninitialized pointer in phar_make_dirstream())
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 $p = new PharData(__DIR__."/bug71331.tar");

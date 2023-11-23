@@ -9,9 +9,7 @@ var_dump(function ($someThing) {});
 
 ?>
 --EXPECT--
-object(Closure)#2 (2) {
-  ["function"]=>
-  string(3) "sin"
+object(Closure)#2 (1) {
   ["parameter"]=>
   array(1) {
     ["$num"]=>

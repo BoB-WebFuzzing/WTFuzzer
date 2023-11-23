@@ -72,7 +72,4 @@ string\(24\) "image\/vnd.microsoft.icon"
 string\(10\) "image\/webp"
 
 -- Iteration 19 --
-string\(10\) "image\/avif"
-
--- Iteration 20 --
 string\(24\) "application\/octet-stream"

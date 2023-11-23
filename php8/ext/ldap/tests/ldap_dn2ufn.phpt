@@ -1,7 +1,7 @@
 --TEST--
 ldap_dn2ufn() test
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

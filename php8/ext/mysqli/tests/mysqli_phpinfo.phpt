@@ -1,9 +1,8 @@
 --TEST--
 phpinfo() mysqli section
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -41,14 +40,19 @@ require_once('skipifconnectfailure.inc');
     if (!stristr($phpinfo, "mysqli.max_links"))
         printf("[008] php.ini setting mysqli.max_links not shown.\n");
 
-    $expected = array(
-        'size',
-        'mysqli.allow_local_infile', 'mysqli.local_infile_directory',
-        'mysqli.allow_persistent', 'mysqli.max_persistent'
-    );
-    foreach ($expected as $k => $entry)
-        if (!stristr($phpinfo, $entry))
-            printf("[010] Could not find entry for '%s'\n", $entry);
+    if (!stristr($phpinfo, "mysqli.reconnect"))
+        printf("[009] php.ini setting mysqli.reconnect not shown.\n");
+
+    if ($IS_MYSQLND) {
+        $expected = array(
+            'size',
+            'mysqli.allow_local_infile',
+            'mysqli.allow_persistent', 'mysqli.max_persistent'
+        );
+        foreach ($expected as $k => $entry)
+            if (!stristr($phpinfo, $entry))
+                printf("[010] Could not find entry for '%s'\n", $entry);
+    }
 
     print "done!";
 ?>

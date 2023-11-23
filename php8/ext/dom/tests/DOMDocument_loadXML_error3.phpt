@@ -10,8 +10,8 @@ Environment variables used in the test:
 Antonio Diaz Ruiz <dejalatele@gmail.com>
 --INI--
 assert.bail=true
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --ENV--
 XML_FILE=/not_well_formed3.xml
 LOAD_OPTIONS=0

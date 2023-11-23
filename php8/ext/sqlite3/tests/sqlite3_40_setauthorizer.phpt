@@ -1,7 +1,7 @@
 --TEST--
 SQLite3 user authorizer callback
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 

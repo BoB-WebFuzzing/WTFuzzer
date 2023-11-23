@@ -4,8 +4,8 @@ Leak 001: Incorrect 'if ();' optimization
 opcache.enable=1
 opcache.enable_cli=1
 opcache.file_cache_only=0
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 if (false);

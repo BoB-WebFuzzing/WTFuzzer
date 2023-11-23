@@ -1,7 +1,7 @@
 --TEST--
 inflate_get_read_len()
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) print "skip"; ?>
 --FILE--
 <?php
 

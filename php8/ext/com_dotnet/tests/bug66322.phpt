@@ -1,9 +1,8 @@
 --TEST--
 Bug #66322 (COMPersistHelper::SaveToFile can save to wrong location)
---EXTENSIONS--
-com_dotnet
 --SKIPIF--
 <?php
+if (!extension_loaded('com_dotnet')) die('skip com_dotnet extension not available');
 try {
     new COM('Word.Application');
 } catch (com_exception $ex) {

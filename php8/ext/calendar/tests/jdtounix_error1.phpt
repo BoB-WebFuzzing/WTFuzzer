@@ -4,8 +4,8 @@ Test jdtounix() function : error conditions
 edgarsandi - <edgar.r.sandi@gmail.com>
 --INI--
 date.timezone=UTC
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 try {

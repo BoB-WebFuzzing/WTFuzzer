@@ -1,7 +1,9 @@
 --TEST--
 Bug #66550 (SQLite prepared statement use-after-free)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded('sqlite3')) die('skip');
+?>
 --FILE--
 <?php
 

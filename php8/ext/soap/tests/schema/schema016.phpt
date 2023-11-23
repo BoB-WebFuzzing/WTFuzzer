@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 16: simpleType/union (inline type)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--

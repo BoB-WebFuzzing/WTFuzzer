@@ -1,7 +1,7 @@
 --TEST--
 Bug #79475 ([JIT] func_get_args() assertion violation)
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function foo() {

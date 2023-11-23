@@ -1,7 +1,7 @@
 --TEST--
 Bug #61964 (finfo_open with directory cause invalid free)
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -45,10 +45,8 @@ rmdir($dir);
 ?>
 --EXPECTF--
 bool(false)%A
-object(finfo)#%d (0) {
-}
-object(finfo)#%d (0) {
-}
+resource(%d) of type (file_info)
+resource(%d) of type (file_info)
 bool(false)%A
 Warning: finfo_open(): offset `string' invalid in %sbug61964.php on line %d
 

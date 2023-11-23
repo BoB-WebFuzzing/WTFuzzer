@@ -1,7 +1,7 @@
 --TEST--
 Bug #69846 Segmenation fault (access violation) when iterating over DOMNodeList
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -78,11 +78,11 @@ object(DOMText)#%d (21) {
   string(3) "
   "
 }
-object(DOMElement)#7 (23) {
-  ["schemaTypeInfo"]=>
-  NULL
+object(DOMElement)#%d (23) {
   ["tagName"]=>
   string(5) "form1"
+  ["schemaTypeInfo"]=>
+  NULL
   ["firstElementChild"]=>
   string(22) "(object value omitted)"
   ["lastElementChild"]=>

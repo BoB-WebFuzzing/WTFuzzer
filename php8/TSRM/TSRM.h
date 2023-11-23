@@ -20,8 +20,7 @@
 # include "main/php_config.h"
 #endif
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "main/php_stdint.h"
 
 #ifdef TSRM_WIN32
 #	ifdef TSRM_EXPORTS
@@ -80,7 +79,7 @@ extern "C" {
 #endif
 
 /* startup/shutdown */
-TSRM_API bool tsrm_startup(int expected_threads, int expected_resources, int debug_level, const char *debug_filename);
+TSRM_API int tsrm_startup(int expected_threads, int expected_resources, int debug_level, const char *debug_filename);
 TSRM_API void tsrm_shutdown(void);
 
 /* environ lock API */
@@ -134,8 +133,8 @@ TSRM_API void *tsrm_set_shutdown_handler(tsrm_shutdown_func_t shutdown_handler);
 
 TSRM_API void *tsrm_get_ls_cache(void);
 TSRM_API size_t tsrm_get_ls_cache_tcb_offset(void);
-TSRM_API bool tsrm_is_main_thread(void);
-TSRM_API bool tsrm_is_shutdown(void);
+TSRM_API uint8_t tsrm_is_main_thread(void);
+TSRM_API uint8_t tsrm_is_shutdown(void);
 TSRM_API const char *tsrm_api_name(void);
 
 #ifdef TSRM_WIN32
@@ -168,10 +167,8 @@ TSRM_API const char *tsrm_api_name(void);
 #define TSRMG_BULK_STATIC(id, type)	((type) (*((void ***) TSRMLS_CACHE))[TSRM_UNSHUFFLE_RSRC_ID(id)])
 #define TSRMG_FAST_STATIC(offset, type, element)	(TSRMG_FAST_BULK_STATIC(offset, type)->element)
 #define TSRMG_FAST_BULK_STATIC(offset, type)	((type) (((char*) TSRMLS_CACHE)+(offset)))
-#define TSRMLS_MAIN_CACHE_EXTERN() extern TSRM_TLS void *TSRMLS_CACHE TSRM_TLS_MODEL_ATTR;
-#define TSRMLS_MAIN_CACHE_DEFINE() TSRM_TLS void *TSRMLS_CACHE TSRM_TLS_MODEL_ATTR = NULL;
-#define TSRMLS_CACHE_EXTERN() extern TSRM_TLS void *TSRMLS_CACHE;
-#define TSRMLS_CACHE_DEFINE() TSRM_TLS void *TSRMLS_CACHE = NULL;
+#define TSRMLS_CACHE_EXTERN() extern TSRM_TLS void *TSRMLS_CACHE TSRM_TLS_MODEL_ATTR;
+#define TSRMLS_CACHE_DEFINE() TSRM_TLS void *TSRMLS_CACHE TSRM_TLS_MODEL_ATTR = NULL;
 #define TSRMLS_CACHE_UPDATE() TSRMLS_CACHE = tsrm_get_ls_cache()
 #define TSRMLS_CACHE _tsrm_ls_cache
 
@@ -185,8 +182,6 @@ TSRM_API const char *tsrm_api_name(void);
 #define tsrm_env_unlock()
 
 #define TSRMG_STATIC(id, type, element)
-#define TSRMLS_MAIN_CACHE_EXTERN()
-#define TSRMLS_MAIN_CACHE_DEFINE()
 #define TSRMLS_CACHE_EXTERN()
 #define TSRMLS_CACHE_DEFINE()
 #define TSRMLS_CACHE_UPDATE()

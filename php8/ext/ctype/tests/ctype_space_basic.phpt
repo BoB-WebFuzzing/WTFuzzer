@@ -1,7 +1,7 @@
 --TEST--
 Test ctype_space() function : basic functionality
---EXTENSIONS--
-ctype
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 echo "*** Testing ctype_space() : basic functionality ***\n";

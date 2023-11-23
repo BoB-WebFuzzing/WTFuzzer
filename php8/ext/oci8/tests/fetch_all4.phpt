@@ -1,7 +1,7 @@
 --TEST--
 Test oci_fetch_* array overwriting when query returns no rows
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --FILE--
 <?php
 

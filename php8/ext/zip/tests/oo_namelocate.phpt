@@ -1,7 +1,9 @@
 --TEST--
 Locate entries by name
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 $dirname = __DIR__ . '/';

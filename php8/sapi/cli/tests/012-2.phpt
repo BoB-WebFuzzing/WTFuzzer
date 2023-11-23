@@ -1,7 +1,5 @@
 --TEST--
 more invalid arguments and error messages
---EXTENSIONS--
-readline
 --SKIPIF--
 <?php include "skipif.inc"; ?>
 --FILE--

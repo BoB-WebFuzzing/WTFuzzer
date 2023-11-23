@@ -3,14 +3,14 @@ Bug #72069 (Behavior \JsonSerializable different from json_encode)
 --FILE--
 <?php
 
-$result = json_encode(['end' => json_decode('', true)]);
+$result = json_encode(['end' => json_decode(null, true)]);
 var_dump($result);
 
 class A implements \JsonSerializable
 {
-    function jsonSerialize(): mixed
+    function jsonSerialize()
     {
-        return ['end' => json_decode('', true)];
+        return ['end' => json_decode(null, true)];
     }
 }
 $a = new A();

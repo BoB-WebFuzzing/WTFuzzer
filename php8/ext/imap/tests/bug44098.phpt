@@ -1,7 +1,9 @@
 --TEST--
 Bug #44098 (imap_utf8() returns only capital letters)
---EXTENSIONS--
-imap
+--SKIPIF--
+<?php
+extension_loaded('imap') or die('skip imap extension not available in this build');
+?>
 --FILE--
 <?php
 $exp = 'Luzon®14 dot CoM';

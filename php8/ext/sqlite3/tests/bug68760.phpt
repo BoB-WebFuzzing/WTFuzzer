@@ -1,7 +1,9 @@
 --TEST--
 Bug #68760 (Callback throws exception behaviour. Segfault in 5.6)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded('sqlite3')) die('skip');
+?>
 --FILE--
 <?php
 function oopsFunction($a, $b) {

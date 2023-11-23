@@ -1,7 +1,7 @@
 --TEST--
 Bug #78563: parsers should not be clonable
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php include("skipif.inc"); ?>
 --FILE--
 <?php
 

@@ -1,5 +1,5 @@
 --TEST--
-Pass uninitialized variables by reference and by value to test implicit initialisation.
+Pass uninitialised variables by reference and by value to test implicit initialisation.
 --FILE--
 <?php
 

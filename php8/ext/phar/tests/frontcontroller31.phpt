@@ -2,8 +2,8 @@
 Phar front controller with invalid callback for rewrites
 --INI--
 default_charset=UTF-8
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller31.php
 REQUEST_URI=/frontcontroller31.php

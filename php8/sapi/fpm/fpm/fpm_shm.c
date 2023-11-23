@@ -8,7 +8,7 @@
 #include "zlog.h"
 
 
-/* MAP_ANON is deprecated, but not in macOS */
+/* MAP_ANON is deprecated, but not in macosx */
 #if defined(MAP_ANON) && !defined(MAP_ANONYMOUS)
 #define MAP_ANONYMOUS MAP_ANON
 #endif

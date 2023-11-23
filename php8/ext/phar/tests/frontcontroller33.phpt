@@ -2,8 +2,8 @@
 Phar front controller with valid callback that does not return any value
 --INI--
 default_charset=UTF-8
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller33.php
 REQUEST_URI=/frontcontroller33.php

@@ -1,7 +1,11 @@
 --TEST--
 Bug #36697 (TrueColor transparency with GIF palette output).
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+    if (!extension_loaded('gd')) {
+        die("skip gd extension not available\n");
+    }
+?>
 --FILE--
 <?php
 $dest = __DIR__ . "/36697.gif";

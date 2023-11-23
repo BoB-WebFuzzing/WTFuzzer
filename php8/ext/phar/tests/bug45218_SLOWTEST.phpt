@@ -1,9 +1,8 @@
 --TEST--
 Phar::buildFromIterator() iterator, too many files for open file handles (Bug #45218)
---EXTENSIONS--
-phar
 --SKIPIF--
 <?php
+if (!extension_loaded("phar")) die("skip");
 if (getenv('SKIP_SLOW_TESTS')) die('skip slow tests excluded by request');
 ?>
 --INI--
@@ -19,22 +18,21 @@ class myIterator implements Iterator
     var $a;
     var $count = 1;
 
-    function next(): void {
-        ++$this->count;
+    function next() {
+        return (++$this->count < 3000) ? 'f' . $this->count : false;
     }
-    function current(): mixed {
+    function current() {
         if (($this->count % 100) === 0) {
             echo $this->count, "\n";
         }
         return $GLOBALS['fname2'];
     }
-    function key(): mixed {
+    function key() {
         return 'f' . $this->count;
     }
-    function valid(): bool {
+    function valid() {
         return $this->count < 3000;
     }
-    #[ReturnTypeWillChange]
     function rewind() {
         $this->count = 1;
         return $GLOBALS['fname2'];

@@ -4,8 +4,8 @@ bcdiv — Divide two arbitrary precision numbers
 TestFest2009
 Antoni Torrents
 antoni@solucionsinternet.com
---EXTENSIONS--
-bcmath
+--SKIPIF--
+<?php if(!extension_loaded("bcmath")) print "skip"; ?>
 --FILE--
 <?php
 try {

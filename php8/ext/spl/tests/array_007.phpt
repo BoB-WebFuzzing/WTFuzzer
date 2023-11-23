@@ -7,7 +7,6 @@ SPL: ArrayObject/Iterator from IteratorAggregate
 // since they cannot be accessed from the external object which iterates
 // them.
 
-#[AllowDynamicProperties]
 class test implements IteratorAggregate
 {
     public    $pub = "public";
@@ -19,7 +18,7 @@ class test implements IteratorAggregate
         $this->imp = "implicit";
     }
 
-    function getIterator(): Traversable
+    function getIterator()
     {
         $it = new ArrayObject($this);
         return $it->getIterator();

@@ -1,7 +1,7 @@
 --TEST--
 Test 2: getElementsByTagName() / getElementsByTagNameNS()
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $xml = <<<HERE

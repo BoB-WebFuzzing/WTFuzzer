@@ -1,7 +1,7 @@
 --TEST--
 Test curl_copy_handle() with CURLINFO_HEADER_OUT
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
   include 'server.inc';

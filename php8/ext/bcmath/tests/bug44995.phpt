@@ -1,7 +1,9 @@
 --TEST--
 Bug #44995 (bcpowmod() fails if scale != 0)
---EXTENSIONS--
-bcmath
+--SKIPIF--
+<?php
+if (!extension_loaded('bcmath')) die('skip bcmath extension not available');
+?>
 --FILE--
 <?php
 var_dump(bcpowmod('4', '4', '3', 1));

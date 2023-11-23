@@ -8,7 +8,6 @@ Return scalar type basics
 $errnames = [
     E_NOTICE => 'E_NOTICE',
     E_WARNING => 'E_WARNING',
-    E_DEPRECATED => 'E_DEPRECATED',
 ];
 set_error_handler(function (int $errno, string $errmsg, string $file, int $line) use ($errnames) {
     echo "$errnames[$errno]: $errmsg on line $line\n";
@@ -71,7 +70,6 @@ int(1)
 *** Trying float(1)
 int(1)
 *** Trying float(1.5)
-E_DEPRECATED: Implicit conversion from float 1.5 to int loses precision on line %d
 int(1)
 *** Trying string(2) "1a"
 *** Caught {closure}(): Return value must be of type int, string returned in %s on line %d

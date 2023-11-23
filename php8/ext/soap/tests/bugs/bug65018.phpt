@@ -1,7 +1,7 @@
 --TEST--
 Bug #65018 (SoapHeader problems with SoapServer)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
     class Tool{

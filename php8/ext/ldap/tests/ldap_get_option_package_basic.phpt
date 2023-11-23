@@ -2,8 +2,8 @@
 ldap_get_option() - Basic test for getting the TLS package ldap option
 --CREDITS--
 Chad Sikorra <Chad.Sikorra@gmail.com>
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require "connect.inc";

@@ -1,12 +1,13 @@
 --TEST--
 mysqli_stmt_get_warnings() - TODO
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once "connect.inc";
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
 
-if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
+require_once("connect.inc");
+
+if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
     die(sprintf("skip Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
         $host, $user, $db, $port, $socket));
 }
@@ -22,7 +23,9 @@ mysqli_query($link, "DROP TABLE IF EXISTS test");
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    require('table.inc');
 
     if (!$stmt = mysqli_stmt_init($link))
         printf("[003] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -93,7 +96,7 @@ mysqli_query($link, "DROP TABLE IF EXISTS test");
 ?>
 --CLEAN--
 <?php
-require_once "clean_table.inc";
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 mysqli_stmt object is not fully initialized

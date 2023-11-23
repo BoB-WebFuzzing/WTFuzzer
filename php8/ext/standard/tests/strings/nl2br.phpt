@@ -4,6 +4,7 @@ nl2br() function
 <?php
     var_dump(nl2br("test"));
     var_dump(nl2br(""));
+    var_dump(nl2br(NULL));
     var_dump(nl2br("\r\n"));
     var_dump(nl2br("\n"));
     var_dump(nl2br("\r"));
@@ -16,6 +17,7 @@ nl2br() function
 ?>
 --EXPECT--
 string(4) "test"
+string(0) ""
 string(0) ""
 string(8) "<br />
 "

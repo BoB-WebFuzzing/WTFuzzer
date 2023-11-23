@@ -3,7 +3,6 @@ stream_set_chunk_size basic tests
 --FILE--
 <?php
 class test_wrapper {
-    public $context;
     function stream_open($path, $mode, $openedpath) {
         return true;
     }

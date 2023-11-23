@@ -1,15 +1,16 @@
 --TEST--
 mb_send_mail() test 2 (lang=Japanese)
---EXTENSIONS--
-mbstring
 --SKIPIF--
 <?php
+if (substr(PHP_OS, 0, 3) == 'WIN') {
+    die('skip.. Not valid for Windows');
+}
 if (!function_exists("mb_send_mail") || !mb_language("japanese")) {
     die("skip mb_send_mail() not available");
 }
 ?>
 --INI--
-sendmail_path={MAIL:{PWD}/mb_send_mail02.eml}
+sendmail_path=/bin/cat
 mail.add_x_header=off
 --FILE--
 <?php
@@ -17,18 +18,12 @@ $to = 'example@example.com';
 
 /* default setting */
 mb_send_mail($to, mb_language(), "test");
-readfile(__DIR__ . "/mb_send_mail02.eml");
 
 /* Japanese (EUC-JP) */
 if (mb_language("japanese")) {
     mb_internal_encoding('EUC-JP');
     mb_send_mail($to, "テスト ".mb_language(), "テスト");
-    readfile(__DIR__ . "/mb_send_mail02.eml");
 }
-?>
---CLEAN--
-<?php
-@unlink(__DIR__ . "/mb_send_mail02.eml");
 ?>
 --EXPECTF--
 To: example@example.com

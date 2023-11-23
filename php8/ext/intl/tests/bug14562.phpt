@@ -1,7 +1,7 @@
 --TEST--
 Bug #14562 NumberFormatter breaks when locale changes
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

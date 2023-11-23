@@ -1,7 +1,8 @@
 --TEST--
 OCI
---EXTENSIONS--
-pdo_oci
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo_oci')) print 'skip'; ?>
 --REDIRECTTEST--
 # magic auto-configuration
 

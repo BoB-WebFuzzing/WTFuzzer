@@ -58,8 +58,6 @@ array(1) {
   }
 }
 Modify the object, and it is apparently no longer referenced.
-
-Deprecated: Creation of dynamic property ReflectionClass::$x is deprecated in %s on line %d
 array(1) {
   ["I"]=>
   object(ReflectionClass)#%d (2) {

@@ -6,8 +6,10 @@ Source code: ext/posix/posix.c
 --CREDITS--
 Moritz Neuhaeuser, info@xcompile.net
 PHP Testfest Berlin 2009-05-10
---EXTENSIONS--
-posix
+--SKIPIF--
+<?php
+    if(!extension_loaded("posix")) print "SKIP - POSIX extension not loaded";
+?>
 --FILE--
 <?php
 echo "*** Testing posix_getsid() : function test ***\n";

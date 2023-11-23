@@ -1,7 +1,7 @@
 --TEST--
 Test DOMDocument::load() with invalid paths
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 // create dom document

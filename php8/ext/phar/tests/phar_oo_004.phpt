@@ -1,7 +1,9 @@
 --TEST--
 Phar and DirectoryIterator
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.require_hash=0
 --FILE--
@@ -31,31 +33,31 @@ class MyDirectoryIterator extends DirectoryIterator
         parent::__construct($dir);
     }
 
-    function rewind(): void
+    function rewind()
     {
         echo __METHOD__ . "\n";
         parent::rewind();
     }
 
-    function valid(): bool
+    function valid()
     {
         echo __METHOD__ . "\n";
         return parent::valid();
     }
 
-    function key(): mixed
+    function key()
     {
         echo __METHOD__ . "\n";
         return parent::key();
     }
 
-    function current(): mixed
+    function current()
     {
         echo __METHOD__ . "\n";
         return parent::current();
     }
 
-    function next(): void
+    function next()
     {
         echo __METHOD__ . "\n";
         parent::next();

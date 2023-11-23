@@ -1,7 +1,5 @@
 --TEST--
 Bug #80226 (imap_sort() leaks sortpgm memory)
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

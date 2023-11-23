@@ -1,13 +1,13 @@
 --TEST--
 SOAP Typemap 12: SoapClient support for typemap's to_xml() (SoapFault)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--
 <?php
 class TestSoapClient extends SoapClient{
-  function __doRequest($request, $location, $action, $version, $one_way = 0): ?string {
+  function __doRequest($request, $location, $action, $version, $one_way = 0) {
         echo $request;
         exit;
     }

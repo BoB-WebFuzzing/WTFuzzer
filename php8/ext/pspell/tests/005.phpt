@@ -1,9 +1,8 @@
 --TEST--
 pspell configs
---EXTENSIONS--
-pspell
 --SKIPIF--
 <?php
+if (!extension_loaded('pspell')) die('skip');
 if (!@pspell_new('en')) die('skip English dictionary is not available');
 if (getenv('SKIP_ASAN')) die('skip pspell leaks memory for invalid dicationaries');
 ?>

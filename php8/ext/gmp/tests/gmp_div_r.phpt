@@ -1,7 +1,7 @@
 --TEST--
 gmp_div_r() tests
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 

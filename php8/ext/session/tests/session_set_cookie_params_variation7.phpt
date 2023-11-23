@@ -7,8 +7,6 @@ session.cookie_domain=""
 session.cookie_secure=0
 session.cookie_httponly=0
 session.cookie_samesite=""
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

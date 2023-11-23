@@ -1,7 +1,9 @@
 --TEST--
 Bug #71536 (Access Violation crashes php-cgi.exe)
---EXTENSIONS--
-xmlwriter
+--SKIPIF--
+<?php
+if (!extension_loaded('xmlwriter')) die('skip xmlwriter extension not available');
+?>
 --FILE--
 <?php
 class Test {

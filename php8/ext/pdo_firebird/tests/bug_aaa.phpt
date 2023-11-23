@@ -1,7 +1,5 @@
 --TEST--
 PDO_Firebird: cursor should not be marked as opened on singleton statements
---EXTENSIONS--
-pdo_firebird
 --SKIPIF--
 <?php require('skipif.inc'); ?>
 --ENV--

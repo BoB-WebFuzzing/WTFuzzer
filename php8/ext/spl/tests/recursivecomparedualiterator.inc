@@ -34,7 +34,7 @@ class RecursiveCompareDualIterator extends RecursiveIteratorIterator
 
     /** Rewind iteration and comparison process. Starting with $equal = true.
      */
-    function rewind(): void
+    function rewind()
     {
         $this->equal = true;
         parent::rewind();
@@ -43,7 +43,7 @@ class RecursiveCompareDualIterator extends RecursiveIteratorIterator
     /** Calculate $equal
      * @see $equal
      */
-    function endChildren(): void
+    function endChildren()
     {
         $this->equal &= !$this->getInnerIterator()->getLHS()->valid()
                      && !$this->getInnerIterator()->getRHS()->valid();

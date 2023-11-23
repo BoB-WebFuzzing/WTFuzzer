@@ -1,7 +1,7 @@
 --TEST--
 SOAP typemap 13: SoapServer support for typemap's to_xml() with default ns
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--

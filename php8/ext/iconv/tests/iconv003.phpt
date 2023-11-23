@@ -1,7 +1,7 @@
 --TEST--
 iconv() test 3
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php extension_loaded('iconv') or die('skip iconv extension is not available'); ?>
 --FILE--
 <?php
 for ($i = 0; $i < 3; ++$i) {

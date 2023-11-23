@@ -1,7 +1,7 @@
 --TEST--
 Sony test
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
 --FILE--
 <?php
 $data = exif_read_data(__DIR__ . DIRECTORY_SEPARATOR . 'sony.jpg');

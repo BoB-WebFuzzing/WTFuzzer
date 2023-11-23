@@ -5,7 +5,7 @@ SPL: RecursiveIteratorIterator and hasChildren
 
 class MyRecursiveArrayIterator extends RecursiveArrayIterator
 {
-    function valid(): bool
+    function valid()
     {
         if (!parent::valid())
         {
@@ -18,7 +18,7 @@ class MyRecursiveArrayIterator extends RecursiveArrayIterator
         }
     }
 
-    function getChildren(): ?RecursiveArrayIterator
+    function getChildren()
     {
         echo __METHOD__ . "\n";
         return parent::getChildren();
@@ -37,14 +37,14 @@ class RecursiveArrayIteratorIterator extends RecursiveIteratorIterator
         parent::__construct($it);
     }
 
-    function rewind(): void
+    function rewind()
     {
         echo __METHOD__ . "\n";
         $this->skip = false;
         parent::rewind();
     }
 
-    function valid(): bool
+    function valid()
     {
         echo __METHOD__ . "\n";
         if ($this->skip)
@@ -55,25 +55,25 @@ class RecursiveArrayIteratorIterator extends RecursiveIteratorIterator
         return parent::valid();
     }
 
-    function current(): mixed
+    function current()
     {
         echo __METHOD__ . "\n";
         return parent::current();
     }
 
-    function key(): mixed
+    function key()
     {
         echo __METHOD__ . "\n";
         return parent::key();
     }
 
-    function next(): void
+    function next()
     {
         echo __METHOD__ . "\n";
         parent::next();
     }
 
-    function callHasChildren(): bool
+    function callHasChildren()
     {
         $this->skip = false;
         $has = parent::callHasChildren();
@@ -89,12 +89,12 @@ class RecursiveArrayIteratorIterator extends RecursiveIteratorIterator
         return $res;
     }
 
-    function beginChildren(): void
+    function beginChildren()
     {
         echo __METHOD__ . "(".$this->getDepth().")\n";
     }
 
-    function endChildren(): void
+    function endChildren()
     {
         echo __METHOD__ . "(".$this->getDepth().")\n";
     }

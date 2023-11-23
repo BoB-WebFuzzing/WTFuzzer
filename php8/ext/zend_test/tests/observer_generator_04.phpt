@@ -1,7 +1,7 @@
 --TEST--
 Observer: Generator with manual traversal
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip: zend-test extension required'); ?>
 --INI--
 zend_test.observer.enabled=1
 zend_test.observer.observe_all=1
@@ -33,87 +33,32 @@ function doSomething() {
 echo doSomething() . PHP_EOL;
 ?>
 --EXPECTF--
-<!-- init '%s' -->
-<file '%s'>
+<!-- init '%s%eobserver_generator_%d.php' -->
+<file '%s%eobserver_generator_%d.php'>
   <!-- init doSomething() -->
   <doSomething>
-    <!-- init Generator::current() -->
-    <Generator::current>
-      <!-- init fooResults() -->
-      <fooResults>
+    <!-- init fooResults() -->
+    <fooResults>
 Starting generator
-      </fooResults:0>
-    </Generator::current:0>
-    <Generator::current>
-    </Generator::current:0>
+    </fooResults:0>
 0
-    <Generator::current>
-    </Generator::current:0>
-    <!-- init Generator::next() -->
-    <Generator::next>
-      <fooResults>
-      </fooResults:1>
-    </Generator::next:NULL>
-    <Generator::current>
-    </Generator::current:1>
-    <Generator::current>
-    </Generator::current:1>
+    <fooResults>
+    </fooResults:1>
 1
-    <Generator::current>
-    </Generator::current:1>
-    <Generator::next>
-      <fooResults>
-      </fooResults:2>
-    </Generator::next:NULL>
-    <Generator::current>
-    </Generator::current:2>
-    <Generator::current>
-    </Generator::current:2>
+    <fooResults>
+    </fooResults:2>
 2
-    <Generator::current>
-    </Generator::current:2>
-    <Generator::next>
-      <fooResults>
-      </fooResults:3>
-    </Generator::next:NULL>
-    <Generator::current>
-    </Generator::current:3>
-    <Generator::current>
-    </Generator::current:3>
+    <fooResults>
+    </fooResults:3>
 3
-    <Generator::current>
-    </Generator::current:3>
-    <Generator::next>
-      <fooResults>
-      </fooResults:4>
-    </Generator::next:NULL>
-    <Generator::current>
-    </Generator::current:4>
-    <Generator::current>
-    </Generator::current:4>
+    <fooResults>
+    </fooResults:4>
 4
-    <Generator::current>
-    </Generator::current:4>
-    <Generator::next>
-      <fooResults>
-      </fooResults:5>
-    </Generator::next:NULL>
-    <Generator::current>
-    </Generator::current:5>
-    <Generator::current>
-    </Generator::current:5>
+    <fooResults>
+    </fooResults:5>
 5
-    <Generator::current>
-    </Generator::current:5>
-    <!-- init Generator::send() -->
-    <Generator::send>
-      <fooResults>
-      </fooResults:NULL>
-    </Generator::send:NULL>
-    <Generator::next>
-    </Generator::next:NULL>
-    <Generator::current>
-    </Generator::current:NULL>
+    <fooResults>
+    </fooResults:NULL>
   </doSomething:'Done'>
 Done
-</file '%s'>
+</file '%s%eobserver_generator_%d.php'>

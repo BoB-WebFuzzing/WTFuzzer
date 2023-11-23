@@ -1,10 +1,9 @@
 --TEST--
 GET/POST/REQUEST Test with filtered data
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --INI--
 filter.default=special_chars
-error_reporting=E_ALL&~E_DEPRECATED
 --POST--
 d="quotes"&e=\slash
 --GET--

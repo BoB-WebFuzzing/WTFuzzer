@@ -1,7 +1,7 @@
 --TEST--
 mb_substitute_character()
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 

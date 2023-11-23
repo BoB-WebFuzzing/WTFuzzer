@@ -4,23 +4,23 @@ Bug #62059: ArrayObject and isset are not friends
 <?php
 
 class MyArrayObject1 extends ArrayObject {
-    public function offsetGet($name): mixed {
+    public function offsetGet($name) {
         echo "offsetGet($name)\n";
         return parent::offsetGet($name);
     }
-    public function offsetExists($name): bool {
+    public function offsetExists($name) {
         echo "offsetExists($name)\n";
         return parent::offsetExists($name);
     }
 }
 class MyArrayObject2 extends ArrayObject {
-    public function offsetGet($name): mixed {
+    public function offsetGet($name) {
         echo "offsetGet($name)\n";
         return parent::offsetGet($name);
     }
 }
 class MyArrayObject3 extends ArrayObject {
-    public function offsetExists($name): bool {
+    public function offsetExists($name) {
         echo "offsetExists($name)\n";
         return parent::offsetExists($name);
     }

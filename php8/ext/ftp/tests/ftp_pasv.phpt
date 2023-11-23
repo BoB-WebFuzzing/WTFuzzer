@@ -2,9 +2,8 @@
 Testing ftp_pasv basic funcionality
 --CREDITS--
 Gabriel Caruso (carusogabriel34@gmail.com)
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --FILE--
 <?php
 require 'server.inc';

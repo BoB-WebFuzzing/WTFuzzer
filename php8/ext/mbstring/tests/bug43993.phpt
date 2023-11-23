@@ -1,7 +1,7 @@
 --TEST--
 Bug #43993 (mb_substr_count() behaves differently to substr_count() with overlapping needles)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 var_dump(mb_substr_count("abcabcabca", "abcabc"));

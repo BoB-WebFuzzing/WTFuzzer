@@ -1,12 +1,12 @@
 --TEST--
 mysqli_autocommit()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-    require_once 'connect.inc';
+    require_once('skipif.inc');
+    require_once('connect.inc');
+    require_once('skipifconnectfailure.inc');
 
-    if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
+    if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
         die(sprintf("skip Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
             $host, $user, $db, $port, $socket));
     }
@@ -16,7 +16,7 @@ mysqli
 ?>
 --FILE--
 <?php
-    require_once "connect.inc";
+    require_once("connect.inc");
 
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
         printf("[004] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
@@ -128,10 +128,9 @@ mysqli
     }
 
     print "done!";
-?>
 --CLEAN--
 <?php
-require_once "clean_table.inc";
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 mysqli object is already closed

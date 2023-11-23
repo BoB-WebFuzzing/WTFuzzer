@@ -1,7 +1,9 @@
 --TEST--
 PDO SQLite Bug #33841 (rowCount() does not work on prepared statements)
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo_sqlite')) print 'skip not loaded';
+?>
 --FILE--
 <?php
 require __DIR__ . '/../../../ext/pdo/tests/pdo_test.inc';

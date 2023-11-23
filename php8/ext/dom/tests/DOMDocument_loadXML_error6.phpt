@@ -1,7 +1,7 @@
 --TEST--
 Test DOMDocument::loadXML() with empty file path
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 // create dom document

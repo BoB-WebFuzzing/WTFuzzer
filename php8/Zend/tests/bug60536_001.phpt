@@ -12,7 +12,6 @@ class Y extends X {
           return ++$this->x;
       }
 }
-#[AllowDynamicProperties]
 class Z extends Y {
       function __construct() {
           return ++$this->x;

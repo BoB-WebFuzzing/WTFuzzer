@@ -1,7 +1,5 @@
 --TEST--
 Instanceof checks in VERIFY_RETURN_TYPE optimization may deal with unlinked classes
---EXTENSIONS--
-opcache
 --FILE--
 <?php
 interface foo { }

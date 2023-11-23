@@ -1,7 +1,5 @@
 --TEST--
 imagepolygon()
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
     if (!function_exists('imagepolygon')) die('skip imagepolygon() not available');

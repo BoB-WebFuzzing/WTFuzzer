@@ -2,8 +2,8 @@
 Phar front controller no index file 404 [cache_list]
 --INI--
 phar.cache_list={PWD}/frontcontroller8.php
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller8.php
 REQUEST_URI=/frontcontroller8.php/

@@ -6,12 +6,12 @@ SPL: Bug #66834
 // overrides both offsetExists and offsetGet
 class ArrayObjectBoth extends ArrayObject
 {
-    public function offsetExists($offset): bool {
+    public function offsetExists($offset) {
         var_dump('Called: '.__METHOD__);
         return parent::offsetExists($offset);
     }
 
-    public function offsetGet($offset): mixed {
+    public function offsetGet($offset) {
         var_dump('Called: '.__METHOD__);
         return parent::offsetGet($offset);
     }
@@ -20,7 +20,7 @@ class ArrayObjectBoth extends ArrayObject
 // overrides only offsetExists
 class ArrayObjectExists extends ArrayObject
 {
-    public function offsetExists($offset): bool {
+    public function offsetExists($offset) {
         var_dump('Called: '.__METHOD__);
         return parent::offsetExists($offset);
     }
@@ -29,7 +29,7 @@ class ArrayObjectExists extends ArrayObject
 // overrides only offsetGet
 class ArrayObjectGet extends ArrayObject
 {
-    public function offsetGet($offset): mixed {
+    public function offsetGet($offset) {
         var_dump('Called: '.__METHOD__);
         return parent::offsetGet($offset);
     }
@@ -38,14 +38,14 @@ class ArrayObjectGet extends ArrayObject
 // overrides only offsetGet and offsetSet
 class ArrayObjectGetSet extends ArrayObject
 {
-    public function offsetGet($offset): mixed
+    public function offsetGet($offset)
     {
         return parent::offsetGet(str_rot13($offset));
     }
 
-    public function offsetSet($offset, $value): void
+    public function offsetSet($offset, $value)
     {
-        parent::offsetSet(str_rot13($offset), $value);
+        return parent::offsetSet(str_rot13($offset), $value);
     }
 }
 

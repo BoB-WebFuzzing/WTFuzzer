@@ -1,7 +1,8 @@
 --TEST--
 Bug #70628 (Clearing bindings on an SQLite3 statement doesn't work)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded('sqlite3')) die('skip'); ?>
 --FILE--
 <?php
 $db = new SQLite3(':memory:');

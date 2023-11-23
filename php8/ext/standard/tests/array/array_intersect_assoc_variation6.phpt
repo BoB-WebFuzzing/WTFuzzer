@@ -30,6 +30,12 @@ $arrays = array (
        array(1 => "1"),
        array(1 => "1", 2 => "2", 3 => "3", 4 => "4"),
 
+       // arrays with float keys
+/*5*/  array(2.3333 => "float"),
+       array(1.2 => "f1", 3.33 => "f2",
+             4.89999922839999 => "f3",
+             33333333.333333 => "f4"),
+
        // arrays with string keys
 /*7*/  array('\tHello' => 111, 're\td' => "color",
              '\v\fworld' => 2.2, 'pen\n' => 33),
@@ -42,11 +48,11 @@ $arrays = array (
 
        // array with mixed keys
 /*11*/ array('hello' => 1, "fruit" => 2.2,
-              133 => "int",
+              133 => "int", 444.432 => "float",
              @$unset_var => "unset", $heredoc => "heredoc")
 );
 
-// array to be passed to $arr1 argument
+// array to be passsed to $arr1 argument
 $arr1 = array(0 => 0, 2 => "float", 4 => "f3", 33333333 => "f4",
               "\tHello" => 111, 2.2, 'color', "Hello world" => "string",
               "pen\n" => 33, 133 => "int");
@@ -94,12 +100,34 @@ array(0) {
 array(0) {
 }
 -- Iteration 5 --
-array(0) {
+array(1) {
+  [2]=>
+  string(5) "float"
 }
-array(0) {
+array(1) {
+  [2]=>
+  string(5) "float"
 }
 -- Iteration 6 --
 array(2) {
+  [4]=>
+  string(2) "f3"
+  [33333333]=>
+  string(2) "f4"
+}
+array(2) {
+  [4]=>
+  string(2) "f3"
+  [33333333]=>
+  string(2) "f4"
+}
+-- Iteration 7 --
+array(0) {
+}
+array(0) {
+}
+-- Iteration 8 --
+array(2) {
   ["	Hello"]=>
   int(111)
   ["pen
@@ -113,21 +141,21 @@ array(2) {
 "]=>
   int(33)
 }
--- Iteration 7 --
-array(1) {
-  ["Hello world"]=>
-  string(6) "string"
-}
-array(1) {
-  ["Hello world"]=>
-  string(6) "string"
-}
--- Iteration 8 --
-array(0) {
-}
-array(0) {
-}
 -- Iteration 9 --
+array(1) {
+  ["Hello world"]=>
+  string(6) "string"
+}
+array(1) {
+  ["Hello world"]=>
+  string(6) "string"
+}
+-- Iteration 10 --
+array(0) {
+}
+array(0) {
+}
+-- Iteration 11 --
 array(1) {
   [133]=>
   string(3) "int"

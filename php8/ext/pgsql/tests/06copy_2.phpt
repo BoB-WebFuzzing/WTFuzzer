@@ -1,7 +1,5 @@
 --TEST--
 PostgreSQL copy functions, part 2
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--

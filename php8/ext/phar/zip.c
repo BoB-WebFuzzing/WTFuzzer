@@ -7,7 +7,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt.                                 |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -147,8 +147,7 @@ static void phar_zip_u2d_time(time_t time, char *dtime, char *ddate) /* {{{ */
 	struct tm *tm, tmbuf;
 
 	tm = php_localtime_r(&time, &tmbuf);
-	/* Note: tm_year is the year - 1900 */
-	if (tm->tm_year >= 80) {
+	if (tm->tm_year >= 1980) {
 		cdate = ((tm->tm_year+1900-1980)<<9) + ((tm->tm_mon+1)<<5) + tm->tm_mday;
 		ctime = ((tm->tm_hour)<<11) + ((tm->tm_min)<<5) + ((tm->tm_sec)>>1);
 	} else {
@@ -304,11 +303,11 @@ foundit:
 	php_stream_seek(fp, PHAR_GET_32(locator.cdir_offset), SEEK_SET);
 	/* read in central directory */
 	zend_hash_init(&mydata->manifest, PHAR_GET_16(locator.count),
-		zend_get_hash_value, destroy_phar_manifest_entry, (bool)mydata->is_persistent);
+		zend_get_hash_value, destroy_phar_manifest_entry, (zend_bool)mydata->is_persistent);
 	zend_hash_init(&mydata->mounted_dirs, 5,
-		zend_get_hash_value, NULL, (bool)mydata->is_persistent);
+		zend_get_hash_value, NULL, (zend_bool)mydata->is_persistent);
 	zend_hash_init(&mydata->virtual_dirs, PHAR_GET_16(locator.count) * 2,
-		zend_get_hash_value, NULL, (bool)mydata->is_persistent);
+		zend_get_hash_value, NULL, (zend_bool)mydata->is_persistent);
 	entry.phar = mydata;
 	entry.is_zip = 1;
 	entry.fp_type = PHAR_FP;
@@ -852,10 +851,10 @@ static int phar_zip_changed_apply_int(phar_entry_info *entry, void *arg) /* {{{ 
 	PHAR_SET_16(perms.size, sizeof(perms) - 4);
 	PHAR_SET_16(perms.perms, entry->flags & PHAR_ENT_PERM_MASK);
 	{
-		uint32_t crc = (uint32_t) php_crc32_bulk_init();
+		uint32_t crc = (uint32_t) ~0;
 		CRC32(crc, perms.perms[0]);
 		CRC32(crc, perms.perms[1]);
-		PHAR_SET_32(perms.crc32, php_crc32_bulk_end(crc));
+		PHAR_SET_32(perms.crc32, ~crc);
 	}
 
 	if (entry->flags & PHAR_ENT_COMPRESSED_GZ) {
@@ -883,6 +882,7 @@ static int phar_zip_changed_apply_int(phar_entry_info *entry, void *arg) /* {{{ 
 
 	/* do extra field for perms later */
 	if (entry->is_modified) {
+		uint32_t loc;
 		php_stream_filter *filter;
 		php_stream *efp;
 
@@ -913,11 +913,13 @@ static int phar_zip_changed_apply_int(phar_entry_info *entry, void *arg) /* {{{ 
 		}
 
 		efp = phar_get_efp(entry, 0);
-		newcrc32 = php_crc32_bulk_init();
+		newcrc32 = ~0;
 
-		php_crc32_stream_bulk_update(&newcrc32, efp, entry->uncompressed_filesize);
+		for (loc = 0;loc < entry->uncompressed_filesize; ++loc) {
+			CRC32(newcrc32, php_stream_getc(efp));
+		}
 
-		entry->crc32 = php_crc32_bulk_end(newcrc32);
+		entry->crc32 = ~newcrc32;
 		PHAR_SET_32(central.uncompsize, entry->uncompressed_filesize);
 		PHAR_SET_32(local.uncompsize, entry->uncompressed_filesize);
 
@@ -1203,6 +1205,7 @@ int phar_zip_flush(phar_archive_data *phar, char *user_stub, zend_long len, int 
 	char *pos;
 	static const char newstub[] = "<?php // zip-based phar archive stub file\n__HALT_COMPILER();";
 	char halt_stub[] = "__HALT_COMPILER();";
+	char *tmp;
 
 	php_stream *stubfile, *oldfile;
 	int free_user_stub, closeoldfile = 0;
@@ -1305,7 +1308,9 @@ int phar_zip_flush(phar_archive_data *phar, char *user_stub, zend_long len, int 
 			free_user_stub = 0;
 		}
 
-		if ((pos = php_stristr(user_stub, halt_stub, len, sizeof(halt_stub) - 1)) == NULL) {
+		tmp = estrndup(user_stub, len);
+		if ((pos = php_stristr(tmp, halt_stub, len, sizeof(halt_stub) - 1)) == NULL) {
+			efree(tmp);
 			if (error) {
 				spprintf(error, 0, "illegal stub for zip-based phar \"%s\"", phar->fname);
 			}
@@ -1314,6 +1319,8 @@ int phar_zip_flush(phar_archive_data *phar, char *user_stub, zend_long len, int 
 			}
 			return EOF;
 		}
+		pos = user_stub + (pos - tmp);
+		efree(tmp);
 
 		len = pos - user_stub + 18;
 		entry.fp = php_stream_fopen_tmpfile();
@@ -1416,7 +1423,7 @@ fperror:
 
 	memcpy(eocd.signature, "PK\5\6", 4);
 	if (!phar->is_data && !phar->sig_flags) {
-		phar->sig_flags = PHAR_SIG_SHA256;
+		phar->sig_flags = PHAR_SIG_SHA1;
 	}
 	if (phar->sig_flags) {
 		PHAR_SET_16(eocd.counthere, zend_hash_num_elements(&phar->manifest) + 1);

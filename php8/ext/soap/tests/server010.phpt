@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 10: setclass and setpersistence(SOAP_PERSISTENCE_REQUEST)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class foo {

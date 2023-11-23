@@ -1,7 +1,9 @@
 --TEST--
 Bug #69972 (Use-after-free vulnerability in sqlite3SafetyCheckSickOrOk())
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded('sqlite3')) die('skip');
+?>
 --FILE--
 <?php
 $db = new SQLite3(':memory:');

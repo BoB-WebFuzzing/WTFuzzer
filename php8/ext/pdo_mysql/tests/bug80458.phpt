@@ -1,10 +1,9 @@
 --TEST--
 Bug #80458 PDOStatement::fetchAll() throws for upsert queries
---EXTENSIONS--
-pdo
-pdo_mysql
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo') || !extension_loaded('pdo_mysql')) die('skip not loaded');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'skipif.inc');
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
 MySQLPDOTest::skip();
 ?>
@@ -15,7 +14,6 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
 $db = MySQLPDOTest::factory();
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-$db->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
 
 $db->query('DROP TABLE IF EXISTS test');
 $db->query('CREATE TABLE test (first int) ENGINE = InnoDB');
@@ -129,9 +127,9 @@ array(1) {
   [0]=>
   array(2) {
     ["first"]=>
-    string(1) "5"
+    int(5)
     [0]=>
-    string(1) "5"
+    int(5)
   }
 }
 array(0) {
@@ -140,9 +138,9 @@ array(1) {
   [0]=>
   array(2) {
     ["first"]=>
-    string(1) "7"
+    int(7)
     [0]=>
-    string(1) "7"
+    int(7)
   }
 }
 array(0) {
@@ -181,8 +179,8 @@ array(1) {
   [0]=>
   array(2) {
     ["first"]=>
-    string(2) "16"
+    int(16)
     [0]=>
-    string(2) "16"
+    int(16)
   }
 }

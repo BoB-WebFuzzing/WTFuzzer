@@ -1,7 +1,7 @@
 --TEST--
 Bug #62759: Buggy grapheme_substr() on edge case
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 var_dump(substr('deja', 1, -4));

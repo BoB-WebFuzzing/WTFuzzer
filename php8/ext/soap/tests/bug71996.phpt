@@ -1,12 +1,12 @@
 --TEST--
 Bug #71996: Using references in arrays doesn't work like expected
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
 $client = new class(null, ['location' => '', 'uri' => 'http://example.org']) extends SoapClient {
-    public function __doRequest($request, $location, $action, $version, $one_way = 0): ?string {
+    public function __doRequest($request, $location, $action, $version, $one_way = 0) {
         echo $request, "\n";
         return '';
     }

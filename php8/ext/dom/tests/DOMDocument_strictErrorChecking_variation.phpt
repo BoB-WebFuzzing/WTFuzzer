@@ -4,8 +4,8 @@ DomDocument::$strictErrorChecking - ensure turning off actually works
 Vincent Tsao <notes4vincent@gmail.com>
 (and Dan Convissor)
 # TestFest 2009 NYPHP
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

@@ -127,33 +127,19 @@ class LogTool
     /**
      * Match the matcher checking the log lines using the callback.
      *
-     * @param callable    $matcher             Callback checking whether the log line matches the expected message.
-     * @param string|null $notFoundMessage     Error message to show if the message is not found.
-     * @param bool        $checkAllLogs        Whether to also check past logs.
-     * @param int|null    $timeoutSeconds      Timeout in seconds for reading of all messages.
-     * @param int|null    $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
+     * @param callable $matcher         Callback checking whether the log line matches the expected message.
+     * @param string   $notFoundMessage Error message to show if the message is not found.
      *
      * @return bool
      * @throws \Exception
      */
-    private function match(
-        callable $matcher,
-        string $notFoundMessage = null,
-        bool $checkAllLogs = false,
-        int $timeoutSeconds = null,
-        int $timeoutMicroseconds = null
-    ): bool {
+    private function match(callable $matcher, string $notFoundMessage): bool
+    {
         if ($this->getError()) {
             return false;
         }
 
-        if ($this->logReader->readUntil(
-            $matcher,
-            $notFoundMessage,
-            $checkAllLogs,
-            $timeoutSeconds,
-            $timeoutMicroseconds
-        )) {
+        if ($this->logReader->readUntil($matcher, $notFoundMessage)) {
             $this->popError();
 
             return true;
@@ -448,8 +434,7 @@ class LogTool
      * @return bool
      * @throws \Exception
      */
-    public function expectReloadingLogsLines(): bool
-    {
+    public function expectReloadingLogsLines(): bool {
         return (
             $this->expectNotice('error log file re-opened') &&
             $this->expectNotice('access log file re-opened')
@@ -513,11 +498,7 @@ class LogTool
         }
         $this->trace("Matching EXPECTED: $expectedMessage");
 
-        // Allow expected message to contain %s and %s for any string or number as in run-tests.php
-        $expectRe = str_replace('%s', '[^\r\n]+', $expectedMessage);
-        $expectRe = str_replace('%d', '\d+', $expectRe);
-
-        $pattern = sprintf('/^(?:%s )?%s: %s(%s)$/', self::P_TIME, $type, self::P_DEBUG, $expectRe);
+        $pattern = sprintf('/^(?:%s )?%s: %s(%s)$/', self::P_TIME, $type, self::P_DEBUG, $expectedMessage);
         $this->trace("PATTERN: $pattern");
 
         return function ($line) use ($expectedMessage, $pattern, $type, $ignoreErrorFor) {
@@ -589,14 +570,10 @@ class LogTool
     /**
      * Expect log entry.
      *
-     * @param string      $type                Entry type like NOTICE, WARNING, DEBUG and so on.
-     * @param string      $expectedMessage     Message to search for
-     * @param string|null $pool                Pool that is used and prefixes the message.
-     * @param string      $ignoreErrorFor      Ignore error for supplied string in the message.
-     * @param bool        $checkAllLogs        Whether to also check past logs.
-     * @param bool        $invert              Whether the log entry is not expected rather than expected.
-     * @param int|null    $timeoutSeconds      Timeout in seconds for reading of all messages.
-     * @param int|null    $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
+     * @param string      $type            Entry type like NOTICE, WARNING, DEBUG and so on.
+     * @param string      $expectedMessage Message to search for
+     * @param string|null $pool            Pool that is used and prefixes the message.
+     * @param string      $ignoreErrorFor  Ignore error for supplied string in the message.
      *
      * @return bool
      * @throws \Exception
@@ -605,29 +582,16 @@ class LogTool
         string $type,
         string $expectedMessage,
         string $pool = null,
-        string $ignoreErrorFor = self::DEBUG,
-        bool $checkAllLogs = false,
-        bool $invert = false,
-        int $timeoutSeconds = null,
-        int $timeoutMicroseconds = null
+        string $ignoreErrorFor = self::DEBUG
     ): bool {
         if ($this->getError()) {
             return false;
         }
 
-        $matchResult = $this->match(
+        return $this->match(
             $this->getEntryMatcher($type, $expectedMessage, $pool, $ignoreErrorFor),
-            $invert ? null : "The $type does not match expected message",
-            $checkAllLogs,
-            $timeoutSeconds,
-            $timeoutMicroseconds
+            "The $type does not match expected message"
         );
-
-        if ($matchResult && $invert) {
-            return $this->error("The $type matches unexpected message");
-        }
-
-        return $matchResult;
     }
 
     /**
@@ -703,23 +667,14 @@ class LogTool
     /**
      * Expect pattern in the log line.
      *
-     * @param string   $pattern             Pattern to use.
-     * @param bool     $invert              Whether to expect pattern not to match.
-     * @param bool     $checkAllLogs        Whether to also check past logs.
-     * @param int|null $timeoutSeconds      Timeout in seconds for reading of all messages.
-     * @param int|null $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
+     * @param string $pattern
      *
      * @return bool
      * @throws \Exception
      */
-    public function expectPattern(
-        string $pattern,
-        bool $invert = false,
-        bool $checkAllLogs = false,
-        int $timeoutSeconds = null,
-        int $timeoutMicroseconds = null,
-    ): bool {
-        $matchResult = $this->match(
+    public function expectPattern(string $pattern): bool
+    {
+        return $this->match(
             function ($line) use ($pattern) {
                 if (preg_match($pattern, $line) === 1) {
                     $this->traceMatch("Pattern expectation", $pattern, $line);
@@ -729,17 +684,8 @@ class LogTool
 
                 return false;
             },
-            $invert ? null : 'The search pattern not found',
-            $checkAllLogs,
-            $timeoutSeconds,
-            $timeoutMicroseconds
+            'The search pattern not found'
         );
-
-        if ($invert && $matchResult) {
-            return $this->logReader->printError('The search pattern found - PATTERN: ' . $pattern);
-        }
-
-        return $matchResult;
     }
 
     /**

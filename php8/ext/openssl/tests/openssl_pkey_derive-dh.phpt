@@ -1,7 +1,7 @@
 --TEST--
 openssl_pkey_derive() DH
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 

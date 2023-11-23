@@ -5,6 +5,10 @@ Daniel Convissor <danielc@php.net>
 # TestFest 2010 BKTK
 --INI--
 date.timezone=UTC
+--SKIPIF--
+<?php
+if (!method_exists('DateInterval', 'format')) die("skip: method doesn't exist");
+?>
 --FILE--
 <?php
 

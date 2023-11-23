@@ -1,7 +1,9 @@
 --TEST--
 Bug #74737: Incorrect ReflectionFunction information for mysqli_get_client_info
---EXTENSIONS--
-mysqli
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 $client_info = mysqli_get_client_info();

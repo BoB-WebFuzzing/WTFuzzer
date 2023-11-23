@@ -1,7 +1,7 @@
 --TEST--
 oci_bind_array_by_name(), SQLT_CHR, default max_length and empty array
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --FILE--
 <?php
 

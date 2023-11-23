@@ -1,16 +1,19 @@
 --TEST--
 SOAP Interop Round4 GroupI XSD 024 (php/wsdl): echoNestedComplexType(minOccurs=0)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 soap.wsdl_cache_enabled=0
 --FILE--
 <?php
 class SOAPComplexTypeComplexType {
-    function __construct(
-        public $varString, public $varInt, public $varFloat, public $varComplexType
-    ) {}
+    function __construct($s, $i, $f, $c) {
+        $this->varString = $s;
+        $this->varInt = $i;
+        $this->varFloat = $f;
+        $this->varComplexType = $c;
+    }
 }
 $struct = new SOAPComplexTypeComplexType("arg",34,12.345,NULL);
 unset($struct->varComplexType);

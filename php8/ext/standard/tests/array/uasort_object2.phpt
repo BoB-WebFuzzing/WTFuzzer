@@ -146,31 +146,31 @@ bool(true)
 array(4) {
   [2]=>
   object(ChildClass)#%d (2) {
-    ["pub_value"]=>
-    NULL
     ["child_value"]=>
     int(15)
+    ["pub_value"]=>
+    NULL
   }
   [0]=>
   object(ChildClass)#%d (2) {
-    ["pub_value"]=>
-    NULL
     ["child_value"]=>
     int(20)
+    ["pub_value"]=>
+    NULL
   }
   [1]=>
   object(ChildClass)#%d (2) {
-    ["pub_value"]=>
-    NULL
     ["child_value"]=>
     int(500)
+    ["pub_value"]=>
+    NULL
   }
   [3]=>
   object(ChildClass)#%d (2) {
-    ["pub_value"]=>
-    NULL
     ["child_value"]=>
     int(700)
+    ["pub_value"]=>
+    NULL
   }
 }
 Done

@@ -40,6 +40,12 @@ $arrays = array (
        array(1 => "1"),
        array(1 => "1", 2 => "2", 3 => "3", 4 => "4"),
 
+       // arrays with float keys
+/*5*/  array(2.3333 => "float"),
+       array(1.2 => "f1", 3.33 => "f2",
+             4.89999922839999 => "f3",
+             33333333.333333 => "f4"),
+
        // arrays with string keys
 /*7*/  array('\tHello' => 111, 're\td' => "color",
              '\v\fworld' => 2.2, 'pen\n' => 33),
@@ -52,7 +58,7 @@ $arrays = array (
 
        // array with mixed keys
 /*11*/ array('hello' => 1, "fruit" => 2.2,
-             $fp => 'resource', 133 => "int",
+             $fp => 'resource', 133 => "int", 444.432 => "float",
              @$unset_var => "unset", $heredoc => "heredoc")
 );
 
@@ -106,18 +112,23 @@ array(4) {
   string(1) "4"
 }
 -- Iteration 5 --
-array(4) {
-  [111]=>
-  int(111)
-  ["color"]=>
-  string(5) "color"
-  ["2.2"]=>
-  float(2.2)
-  [33]=>
-  int(33)
+array(1) {
+  ["float"]=>
+  string(5) "float"
 }
 -- Iteration 6 --
 array(4) {
+  ["f1"]=>
+  string(2) "f1"
+  ["f2"]=>
+  string(2) "f2"
+  ["f3"]=>
+  string(2) "f3"
+  ["f4"]=>
+  string(2) "f4"
+}
+-- Iteration 7 --
+array(4) {
   [111]=>
   int(111)
   ["color"]=>
@@ -127,22 +138,33 @@ array(4) {
   [33]=>
   int(33)
 }
--- Iteration 7 --
+-- Iteration 8 --
+array(4) {
+  [111]=>
+  int(111)
+  ["color"]=>
+  string(5) "color"
+  ["2.2"]=>
+  float(2.2)
+  [33]=>
+  int(33)
+}
+-- Iteration 9 --
 array(2) {
   ["hello"]=>
   string(5) "hello"
   ["string"]=>
   string(6) "string"
 }
--- Iteration 8 --
+-- Iteration 10 --
 array(2) {
   ["hello"]=>
   string(5) "hello"
   ["resource"]=>
   string(8) "resource"
 }
--- Iteration 9 --
-array(6) {
+-- Iteration 11 --
+array(7) {
   [1]=>
   int(1)
   ["2.2"]=>
@@ -151,6 +173,8 @@ array(6) {
   string(8) "resource"
   ["int"]=>
   string(3) "int"
+  ["float"]=>
+  string(5) "float"
   ["unset"]=>
   string(5) "unset"
   ["heredoc"]=>

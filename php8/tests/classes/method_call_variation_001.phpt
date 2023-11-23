@@ -2,9 +2,7 @@
 In $a->$b[Y]() and $a->X[Y]() both $a->$b[Y] and $a->X[Y] represent a global function name
 --FILE--
 <?php
-  class C {
-    public $functions;
-  }
+  class C {}
 
   function foo($a, $b) {
       echo "Called global foo($a, $b)\n";

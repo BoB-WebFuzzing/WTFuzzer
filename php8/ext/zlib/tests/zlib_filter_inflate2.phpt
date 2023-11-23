@@ -1,7 +1,7 @@
 --TEST--
 zlib.inflate of gzip-encoded stream
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) print "skip"; ?>
 --FILE--
 <?php
 

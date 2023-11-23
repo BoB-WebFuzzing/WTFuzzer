@@ -1,7 +1,5 @@
 --TEST--
 Offset errors for various strpos functions
---EXTENSIONS--
-mbstring
 --FILE--
 <?php
 

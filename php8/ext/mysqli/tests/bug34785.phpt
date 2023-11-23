@@ -1,9 +1,8 @@
 --TEST--
-Bug #34785 (Cannot properly subclass mysqli_stmt)
---EXTENSIONS--
-mysqli
+Bug #34785 (Can not properly subclass mysqli_stmt)
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

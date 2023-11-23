@@ -1,7 +1,5 @@
 --TEST--
 Bug #80147 (BINARY strings may not be properly zero-terminated)
---EXTENSIONS--
-odbc
 --SKIPIF--
 <?php include 'skipif.inc'; ?>
 --FILE--

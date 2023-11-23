@@ -1,7 +1,7 @@
 --TEST--
 tidy_clean_repair()
---EXTENSIONS--
-tidy
+--SKIPIF--
+<?php if (!extension_loaded("tidy")) print "skip"; ?>
 --FILE--
 <?php
 

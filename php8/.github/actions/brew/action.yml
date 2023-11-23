@@ -12,7 +12,6 @@ runs:
           re2c
         brew install \
           openssl@1.1 \
-          curl \
           krb5 \
           bzip2 \
           enchant \

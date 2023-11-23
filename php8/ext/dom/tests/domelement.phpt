@@ -1,7 +1,7 @@
 --TEST--
 Elements: DOMElement functionality
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require_once("dom_test.inc");

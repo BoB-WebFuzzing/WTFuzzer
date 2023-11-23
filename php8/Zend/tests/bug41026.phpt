@@ -12,7 +12,7 @@ class try_class
 
     static public function on_shutdown ()
     {
-        printf ("CHECKPOINT\n");
+        printf ("CHECKPOINT\n"); /* never reached */
     }
 }
 
@@ -20,7 +20,7 @@ try_class::main ();
 
 echo "Done\n";
 ?>
---EXPECTF--
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
+--EXPECT--
 Done
-CHECKPOINT
+
+Fatal error: Registered shutdown function self::on_shutdown() cannot be called, function does not exist in Unknown on line 0

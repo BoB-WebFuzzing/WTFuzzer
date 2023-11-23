@@ -1,7 +1,7 @@
 --TEST--
 FFI 038: Casting array to pointer
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

@@ -1,7 +1,5 @@
 --TEST--
 PostgreSQL drop db
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--

@@ -22,10 +22,7 @@ second::init();
 var_dump(spl_autoload_functions());
 
 ?>
---EXPECTF--
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
-
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
+--EXPECT--
 array(2) {
   [0]=>
   array(2) {

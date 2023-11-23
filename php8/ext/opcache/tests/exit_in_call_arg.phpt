@@ -1,7 +1,5 @@
 --TEST--
 exit() may occur in a call argument
---EXTENSIONS--
-opcache
 --FILE--
 <?php
 

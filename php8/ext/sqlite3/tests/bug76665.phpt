@@ -1,7 +1,9 @@
 --TEST--
 Bug #76665 (SQLite3Stmt::bindValue() with SQLITE3_FLOAT doesn't juggle)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded('sqlite3')) die('skip sqlite3 extension not available');
+?>
 --FILE--
 <?php
 $db = new SQLite3(':memory:');

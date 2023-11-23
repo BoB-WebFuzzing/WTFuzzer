@@ -1,8 +1,10 @@
 --TEST--
 BUg #81325 (segfault in zif_simplexml_import_dom)
---EXTENSIONS--
-simplexml
-dom
+--SKIPIF--
+<?php
+if (!extension_loaded('simplexml')) die('skip simplexml not available');
+if (!extension_loaded('dom')) die('skip dom not available');
+?>
 --FILE--
 <?php
 $dom = new DOMDocument;

@@ -1,7 +1,11 @@
 --TEST--
 Bug #24594 (Filling an area using tiles).
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+    if (!extension_loaded('gd')) {
+        die("skip gd extension not available\n");
+    }
+?>
 --FILE--
 <?php
     $tile = imagecreate(36,36);

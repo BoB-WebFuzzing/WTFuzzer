@@ -1,8 +1,11 @@
 --TEST--
 Test sem_acquire with nowait option
---EXTENSIONS--
-sysvsem
-pcntl
+--SKIPIF--
+<?php
+if(!extension_loaded('sysvsem') || !extension_loaded('pcntl')) {
+    die("skip sysvsem and pcntl required");
+}
+?>
 --FILE--
 <?php
 $P_SEMKEY = ftok(__FILE__, 'P');  //  Parent Semaphore key

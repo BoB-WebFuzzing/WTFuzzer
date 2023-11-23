@@ -1,7 +1,7 @@
 --TEST--
 Null bytes in SQL statements
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --INI--
 display_errors = On
 error_reporting = E_WARNING

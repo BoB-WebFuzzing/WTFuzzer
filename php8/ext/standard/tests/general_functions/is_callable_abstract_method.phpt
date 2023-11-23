@@ -9,13 +9,11 @@ abstract class A {
 
 class B extends A {
     function foo() {}
-
-    function test() {
-        var_dump(is_callable(['A', 'foo']));
-    }
 }
 
-(new B)->test();
+$foo = [new B, 'A::foo'];
+var_dump(is_callable($foo));
+
 ?>
 --EXPECT--
 bool(false)

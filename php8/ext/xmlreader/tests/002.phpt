@@ -1,7 +1,7 @@
 --TEST--
 XMLReader: libxml2 XML Reader, file data
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 $filename = __DIR__ . '/_002.xml';

@@ -1,7 +1,7 @@
 --TEST--
 Extending the PhpToken class
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip tokenizer extension not enabled"; ?>
 --FILE--
 <?php
 

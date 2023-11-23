@@ -1,7 +1,5 @@
 --TEST--
 Bug #74541 Wrong reflection on session_start()
---EXTENSIONS--
-session
 --SKIPIF--
 <?php
 include('skipif.inc');

@@ -1,7 +1,9 @@
 --TEST--
 DOMDocument::save  Test basic function of save method
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 $doc = new DOMDocument('1.0');

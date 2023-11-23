@@ -1,7 +1,9 @@
 --TEST--
 Bug #57547 Settings options on file doesn't give same result as constructor options
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php
+if (!class_exists('finfo'))
+    die('skip no fileinfo extension');
 --FILE--
 <?php
 

@@ -1,7 +1,7 @@
 --TEST--
 Bind with SQLT_CHR
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --FILE--
 <?php
 

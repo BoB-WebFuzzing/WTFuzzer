@@ -1,7 +1,5 @@
 --TEST--
 Test imap_fetchheader() function : usage variations - $message_num argument
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

@@ -1,7 +1,7 @@
 --TEST--
 Check for libsodium generichash
---EXTENSIONS--
-sodium
+--SKIPIF--
+<?php if (!extension_loaded("sodium")) print "skip"; ?>
 --FILE--
 <?php
 $q = sodium_crypto_generichash('msg');

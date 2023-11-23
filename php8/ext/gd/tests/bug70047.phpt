@@ -1,7 +1,9 @@
 --TEST--
 Bug #70047 (gd_info() doesn't report WebP support)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $info = gd_info();

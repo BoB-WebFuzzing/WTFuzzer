@@ -4,7 +4,7 @@ Bug #64106: Segfault on SplFixedArray[][x] = y when extended
 <?php
 
 class MyFixedArray extends SplFixedArray {
-    public function offsetGet($offset): mixed { var_dump($offset);  return null; }
+    public function offsetGet($offset) { var_dump($offset); }
 }
 
 $array = new MyFixedArray(10);

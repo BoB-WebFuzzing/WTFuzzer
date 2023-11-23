@@ -1,7 +1,9 @@
 --TEST--
 zlib.output_compression
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) die("skip need ext/zlib");
+?>
 --INI--
 zlib.output_compression=1
 --ENV--

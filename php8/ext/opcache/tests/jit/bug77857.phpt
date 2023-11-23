@@ -6,8 +6,8 @@ opcache.enable_cli=1
 opcache.file_update_protection=0
 opcache.jit_buffer_size=64
 opcache.jit=1205
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test() {

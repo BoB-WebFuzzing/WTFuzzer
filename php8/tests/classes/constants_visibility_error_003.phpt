@@ -12,4 +12,4 @@ class B extends A {
 }
 ?>
 --EXPECTF--
-Fatal error: Access level to B::publicConst must be public (as in class A) in %s on line 7
+Fatal error: Access level to B::publicConst must be public (as in class A) in %s on line 9

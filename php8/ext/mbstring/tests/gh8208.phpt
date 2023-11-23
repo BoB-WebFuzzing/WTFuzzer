@@ -1,7 +1,9 @@
 --TEST--
 GH-8208 (mb_encode_mimeheader: $indent functionality broken)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+if (!extension_loaded("mbstring")) die("skip mbstring extension not available");
+?>
 --FILE--
 <?php
 $s = "[service-Aufgaben S&W-Team][#19415] VM''s aufsetzen mit unterschiedlichen";

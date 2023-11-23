@@ -5,7 +5,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -20,7 +20,7 @@
 
 #include "php.h"
 
-#ifdef DBA_LMDB
+#if DBA_LMDB
 #include "php_lmdb.h"
 
 #ifdef LMDB_INCLUDE_FILE
@@ -40,31 +40,20 @@ DBA_OPEN_FUNC(lmdb)
 {
 	MDB_env *env;
 	MDB_txn *txn;
-	int rc;
-	int mode = info->file_permission;
-	zend_long map_size = info->map_size;
+	int rc, mode = 0644, flags = MDB_NOSUBDIR;
+	zend_long mapsize = 0;
 
-	ZEND_ASSERT(map_size >= 0);
+	if(info->argc > 0) {
+		mode = zval_get_long(&info->argv[0]);
 
-	/* By default use the MDB_NOSUBDIR flag */
-	int flags = MDB_NOSUBDIR;
-	/* Use flags passed by the user for driver flags */
-	if (info->driver_flags != DBA_DEFAULT_DRIVER_FLAGS) {
-		ZEND_ASSERT(info->driver_flags >= 0);
-		switch (info->driver_flags) {
-			case 0:
-			case MDB_NOSUBDIR:
-				flags = info->driver_flags;
-				break;
-			default:
-				zend_argument_value_error(6, "must be either DBA_LMDB_USE_SUB_DIR or DBA_LMDB_NO_SUB_DIR for LMDB driver");
+		if (info->argc > 1) {
+			mapsize = zval_get_long(&info->argv[1]);
+			if (mapsize < 0) {
+				*error = "mapsize must be greater than or equal to zero";
 				return FAILURE;
+			}
 		}
-	}
-
-	/* Add readonly flag if DB is opened in read only mode */
-	if (info->mode == DBA_READER) {
-		flags |= MDB_RDONLY;
+		/* TODO implement handling of the additional flags. */
 	}
 
 	rc = mdb_env_create(&env);
@@ -73,8 +62,8 @@ DBA_OPEN_FUNC(lmdb)
 		return FAILURE;
 	}
 
-	if (map_size > 0) {
-		rc = mdb_env_set_mapsize(env, (size_t) map_size);
+	if (mapsize > 0) {
+		rc = mdb_env_set_mapsize(env, (size_t) mapsize);
 		if (rc) {
 			*error = mdb_strerror(rc);
 			return FAILURE;
@@ -83,14 +72,12 @@ DBA_OPEN_FUNC(lmdb)
 
 	rc = mdb_env_open(env, info->path, flags, mode);
 	if (rc) {
-		/* If this function [mdb_env_open()] fails, mdb_env_close() must be called to discard the MDB_env handle.
-		 * http://www.lmdb.tech/doc/group__mdb.html#ga32a193c6bf4d7d5c5d579e71f22e9340 */
 		mdb_env_close(env);
 		*error = mdb_strerror(rc);
 		return FAILURE;
 	}
 
-	rc = mdb_txn_begin(env, NULL, /* flags */ MDB_RDONLY, &txn);
+	rc = mdb_txn_begin(env, NULL, 0, &txn);
 	if (rc) {
 		mdb_env_close(env);
 		*error = mdb_strerror(rc);
@@ -132,7 +119,7 @@ DBA_FETCH_FUNC(lmdb)
 {
 	int rc;
 	MDB_val k, v;
-	zend_string *ret = NULL;
+	char *ret = NULL;
 
 	if (LMDB_IT(cur)) {
 		rc = mdb_txn_renew(LMDB_IT(txn));
@@ -140,24 +127,25 @@ DBA_FETCH_FUNC(lmdb)
 		rc = mdb_txn_begin(LMDB_IT(env), NULL, MDB_RDONLY, &LMDB_IT(txn));
 	}
 	if (rc) {
-		php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+		php_error_docref1(NULL, key, E_WARNING, "%s", mdb_strerror(rc));
 		return NULL;
 	}
 
-	k.mv_size = ZSTR_LEN(key);
-	k.mv_data = ZSTR_VAL(key);
+	k.mv_size = keylen;
+	k.mv_data = key;
 
 	rc = mdb_get(LMDB_IT(txn), LMDB_IT(dbi), &k, &v);
 	if (rc) {
 		if (MDB_NOTFOUND != rc) {
-			php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+			php_error_docref1(NULL, key, E_WARNING, "%s", mdb_strerror(rc));
 		}
 		mdb_txn_abort(LMDB_IT(txn));
 		return NULL;
 	}
 
 	if (v.mv_data) {
-		ret = zend_string_init(v.mv_data, v.mv_size, /* persistent */ false);
+		if(newlen) *newlen = v.mv_size;
+		ret = estrndup(v.mv_data, v.mv_size);
 	}
 
 	if (LMDB_IT(cur)) {
@@ -176,19 +164,19 @@ DBA_UPDATE_FUNC(lmdb)
 
 	rc = mdb_txn_begin(LMDB_IT(env), NULL, 0, &LMDB_IT(txn));
 	if (rc) {
-		php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+		php_error_docref2(NULL, key, val, E_WARNING, "%s", mdb_strerror(rc));
 		return FAILURE;
 	}
 
-	k.mv_size = ZSTR_LEN(key);
-	k.mv_data = ZSTR_VAL(key);
-	v.mv_size = ZSTR_LEN(val);
-	v.mv_data = ZSTR_VAL(val);
+	k.mv_size = keylen;
+	k.mv_data = key;
+	v.mv_size = vallen;
+	v.mv_data = val;
 
 	rc = mdb_put(LMDB_IT(txn), LMDB_IT(dbi), &k, &v, mode == 1 ? MDB_NOOVERWRITE : 0);
 	if (rc) {
 		if (MDB_KEYEXIST != rc) {
-			php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+			php_error_docref2(NULL, key, val, E_WARNING, "%s", mdb_strerror(rc));
 		}
 		mdb_txn_abort(LMDB_IT(txn));
 		return FAILURE;
@@ -196,7 +184,7 @@ DBA_UPDATE_FUNC(lmdb)
 
 	rc = mdb_txn_commit(LMDB_IT(txn));
 	if (rc) {
-		php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+		php_error_docref2(NULL, key, val, E_WARNING, "%s", mdb_strerror(rc));
 		mdb_txn_abort(LMDB_IT(txn));
 		return FAILURE;
 	}
@@ -215,17 +203,17 @@ DBA_EXISTS_FUNC(lmdb)
 		rc = mdb_txn_begin(LMDB_IT(env), NULL, MDB_RDONLY, &LMDB_IT(txn));
 	}
 	if (rc) {
-		php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+		php_error_docref1(NULL, key, E_WARNING, "%s", mdb_strerror(rc));
 		return FAILURE;
 	}
 
-	k.mv_size = ZSTR_LEN(key);
-	k.mv_data = ZSTR_VAL(key);
+	k.mv_size = keylen;
+	k.mv_data = key;
 
 	rc = mdb_get(LMDB_IT(txn), LMDB_IT(dbi), &k, &v);
 	if (rc) {
 		if (MDB_NOTFOUND != rc) {
-			php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+			php_error_docref1(NULL, key, E_WARNING, "%s", mdb_strerror(rc));
 		}
 		mdb_txn_abort(LMDB_IT(txn));
 		return FAILURE;
@@ -247,25 +235,25 @@ DBA_DELETE_FUNC(lmdb)
 
 	rc = mdb_txn_begin(LMDB_IT(env), NULL, 0, &LMDB_IT(txn));
 	if (rc) {
-		php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+		php_error_docref1(NULL, key, E_WARNING, "%s", mdb_strerror(rc));
 		return FAILURE;
 	}
 
-	k.mv_size = ZSTR_LEN(key);
-	k.mv_data = ZSTR_VAL(key);
+	k.mv_size = keylen;
+	k.mv_data = key;
 
 	rc = mdb_del(LMDB_IT(txn), LMDB_IT(dbi), &k, NULL);
 	if (!rc) {
 		rc = mdb_txn_commit(LMDB_IT(txn));
 		if (rc) {
-			php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+			php_error_docref1(NULL, key, E_WARNING, "%s", mdb_strerror(rc));
 			mdb_txn_abort(LMDB_IT(txn));
 			return FAILURE;
 		}
 		return SUCCESS;
 	}
 
-	php_error_docref(NULL, E_WARNING, "%s", mdb_strerror(rc));
+	php_error_docref1(NULL, key, E_WARNING, "%s", mdb_strerror(rc));
 
 	mdb_txn_abort(LMDB_IT(txn));
 	return FAILURE;
@@ -275,7 +263,7 @@ DBA_FIRSTKEY_FUNC(lmdb)
 {
 	int rc;
 	MDB_val k, v;
-	zend_string *ret = NULL;
+	char *ret = NULL;
 
 	rc = mdb_txn_begin(LMDB_IT(env), NULL, MDB_RDONLY, &LMDB_IT(txn));
 	if (rc) {
@@ -301,8 +289,9 @@ DBA_FIRSTKEY_FUNC(lmdb)
 		return NULL;
 	}
 
-	if (k.mv_data) {
-		ret = zend_string_init(k.mv_data, k.mv_size, /* persistent */ false);
+	if(k.mv_data) {
+		if(newlen) *newlen = k.mv_size;
+		ret = estrndup(k.mv_data, k.mv_size);
 	}
 
 	mdb_txn_reset(LMDB_IT(txn));
@@ -314,7 +303,7 @@ DBA_NEXTKEY_FUNC(lmdb)
 {
 	int rc;
 	MDB_val k, v;
-	zend_string *ret = NULL;
+	char *ret = NULL;
 
 	rc = mdb_txn_renew(LMDB_IT(txn));
 	if (rc) {
@@ -333,8 +322,9 @@ DBA_NEXTKEY_FUNC(lmdb)
 		return NULL;
 	}
 
-	if (k.mv_data) {
-		ret = zend_string_init(k.mv_data, k.mv_size, /* persistent */ false);
+	if(k.mv_data) {
+		if(newlen) *newlen = k.mv_size;
+		ret = estrndup(k.mv_data, k.mv_size);
 	}
 
 	mdb_txn_reset(LMDB_IT(txn));

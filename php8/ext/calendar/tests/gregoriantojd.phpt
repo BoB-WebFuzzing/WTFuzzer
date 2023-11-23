@@ -1,7 +1,7 @@
 --TEST--
 gregoriantojd()
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 echo gregoriantojd( 0, 0,    0). "\n";

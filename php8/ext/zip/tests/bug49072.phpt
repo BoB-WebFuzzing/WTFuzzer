@@ -1,7 +1,9 @@
 --TEST--
 Bug #49072 (feof never returns true for damaged file in zip)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 $f = __DIR__  . '/bug49072.zip';

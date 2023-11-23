@@ -1,9 +1,8 @@
 --TEST--
-Operators on overloaded property reference
+Operators on overlaoded property reference
 --FILE--
 <?php
 class C {
-    private $bar;
     function __construct() { $this->bar = str_repeat("1", 2); }
     function &__get($x) { return $this->bar; }
     function __set($x, $v) { $this->bar = $v; }

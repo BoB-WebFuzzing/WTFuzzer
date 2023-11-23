@@ -1,9 +1,5 @@
 --TEST--
 DBA DB4 Sync Test
---EXTENSIONS--
-dba
---CONFLICTS--
-dba
 --SKIPIF--
 <?php
 $handler = "db4";

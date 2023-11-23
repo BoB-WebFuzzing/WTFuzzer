@@ -1,7 +1,9 @@
 --TEST--
 Test posix_getgrgid() function : basic functionality
---EXTENSIONS--
-posix
+--SKIPIF--
+<?php
+    if (!extension_loaded('posix')) die('skip - POSIX extension not loaded');
+?>
 --FILE--
 <?php
   echo "Basic test of POSIX getgid and getgrid functions\n";
@@ -17,7 +19,7 @@ Basic test of POSIX getgid and getgrid functions
 Array
 (
     [name] => %s
-    [passwd] => %A
+    [passwd] => %a
     [members] => Array
 %a
 

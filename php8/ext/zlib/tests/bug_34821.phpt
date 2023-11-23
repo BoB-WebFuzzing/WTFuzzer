@@ -1,7 +1,7 @@
 --TEST--
 Bug #34821 (zlib encoders fail on widely varying binary data)
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) print "skip"; ?>
 --FILE--
 <?php
 

@@ -1,7 +1,5 @@
 --TEST--
 Attributes are exposed as tokens.
---EXTENSIONS--
-tokenizer
 --FILE--
 <?php
 

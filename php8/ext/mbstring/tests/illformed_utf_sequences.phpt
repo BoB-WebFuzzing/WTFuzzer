@@ -1,12 +1,15 @@
 --TEST--
 Unicode standard conformance test (ill-formed UTF sequences.)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
-function chk_enc($str, $n, $enc = "UTF-8") {
+function chk_enc($str, $n, $enc = "UTF-8", $with_bom = false) {
     $src = bin2hex(mb_convert_encoding($str, "UCS-4BE", $enc));
     $dst = str_repeat("0000fffd", $n);
+    if ($with_bom) {
+        $dst = "0000feff" . $dst;
+    }
     if ($dst == $src) {
         return false;
     } else {
@@ -15,6 +18,7 @@ function chk_enc($str, $n, $enc = "UTF-8") {
 }
 
 mb_substitute_character(0xfffd);
+
 
 echo "UTF-8 redundancy\n";
 var_dump(chk_enc("\x31\x32\x33", 0));
@@ -125,7 +129,7 @@ $out = '';
 $cnt = 0;
 for ($i = 0xd7ff; $i <= 0xe000; ++$i) {
     $s = chk_enc("\x00\x00\xfe\xff". pack('C4', $i >> 24, ($i >> 16) & 0xff, ($i >> 8) & 0xff, $i & 0xff),
-                 1, "UTF-32");
+                 1, "UTF-32", true);
     if ($s === false) {
         $cnt++;
     } else {
@@ -133,13 +137,13 @@ for ($i = 0xd7ff; $i <= 0xe000; ++$i) {
     }
 }
 var_dump($cnt);
-var_dump($out);
+var_dump(str_replace("0000feff","",$out));
 
 $out = '';
 $cnt = 0;
 for ($i = 0xd7ff; $i <= 0xe000; ++$i) {
     $s = chk_enc("\xff\xfe\x00\x00". pack('C4', $i & 0xff, ($i >> 8) & 0xff, ($i >> 16) & 0xff, ($i >> 24) & 0xff),
-                 1, "UTF-32");
+                 1, "UTF-32", true);
     if ($s === false) {
         $cnt++;
     } else {
@@ -147,7 +151,7 @@ for ($i = 0xd7ff; $i <= 0xe000; ++$i) {
     }
 }
 var_dump($cnt);
-var_dump($out);
+var_dump(str_replace("0000feff","",$out));
 
 ?>
 --EXPECT--
@@ -195,10 +199,10 @@ bool(false)
 string(8) "0010ffff"
 bool(false)
 string(8) "0010ffff"
-string(8) "0000fffd"
-string(8) "0010ffff"
-string(8) "0000fffd"
-string(8) "0010ffff"
+string(16) "0000feff0000fffd"
+string(16) "0000feff0010ffff"
+string(16) "0000feff0000fffd"
+string(16) "0000feff0010ffff"
 UTF-32 and surrogates area
 int(2048)
 string(16) "0000d7ff0000e000"

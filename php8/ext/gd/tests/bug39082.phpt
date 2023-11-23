@@ -1,7 +1,11 @@
 --TEST--
 Bug #39082 (Output image to stdout segfaults).
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+    if (!extension_loaded('gd')) {
+        die("skip gd extension not available\n");
+    }
+?>
 --FILE--
 <?php
 $im = imagecreatetruecolor(1,1);

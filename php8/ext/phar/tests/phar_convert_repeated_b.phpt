@@ -1,8 +1,8 @@
 --TEST--
 PharData::convertToZip|Tar|Phar() repeated (phardata_based archives)
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
+<?php if (!extension_loaded("zlib")) die("skip zlib not available"); ?>
 --INI--
 phar.readonly=1
 --FILE--
@@ -77,10 +77,15 @@ try {
 ?>
 --CLEAN--
 <?php
+echo __DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.gz' . "\n";
+
+unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.gz');
+unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.tar.gz');
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.tar');
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.1.2.tar');
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.zip');
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.1.zip');
+
 ?>
 --EXPECT--
 =================== new PharData() ==================

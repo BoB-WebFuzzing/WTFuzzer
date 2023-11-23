@@ -1,7 +1,9 @@
 --TEST--
 Bug #77147 (Fixing 60494 ignored ICONV_MIME_DECODE_CONTINUE_ON_ERROR)
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+if (!extension_loaded('iconv')) die('skip iconv extension not available');
+?>
 --FILE--
 <?php
 $string = <<<EOF

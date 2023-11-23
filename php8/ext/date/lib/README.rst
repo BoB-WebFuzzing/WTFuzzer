@@ -7,8 +7,3 @@ information.
 
 It is the library supporting PHP's Date/Time extension and MongoDB's time zone
 support.
-
-Build Requirements
-------------------
-
-On Debian: ``apt install libcpputest-dev re2c``

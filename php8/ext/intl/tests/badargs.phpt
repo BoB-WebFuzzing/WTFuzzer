@@ -1,7 +1,7 @@
 --TEST--
 Check that bad arguments return the same
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 $funcs = get_extension_funcs("intl");

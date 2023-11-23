@@ -1,7 +1,9 @@
 --TEST--
 Bug #81011 (mb_convert_encoding removes references from arrays)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+if (!extension_loaded('mbstring')) die("skip mbstring extension not available");
+?>
 --FILE--
 <?php
 $array = [

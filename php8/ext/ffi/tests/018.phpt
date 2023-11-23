@@ -1,7 +1,7 @@
 --TEST--
 FFI 018: Indirectly recursive structure
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

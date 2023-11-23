@@ -1,7 +1,5 @@
 --TEST--
 Test session_set_save_handler() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -14,15 +12,13 @@ ob_start();
 echo "*** Testing session_set_save_handler() : variation ***\n";
 
 require_once "save_handler.inc";
-$path = __DIR__ . '/session_set_save_handler_variation3';
-@mkdir($path);
+$path = __DIR__;
 var_dump(session_status());
 session_save_path($path);
 var_dump(session_set_save_handler("open", "close", "read", "write", "destroy", "gc"));
 var_dump(session_destroy());
-ob_end_flush();
 
-rmdir($path);
+ob_end_flush();
 ?>
 --EXPECTF--
 *** Testing session_set_save_handler() : variation ***

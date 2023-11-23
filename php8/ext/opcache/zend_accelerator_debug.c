@@ -7,7 +7,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -28,8 +28,9 @@
 #endif
 #include "ZendAccelerator.h"
 
-static void zend_accel_error_va_args(int type, const char *format, va_list args)
+void zend_accel_error(int type, const char *format, ...)
 {
+	va_list args;
 	time_t timestamp;
 	char *time_string;
 	FILE * fLog = NULL;
@@ -76,7 +77,9 @@ static void zend_accel_error_va_args(int type, const char *format, va_list args)
 				break;
 		}
 
+		va_start(args, format);
 		vfprintf(fLog, format, args);
+		va_end(args);
 		fprintf(fLog, "\n");
 
 		fflush(fLog);
@@ -94,23 +97,4 @@ static void zend_accel_error_va_args(int type, const char *format, va_list args)
 			break;
 	}
 
-}
-
-void zend_accel_error(int type, const char *format, ...)
-{
-	va_list args;
-	va_start(args, format);
-	zend_accel_error_va_args(type, format, args);
-	va_end(args);
-}
-
-ZEND_NORETURN void zend_accel_error_noreturn(int type, const char *format, ...)
-{
-	va_list args;
-	va_start(args, format);
-	ZEND_ASSERT(type == ACCEL_LOG_FATAL || type == ACCEL_LOG_ERROR);
-	zend_accel_error_va_args(type, format, args);
-	va_end(args);
-	/* Should never reach this. */
-	abort();
 }

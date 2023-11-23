@@ -3,8 +3,6 @@ Test session_set_save_handler() function: create_sid
 --INI--
 session.save_handler=files
 session.name=PHPSESSID
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -17,7 +15,7 @@ echo "*** Testing session_set_save_handler() function: create_sid ***\n";
 class MySession2 {
     public $path;
 
-    public function open($path, $name): bool {
+    public function open($path, $name) {
         if (!$path) {
             $path = sys_get_temp_dir();
         }
@@ -25,24 +23,24 @@ class MySession2 {
         return true;
     }
 
-    public function close(): bool {
+    public function close() {
         return true;
     }
 
-    public function read($id): string|false {
+    public function read($id) {
         return (string)@file_get_contents($this->path . $id);
     }
 
-    public function write($id, $data): bool {
+    public function write($id, $data) {
         // Empty $data = 0 = false
         return (bool)file_put_contents($this->path . $id, $data);
     }
 
-    public function destroy($id): bool {
+    public function destroy($id) {
         @unlink($this->path . $id);
     }
 
-    public function gc($maxlifetime): int|false {
+    public function gc($maxlifetime) {
         foreach (glob($this->path . '*') as $filename) {
             if (filemtime($filename) + $maxlifetime < time()) {
                 @unlink($filename);
@@ -51,7 +49,7 @@ class MySession2 {
         return true;
     }
 
-    public function create_sid(): string {
+    public function create_sid() {
         return pathinfo(__FILE__)['filename'];
     }
 }

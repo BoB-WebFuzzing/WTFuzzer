@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: cast to array
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $string = '<?xml version="1.0"?>

@@ -1,11 +1,7 @@
 --TEST--
 openssl_csr_sign() tests
---EXTENSIONS--
-openssl
 --SKIPIF--
-<?php
-if (!defined("OPENSSL_KEYTYPE_DSA")) die("skip DSA disabled");
-?>
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 $cert = "file://" . __DIR__ . "/cert.crt";
@@ -24,7 +20,7 @@ $dn = array(
 );
 
 $args = array(
-    "digest_alg" => "sha256",
+    "digest_alg" => "sha1",
     "private_key_bits" => 2048,
     "private_key_type" => OPENSSL_KEYTYPE_DSA,
     "encrypt_key" => true,

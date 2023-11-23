@@ -1,7 +1,5 @@
 --TEST--
 PECL Bug #16842 (NO_DATA_FOUND exception is a warning)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs

@@ -19,6 +19,5 @@ class Test2 extends Test1 {
 }
 Test2::test();
 ?>
---EXPECTF--
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
+--EXPECT--
 ok

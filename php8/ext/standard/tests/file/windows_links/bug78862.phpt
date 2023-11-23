@@ -15,4 +15,5 @@ Stack trace:
 --CLEAN--
 <?php
 unlink(__DIR__ . '/bug78862.target');
+unlink(__DIR__ . '/bug78862.link');
 ?>

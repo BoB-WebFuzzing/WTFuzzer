@@ -1,7 +1,9 @@
 --TEST--
 Bug #72709 (imagesetstyle() causes OOB read for empty $styles)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip ext/gd not available');
+?>
 --FILE--
 <?php
 $im = imagecreatetruecolor(1, 1);

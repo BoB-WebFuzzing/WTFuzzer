@@ -26,10 +26,6 @@ function test6() : object|callable {
     yield 6;
 }
 
-function test7() : iterable {
-    yield 7;
-}
-
 var_dump(
     test1(),
     test2(),
@@ -37,12 +33,9 @@ var_dump(
     test4(),
     test5(),
     test6(),
-    test7(),
 );
 ?>
 --EXPECTF--
-object(Generator)#%d (%d) {
-}
 object(Generator)#%d (%d) {
 }
 object(Generator)#%d (%d) {

@@ -1,7 +1,5 @@
 --TEST--
 PostgreSQL pg_meta_data() - basic test using schema
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--
@@ -11,11 +9,11 @@ include('config.inc');
 
 $conn = pg_connect($conn_str);
 
-pg_query($conn, 'CREATE SCHEMA phptests');
+pg_query('CREATE SCHEMA phptests');
 
-pg_query($conn, 'CREATE TABLE phptests.foo (id INT, id2 INT)');
+pg_query('CREATE TABLE phptests.foo (id INT, id2 INT)');
 
-pg_query($conn, 'CREATE TABLE foo (id INT, id3 INT)');
+pg_query('CREATE TABLE foo (id INT, id3 INT)');
 
 
 var_dump(pg_meta_data($conn, 'foo'));
@@ -23,9 +21,9 @@ var_dump(pg_meta_data($conn, 'phptests.foo'));
 var_dump(pg_meta_data($conn, 'phptests.foo', TRUE));
 
 
-pg_query($conn, 'DROP TABLE foo');
-pg_query($conn, 'DROP TABLE phptests.foo');
-pg_query($conn, 'DROP SCHEMA phptests');
+pg_query('DROP TABLE foo');
+pg_query('DROP TABLE phptests.foo');
+pg_query('DROP SCHEMA phptests');
 
 ?>
 --EXPECT--
@@ -122,7 +120,7 @@ array(2) {
     bool(true)
     ["is composite"]=>
     bool(false)
-    ["is pseudo"]=>
+    ["is pesudo"]=>
     bool(false)
     ["description"]=>
     string(0) ""
@@ -147,7 +145,7 @@ array(2) {
     bool(true)
     ["is composite"]=>
     bool(false)
-    ["is pseudo"]=>
+    ["is pesudo"]=>
     bool(false)
     ["description"]=>
     string(0) ""

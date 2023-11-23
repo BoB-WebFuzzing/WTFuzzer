@@ -1,7 +1,9 @@
 --TEST--
 imageline, dashed
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+        if (!function_exists('imagecreatefromstring')) die("skip gd extension not available\n");
+?>
 --FILE--
 <?php
 $im = imagecreatetruecolor(6,6);

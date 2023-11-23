@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -42,11 +42,13 @@
 #include "dl.h"
 #include "php_crypt.h"
 #include "head.h"
+#include "php_lcg.h"
 #include "php_output.h"
 #include "php_array.h"
 #include "php_assert.h"
 #include "php_versioning.h"
 #include "php_password.h"
+#include "php_random.h"
 
 #include "php_version.h"
 #define PHP_STANDARD_VERSION PHP_VERSION

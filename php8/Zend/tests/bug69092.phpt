@@ -1,7 +1,11 @@
 --TEST--
 Bug #69092 (Declare Encoding Compile Check Wrong)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+if (!extension_loaded("mbstring")) {
+  die("skip Requires mbstring extension");
+}
+?>
 --INI--
 zend.multibyte=On
 --FILE--

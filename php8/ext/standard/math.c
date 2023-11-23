@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -283,11 +283,15 @@ PHP_FUNCTION(round)
 	ZEND_PARSE_PARAMETERS_END();
 
 	if (ZEND_NUM_ARGS() >= 2) {
+#if SIZEOF_ZEND_LONG > SIZEOF_INT
 		if (precision >= 0) {
-			places = ZEND_LONG_INT_OVFL(precision) ? INT_MAX : (int)precision;
+			places = precision > INT_MAX ? INT_MAX : (int)precision;
 		} else {
-			places = ZEND_LONG_INT_UDFL(precision) ? INT_MIN : (int)precision;
+			places = precision <= INT_MIN ? INT_MIN+1 : (int)precision;
 		}
+#else
+		places = precision;
+#endif
 	}
 
 	switch (Z_TYPE_P(value)) {
@@ -296,7 +300,7 @@ PHP_FUNCTION(round)
 			if (places >= 0) {
 				RETURN_DOUBLE((double) Z_LVAL_P(value));
 			}
-			ZEND_FALLTHROUGH;
+			/* break omitted intentionally */
 
 		case IS_DOUBLE:
 			return_val = (Z_TYPE_P(value) == IS_LONG) ? (double)Z_LVAL_P(value) : Z_DVAL_P(value);
@@ -769,7 +773,7 @@ PHPAPI void _php_math_basetozval(zend_string *str, int base, zval *ret)
 				fnum = (double)num;
 				mode = 1;
 			}
-			ZEND_FALLTHROUGH;
+			/* fall-through */
 		case 1: /* Float */
 			fnum = fnum * base + c;
 		}
@@ -1132,7 +1136,6 @@ PHP_FUNCTION(number_format)
 {
 	double num;
 	zend_long dec = 0;
-	int dec_int;
 	char *thousand_sep = NULL, *dec_point = NULL;
 	size_t thousand_sep_len = 0, dec_point_len = 0;
 
@@ -1153,13 +1156,7 @@ PHP_FUNCTION(number_format)
 		thousand_sep_len = 1;
 	}
 
-	if (dec >= 0) {
-		dec_int = ZEND_LONG_INT_OVFL(dec) ? INT_MAX : (int)dec;
-	} else {
-		dec_int = ZEND_LONG_INT_UDFL(dec) ? INT_MIN : (int)dec;
-	}
-
-	RETURN_STR(_php_math_number_format_ex(num, dec_int, dec_point, dec_point_len, thousand_sep, thousand_sep_len));
+	RETURN_STR(_php_math_number_format_ex(num, (int)dec, dec_point, dec_point_len, thousand_sep, thousand_sep_len));
 }
 /* }}} */
 

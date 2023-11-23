@@ -1,19 +1,19 @@
 --TEST--
 mysqli_fetch_assoc() - BIT
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+    require_once('skipif.inc');
+    require_once('skipifconnectfailure.inc');
 
-require_once 'table.inc';
-if (mysqli_get_server_version($link) < 50003)
-    // b'001' syntax not supported before 5.0.3
-    die("skip Syntax used for test not supported with MySQL Server before 5.0.3");
+    require_once('connect.inc');
+    require_once('table.inc');
+    if (mysqli_get_server_version($link) < 50003)
+        // b'001' syntax not supported before 5.0.3
+        die("skip Syntax used for test not supported with MySQL Server before 5.0.3");
 ?>
 --FILE--
 <?php
-    require 'connect.inc';
+    require('connect.inc');
 
     function dec32bin($dec, $bits) {
 
@@ -107,7 +107,7 @@ if (mysqli_get_server_version($link) < 50003)
 ?>
 --CLEAN--
 <?php
-require_once "clean_table.inc";
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 done!

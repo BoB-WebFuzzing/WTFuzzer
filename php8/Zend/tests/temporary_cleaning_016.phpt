@@ -11,6 +11,5 @@ try {
 }
 ?>
 DONE
---EXPECTF--
-Deprecated: Using ${expr} (variable variables) in strings is deprecated, use {${expr}} instead in %s on line %d
+--EXPECT--
 DONE

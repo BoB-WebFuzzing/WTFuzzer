@@ -1,7 +1,5 @@
 --TEST--
 Bug #80723: Different sockets compare as equal (regression in 8.0)
---EXTENSIONS--
-sockets
 --FILE--
 <?php
 $socket_1 = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);

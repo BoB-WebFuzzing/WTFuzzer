@@ -1,7 +1,7 @@
 --TEST--
 DOMParentNode::append()
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 declare(strict_types=1);

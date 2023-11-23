@@ -1,7 +1,7 @@
 --TEST--
 FFI 031: bit-fields packing
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

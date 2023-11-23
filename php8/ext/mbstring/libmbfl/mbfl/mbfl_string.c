@@ -31,22 +31,31 @@
 #include "mbfl_string.h"
 #include "mbfilter_pass.h"
 
-void mbfl_string_init_set(mbfl_string *string, const mbfl_encoding *encoding)
+/*
+ * string object
+ */
+void
+mbfl_string_init(mbfl_string *string)
 {
-	string->encoding = encoding;
-	string->val = NULL;
+	string->encoding = &mbfl_encoding_pass;
+	string->val = (unsigned char*)NULL;
 	string->len = 0;
 }
 
-void mbfl_string_init(mbfl_string *string)
+void
+mbfl_string_init_set(mbfl_string *string, const mbfl_encoding *encoding)
 {
-	mbfl_string_init_set(string, &mbfl_encoding_pass);
+	string->encoding = encoding;
+	string->val = (unsigned char*)NULL;
+	string->len = 0;
 }
 
-void mbfl_string_clear(mbfl_string *string)
+void
+mbfl_string_clear(mbfl_string *string)
 {
-	if (string->val) {
+	if (string->val != (unsigned char*)NULL) {
 		efree(string->val);
 	}
-	mbfl_string_init_set(string, NULL); /* Poison it so any attempt to reuse will fail hard */
+	string->val = (unsigned char*)NULL;
+	string->len = 0;
 }

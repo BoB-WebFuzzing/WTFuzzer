@@ -2,8 +2,10 @@
 does the imagepalettetotruecollor function really converts the image palette?
 --CREDITS--
 Carlos André Ferrari <caferrari [at] gmail [dot] com>
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+    if (!extension_loaded('gd')) die("skip gd extension not available.");
+?>
 --FILE--
 <?php
 $im = imagecreate(100, 100);

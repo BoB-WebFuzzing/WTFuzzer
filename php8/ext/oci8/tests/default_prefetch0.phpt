@@ -1,7 +1,7 @@
 --TEST--
 oci8.default_prefetch ini option
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --INI--
 oci8.default_prefetch=20
 --FILE--

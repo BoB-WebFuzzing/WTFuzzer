@@ -1,7 +1,9 @@
 --TEST--
 MessageFormatter::format() invalid type for key not in pattern
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);

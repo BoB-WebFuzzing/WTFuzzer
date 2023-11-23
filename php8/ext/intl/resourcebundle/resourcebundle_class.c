@@ -3,7 +3,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -74,13 +74,13 @@ static zend_object *ResourceBundle_object_create( zend_class_entry *ce )
 /* }}} */
 
 /* {{{ ResourceBundle_ctor */
-static int resourcebundle_ctor(INTERNAL_FUNCTION_PARAMETERS, zend_error_handling *error_handling, bool *error_handling_replaced)
+static int resourcebundle_ctor(INTERNAL_FUNCTION_PARAMETERS)
 {
 	const char *bundlename;
 	size_t		bundlename_len = 0;
 	const char *locale;
 	size_t		locale_len = 0;
-	bool	fallback = 1;
+	zend_bool	fallback = 1;
 
 	zval                  *object = return_value;
 	ResourceBundle_object *rb = Z_INTL_RESOURCEBUNDLE_P( object );
@@ -91,11 +91,6 @@ static int resourcebundle_ctor(INTERNAL_FUNCTION_PARAMETERS, zend_error_handling
 		&locale, &locale_len, &bundlename, &bundlename_len, &fallback ) == FAILURE )
 	{
 		return FAILURE;
-	}
-
-	if (error_handling != NULL) {
-		zend_replace_error_handling(EH_THROW, IntlException_ce_ptr, error_handling);
-		*error_handling_replaced = 1;
 	}
 
 	if (rb->me) {
@@ -144,17 +139,15 @@ static int resourcebundle_ctor(INTERNAL_FUNCTION_PARAMETERS, zend_error_handling
 PHP_METHOD( ResourceBundle, __construct )
 {
 	zend_error_handling error_handling;
-	bool error_handling_replaced = 0;
 
+	zend_replace_error_handling(EH_THROW, IntlException_ce_ptr, &error_handling);
 	return_value = ZEND_THIS;
-	if (resourcebundle_ctor(INTERNAL_FUNCTION_PARAM_PASSTHRU, &error_handling, &error_handling_replaced) == FAILURE) {
+	if (resourcebundle_ctor(INTERNAL_FUNCTION_PARAM_PASSTHRU) == FAILURE) {
 		if (!EG(exception)) {
 			zend_throw_exception(IntlException_ce_ptr, "Constructor failed", 0);
 		}
 	}
-	if (error_handling_replaced) {
-		zend_restore_error_handling(&error_handling);
-	}
+	zend_restore_error_handling(&error_handling);
 }
 /* }}} */
 
@@ -162,7 +155,7 @@ PHP_METHOD( ResourceBundle, __construct )
 PHP_FUNCTION( resourcebundle_create )
 {
 	object_init_ex( return_value, ResourceBundle_ce_ptr );
-	if (resourcebundle_ctor(INTERNAL_FUNCTION_PARAM_PASSTHRU, NULL, NULL) == FAILURE) {
+	if (resourcebundle_ctor(INTERNAL_FUNCTION_PARAM_PASSTHRU) == FAILURE) {
 		zval_ptr_dtor(return_value);
 		RETURN_NULL();
 	}
@@ -174,8 +167,8 @@ static void resourcebundle_array_fetch(zend_object *object, zval *offset, zval *
 {
 	int32_t     meindex = 0;
 	char *      mekey = NULL;
-	bool        is_numeric = 0;
-	char        *pbuf;
+    zend_bool    is_numeric = 0;
+	char         *pbuf;
 	ResourceBundle_object *rb;
 
 	rb = php_intl_resourcebundle_fetch_object(object);
@@ -239,7 +232,7 @@ zval *resourcebundle_array_get(zend_object *object, zval *offset, int type, zval
 /* {{{ Get resource identified by numerical index or key name. */
 PHP_FUNCTION( resourcebundle_get )
 {
-	bool   fallback = 1;
+	zend_bool   fallback = 1;
 	zval *		offset;
 	zval *      object;
 
@@ -252,7 +245,7 @@ PHP_FUNCTION( resourcebundle_get )
 /* }}} */
 
 /* {{{ resourcebundle_array_count */
-static zend_result resourcebundle_array_count(zend_object *object, zend_long *count)
+int resourcebundle_array_count(zend_object *object, zend_long *count)
 {
 	ResourceBundle_object *rb = php_intl_resourcebundle_fetch_object(object);
 
@@ -373,9 +366,14 @@ PHP_METHOD(ResourceBundle, getIterator) {
  */
 void resourcebundle_register_class( void )
 {
-	ResourceBundle_ce_ptr = register_class_ResourceBundle(zend_ce_aggregate, zend_ce_countable);
-	ResourceBundle_ce_ptr->create_object = ResourceBundle_object_create;
-	ResourceBundle_ce_ptr->get_iterator = resourcebundle_get_iterator;
+	zend_class_entry ce;
+
+	INIT_CLASS_ENTRY( ce, "ResourceBundle", class_ResourceBundle_methods );
+
+	ce.create_object = ResourceBundle_object_create;
+	ce.get_iterator = resourcebundle_get_iterator;
+
+	ResourceBundle_ce_ptr = zend_register_internal_class( &ce );
 
 	ResourceBundle_object_handlers = std_object_handlers;
 	ResourceBundle_object_handlers.offset = XtOffsetOf(ResourceBundle_object, zend);
@@ -383,5 +381,7 @@ void resourcebundle_register_class( void )
 	ResourceBundle_object_handlers.free_obj = ResourceBundle_object_free;
 	ResourceBundle_object_handlers.read_dimension = resourcebundle_array_get;
 	ResourceBundle_object_handlers.count_elements = resourcebundle_array_count;
+
+	zend_class_implements(ResourceBundle_ce_ptr, 2, zend_ce_aggregate, zend_ce_countable);
 }
 /* }}} */

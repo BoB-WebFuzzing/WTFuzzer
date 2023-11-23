@@ -3,8 +3,8 @@ DOMDocument::$preserveWhiteSpace - test ability to read and write property
 --CREDITS--
 Lev Radin <prokurator@gmail.com>
 # TestFest 2009 NYPHP
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

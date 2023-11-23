@@ -1,7 +1,5 @@
 --TEST--
 Bug #64037 Firebird return wrong value for numeric field
---EXTENSIONS--
-pdo_firebird
 --SKIPIF--
 <?php require('skipif.inc'); ?>
 --ENV--

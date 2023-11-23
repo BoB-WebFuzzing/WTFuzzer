@@ -1,7 +1,5 @@
 --TEST--
 Bug #60860 (session.save_handler=user without defined function core dumps)
---EXTENSIONS--
-session
 --SKIPIF--
 <?php
 include('skipif.inc');

@@ -1,7 +1,9 @@
 --TEST--
 DOMDocument::saveHTML() optional parameters
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once __DIR__ .'/skipif.inc';
+?>
 --FILE--
 <?php
 $doc = new DOMDocument('1.0');

@@ -1,7 +1,5 @@
 --TEST--
 Test session_cache_limiter() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

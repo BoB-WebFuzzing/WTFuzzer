@@ -34,14 +34,8 @@
 #endif
 
 
-enum fpm_init_return_status {
-	FPM_INIT_ERROR,
-	FPM_INIT_CONTINUE,
-	FPM_INIT_EXIT_OK,
-};
-
 int fpm_run(int *max_requests);
-enum fpm_init_return_status fpm_init(int argc, char **argv, char *config, char *prefix, char *pid, int test_conf, int run_as_root, int force_daemon, int force_stderr);
+int fpm_init(int argc, char **argv, char *config, char *prefix, char *pid, int test_conf, int run_as_root, int force_daemon, int force_stderr);
 
 struct fpm_globals_s {
 	pid_t parent_pid;

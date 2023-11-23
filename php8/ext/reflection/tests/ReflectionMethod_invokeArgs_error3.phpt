@@ -49,7 +49,11 @@ echo "\nStatic method:\n";
 var_dump($staticMethod->invokeArgs(null, array()));
 
 echo "\nPrivate method:\n";
-var_dump($privateMethod->invokeArgs($testClassInstance, array()));
+try {
+    var_dump($privateMethod->invokeArgs($testClassInstance, array()));
+} catch (ReflectionException $e) {
+    var_dump($e->getMessage());
+}
 
 echo "\nAbstract method:\n";
 $abstractMethod = new ReflectionMethod("AbstractClass::foo");
@@ -75,8 +79,7 @@ Exception: Using $this when not in object context
 NULL
 
 Private method:
-Called privateMethod()
-NULL
+string(86) "Trying to invoke private method TestClass::privateMethod() from scope ReflectionMethod"
 
 Abstract method:
 string(53) "Trying to invoke abstract method AbstractClass::foo()"

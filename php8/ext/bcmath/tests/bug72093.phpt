@@ -1,7 +1,9 @@
 --TEST--
 Bug 72093: bcpowmod fails on negative scale and corrupts _one_ definition
---EXTENSIONS--
-bcmath
+--SKIPIF--
+<?php
+if(!extension_loaded("bcmath")) print "skip";
+?>
 --FILE--
 <?php
 try {

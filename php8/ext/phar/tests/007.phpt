@@ -1,7 +1,7 @@
 --TEST--
 Phar::mapPhar manifest too big
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip");?>
 --FILE--
 <?php
 try {

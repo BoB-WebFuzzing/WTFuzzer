@@ -1,7 +1,5 @@
 --TEST--
 Bug #78986: Opcache segfaults when inheriting ctor from immutable into mutable class
---EXTENSIONS--
-opcache
 --FILE--
 <?php
 

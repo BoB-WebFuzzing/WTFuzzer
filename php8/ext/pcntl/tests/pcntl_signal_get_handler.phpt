@@ -1,8 +1,8 @@
 --TEST--
 pcntl_signal_get_handler()
---EXTENSIONS--
-pcntl
-posix
+--SKIPIF--
+<?php if (!extension_loaded("pcntl")) print "skip"; ?>
+<?php if (!extension_loaded("posix")) die("skip posix extension not available"); ?>
 --FILE--
 <?php
 var_dump(pcntl_signal_get_handler(SIGUSR1));

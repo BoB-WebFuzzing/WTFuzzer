@@ -1,7 +1,5 @@
 --TEST--
 Test imap_close() function : usage variations - different ints as $flags arg
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

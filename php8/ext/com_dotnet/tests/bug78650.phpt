@@ -1,7 +1,9 @@
 --TEST--
 Bug #78650 (new COM Crash)
---EXTENSIONS--
-com_dotnet
+--SKIPIF--
+<?php
+if (!extension_loaded('com_dotnet')) die('skip com_dotnet extension not available');
+?>
 --FILE--
 <?php
 $fname = __DIR__ . '/bug78650/foo/bar';
@@ -17,9 +19,9 @@ print('OK');
 OK
 --CLEAN--
 <?php
-@rmdir(__DIR__ . '/bug78650/foo/bar');
-@rmdir(__DIR__ . '/bug78650/foo');
 rmdir(__DIR__ . '/bug78650/baz/bar');
+rmdir(__DIR__ . '/bug78650/foo/bar');
 rmdir(__DIR__ . '/bug78650/baz');
+rmdir(__DIR__ . '/bug78650/foo');
 rmdir(__DIR__ . '/bug78650');
 ?>

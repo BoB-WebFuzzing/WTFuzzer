@@ -1,9 +1,5 @@
 --TEST--
 Bug GH-9155 (dba_open("non-existing", "c-", "flatfile") segfaults)
---EXTENSIONS--
-dba
---CONFLICTS--
-dba
 --SKIPIF--
 <?php
 $handler = "flatfile";

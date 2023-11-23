@@ -1,7 +1,11 @@
 --TEST--
 Bug #46711 (lost memory when foreach is used for values passed to curl_setopt())
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+if (!extension_loaded("curl")) {
+    exit("skip curl extension not loaded");
+}
+?>
 --FILE--
 <?php
 $ch = curl_init();

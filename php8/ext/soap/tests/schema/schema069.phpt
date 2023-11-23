@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 69: Attribute with default value (reference)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";

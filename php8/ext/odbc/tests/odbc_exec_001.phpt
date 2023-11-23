@@ -1,7 +1,5 @@
 --TEST--
 odbc_exec(): Basic test
---EXTENSIONS--
-odbc
 --SKIPIF--
 <?php include 'skipif.inc'; ?>
 <?php

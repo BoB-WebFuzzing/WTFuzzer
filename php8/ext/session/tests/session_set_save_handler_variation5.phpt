@@ -8,8 +8,6 @@ session.gc_maxlifetime=0
 session.save_path=
 session.name=PHPSESSID
 session.save_handler=files
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -26,8 +24,7 @@ function noisy_gc($maxlifetime) {
 echo "*** Testing session_set_save_handler() : variation ***\n";
 
 require_once "save_handler.inc";
-$path = __DIR__ . '/session_set_save_handler_variation5';
-@mkdir($path);
+$path = __DIR__;
 var_dump(session_save_path($path));
 
 echo "*** Without lazy_write ***\n";
@@ -51,7 +48,6 @@ var_dump(session_start());
 var_dump(session_destroy());
 
 ob_end_flush();
-rmdir($path);
 ?>
 --EXPECTF--
 *** Testing session_set_save_handler() : variation ***

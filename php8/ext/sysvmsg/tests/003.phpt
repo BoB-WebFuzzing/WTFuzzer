@@ -1,7 +1,7 @@
 --TEST--
 msg_queue_exists()
---EXTENSIONS--
-sysvmsg
+--SKIPIF--
+<?php if (!extension_loaded("sysvmsg")) die("skip sysvmsg extension is not available")?>
 --FILE--
 <?php
 $id = ftok(__FILE__, 'r');

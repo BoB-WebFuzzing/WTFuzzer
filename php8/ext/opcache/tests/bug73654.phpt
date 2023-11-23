@@ -1,7 +1,7 @@
 --TEST--
 Bug #73654: Segmentation fault in zend_call_function
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 echo xyz();

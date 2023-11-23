@@ -1,9 +1,8 @@
 --TEST--
 Phar::setSupportedSignatures() with hash
---EXTENSIONS--
-phar
 --SKIPIF--
 <?php
+if (!extension_loaded("phar")) die("skip");
 $arr = Phar::getSupportedSignatures();
 if (!in_array("OpenSSL", $arr)) die("skip openssl support required");
 ?>
@@ -53,7 +52,7 @@ array(2) {
   ["hash"]=>
   string(%d) "%s"
   ["hash_type"]=>
-  string(7) "SHA-256"
+  string(5) "SHA-1"
 }
 array(2) {
   ["hash"]=>

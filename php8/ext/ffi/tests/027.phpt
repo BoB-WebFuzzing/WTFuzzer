@@ -1,7 +1,7 @@
 --TEST--
 FFI 027: Incomplete and variable length arrays
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

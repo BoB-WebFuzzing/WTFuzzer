@@ -2,9 +2,8 @@
 ldap_exop() and ldap_parse_exop() - EXOP operations
 --CREDITS--
 Côme Chilliet <mcmic@php.net>
---EXTENSIONS--
-ldap
 --SKIPIF--
+<?php require_once('skipif.inc'); ?>
 <?php require_once('skipifbindfailure.inc'); ?>
 --FILE--
 <?php
@@ -37,6 +36,8 @@ function extract_genpw($retdata)
 
 $userAPassword = "oops";
 
+// ldap_exop(resource link, string reqoid [, string reqdata [, array servercontrols [, string &retdata [, string &retoid]]]])
+// bool ldap_parse_exop(resource link, resource result [, string &retdata [, string &retoid]])
 var_dump(
     ldap_exop($link, LDAP_EXOP_WHO_AM_I, NULL, NULL, $retdata, $retoid),
     $retdata,
@@ -68,13 +69,11 @@ string(%d) "dn:%s"
 string(0) ""
 bool(true)
 string(%d) "dn:cn=user%s"
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 bool(true)
 string(%d) "dn:%s"
 bool(true)
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 bool(true)
 string(%d) "%s"
 string(0) ""

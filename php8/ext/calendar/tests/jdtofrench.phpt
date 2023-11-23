@@ -1,7 +1,7 @@
 --TEST--
 jdtofrench()
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 echo jdtofrench(0). "\n";

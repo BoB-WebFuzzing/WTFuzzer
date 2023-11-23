@@ -23,6 +23,5 @@ class FooBar extends Foo implements ia {
 new FooBar;
 
 ?>
-===DONE===
---EXPECT--
-===DONE===
+--EXPECTF--
+Fatal error: Cannot inherit previously-inherited or override constant c from interface ia in %s on line %d

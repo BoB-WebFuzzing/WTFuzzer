@@ -1,7 +1,7 @@
 --TEST--
 Bug #74705 Wrong reflection on Collator::getSortKey
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 $rm = new ReflectionMethod(Collator::class, 'getSortKey');

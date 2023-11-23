@@ -1,7 +1,9 @@
 --TEST--
 Bug #48773 (Incorrect error when setting PDO::ATTR_STATEMENT_CLASS with ctor_args)
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo_sqlite')) print 'skip not loaded';
+?>
 --FILE--
 <?php
 

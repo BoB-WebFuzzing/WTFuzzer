@@ -1,11 +1,12 @@
 --TEST--
 Trying implicit reconnect after wait_timeout and KILL using mysqli_ping()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
+--INI--
+mysqli.reconnect=0
 --FILE--
 <?php
     require_once("connect.inc");
@@ -83,14 +84,17 @@ require_once('skipifconnectfailure.inc');
       the server always manages to send a full a reply. Whereas MySQl 5.5
       may not. The behaviour is undefined. Any return value is fine.
     */
-    /*
-    mysqlnd is a bit more verbose than libmysql. mysqlnd should print:
-    Warning: mysqli_query(): MySQL server has gone away in %s on line %d
+    if ($IS_MYSQLND) {
+        /*
+        mysqlnd is a bit more verbose than libmysql. mysqlnd should print:
+        Warning: mysqli_query(): MySQL server has gone away in %s on line %d
 
-    Warning: mysqli_query(): Error reading result set's header in %d on line %d
-    */
-    @mysqli_query($link, sprintf('KILL %d', $thread_id_timeout));
-
+        Warning: mysqli_query(): Error reading result set's header in %d on line %d
+        */
+        @mysqli_query($link, sprintf('KILL %d', $thread_id_timeout));
+    } else {
+        mysqli_query($link, sprintf('KILL %d', $thread_id_timeout));
+    }
     // Give the server a second to really kill the other thread...
     sleep(1);
 

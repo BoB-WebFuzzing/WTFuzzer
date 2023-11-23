@@ -27,6 +27,7 @@ class OtherClass
 
 $reflectionClass = new ReflectionClass('OtherClass');
 $reflectionProperty = $reflectionClass->getProperty('prop');
+$reflectionProperty->setAccessible(true);
 $value = $reflectionProperty->getValue();
 echo "Value is $value\n";
 

@@ -13,6 +13,8 @@ $link_string = array (
   /* empty linkname */
   "",
   '',
+  NULL,
+  null
  );
 for($loop_counter = 0; $loop_counter < count($link_string); $loop_counter++) {
   echo "-- Iteration";
@@ -45,6 +47,16 @@ Warning: readlink(): %s in %s on line %d
 bool(false)
 string(%d) "%s"
 -- Iteration4 --
+
+Warning: readlink(): %s in %s on line %d
+bool(false)
+string(%d) "%s"
+-- Iteration5 --
+
+Warning: readlink(): %s in %s on line %d
+bool(false)
+string(%d) "%s"
+-- Iteration6 --
 
 Warning: readlink(): %s in %s on line %d
 bool(false)

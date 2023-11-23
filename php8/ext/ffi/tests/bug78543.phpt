@@ -1,7 +1,7 @@
 --TEST--
 Bug #78543 (is_callable() on FFI\CData throws Exception)
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $ffi = FFI::cdef(' struct test { int dummy; }; ');

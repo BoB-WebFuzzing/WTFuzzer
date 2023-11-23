@@ -4,7 +4,7 @@ php_user_filter onCreate() returns false
 <?php
 
 class my_filter extends php_user_filter {
-    function onCreate(): bool {
+    function onCreate() {
         return false;
     }
 }

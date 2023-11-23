@@ -3,8 +3,8 @@ curl_setopt() call with CURLOPT_HTTPHEADER
 --CREDITS--
 Paul Sohier
 #phptestfest utrecht
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 

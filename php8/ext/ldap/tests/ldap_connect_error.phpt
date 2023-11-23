@@ -5,8 +5,8 @@ Patrick Allaert <patrickallaert@php.net>
 # Belgian PHP Testfest 2009
 --INI--
 ldap.max_links=1
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require "connect.inc";

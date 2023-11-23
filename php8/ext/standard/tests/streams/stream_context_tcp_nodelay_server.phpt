@@ -1,7 +1,7 @@
 --TEST--
 stream context tcp_nodelay server
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php if (!extension_loaded("sockets")) die("skip: need sockets") ?>
 --FILE--
 <?php
 $serverCode = <<<'CODE'

@@ -1,7 +1,9 @@
 --TEST--
 Bug #77565 (Incorrect locator detection in ZIP-based phars)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded('phar')) die('skip phar extension not available');
+?>
 --FILE--
 <?php
 $phar = new PharData(__DIR__ . '/bug77565.zip');

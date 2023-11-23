@@ -8,8 +8,6 @@ session.gc_divisor=1000
 session.gc_maxlifetime=300
 session.save_path=
 session.name=PHPSESSID
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -19,7 +17,7 @@ ob_start();
 
 echo "*** Testing basic session functionality : variation1 ***\n";
 
-$session_id = 'session-basic1';
+$session_id = 'testid';
 session_id($session_id);
 $path = __DIR__;
 var_dump(session_save_path($path));
@@ -49,20 +47,20 @@ ob_end_flush();
 *** Testing basic session functionality : variation1 ***
 string(0) ""
 *** Without lazy_write ***
-string(14) "session-basic1"
+string(6) "testid"
 bool(true)
 array(1) {
   ["lazy_write"]=>
   bool(false)
 }
 bool(true)
-string(14) "session-basic1"
+string(6) "testid"
 *** With lazy_write ***
-string(14) "session-basic1"
+string(6) "testid"
 bool(true)
 bool(true)
-string(14) "session-basic1"
+string(6) "testid"
 *** Cleanup ***
-string(14) "session-basic1"
+string(6) "testid"
 bool(true)
 bool(true)

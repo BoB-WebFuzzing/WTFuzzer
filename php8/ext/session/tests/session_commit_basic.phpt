@@ -1,7 +1,5 @@
 --TEST--
 Test session_commit() function : basic functionality
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

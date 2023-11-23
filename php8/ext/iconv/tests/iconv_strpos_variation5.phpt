@@ -1,7 +1,10 @@
 --TEST--
 Test iconv_strpos() function : usage variations - Pass different integers as $offset argument
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+extension_loaded('iconv') or die('skip');
+function_exists('iconv_strpos') or die("skip iconv_strpos() is not available in this build");
+?>
 --INI--
 error_reporting=E_ALL & ~E_DEPRECATED
 --FILE--

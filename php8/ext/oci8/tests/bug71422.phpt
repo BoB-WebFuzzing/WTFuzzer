@@ -1,7 +1,9 @@
 --TEST--
 Bug #71422 (Fix ORA-01438: value larger than specified precision allowed for this column)
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php
+if (!extension_loaded('oci8')) die ("skip no oci8 extension");
+?>
 --FILE--
 <?php
 

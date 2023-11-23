@@ -1,151 +1,135 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
 class SplPriorityQueue implements Iterator, Countable
 {
-    /**
-     * @var int
-     * @cvalue SPL_PQUEUE_EXTR_BOTH
-     */
-    public const EXTR_BOTH = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue SPL_PQUEUE_EXTR_PRIORITY
-     */
-    public const EXTR_PRIORITY = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue SPL_PQUEUE_EXTR_DATA
-     */
-    public const EXTR_DATA = UNKNOWN;
-
-    /** @tentative-return-type */
-    public function compare(mixed $priority1, mixed $priority2): int {}
+    /** @return int */
+    public function compare(mixed $priority1, mixed $priority2) {}
 
     /** @return bool */
-    public function insert(mixed $value, mixed $priority) {} // TODO make return type void
+    public function insert(mixed $value, mixed $priority) {}
 
-    /** @tentative-return-type */
-    public function setExtractFlags(int $flags): int {}
+    /** @return int */
+    public function setExtractFlags(int $flags) {}
 
-    /** @tentative-return-type */
-    public function top(): mixed {}
+    /** @return mixed */
+    public function top() {}
 
-    /** @tentative-return-type */
-    public function extract(): mixed {}
+    /** @return mixed */
+    public function extract() {}
 
     /**
-     * @tentative-return-type
+     * @return int
      * @implementation-alias SplHeap::count
      */
-    public function count(): int {}
+    public function count() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @implementation-alias SplHeap::isEmpty
      */
-    public function isEmpty(): bool {}
+    public function isEmpty() {}
 
     /**
-     * @tentative-return-type
+     * @return void
      * @implementation-alias SplHeap::rewind
      */
-    public function rewind(): void {}
+    public function rewind() {}
 
-    /** @tentative-return-type */
-    public function current(): mixed {}
+    /** @return mixed */
+    public function current() {}
 
     /**
-     * @tentative-return-type
+     * @return int
      * @implementation-alias SplHeap::key
      */
-    public function key(): int {}
+    public function key() {}
 
     /**
-     * @tentative-return-type
+     * @return void
      * @implementation-alias SplHeap::next
      */
-    public function next(): void {}
+    public function next() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @implementation-alias SplHeap::valid
      */
-    public function valid(): bool {}
+    public function valid() {}
 
     /**
      * @return bool
      * @implementation-alias SplHeap::recoverFromCorruption
      */
-    public function recoverFromCorruption() {} // TODO make return type void
+    public function recoverFromCorruption() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @implementation-alias SplHeap::isCorrupted
      */
-    public function isCorrupted(): bool {}
+    public function isCorrupted() {}
 
-    /** @tentative-return-type */
-    public function getExtractFlags(): int {}
+    /** @return int */
+    public function getExtractFlags() {}
 
-    /** @tentative-return-type */
-    public function __debugInfo(): array {}
+    /** @return array */
+    public function __debugInfo() {}
 }
 
 abstract class SplHeap implements Iterator, Countable
 {
-    /** @tentative-return-type */
-    public function extract(): mixed {}
+    /** @return mixed */
+    public function extract() {}
 
-    /** @tentative-return-type */
-    public function insert(mixed $value): bool {}
+    /** @return bool */
+    public function insert(mixed $value) {}
 
-    /** @tentative-return-type */
-    public function top(): mixed {}
+    /** @return mixed */
+    public function top() {}
 
-    /** @tentative-return-type */
-    public function count(): int {}
+    /** @return int */
+    public function count() {}
 
-    /** @tentative-return-type */
-    public function isEmpty(): bool {}
+    /** @return bool */
+    public function isEmpty() {}
 
-    /** @tentative-return-type */
-    public function rewind(): void {}
+    /** @return void */
+    public function rewind() {}
 
-    /** @tentative-return-type */
-    public function current(): mixed {}
+    /** @return mixed */
+    public function current() {}
 
-    /** @tentative-return-type */
-    public function key(): int {}
+    /** @return int */
+    public function key() {}
 
-    /** @tentative-return-type */
-    public function next(): void {}
+    /** @return void */
+    public function next() {}
 
-    /** @tentative-return-type */
-    public function valid(): bool {}
+    /** @return bool */
+    public function valid() {}
 
-    /** @tentative-return-type */
-    public function recoverFromCorruption(): bool {}
+    /** @return bool */
+    public function recoverFromCorruption() {}
 
-    /** @tentative-return-type */
-    abstract protected function compare(mixed $value1, mixed $value2): int;
+    /** @return int */
+    abstract protected function compare(mixed $value1, mixed $value2);
 
-    /** @tentative-return-type */
-    public function isCorrupted(): bool {}
+    /** @return bool */
+    public function isCorrupted() {}
 
-    /** @tentative-return-type */
-    public function __debugInfo(): array {}
+    /** @return array */
+    public function __debugInfo() {}
 }
 
 class SplMinHeap extends SplHeap
 {
-    /** @tentative-return-type */
-    protected function compare(mixed $value1, mixed $value2): int {}
+    /** @return int */
+    protected function compare(mixed $value1, mixed $value2) {}
 }
 
 class SplMaxHeap extends SplHeap
 {
-    /** @tentative-return-type */
-    protected function compare(mixed $value1, mixed $value2): int {}
+    /** @return int */
+    protected function compare(mixed $value1, mixed $value2) {}
 }

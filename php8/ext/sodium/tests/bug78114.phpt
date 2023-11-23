@@ -1,7 +1,9 @@
 --TEST--
 Bug #78114 (segfault when calling sodium_* functions from eval)
---EXTENSIONS--
-sodium
+--SKIPIF--
+<?php
+if (!extension_loaded('sodium')) die('skip sodium extension not available');
+?>
 --FILE--
 <?php
 try {

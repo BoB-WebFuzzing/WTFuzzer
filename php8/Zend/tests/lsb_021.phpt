@@ -39,20 +39,12 @@ C::testForward();
 C::testNoForward();
 
 ?>
---EXPECTF--
-C
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
-C
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
+--EXPECT--
 C
 C
-
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
 C
-
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
+C
+C
 C
 A
 A

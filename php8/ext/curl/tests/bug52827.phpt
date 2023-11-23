@@ -1,7 +1,13 @@
 --TEST--
 Bug #52827 (curl_setopt with CURLOPT_STDERR erroneously increments the resource refcount)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+
+if (!extension_loaded('curl')) {
+    exit("skip curl extension not loaded");
+}
+
+?>
 --FILE--
 <?php
 $s = fopen('php://temp/maxmemory=1024','wb+');

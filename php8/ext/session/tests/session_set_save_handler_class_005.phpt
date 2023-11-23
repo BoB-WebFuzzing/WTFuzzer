@@ -4,8 +4,6 @@ Test session_set_save_handler() : incomplete implementation
 session.save_handler=files
 session.name=PHPSESSID
 session.gc_probability=0
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -16,12 +14,12 @@ ob_start();
 echo "*** Testing session_set_save_handler() : incomplete implementation ***\n";
 
 class MySession6 extends SessionHandler {
-    public function open($path, $name): bool {
+    public function open($path, $name) {
         // don't call parent
         return true;
     }
 
-    public function read($id): string|false {
+    public function read($id) {
         // should error because parent::open hasn't been called
         return parent::read($id);
     }

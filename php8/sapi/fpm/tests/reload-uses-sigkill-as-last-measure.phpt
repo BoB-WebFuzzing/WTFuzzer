@@ -1,7 +1,5 @@
 --TEST--
-FPM: If SIGQUIT and SIGTERM during reloading fail, SIGKILL should be sent
---EXTENSIONS--
-pcntl
+If SIGQUIT and SIGTERM during reloading fail, SIGKILL should be sent
 --SKIPIF--
 <?php
 include "skipif.inc";
@@ -35,7 +33,7 @@ pcntl_sigprocmask(SIG_BLOCK, [SIGQUIT, SIGTERM]);
 EOT;
 
 $tester = new FPM\Tester($cfg, $code);
-$tester->start(extensions: ['pcntl']);
+$tester->start();
 $tester->expectLogStartNotices();
 $tester->request()->expectEmptyBody();
 $tester->signal('USR2');

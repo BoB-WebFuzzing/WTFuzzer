@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -51,7 +51,7 @@ static const short base64_reverse_table[256] = {
 };
 /* }}} */
 
-#if defined(__aarch64__) || defined(_M_ARM64)
+#ifdef __aarch64__
 #include <arm_neon.h>
 
 static zend_always_inline uint8x16_t encode_toascii(const uint8x16_t input, const uint8x16x2_t shift_LUT)
@@ -115,14 +115,14 @@ static zend_always_inline unsigned char *neon_base64_encode(const unsigned char 
 		inl -= 16 * 3;
 	} while (inl >= 16 * 3);
 
-	*left = inl;
+        *left = inl;
 	return out;
 }
-#endif /* defined(__aarch64__) || defined(_M_ARM64) */
+#endif /* __aarch64__ */
 
 static zend_always_inline unsigned char *php_base64_encode_impl(const unsigned char *in, size_t inl, unsigned char *out) /* {{{ */
 {
-#if defined(__aarch64__) || defined(_M_ARM64)
+#ifdef __aarch64__
 	if (inl >= 16 * 3) {
 		size_t left = 0;
 		out = neon_base64_encode(in, inl, out, &left);
@@ -161,7 +161,7 @@ static zend_always_inline unsigned char *php_base64_encode_impl(const unsigned c
 }
 /* }}} */
 
-#if defined(__aarch64__) || defined(_M_ARM64)
+#ifdef __aarch64__
 static zend_always_inline uint8x16_t decode_fromascii(const uint8x16_t input, uint8x16_t *error, const uint8x16x2_t shiftLUT, const uint8x16x2_t maskLUT, const uint8x16x2_t bitposLUT) {
 	const uint8x16_t higher_nibble = vshrq_n_u8(input, 4);
 	const uint8x16_t lower_nibble = vandq_u8(input, vdupq_n_u8(0x0f));
@@ -241,18 +241,18 @@ static zend_always_inline size_t neon_base64_decode(const unsigned char *in, siz
 	*left = inl;
 	return out - out_orig;
 }
-#endif /* defined(__aarch64__) || defined(_M_ARM64) */
+#endif /* __aarch64__ */
 
-static zend_always_inline int php_base64_decode_impl(const unsigned char *in, size_t inl, unsigned char *out, size_t *outl, bool strict) /* {{{ */
+static zend_always_inline int php_base64_decode_impl(const unsigned char *in, size_t inl, unsigned char *out, size_t *outl, zend_bool strict) /* {{{ */
 {
 	int ch;
 	size_t i = 0, padding = 0, j = *outl;
 
-#if defined(__aarch64__) || defined(_M_ARM64)
+#ifdef __aarch64__
 	if (inl >= 16 * 4) {
 		size_t left = 0;
 		j += neon_base64_decode(in, inl, out, &left);
-		i = inl - left;
+                i = inl - left;
 		in += i;
 		inl = left;
 	}
@@ -368,27 +368,27 @@ fail:
 
 # if ZEND_INTRIN_AVX2_RESOLVER
 ZEND_INTRIN_AVX2_FUNC_DECL(zend_string *php_base64_encode_avx2(const unsigned char *str, size_t length));
-ZEND_INTRIN_AVX2_FUNC_DECL(zend_string *php_base64_decode_ex_avx2(const unsigned char *str, size_t length, bool strict));
+ZEND_INTRIN_AVX2_FUNC_DECL(zend_string *php_base64_decode_ex_avx2(const unsigned char *str, size_t length, zend_bool strict));
 # endif
 
 # if ZEND_INTRIN_SSSE3_RESOLVER
 ZEND_INTRIN_SSSE3_FUNC_DECL(zend_string *php_base64_encode_ssse3(const unsigned char *str, size_t length));
-ZEND_INTRIN_SSSE3_FUNC_DECL(zend_string *php_base64_decode_ex_ssse3(const unsigned char *str, size_t length, bool strict));
+ZEND_INTRIN_SSSE3_FUNC_DECL(zend_string *php_base64_decode_ex_ssse3(const unsigned char *str, size_t length, zend_bool strict));
 # endif
 
 zend_string *php_base64_encode_default(const unsigned char *str, size_t length);
-zend_string *php_base64_decode_ex_default(const unsigned char *str, size_t length, bool strict);
+zend_string *php_base64_decode_ex_default(const unsigned char *str, size_t length, zend_bool strict);
 
 # if (ZEND_INTRIN_AVX2_FUNC_PROTO || ZEND_INTRIN_SSSE3_FUNC_PROTO)
 PHPAPI zend_string *php_base64_encode(const unsigned char *str, size_t length) __attribute__((ifunc("resolve_base64_encode")));
-PHPAPI zend_string *php_base64_decode_ex(const unsigned char *str, size_t length, bool strict) __attribute__((ifunc("resolve_base64_decode")));
+PHPAPI zend_string *php_base64_decode_ex(const unsigned char *str, size_t length, zend_bool strict) __attribute__((ifunc("resolve_base64_decode")));
 
 typedef zend_string *(*base64_encode_func_t)(const unsigned char *, size_t);
-typedef zend_string *(*base64_decode_func_t)(const unsigned char *, size_t, bool);
+typedef zend_string *(*base64_decode_func_t)(const unsigned char *, size_t, zend_bool);
 
 ZEND_NO_SANITIZE_ADDRESS
 ZEND_ATTRIBUTE_UNUSED /* clang mistakenly warns about this */
-static base64_encode_func_t resolve_base64_encode(void) {
+static base64_encode_func_t resolve_base64_encode() {
 # if ZEND_INTRIN_AVX2_FUNC_PROTO
 	if (zend_cpu_supports_avx2()) {
 		return php_base64_encode_avx2;
@@ -404,7 +404,7 @@ static base64_encode_func_t resolve_base64_encode(void) {
 
 ZEND_NO_SANITIZE_ADDRESS
 ZEND_ATTRIBUTE_UNUSED /* clang mistakenly warns about this */
-static base64_decode_func_t resolve_base64_decode(void) {
+static base64_decode_func_t resolve_base64_decode() {
 # if ZEND_INTRIN_AVX2_FUNC_PROTO
 	if (zend_cpu_supports_avx2()) {
 		return php_base64_decode_ex_avx2;
@@ -420,12 +420,12 @@ static base64_decode_func_t resolve_base64_decode(void) {
 # else /* (ZEND_INTRIN_AVX2_FUNC_PROTO || ZEND_INTRIN_SSSE3_FUNC_PROTO) */
 
 PHPAPI zend_string *(*php_base64_encode_ptr)(const unsigned char *str, size_t length) = NULL;
-PHPAPI zend_string *(*php_base64_decode_ex_ptr)(const unsigned char *str, size_t length, bool strict) = NULL;
+PHPAPI zend_string *(*php_base64_decode_ex_ptr)(const unsigned char *str, size_t length, zend_bool strict) = NULL;
 
 PHPAPI zend_string *php_base64_encode(const unsigned char *str, size_t length) {
 	return php_base64_encode_ptr(str, length);
 }
-PHPAPI zend_string *php_base64_decode_ex(const unsigned char *str, size_t length, bool strict) {
+PHPAPI zend_string *php_base64_decode_ex(const unsigned char *str, size_t length, zend_bool strict) {
 	return php_base64_decode_ex_ptr(str, length, strict);
 }
 
@@ -775,11 +775,11 @@ static __m128i php_base64_decode_ssse3_reshuffle(__m128i in)
 
 #if ZEND_INTRIN_AVX2_NATIVE || ZEND_INTRIN_AVX2_RESOLVER || ZEND_INTRIN_SSSE3_NATIVE || ZEND_INTRIN_SSSE3_RESOLVER
 # if ZEND_INTRIN_AVX2_NATIVE || ZEND_INTRIN_SSSE3_NATIVE
-PHPAPI zend_string *php_base64_decode_ex(const unsigned char *str, size_t length, bool strict)
+PHPAPI zend_string *php_base64_decode_ex(const unsigned char *str, size_t length, zend_bool strict)
 # elif ZEND_INTRIN_AVX2_RESOLVER
-zend_string *php_base64_decode_ex_avx2(const unsigned char *str, size_t length, bool strict)
+zend_string *php_base64_decode_ex_avx2(const unsigned char *str, size_t length, zend_bool strict)
 # else
-zend_string *php_base64_decode_ex_ssse3(const unsigned char *str, size_t length, bool strict)
+zend_string *php_base64_decode_ex_ssse3(const unsigned char *str, size_t length, zend_bool strict)
 # endif
 {
 	const unsigned char *c = str;
@@ -856,7 +856,7 @@ zend_string *php_base64_decode_ex_ssse3(const unsigned char *str, size_t length,
 }
 
 # if ZEND_INTRIN_SSSE3_RESOLVER && ZEND_INTRIN_AVX2_RESOLVER
-zend_string *php_base64_decode_ex_ssse3(const unsigned char *str, size_t length, bool strict)
+zend_string *php_base64_decode_ex_ssse3(const unsigned char *str, size_t length, zend_bool strict)
 {
 	const unsigned char *c = str;
 	unsigned char *o;
@@ -903,9 +903,9 @@ PHPAPI zend_string *php_base64_encode(const unsigned char *str, size_t length)
 
 #if !ZEND_INTRIN_AVX2_NATIVE && !ZEND_INTRIN_SSSE3_NATIVE
 #if ZEND_INTRIN_AVX2_RESOLVER || ZEND_INTRIN_SSSE3_RESOLVER
-zend_string *php_base64_decode_ex_default(const unsigned char *str, size_t length, bool strict)
+zend_string *php_base64_decode_ex_default(const unsigned char *str, size_t length, zend_bool strict)
 #else
-PHPAPI zend_string *php_base64_decode_ex(const unsigned char *str, size_t length, bool strict)
+PHPAPI zend_string *php_base64_decode_ex(const unsigned char *str, size_t length, zend_bool strict)
 #endif
 {
 	zend_string *result;
@@ -945,7 +945,7 @@ PHP_FUNCTION(base64_encode)
 PHP_FUNCTION(base64_decode)
 {
 	char *str;
-	bool strict = 0;
+	zend_bool strict = 0;
 	size_t str_len;
 	zend_string *result;
 

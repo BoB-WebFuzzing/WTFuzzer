@@ -1,7 +1,9 @@
 --TEST--
 Bug #77088 (Segfault when using SoapClient with null options)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php
+    require_once('skipif.inc');
+?>
 --FILE--
 <?php
 

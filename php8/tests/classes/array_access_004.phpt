@@ -1,16 +1,16 @@
 --TEST--
-ZE2 ArrayAccess::offsetGet ambiguities
+ZE2 ArrayAccess::offsetGet ambiguties
 --FILE--
 <?php
 class ObjectOne implements ArrayAccess {
 
     public $a = array('1st', 1, 2=>'3rd', '4th'=>4);
 
-    function offsetExists($index): bool {
+    function offsetExists($index) {
         echo __METHOD__ . "($index)\n";
         return array_key_exists($index, $this->a);
     }
-    function offsetGet($index): mixed {
+    function offsetGet($index) {
         echo __METHOD__ . "($index)\n";
         switch($index) {
         case 1:
@@ -22,14 +22,14 @@ class ObjectOne implements ArrayAccess {
         }
         return $this->a[$index];
     }
-    function offsetSet($index, $newval): void {
+    function offsetSet($index, $newval) {
         echo __METHOD__ . "($index,$newval)\n";
         if ($index==3) {
             $this->cnt = $newval;
         }
-        $this->a[$index] = $newval;
+        return $this->a[$index] = $newval;
     }
-    function offsetUnset($index): void {
+    function offsetUnset($index) {
         echo __METHOD__ . "($index)\n";
         unset($this->a[$index]);
     }

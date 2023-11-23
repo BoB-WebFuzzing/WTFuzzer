@@ -1,9 +1,8 @@
 --TEST--
 mysqli_stmt_get_result() - SHOW, DESCRIBE, EXPLAIN
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 
 if (!function_exists('mysqli_stmt_get_result'))
@@ -36,12 +35,12 @@ if (!function_exists('mysqli_stmt_get_result'))
             printf("[004] It is very unlikely that SHOW ENGINES returns no data, check manually\n");
         } else {
             $found = false;
-            foreach ($engines as $engine) {
-                if (stristr($engine[0], 'MyISAM')) {
-                    $found = true;
-                    break;
-                }
-            }
+            foreach ($engines as $k => $engine)
+                foreach ($engine as $k => $v)
+                    if (stristr($v, 'MyISAM')) {
+                        $found = true;
+                        break;
+                    }
             if (!$found)
                 printf("[005] It is very unlikely that SHOW ENGINES does not show MyISAM, check manually\n");
         }

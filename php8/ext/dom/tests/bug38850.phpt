@@ -1,7 +1,7 @@
 --TEST--
 Bug #38850 (lookupNamespaceURI does not return default namespace)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $xml = <<<HERE

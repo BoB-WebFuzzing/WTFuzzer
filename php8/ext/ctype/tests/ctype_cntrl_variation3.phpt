@@ -1,7 +1,7 @@
 --TEST--
 Test ctype_cntrl() function : usage variations - Different strings
---EXTENSIONS--
-ctype
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 /*

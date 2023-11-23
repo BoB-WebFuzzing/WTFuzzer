@@ -1,27 +1,55 @@
 --TEST--
-Changing Directory::$handle property
+Directory class behaviour.
 --FILE--
 <?php
 
-$d = dir(getcwd());
+echo "\n--> Try all methods with bad handle:\n";
+$d = new Directory(getcwd());
+$d->handle = "Havoc!";
 try {
-    $d->handle = "Havoc!";
-} catch (Error $e) {
+    var_dump($d->read());
+} catch (TypeError $e) {
     echo $e->getMessage(), "\n";
 }
-var_dump($d->handle);
+try {
+    var_dump($d->rewind());
+} catch (TypeError $e) {
+    echo $e->getMessage(), "\n";
+}
+try {
+    var_dump($d->close());
+} catch (TypeError $e) {
+    echo $e->getMessage(), "\n";
+}
 
-$d = dir(getcwd());
+echo "\n--> Try all methods with no handle:\n";
+$d = new Directory(getcwd());
+unset($d->handle);
+
 try {
-    unset($d->handle);
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
+    var_dump($d->read());
+} catch (\Error $e) {
+    echo $e->getMessage() . "\n";
 }
-var_dump($d->handle);
+try {
+    var_dump($d->rewind());
+} catch (\Error $e) {
+    echo $e->getMessage() . "\n";
+}
+try {
+    var_dump($d->close());
+} catch (\Error $e) {
+    echo $e->getMessage() . "\n";
+}
 
 ?>
---EXPECTF--
-Cannot modify readonly property Directory::$handle
-resource(%d) of type (stream)
-Cannot unset readonly property Directory::$handle
-resource(%d) of type (stream)
+--EXPECT--
+--> Try all methods with bad handle:
+Directory::read(): supplied argument is not a valid Directory resource
+Directory::rewind(): supplied argument is not a valid Directory resource
+Directory::close(): supplied argument is not a valid Directory resource
+
+--> Try all methods with no handle:
+Unable to find my handle property
+Unable to find my handle property
+Unable to find my handle property

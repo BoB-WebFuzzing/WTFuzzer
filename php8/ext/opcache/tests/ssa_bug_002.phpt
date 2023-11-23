@@ -1,7 +1,7 @@
 --TEST--
 Incorrect NOP removal on jump to NOP
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

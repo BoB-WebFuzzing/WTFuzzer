@@ -1,7 +1,9 @@
 --TEST--
 Bug #74063 (NumberFormatter fails after retrieval from session)
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl')) die('skip intl extension not available');
+?>
 --FILE--
 <?php
 $formatter = new NumberFormatter("en_GB", NumberFormatter::CURRENCY);

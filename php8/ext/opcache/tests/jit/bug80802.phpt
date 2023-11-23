@@ -5,8 +5,8 @@ opcache.enable=1
 opcache.enable_cli=1
 opcache.jit_buffer_size=1M
 opcache.jit=tracing
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 abstract class AsyncTask{

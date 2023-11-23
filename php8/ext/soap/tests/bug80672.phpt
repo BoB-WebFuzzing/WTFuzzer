@@ -1,7 +1,7 @@
 --TEST--
 Bug #80672 Null Dereference in SoapClient
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 try {
@@ -11,5 +11,5 @@ try {
     print $e->getMessage();
 }
 ?>
---EXPECT--
+--EXPECTF--
 SOAP-ERROR: Parsing WSDL: Unexpected WSDL element <>

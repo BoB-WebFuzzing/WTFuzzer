@@ -1,7 +1,7 @@
 --TEST--
 SOAP Interop Round2 base 014 (soap/direct): echoStruct
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--

@@ -1,7 +1,7 @@
 --TEST--
 callback function is a closure
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 $callback = function ($var) {

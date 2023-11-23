@@ -1,7 +1,7 @@
 --TEST--
 Bug #42139 (XMLReader option constants are broken using XML())
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 

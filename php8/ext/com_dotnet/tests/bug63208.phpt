@@ -1,7 +1,9 @@
 --TEST--
 Bug #63208 (BSTR to PHP string conversion not binary safe)
---EXTENSIONS--
-com_dotnet
+--SKIPIF--
+<?php
+if (!extension_loaded('com_dotnet')) die('skip com_dotnet extension not available');
+?>
 --FILE--
 <?php
 $string = "\u{0905}b\0cd";

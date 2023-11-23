@@ -1,7 +1,7 @@
 --TEST--
 FFI 036: Type memory management
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

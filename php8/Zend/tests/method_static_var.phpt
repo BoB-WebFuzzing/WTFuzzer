@@ -3,6 +3,8 @@ Initial value of static var in method depends on the include time of the class d
 --FILE--
 <?php
 
+/* The current behavior is probably a bug, but we should still test how it currently works. */
+
 class Foo {
     public static function test() {
         static $i = 0;
@@ -20,5 +22,5 @@ Bar::test();
 --EXPECT--
 int(1)
 int(2)
+int(2)
 int(3)
-int(4)

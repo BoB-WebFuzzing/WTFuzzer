@@ -1,7 +1,7 @@
 --TEST--
 ldap_option_reqcert_basic() - Error test for TLS require cert ldap option
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --CREDITS--
 Edwin Hoksberg <edwin@edwinhoksberg.nl>
 --FILE--

@@ -4,8 +4,6 @@ Test session_set_save_handler() : session_gc() returns the number of deleted rec
 session.name=PHPSESSID
 session.save_handler=files
 session.gc_probability=0
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -16,27 +14,27 @@ ob_start();
 echo "*** Test session_set_save_handler() : session_gc() returns the number of deleted records. ***\n";
 
 class MySession implements SessionHandlerInterface {
-    public function open($path, $name): bool {
+    public function open($path, $name) {
         echo 'Open', "\n";
         return true;
     }
-    public function read($key): string|false {
+    public function read($key) {
         echo 'Read ', session_id(), "\n";
         return '';
     }
-    public function write($key, $data): bool {
+    public function write($key, $data) {
         echo 'Write ', session_id(), "\n";
         return true;
     }
-    public function close(): bool {
+    public function close() {
         echo 'Close ', session_id(), "\n";
         return true;
     }
-    public function destroy($key): bool {
+    public function destroy($key) {
         echo 'Destroy ', session_id(), "\n";
         return true;
     }
-    public function gc($ts): int|false {
+    public function gc($ts) {
         echo 'Garbage collect', "\n";
         return 1;
     }

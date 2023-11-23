@@ -4,8 +4,10 @@ Bug #51269 (zlib.output_compression Overwrites Vary Header)
 zlib.output_compression=1
 --ENV--
 HTTP_ACCEPT_ENCODING=gzip
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) die("skip zlib required");
+?>
 --FILE--
 <?php
 header('Vary: Cookie');

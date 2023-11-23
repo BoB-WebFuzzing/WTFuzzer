@@ -1,9 +1,8 @@
 --TEST--
 COM: General variant tests
---EXTENSIONS--
-com_dotnet
 --SKIPIF--
 <?php
+if (!extension_loaded("com_dotnet")) print "skip COM/.Net support not present";
 if (4 != PHP_INT_SIZE) print "skip x86 only"; ?>
 --FILE--
 <?php

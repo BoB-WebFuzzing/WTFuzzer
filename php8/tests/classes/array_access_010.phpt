@@ -17,22 +17,22 @@ class ArrayReferenceProxy implements ArrayAccess
         $this->element = &$element;
     }
 
-    function offsetExists($index): bool {
+    function offsetExists($index) {
         echo __METHOD__ . "($this->element, $index)\n";
         return array_key_exists($index, $this->element);
     }
 
-    function offsetGet($index): mixed {
+    function offsetGet($index) {
         echo __METHOD__ . "(Array, $index)\n";
         return isset($this->element[$index]) ? $this->element[$index] : NULL;
     }
 
-    function offsetSet($index, $value): void {
+    function offsetSet($index, $value) {
         echo __METHOD__ . "(Array, $index, $value)\n";
         $this->element[$index] = $value;
     }
 
-    function offsetUnset($index): void {
+    function offsetUnset($index) {
         echo __METHOD__ . "(Array, $index)\n";
         unset($this->element[$index]);
     }
@@ -47,22 +47,22 @@ class Peoples implements ArrayAccess
         $this->person = array(array('name'=>'Foo'));
     }
 
-    function offsetExists($index): bool
+    function offsetExists($index)
     {
         return array_key_exists($index, $this->person);
     }
 
-    function offsetGet($index): mixed
+    function offsetGet($index)
     {
         return new ArrayReferenceProxy($this, $this->person[$index]);
     }
 
-    function offsetSet($index, $value): void
+    function offsetSet($index, $value)
     {
         $this->person[$index] = $value;
     }
 
-    function offsetUnset($index): void
+    function offsetUnset($index)
     {
         unset($this->person[$index]);
     }

@@ -1,7 +1,7 @@
 --TEST--
 Incorrect type inference
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class PHP_CodeCoverage

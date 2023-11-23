@@ -1,7 +1,7 @@
 --TEST--
 Bug #60261 (phar dos null pointer)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 

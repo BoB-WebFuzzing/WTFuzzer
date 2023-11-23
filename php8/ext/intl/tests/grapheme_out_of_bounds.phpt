@@ -1,7 +1,5 @@
 --TEST--
 grapheme_* functions with out-of-bounds offsets
---EXTENSIONS--
-intl
 --FILE--
 <?php
 

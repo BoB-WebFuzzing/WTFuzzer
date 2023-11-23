@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -70,17 +70,12 @@ static void dom_xpath_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs,
 		return;
 	}
 
-	if (UNEXPECTED(nargs == 0)) {
-		zend_throw_error(NULL, "Function name must be passed as the first argument");
-		return;
-	}
-
 	fci.param_count = nargs - 1;
 	if (fci.param_count > 0) {
 		fci.params = safe_emalloc(fci.param_count, sizeof(zval), 0);
 	}
 	/* Reverse order to pop values off ctxt stack */
-	for (i = fci.param_count - 1; i >= 0; i--) {
+	for (i = nargs - 2; i >= 0; i--) {
 		obj = valuePop(ctxt);
 		switch (obj->type) {
 			case XPATH_STRING:
@@ -106,18 +101,24 @@ static void dom_xpath_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs,
 							zval child;
 							/* not sure, if we need this... it's copied from xpath.c */
 							if (node->type == XML_NAMESPACE_DECL) {
-								xmlNodePtr nsparent = node->_private;
-								xmlNsPtr original = (xmlNsPtr) node;
+								xmlNsPtr curns;
+								xmlNodePtr nsparent;
 
-								/* Make sure parent dom object exists, so we can take an extra reference. */
-								zval parent_zval; /* don't destroy me, my lifetime is transfered to the fake namespace decl */
-								php_dom_create_object(nsparent, &parent_zval, &intern->dom);
-								dom_object *parent_intern = Z_DOMOBJ_P(&parent_zval);
-
-								node = php_dom_create_fake_namespace_decl(nsparent, original, &child, parent_intern);
-							} else {
-								php_dom_create_object(node, &child, &intern->dom);
+								nsparent = node->_private;
+								curns = xmlNewNs(NULL, node->name, NULL);
+								if (node->children) {
+									curns->prefix = xmlStrdup((xmlChar *) node->children);
+								}
+								if (node->children) {
+									node = xmlNewDocNode(node->doc, NULL, (xmlChar *) node->children, node->name);
+								} else {
+									node = xmlNewDocNode(node->doc, NULL, (xmlChar *) "xmlns", node->name);
+								}
+								node->type = XML_NAMESPACE_DECL;
+								node->parent = nsparent;
+								node->ns = curns;
 							}
+							php_dom_create_object(node, &child, &intern->dom);
 							add_next_index_zval(&fci.params[i], &child);
 						}
 					} else {
@@ -133,12 +134,11 @@ static void dom_xpath_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs,
 
 	fci.size = sizeof(fci);
 
-	/* Last element of the stack is the function name */
 	obj = valuePop(ctxt);
 	if (obj->stringval == NULL) {
 		zend_type_error("Handler name must be a string");
 		xmlXPathFreeObject(obj);
-		goto cleanup_no_callable;
+		goto cleanup;
 	}
 	ZVAL_STRING(&fci.function_name, (char *) obj->stringval);
 	xmlXPathFreeObject(obj);
@@ -182,8 +182,7 @@ static void dom_xpath_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs,
 	}
 cleanup:
 	zend_string_release_ex(callable, 0);
-	zval_ptr_dtor_nogc(&fci.function_name);
-cleanup_no_callable:
+	zval_ptr_dtor_str(&fci.function_name);
 	if (fci.param_count > 0) {
 		for (i = 0; i < nargs - 1; i++) {
 			zval_ptr_dtor(&fci.params[i]);
@@ -209,7 +208,7 @@ static void dom_xpath_ext_function_object_php(xmlXPathParserContextPtr ctxt, int
 PHP_METHOD(DOMXPath, __construct)
 {
 	zval *doc;
-	bool register_node_ns = 1;
+	zend_bool register_node_ns = 1;
 	xmlDocPtr docp = NULL;
 	dom_object *docobj;
 	dom_xpath_object *intern;
@@ -336,7 +335,7 @@ static void php_xpath_eval(INTERNAL_FUNCTION_PARAMETERS, int type) /* {{{ */
 	char *expr;
 	xmlDoc *docp = NULL;
 	xmlNsPtr *ns = NULL;
-	bool register_node_ns;
+	zend_bool register_node_ns;
 
 	id = ZEND_THIS;
 	intern = Z_XPATHOBJ_P(id);
@@ -384,8 +383,8 @@ static void php_xpath_eval(INTERNAL_FUNCTION_PARAMETERS, int type) /* {{{ */
 	}
 
 
-	ctxp->namespaces = ns;
-	ctxp->nsNr = nsnbr;
+    ctxp->namespaces = ns;
+    ctxp->nsNr = nsnbr;
 
 	xpathobjp = xmlXPathEvalExpression((xmlChar *) expr, ctxp);
 	ctxp->node = NULL;
@@ -422,18 +421,24 @@ static void php_xpath_eval(INTERNAL_FUNCTION_PARAMETERS, int type) /* {{{ */
 					zval child;
 
 					if (node->type == XML_NAMESPACE_DECL) {
-						xmlNodePtr nsparent = node->_private;
-						xmlNsPtr original = (xmlNsPtr) node;
+						xmlNsPtr curns;
+						xmlNodePtr nsparent;
 
-						/* Make sure parent dom object exists, so we can take an extra reference. */
-						zval parent_zval; /* don't destroy me, my lifetime is transfered to the fake namespace decl */
-						php_dom_create_object(nsparent, &parent_zval, &intern->dom);
-						dom_object *parent_intern = Z_DOMOBJ_P(&parent_zval);
-
-						node = php_dom_create_fake_namespace_decl(nsparent, original, &child, parent_intern);
-					} else {
-						php_dom_create_object(node, &child, &intern->dom);
+						nsparent = node->_private;
+						curns = xmlNewNs(NULL, node->name, NULL);
+						if (node->children) {
+							curns->prefix = xmlStrdup((xmlChar *) node->children);
+						}
+						if (node->children) {
+							node = xmlNewDocNode(docp, NULL, (xmlChar *) node->children, node->name);
+						} else {
+							node = xmlNewDocNode(docp, NULL, (xmlChar *) "xmlns", node->name);
+						}
+						node->type = XML_NAMESPACE_DECL;
+						node->parent = nsparent;
+						node->ns = curns;
 					}
+					php_dom_create_object(node, &child, &intern->dom);
 					add_next_index_zval(&retval, &child);
 				}
 			} else {

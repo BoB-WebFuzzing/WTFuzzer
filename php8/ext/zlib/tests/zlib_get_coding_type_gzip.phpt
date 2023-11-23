@@ -2,8 +2,8 @@
 zlib_get_coding_type() with gzip encoding
 --CREDITS--
 PHP TestFest 2017 - Bergfreunde, Florian Engelhardt <florian.engelhardt@bergfreunde.de>
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) print "skip"; ?>
 --ENV--
 HTTP_ACCEPT_ENCODING=gzip
 --FILE--

@@ -1,7 +1,9 @@
 --TEST--
 Bug #37360 (gdimagecreatefromgif, bad image sizes)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+    if (!extension_loaded('gd')) die("skip gd extension not available\n");
+?>
 --FILE--
 <?php
 $im = imagecreatefromgif(__DIR__ . '/bug37360.gif');

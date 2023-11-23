@@ -1,9 +1,8 @@
 --TEST--
 Bug #61367: open_basedir bypass in libxml RSHUTDOWN: read test
---EXTENSIONS--
-dom
 --SKIPIF--
 <?php
+if(!extension_loaded('dom')) echo 'skip dom extension not available';
 if (LIBXML_VERSION < 20912) die('skip For libxml2 >= 2.9.12 only');
 ?>
 --INI--
@@ -14,8 +13,6 @@ open_basedir=.
  * Note: Using error_reporting=E_ALL & ~E_NOTICE to suppress "Trying to get property of non-object" notices.
  */
 class StreamExploiter {
-    public $context;
-
     public function stream_close (  ) {
         $doc = new DOMDocument;
         $doc->resolveExternals = true;
@@ -58,6 +55,6 @@ bool(true)
 int(4)
 bool(true)
 
-Warning: DOMDocument::loadXML(): %Sfailed to load external entity "file:///%s/test_bug_61367-read/bad" in %s on line %d
+Warning: DOMDocument::loadXML(): I/O warning : failed to load external entity "file:///%s/test_bug_61367-read/bad" in %s on line %d
 
 Warning: Attempt to read property "nodeValue" on null in %s on line %d

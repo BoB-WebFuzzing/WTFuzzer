@@ -1,7 +1,9 @@
 --TEST--
 Bug #67474 getElementsByTagNameNS and default namespace
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 declare(strict_types=1);

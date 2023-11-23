@@ -1,7 +1,7 @@
 --TEST--
 Bug #72154 (pcntl_wait/pcntl_waitpid array internal structure overwrite)
---EXTENSIONS--
-pcntl
+--SKIPIF--
+<?php if (!extension_loaded("pcntl")) print "skip"; ?>
 --FILE--
 <?php
 $b = 666;

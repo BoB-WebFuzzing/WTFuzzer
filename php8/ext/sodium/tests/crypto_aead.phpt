@@ -1,9 +1,8 @@
 --TEST--
 Check for libsodium AEAD
---EXTENSIONS--
-sodium
 --SKIPIF--
 <?php
+if (!extension_loaded("sodium")) print "skip extension not loaded";
 if (!defined('SODIUM_CRYPTO_AEAD_AES256GCM_NPUBBYTES')) print "skip libsodium without AESGCM";
 ?>
 --FILE--

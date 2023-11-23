@@ -2,8 +2,8 @@
 Phar front controller with unknown extension mime type [cache_list]
 --INI--
 phar.cache_list={PWD}/frontcontroller26.php
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller26.php
 REQUEST_URI=/frontcontroller26.php/unknown.ext

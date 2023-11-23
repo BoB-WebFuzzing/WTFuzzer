@@ -1,7 +1,9 @@
 --TEST--
 Bug #80774 (session_name() problem with backslash)
---EXTENSIONS--
-session
+--SKIPIF--
+<?php
+if (!extension_loaded('session')) die("skip session extension not available");
+?>
 --FILE--
 <?php
 session_name("foo\\bar");

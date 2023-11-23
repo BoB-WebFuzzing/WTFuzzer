@@ -6,8 +6,8 @@ opcache.enable_cli=1
 opcache.file_update_protection=0
 opcache.jit_buffer_size=1M
 opcache.protect_memory=1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class Caster
@@ -16,7 +16,7 @@ class Caster
     const EXCLUDE_PRIVATE = 32;
     const EXCLUDE_STRICT = 512;
 
-    public static function filter(array $a, $filter): int
+    public static function filter(array $a, $filter)
     {
         foreach ($a as $k => $v) {
             if (!isset($k[1])) {

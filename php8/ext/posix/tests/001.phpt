@@ -1,7 +1,7 @@
 --TEST--
 posix_access() with bogus paths
---EXTENSIONS--
-posix
+--SKIPIF--
+<?php if (!extension_loaded('posix')) echo 'skip'; ?>
 --FILE--
 <?php
 

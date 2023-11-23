@@ -52,10 +52,8 @@ Content-type: text/html; charset=UTF-8
 
 array(1) {
   ["userfile"]=>
-  array(6) {
+  array(5) {
     ["name"]=>
-    string(12) "laruence.txt"
-    ["full_path"]=>
     string(12) "laruence.txt"
     ["type"]=>
     string(10) "text/plain"

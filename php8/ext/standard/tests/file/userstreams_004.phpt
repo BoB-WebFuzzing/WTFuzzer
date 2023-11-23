@@ -3,7 +3,6 @@ User-space streams: stream_lock()
 --FILE--
 <?php
 class test_wrapper_base {
-    public $context;
     public $mode;
     function stream_open($path, $mode, $openedpath) {
         return true;

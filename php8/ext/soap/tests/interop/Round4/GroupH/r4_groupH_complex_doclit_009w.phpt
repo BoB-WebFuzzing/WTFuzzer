@@ -1,28 +1,36 @@
 --TEST--
 SOAP Interop Round4 GroupH Complex Doc Lit 009 (php/wsdl): echoMultipleFaults2(3)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--
 <?php
 class SOAPStruct {
-    function __construct(public $varString, public $varInt, public $varFloat) {}
+    function __construct($s, $i, $f) {
+        $this->varString = $s;
+        $this->varInt = $i;
+        $this->varFloat = $f;
+    }
 }
 class BaseStruct {
-    function __construct(public $structMessage, public $shortMessage) {}
+    function __construct($f, $s) {
+        $this->structMessage = $f;
+        $this->shortMessage = $s;
+    }
 }
 class ExtendedStruct extends BaseStruct {
-    function __construct(
-        $structMessage, $shortMessage,
-        public $stringMessage, public $intMessage, public $anotherIntMessage)
-    {
-        parent::__construct($structMessage, $shortMessage);
+    function __construct($f, $s, $x1, $x2, $x3) {
+        parent::__construct($f,$s);
+        $this->stringMessage = $x1;
+        $this->intMessage = $x2;
+        $this->anotherIntMessage = $x3;
     }
 }
 class MoreExtendedStruct extends ExtendedStruct {
-    function __construct($f, $s, $x1, $x2, $x3, public $booleanMessage) {
+    function __construct($f, $s, $x1, $x2, $x3, $b) {
         parent::__construct($f, $s, $x1, $x2, $x3);
+        $this->booleanMessage = $b;
     }
 }
 $s1 = new BaseStruct(new SOAPStruct("s1",1,1.1),1);

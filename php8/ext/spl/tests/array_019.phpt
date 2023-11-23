@@ -9,7 +9,7 @@ $ar = new RecursiveArrayIterator(array(3)); foreach($ar as &$v) var_dump($v);
 
 class ArrayIteratorEx extends ArrayIterator
 {
-    function current(): mixed
+    function current()
     {
         return ArrayIterator::current();
     }

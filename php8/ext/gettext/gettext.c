@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -71,16 +71,19 @@ PHP_MINFO_FUNCTION(php_gettext)
 /* {{{ Set the textdomain to "domain". Returns the current domain */
 PHP_FUNCTION(textdomain)
 {
-	char *domain_name = NULL, *retval;
-	zend_string *domain = NULL;
+	char *domain = NULL, *domain_name, *retval;
+	size_t domain_len = 0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S!", &domain) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s!", &domain, &domain_len) == FAILURE) {
 		RETURN_THROWS();
 	}
 
-	if (domain != NULL && ZSTR_LEN(domain) != 0 && !zend_string_equals_literal(domain, "0")) {
-		PHP_GETTEXT_DOMAIN_LENGTH_CHECK(1, ZSTR_LEN(domain))
-		domain_name = ZSTR_VAL(domain);
+	PHP_GETTEXT_DOMAIN_LENGTH_CHECK(1, domain_len)
+
+	if (domain != NULL && strcmp(domain, "") && strcmp(domain, "0")) {
+		domain_name = domain;
+	} else {
+		domain_name = NULL;
 	}
 
 	retval = textdomain(domain_name);
@@ -160,12 +163,11 @@ PHP_FUNCTION(dcgettext)
 /* {{{ Bind to the text domain domain_name, looking for translations in dir. Returns the current domain */
 PHP_FUNCTION(bindtextdomain)
 {
-	char *domain;
-	size_t domain_len;
-	zend_string *dir = NULL;
+	char *domain, *dir = NULL;
+	size_t domain_len, dir_len;
 	char *retval, dir_name[MAXPATHLEN];
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "sS!", &domain, &domain_len, &dir) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss!", &domain, &domain_len, &dir, &dir_len) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -180,8 +182,8 @@ PHP_FUNCTION(bindtextdomain)
 		RETURN_STRING(bindtextdomain(domain, NULL));
 	}
 
-	if (ZSTR_LEN(dir) != 0 && !zend_string_equals_literal(dir, "0")) {
-		if (!VCWD_REALPATH(ZSTR_VAL(dir), dir_name)) {
+	if (dir[0] != '\0' && strcmp(dir, "0")) {
+		if (!VCWD_REALPATH(dir, dir_name)) {
 			RETURN_FALSE;
 		}
 	} else if (!VCWD_GETCWD(dir_name, MAXPATHLEN)) {

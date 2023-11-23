@@ -3,8 +3,8 @@ PDO_sqlite: Testing sqliteCreateFunction() produces warning when
 un-callable function passed
 --CREDITS--
 Chris MacPherson chris@kombine.co.uk
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php if (!extension_loaded('pdo_sqlite')) print 'skip not loaded'; ?>
 --FILE--
 <?php
 

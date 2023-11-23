@@ -1,7 +1,7 @@
 --TEST--
 ValueErrors for format/parse methods and procedural functions
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 
