@@ -2,6 +2,11 @@
 Test array_merge() function : usage variations - Pass different data types as $arr2 arg
 --FILE--
 <?php
+/* Prototype  : array array_merge(array $arr1, array $arr2 [, array $...])
+ * Description: Merges elements from passed arrays into one array
+ * Source code: ext/standard/array.c
+ */
+
 /*
  * Pass different data types as $arr2 argument to array_merge() to test behaviour
  */
@@ -83,72 +88,102 @@ $inputs = array(
 // loop through each element of $inputs to check the behavior of array_merge()
 $iterator = 1;
 foreach($inputs as $input) {
-    echo "\n-- Iteration $iterator --\n";
-    try {
-        var_dump( array_merge($arr1, $input) );
-    } catch (TypeError $e) {
-        echo $e->getMessage(), "\n";
-    }
-    $iterator++;
+  echo "\n-- Iteration $iterator --\n";
+  var_dump( array_merge($arr1, $input) );
+  $iterator++;
 };
 
 fclose($fp);
 
 echo "Done";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing array_merge() : usage variations ***
 
 -- Iteration 1 --
-array_merge(): Argument #2 must be of type array, int given
+
+Warning: array_merge(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 -- Iteration 2 --
-array_merge(): Argument #2 must be of type array, int given
+
+Warning: array_merge(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 -- Iteration 3 --
-array_merge(): Argument #2 must be of type array, int given
+
+Warning: array_merge(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 -- Iteration 4 --
-array_merge(): Argument #2 must be of type array, int given
+
+Warning: array_merge(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 -- Iteration 5 --
-array_merge(): Argument #2 must be of type array, float given
+
+Warning: array_merge(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 6 --
-array_merge(): Argument #2 must be of type array, float given
+
+Warning: array_merge(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 7 --
-array_merge(): Argument #2 must be of type array, float given
+
+Warning: array_merge(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 8 --
-array_merge(): Argument #2 must be of type array, float given
+
+Warning: array_merge(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 9 --
-array_merge(): Argument #2 must be of type array, float given
+
+Warning: array_merge(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 10 --
-array_merge(): Argument #2 must be of type array, null given
+
+Warning: array_merge(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 -- Iteration 11 --
-array_merge(): Argument #2 must be of type array, null given
+
+Warning: array_merge(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 -- Iteration 12 --
-array_merge(): Argument #2 must be of type array, true given
+
+Warning: array_merge(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 -- Iteration 13 --
-array_merge(): Argument #2 must be of type array, false given
+
+Warning: array_merge(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 -- Iteration 14 --
-array_merge(): Argument #2 must be of type array, true given
+
+Warning: array_merge(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 -- Iteration 15 --
-array_merge(): Argument #2 must be of type array, false given
+
+Warning: array_merge(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 -- Iteration 16 --
-array_merge(): Argument #2 must be of type array, string given
+
+Warning: array_merge(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 17 --
-array_merge(): Argument #2 must be of type array, string given
+
+Warning: array_merge(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 18 --
 array(2) {
@@ -159,23 +194,37 @@ array(2) {
 }
 
 -- Iteration 19 --
-array_merge(): Argument #2 must be of type array, string given
+
+Warning: array_merge(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 20 --
-array_merge(): Argument #2 must be of type array, string given
+
+Warning: array_merge(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 21 --
-array_merge(): Argument #2 must be of type array, string given
+
+Warning: array_merge(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 22 --
-array_merge(): Argument #2 must be of type array, classA given
+
+Warning: array_merge(): Expected parameter 2 to be an array, object given in %s on line %d
+NULL
 
 -- Iteration 23 --
-array_merge(): Argument #2 must be of type array, null given
+
+Warning: array_merge(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 -- Iteration 24 --
-array_merge(): Argument #2 must be of type array, null given
+
+Warning: array_merge(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 -- Iteration 25 --
-array_merge(): Argument #2 must be of type array, resource given
+
+Warning: array_merge(): Expected parameter 2 to be an array, resource given in %s on line %d
+NULL
 Done

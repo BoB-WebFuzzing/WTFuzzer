@@ -24,6 +24,7 @@ foreach ($Files2Report as $file => &$Report)
 
 
 ?>
+==DONE==
 --CLEAN--
 <?php
 $d = __DIR__;
@@ -62,3 +63,4 @@ Array
     [strlen] => 261
     [result] => ok
 )
+==DONE==

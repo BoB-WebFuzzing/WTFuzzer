@@ -1,16 +1,12 @@
 --TEST--
 gmp_sqrtrem() basic tests
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 
-try {
-    $r = gmp_sqrtrem(-1);
-    var_dump($r);
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+$r = gmp_sqrtrem(-1);
+var_dump($r);
 
 $r = gmp_sqrtrem("0");
 var_dump(gmp_strval($r[0]));
@@ -44,29 +40,24 @@ $r = gmp_sqrtrem("1000001");
 var_dump(gmp_strval($r[0]));
 var_dump(gmp_strval($r[1]));
 
-try {
-    $n = gmp_init(-1);
-    $r = gmp_sqrtrem($n);
-    var_dump($r);
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+
+$n = gmp_init(-1);
+$r = gmp_sqrtrem($n);
+var_dump($r);
 
 $n = gmp_init(1000001);
 $r = gmp_sqrtrem($n);
 var_dump(gmp_strval($r[0]));
 var_dump(gmp_strval($r[1]));
 
-try {
-    var_dump(gmp_sqrtrem(array()));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gmp_sqrtrem(array()));
+var_dump(gmp_sqrtrem());
 
 echo "Done\n";
 ?>
---EXPECT--
-gmp_sqrtrem(): Argument #1 ($num) must be greater than or equal to 0
+--EXPECTF--
+Warning: gmp_sqrtrem(): Number has to be greater than or equal to 0 in %s on line %d
+bool(false)
 string(1) "0"
 string(1) "0"
 string(1) "1"
@@ -83,8 +74,15 @@ string(4) "1000"
 string(1) "0"
 string(4) "1000"
 string(1) "1"
-gmp_sqrtrem(): Argument #1 ($num) must be greater than or equal to 0
+
+Warning: gmp_sqrtrem(): Number has to be greater than or equal to 0 in %s on line %d
+bool(false)
 string(4) "1000"
 string(1) "1"
-gmp_sqrtrem(): Argument #1 ($num) must be of type GMP|string|int, array given
+
+Warning: gmp_sqrtrem(): Unable to convert variable to GMP - wrong type in %s on line %d
+bool(false)
+
+Warning: gmp_sqrtrem() expects exactly 1 parameter, 0 given in %s on line %d
+NULL
 Done

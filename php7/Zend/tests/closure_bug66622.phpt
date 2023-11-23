@@ -28,7 +28,6 @@ function test() {
     B::baz();
 }
 test();
-?>
 --EXPECT--
 B vs B
 B vs B

@@ -2,9 +2,10 @@
 FTP ftp_get file for both binary and ASCII transfer modes
 --CREDITS--
 Nathaniel McHugh
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php
+require 'skipif.inc';
+?>
 --FILE--
 <?php
 require 'server.inc';
@@ -23,17 +24,23 @@ unlink($tmpfname);
 //test binary data transfer
 $tmpfname = tempnam(__DIR__, "ftp_test");
 var_dump(ftp_get($ftp, $tmpfname, 'binary data.bin', FTP_BINARY));
-echo json_encode(file_get_contents($tmpfname)), "\n";
+var_dump(urlencode(file_get_contents($tmpfname)));
 unlink($tmpfname);
 
 //test non-existent file request
 ftp_get($ftp, $tmpfname ,'a warning.txt', FTP_ASCII);
+
+//test invalid ftp_get params
+var_dump(ftp_get('foo', 'bar', 'baz'));
 ?>
 --EXPECTF--
 bool(true)
 bool(true)
 For sale: baby shoes, never worn.
 bool(true)
-"BINARYFoo\u0000Bar\r\n"
+string(21) "BINARYFoo%00Bar%0D%0A"
 
 Warning: ftp_get(): a warning: No such file or directory  in %sftp_get_basic.php on line %d
+
+Warning: ftp_get() expects parameter 1 to be resource, string given in %s on line %d
+NULL

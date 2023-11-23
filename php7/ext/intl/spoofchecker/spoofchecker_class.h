@@ -1,9 +1,11 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -18,6 +20,7 @@
 #include <php.h>
 
 #include "intl_common.h"
+#include "spoofchecker_create.h"
 #include "intl_error.h"
 #include "intl_data.h"
 
@@ -28,10 +31,7 @@ typedef struct {
 	intl_error  err;
 
 	// ICU Spoofchecker
-	USpoofChecker*     uspoof;
-#if U_ICU_VERSION_MAJOR_NUM >= 58
-	USpoofCheckResult* uspoofres;
-#endif
+	USpoofChecker*      uspoof;
 
 	zend_object     zo;
 } Spoofchecker_object;
@@ -65,8 +65,9 @@ extern zend_class_entry *Spoofchecker_ce_ptr;
 #define SPOOFCHECKER_METHOD_FETCH_OBJECT							\
 	SPOOFCHECKER_METHOD_FETCH_OBJECT_NO_CHECK;						\
 	if (co->uspoof == NULL)	{										\
-		zend_throw_error(NULL, "Found unconstructed Spoofchecker");	\
-		RETURN_THROWS();											\
+		intl_errors_set(&co->err, U_ILLEGAL_ARGUMENT_ERROR,			\
+				"Found unconstructed Spoofchecker", 0);	\
+		RETURN_FALSE;												\
 	}
 
 // Macro to check return value of a ucol_* function call.

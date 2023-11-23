@@ -12,13 +12,10 @@ echo(\test\ns1\FOO);
 echo(BAR);
 
 const BAR = "ok\n";
-?>
 --EXPECTF--
 ok
 ok
 ok
 
-Fatal error: Uncaught Error: Undefined constant "test\ns1\BAR" in %s:%d
-Stack trace:
-#0 {main}
-  thrown in %s on line %d
+Warning: Use of undefined constant BAR - assumed 'BAR' (this will throw an Error in a future version of PHP) in %sns_041.php on line 9
+BAR

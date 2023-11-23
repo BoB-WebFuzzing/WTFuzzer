@@ -1,40 +1,30 @@
 --TEST--
 PostgreSQL pg_meta_data() - basic test using schema
---EXTENSIONS--
-pgsql
 --SKIPIF--
-<?php include("inc/skipif.inc"); ?>
+<?php include("skipif.inc"); ?>
 --FILE--
 <?php
 
-include('inc/config.inc');
-$schema_name = 'schema_pg_meta_data_001';
-$table_name = 'table_pg_meta_data_001';
+include('config.inc');
 
 $conn = pg_connect($conn_str);
 
-pg_query($conn, "CREATE SCHEMA {$schema_name}");
+pg_query('CREATE SCHEMA phptests');
 
-pg_query($conn, "CREATE TABLE {$schema_name}.{$table_name} (id INT, id2 INT)");
+pg_query('CREATE TABLE phptests.foo (id INT, id2 INT)');
 
-pg_query($conn, "CREATE TABLE {$table_name} (id INT, id3 INT)");
+pg_query('CREATE TABLE foo (id INT, id3 INT)');
 
 
-var_dump(pg_meta_data($conn, $table_name));
-var_dump(pg_meta_data($conn, "{$schema_name}.{$table_name}"));
-var_dump(pg_meta_data($conn, "{$schema_name}.{$table_name}", TRUE));
+var_dump(pg_meta_data($conn, 'foo'));
+var_dump(pg_meta_data($conn, 'phptests.foo'));
+var_dump(pg_meta_data($conn, 'phptests.foo', TRUE));
 
-?>
---CLEAN--
-<?php
-require_once('inc/config.inc');
-$schema_name = 'schema_pg_meta_data_001';
-$table_name = 'table_pg_meta_data_001';
 
-$conn = pg_connect($conn_str);
-pg_query($conn, "DROP TABLE IF EXISTS {$table_name}");
-pg_query($conn, "DROP TABLE IF EXISTS {$schema_name}.{$table_name}");
-pg_query($conn, "DROP SCHEMA IF EXISTS {$schema_name}");
+pg_query('DROP TABLE foo');
+pg_query('DROP TABLE phptests.foo');
+pg_query('DROP SCHEMA phptests');
+
 ?>
 --EXPECT--
 array(2) {
@@ -130,7 +120,7 @@ array(2) {
     bool(true)
     ["is composite"]=>
     bool(false)
-    ["is pseudo"]=>
+    ["is pesudo"]=>
     bool(false)
     ["description"]=>
     string(0) ""
@@ -155,7 +145,7 @@ array(2) {
     bool(true)
     ["is composite"]=>
     bool(false)
-    ["is pseudo"]=>
+    ["is pesudo"]=>
     bool(false)
     ["description"]=>
     string(0) ""

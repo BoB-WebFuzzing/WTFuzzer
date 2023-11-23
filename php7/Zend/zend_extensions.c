@@ -18,14 +18,13 @@
 */
 
 #include "zend_extensions.h"
-#include "zend_system_id.h"
 
 ZEND_API zend_llist zend_extensions;
 ZEND_API uint32_t zend_extension_flags = 0;
 ZEND_API int zend_op_array_extension_handles = 0;
 static int last_resource_number;
 
-zend_result zend_load_extension(const char *path)
+int zend_load_extension(const char *path)
 {
 #if ZEND_EXTENSIONS_SUPPORT
 	DL_HANDLE handle;
@@ -41,13 +40,6 @@ zend_result zend_load_extension(const char *path)
 #endif
 		return FAILURE;
 	}
-#ifdef ZEND_WIN32
-	char *err;
-	if (!php_win32_image_compatible(handle, &err)) {
-		zend_error(E_CORE_WARNING, err);
-		return FAILURE;
-	}
-#endif
 	return zend_load_extension_handle(handle, path);
 #else
 	fprintf(stderr, "Extensions are not supported on this platform.\n");
@@ -59,14 +51,15 @@ zend_result zend_load_extension(const char *path)
 #endif
 }
 
-zend_result zend_load_extension_handle(DL_HANDLE handle, const char *path)
+int zend_load_extension_handle(DL_HANDLE handle, const char *path)
 {
 #if ZEND_EXTENSIONS_SUPPORT
 	zend_extension *new_extension;
+	zend_extension_version_info *extension_version_info;
 
-	const zend_extension_version_info *extension_version_info = (const zend_extension_version_info *) DL_FETCH_SYMBOL(handle, "extension_version_info");
+	extension_version_info = (zend_extension_version_info *) DL_FETCH_SYMBOL(handle, "extension_version_info");
 	if (!extension_version_info) {
-		extension_version_info = (const zend_extension_version_info *) DL_FETCH_SYMBOL(handle, "_extension_version_info");
+		extension_version_info = (zend_extension_version_info *) DL_FETCH_SYMBOL(handle, "_extension_version_info");
 	}
 	new_extension = (zend_extension *) DL_FETCH_SYMBOL(handle, "zend_extension_entry");
 	if (!new_extension) {
@@ -133,8 +126,7 @@ zend_result zend_load_extension_handle(DL_HANDLE handle, const char *path)
 		return FAILURE;
 	}
 
-	zend_register_extension(new_extension, handle);
-	return SUCCESS;
+	return zend_register_extension(new_extension, handle);
 #else
 	fprintf(stderr, "Extensions are not supported on this platform.\n");
 /* See http://support.microsoft.com/kb/190351 */
@@ -146,7 +138,7 @@ zend_result zend_load_extension_handle(DL_HANDLE handle, const char *path)
 }
 
 
-void zend_register_extension(zend_extension *new_extension, DL_HANDLE handle)
+int zend_register_extension(zend_extension *new_extension, DL_HANDLE handle)
 {
 #if ZEND_EXTENSIONS_SUPPORT
 	zend_extension extension;
@@ -175,6 +167,8 @@ void zend_register_extension(zend_extension *new_extension, DL_HANDLE handle)
 	}
 	/*fprintf(stderr, "Loaded %s, version %s\n", extension.name, extension.version);*/
 #endif
+
+	return SUCCESS;
 }
 
 
@@ -187,7 +181,6 @@ static void zend_extension_shutdown(zend_extension *extension)
 #endif
 }
 
-/* int return due to zend linked list API */
 static int zend_extension_startup(zend_extension *extension)
 {
 #if ZEND_EXTENSIONS_SUPPORT
@@ -202,18 +195,20 @@ static int zend_extension_startup(zend_extension *extension)
 }
 
 
-void zend_startup_extensions_mechanism(void)
+int zend_startup_extensions_mechanism()
 {
 	/* Startup extensions mechanism */
 	zend_llist_init(&zend_extensions, sizeof(zend_extension), (void (*)(void *)) zend_extension_dtor, 1);
 	zend_op_array_extension_handles = 0;
 	last_resource_number = 0;
+	return SUCCESS;
 }
 
 
-void zend_startup_extensions(void)
+int zend_startup_extensions()
 {
 	zend_llist_apply_with_del(&zend_extensions, (int (*)(void *)) zend_extension_startup);
+	return SUCCESS;
 }
 
 
@@ -254,85 +249,19 @@ ZEND_API void zend_extension_dispatch_message(int message, void *arg)
 }
 
 
-ZEND_API int zend_get_resource_handle(const char *module_name)
+ZEND_API int zend_get_resource_handle(zend_extension *extension)
 {
 	if (last_resource_number<ZEND_MAX_RESERVED_RESOURCES) {
-		zend_add_system_entropy(module_name, "zend_get_resource_handle", &last_resource_number, sizeof(int));
+		extension->resource_number = last_resource_number;
 		return last_resource_number++;
 	} else {
 		return -1;
 	}
 }
 
-/**
- * The handle returned by this function can be used with
- * `ZEND_OP_ARRAY_EXTENSION(op_array, handle)`.
- *
- * The extension slot has been available since PHP 7.4 on user functions and
- * has been available since PHP 8.2 on internal functions.
- * 
- * # Safety
- * The extension slot made available by calling this function is initialized on
- * the first call made to the function in that request. If you need to
- * initialize it before this point, call `zend_init_func_run_time_cache`.
- *
- * The function cache slots are not available if the function is a trampoline,
- * which can be checked with something like:
- * 
- *     if (fbc->type == ZEND_USER_FUNCTION
- *         && !(fbc->op_array.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE)
- *     ) {
- *         // Use ZEND_OP_ARRAY_EXTENSION somehow
- *     }
- */  
-ZEND_API int zend_get_op_array_extension_handle(const char *module_name)
+ZEND_API int zend_get_op_array_extension_handle(void)
 {
-	int handle = zend_op_array_extension_handles++;
-	zend_add_system_entropy(module_name, "zend_get_op_array_extension_handle", &zend_op_array_extension_handles, sizeof(int));
-	return handle;
-}
-
-/** See zend_get_op_array_extension_handle for important usage information. */
-ZEND_API int zend_get_op_array_extension_handles(const char *module_name, int handles)
-{
-	int handle = zend_op_array_extension_handles;
-	zend_op_array_extension_handles += handles;
-	zend_add_system_entropy(module_name, "zend_get_op_array_extension_handle", &zend_op_array_extension_handles, sizeof(int));
-	return handle;
-}
-
-ZEND_API size_t zend_internal_run_time_cache_reserved_size(void) {
-	return zend_op_array_extension_handles * sizeof(void *);
-}
-
-ZEND_API void zend_init_internal_run_time_cache(void) {
-	size_t rt_size = zend_internal_run_time_cache_reserved_size();
-	if (rt_size) {
-		size_t functions = zend_hash_num_elements(CG(function_table));
-		zend_class_entry *ce;
-		ZEND_HASH_MAP_FOREACH_PTR(CG(class_table), ce) {
-			functions += zend_hash_num_elements(&ce->function_table);
-		} ZEND_HASH_FOREACH_END();
-
-		char *ptr = zend_arena_calloc(&CG(arena), functions, rt_size);
-		zend_internal_function *zif;
-		ZEND_HASH_MAP_FOREACH_PTR(CG(function_table), zif) {
-			if (!ZEND_USER_CODE(zif->type) && ZEND_MAP_PTR_GET(zif->run_time_cache) == NULL)
-			{
-				ZEND_MAP_PTR_SET(zif->run_time_cache, (void *)ptr);
-				ptr += rt_size;
-			}
-		} ZEND_HASH_FOREACH_END();
-		ZEND_HASH_MAP_FOREACH_PTR(CG(class_table), ce) {
-			ZEND_HASH_MAP_FOREACH_PTR(&ce->function_table, zif) {
-				if (!ZEND_USER_CODE(zif->type) && ZEND_MAP_PTR_GET(zif->run_time_cache) == NULL)
-				{
-					ZEND_MAP_PTR_SET(zif->run_time_cache, (void *)ptr);
-					ptr += rt_size;
-				}
-			} ZEND_HASH_FOREACH_END();
-		} ZEND_HASH_FOREACH_END();
-	}
+	return zend_op_array_extension_handles++;
 }
 
 ZEND_API zend_extension *zend_get_extension(const char *extension_name)

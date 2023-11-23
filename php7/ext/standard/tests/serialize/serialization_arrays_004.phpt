@@ -2,19 +2,30 @@
 serialization: arrays with references to the containing array
 --FILE--
 <?php
-function check(&$a) {
-    var_dump($a);
-    $ser = serialize($a);
-    var_dump($ser);
+/* Prototype  : proto string serialize(mixed variable)
+ * Description: Returns a string representation of variable (which can later be unserialized)
+ * Source code: ext/standard/var.c
+ * Alias to functions:
+ */
+/* Prototype  : proto mixed unserialize(string variable_representation)
+ * Description: Takes a string representation of variable and recreates it
+ * Source code: ext/standard/var.c
+ * Alias to functions:
+ */
 
-    $b = unserialize($ser);
-    var_dump($b);
-    $b[0] = "b0.changed";
-    var_dump($b);
-    $b[1] = "b1.changed";
-    var_dump($b);
-    $b[2] = "b2.changed";
-    var_dump($b);
+function check(&$a) {
+	var_dump($a);
+	$ser = serialize($a);
+	var_dump($ser);
+
+	$b = unserialize($ser);
+	var_dump($b);
+	$b[0] = "b0.changed";
+	var_dump($b);
+	$b[1] = "b1.changed";
+	var_dump($b);
+	$b[2] = "b2.changed";
+	var_dump($b);
 }
 
 echo "\n\n--- 1 refs container:\n";
@@ -44,7 +55,14 @@ echo "Done";
 --- 1 refs container:
 array(3) {
   [0]=>
-  *RECURSION*
+  &array(3) {
+    [0]=>
+    *RECURSION*
+    [1]=>
+    int(1)
+    [2]=>
+    int(1)
+  }
   [1]=>
   int(1)
   [2]=>
@@ -95,9 +113,23 @@ array(3) {
 --- 1,2 ref container:
 array(3) {
   [0]=>
-  *RECURSION*
+  &array(3) {
+    [0]=>
+    *RECURSION*
+    [1]=>
+    *RECURSION*
+    [2]=>
+    int(1)
+  }
   [1]=>
-  *RECURSION*
+  &array(3) {
+    [0]=>
+    *RECURSION*
+    [1]=>
+    *RECURSION*
+    [2]=>
+    int(1)
+  }
   [2]=>
   int(1)
 }
@@ -153,11 +185,32 @@ array(3) {
 --- 1,2,3 ref container:
 array(3) {
   [0]=>
-  *RECURSION*
+  &array(3) {
+    [0]=>
+    *RECURSION*
+    [1]=>
+    *RECURSION*
+    [2]=>
+    *RECURSION*
+  }
   [1]=>
-  *RECURSION*
+  &array(3) {
+    [0]=>
+    *RECURSION*
+    [1]=>
+    *RECURSION*
+    [2]=>
+    *RECURSION*
+  }
   [2]=>
-  *RECURSION*
+  &array(3) {
+    [0]=>
+    *RECURSION*
+    [1]=>
+    *RECURSION*
+    [2]=>
+    *RECURSION*
+  }
 }
 string(56) "a:3:{i:0;a:3:{i:0;R:2;i:1;R:2;i:2;R:2;}i:1;R:2;i:2;R:2;}"
 array(3) {

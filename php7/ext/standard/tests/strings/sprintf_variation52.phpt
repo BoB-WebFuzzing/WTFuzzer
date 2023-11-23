@@ -2,6 +2,11 @@
 Test sprintf() function : usage variations - typical format strings
 --FILE--
 <?php
+/* Prototype  : string sprintf(string $format [, mixed $arg1 [, mixed ...]])
+ * Description: Return a formatted string
+ * Source code: ext/standard/formatted_print.c
+*/
+
 echo "*** Testing sprintf() : with  typical format strings ***\n";
 
 // initialising required variables
@@ -18,11 +23,7 @@ echo"\n-- Testing for precision value more than maximum --\n";
 var_dump(sprintf("%.988f", 1.23456789e10));
 
 echo"\n-- Testing for invalid width(-15) specifier --\n";
-try {
-    var_dump(sprintf("%030.-15s", $tempstring));
-} catch (ValueError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(sprintf("%030.-15s", $tempstring));
 
 echo"\n-- Testing for '%X' as the format parameter --\n";
 var_dump(sprintf("%X", 12));
@@ -50,7 +51,7 @@ Notice: sprintf(): Requested precision of 988 digits was truncated to PHP maximu
 string(65) "12345678900.00000000000000000000000000000000000000000000000000000"
 
 -- Testing for invalid width(-15) specifier --
-Unknown format specifier "-"
+string(3) "15s"
 
 -- Testing for '%X' as the format parameter --
 string(1) "C"

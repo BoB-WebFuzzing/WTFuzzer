@@ -1,7 +1,7 @@
 --TEST--
 Phar: alias edge cases
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly=0
 --FILE--
@@ -32,6 +32,7 @@ $b = new Phar($fname, 0, 'another');
 echo $e->getMessage(),"\n";
 }
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar');
@@ -42,3 +43,4 @@ alias "foo" is already used for archive "%salias_acrobatics.phar" cannot be over
 2
 Cannot open archive "%salias_acrobatics.2.phar", alias is already in use by existing archive
 alias "another" is already used for archive "%salias_acrobatics.phar" cannot be overloaded with "%salias_acrobatics.phar"
+===DONE===

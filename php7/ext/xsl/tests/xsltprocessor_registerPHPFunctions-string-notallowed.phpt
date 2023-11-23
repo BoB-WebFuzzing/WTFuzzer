@@ -1,7 +1,11 @@
 --TEST--
 Check xsltprocessor::registerPHPFunctions with string and not allowed function
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+        if (!extension_loaded('xsl')) {
+                die("skip\n");
+        }
+?>
 --FILE--
 <?php
 include __DIR__ .'/prepare.inc';
@@ -14,7 +18,6 @@ if(!$phpfuncxsl) {
 $proc->importStylesheet($phpfuncxsl);
 var_dump($proc->registerPHPFunctions('strpos'));
 var_dump($proc->transformToXml($dom));
-?>
 --EXPECTF--
 NULL
 

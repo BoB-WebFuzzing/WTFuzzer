@@ -1,7 +1,7 @@
 --TEST--
 Bug #66964 (mb_convert_variables() cannot detect recursion)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 $a[] = &$a;
@@ -49,5 +49,16 @@ array(5) {
   [3]=>
   string(21) "日本語テキスト"
   [4]=>
-  *RECURSION*
+  &array(5) {
+    [0]=>
+    string(21) "日本語テキスト"
+    [1]=>
+    string(21) "日本語テキスト"
+    [2]=>
+    string(21) "日本語テキスト"
+    [3]=>
+    string(21) "日本語テキスト"
+    [4]=>
+    *RECURSION*
+  }
 }

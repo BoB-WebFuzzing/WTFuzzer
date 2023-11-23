@@ -44,6 +44,7 @@ var_dump(ClassB::$prop);
 var_dump(ClassC::$prop);
 
 ?>
+===DONE===
 --EXPECT--
 ===INIT===
 string(1) "A"
@@ -61,3 +62,4 @@ string(2) "B2"
 string(2) "A2"
 string(2) "C2"
 string(2) "C2"
+===DONE===

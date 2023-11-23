@@ -1,7 +1,7 @@
 --TEST--
 The Tidy Output Buffer Filter
---EXTENSIONS--
-tidy
+--SKIPIF--
+<?php if (!extension_loaded("tidy")) print "skip"; ?>
 --FILE--
 <?php ob_start("ob_tidyhandler"); ?>
 <B>testing</I>

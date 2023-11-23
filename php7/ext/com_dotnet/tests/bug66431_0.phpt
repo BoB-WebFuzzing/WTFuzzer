@@ -1,7 +1,9 @@
 --TEST--
 Bug #66431 Special Character via COM Interface (CP_UTF8), Scripting.FileSystemObject
---EXTENSIONS--
-com_dotnet
+--SKIPIF--
+<?php
+if (!extension_loaded("com_dotnet")){ echo "skip COM/.Net support not present"; }
+?>
 --FILE--
 <?php
 
@@ -20,19 +22,21 @@ $result = ($check_text == $text);
 var_dump($result);
 
 if (!$result) {
-    echo "Expected: '$check_text'\n";
-    echo "Have: '$text'\n";
+	echo "Expected: '$check_text'\n";
+	echo "Have: '$text'\n";
 }
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 
 $fpath = str_replace("/", "\\", __DIR__ . "/bug66431.txt");
 
 if (file_exists($fpath)) {
-    unlink($fpath);
+	unlink($fpath);
 }
 ?>
 --EXPECT--
 bool(true)
+===DONE===

@@ -13,5 +13,4 @@ class B implements A {
 
 $b = new B();
 $b->method(null);
-?>
 --EXPECT--

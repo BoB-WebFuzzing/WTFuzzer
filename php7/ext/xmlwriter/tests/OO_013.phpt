@@ -2,8 +2,8 @@
 XMLWriter: libxml2 XML Writer, Write Raw
 --CREDITS--
 Mark Baker mark@lange.demon.co.uk at the PHPNW2017 Conference for PHP Testfest 2017
---EXTENSIONS--
-xmlwriter
+--SKIPIF--
+<?php if (!extension_loaded("xmlwriter")) print "skip"; ?>
 --FILE--
 <?php
 

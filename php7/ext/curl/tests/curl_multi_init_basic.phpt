@@ -3,10 +3,15 @@ Test curl_multi_init()
 --CREDITS--
 Mark van der Velden
 #testfest Utrecht 2009
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php if (!extension_loaded("curl")) print "skip"; ?>
 --FILE--
 <?php
+/* Prototype         : resource curl_multi_init(void)
+ * Description       : Returns a new cURL multi handle
+ * Source code       : ext/curl/multi.c
+ * Test documentation:  http://wiki.php.net/qa/temp/ext/curl
+ */
 
 // start testing
 echo "*** Testing curl_multi_init(void); ***\n";
@@ -18,9 +23,9 @@ var_dump($mh);
 curl_multi_close($mh);
 var_dump($mh);
 ?>
---EXPECT--
+===DONE===
+--EXPECTF--
 *** Testing curl_multi_init(void); ***
-object(CurlMultiHandle)#1 (0) {
-}
-object(CurlMultiHandle)#1 (0) {
-}
+resource(%d) of type (curl_multi)
+resource(%d) of type (Unknown)
+===DONE===

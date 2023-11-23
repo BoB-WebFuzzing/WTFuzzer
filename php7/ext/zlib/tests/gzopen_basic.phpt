@@ -1,9 +1,19 @@
 --TEST--
 Test gzopen() function : basic functionality
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+	print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
+/* Prototype  : resource gzopen(string filename, string mode [, int use_include_path])
+ * Description: Open a .gz-file and return a .gz-file pointer
+ * Source code: ext/zlib/zlib.c
+ * Alias to functions:
+ */
+
 echo "*** Testing gzopen() : basic functionality ***\n";
 
 
@@ -23,6 +33,7 @@ gzpassthru($h);
 gzclose($h);
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing gzopen() : basic functionality ***
 When you're taught through feelings
@@ -37,3 +48,4 @@ all I know is that you can realize it
 Destiny who cares
 as it turns around
 and I know that it descends down on me
+===DONE===

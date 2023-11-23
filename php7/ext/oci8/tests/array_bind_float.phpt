@@ -1,12 +1,9 @@
 --TEST--
 oci_bind_array_by_name() and SQLT_FLT
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -64,7 +61,7 @@ var_dump($array);
 
 echo "Done\n";
 ?>
---EXPECTF--
+--EXPECT--
 array(5) {
   [0]=>
   float(5.9999)
@@ -73,7 +70,7 @@ array(5) {
   [2]=>
   float(3.4234)
   [3]=>
-  float(2.5658%S)
+  float(2.5658)
   [4]=>
   float(1.243)
 }

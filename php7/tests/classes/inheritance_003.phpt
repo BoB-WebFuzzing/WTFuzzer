@@ -5,14 +5,16 @@ ZE2 method inheritance without interfaces
 
 class A
 {
-    function f($x) {}
+	function f($x) {}
 }
 
 class B extends A
 {
-    function f() {}
+	function f() {}
 }
 
 ?>
+===DONE===
 --EXPECTF--
-Fatal error: Declaration of B::f() must be compatible with A::f($x) in %sinheritance_003.php on line %d
+Warning: Declaration of B::f() should be compatible with A::f($x) in %sinheritance_003.php on line %d
+===DONE===

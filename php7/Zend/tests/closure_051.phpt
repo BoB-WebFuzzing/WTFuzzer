@@ -15,6 +15,5 @@ class A {
 class B extends A {}
 
 var_dump(B::foo());
-?>
 --EXPECT--
 string(1) "B"

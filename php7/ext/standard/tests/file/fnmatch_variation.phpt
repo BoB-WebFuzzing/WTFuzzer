@@ -7,6 +7,10 @@ if (!function_exists('fnmatch'))
 ?>
 --FILE--
 <?php
+/* Prototype: bool fnmatch ( string $pattern, string $string [, int $flags] )
+   Description: fnmatch() checks if the passed string would match
+     the given shell wildcard pattern.
+*/
 
 echo "*** Testing fnmatch() with file and various patterns ***\n";
 $file_name = __DIR__."/match.tmp";
@@ -62,11 +66,7 @@ $pattern_arr = array(
 
 for( $i = 0; $i<count($pattern_arr); $i++ ) {
   echo "-- Iteration $i --\n";
-  try {
-    var_dump( fnmatch($pattern_arr[$i], $file_name) );
-  } catch (Error $e) {
-    echo $e->getMessage(), "\n";
-  }
+  var_dump( fnmatch($pattern_arr[$i], $file_name) );
 }
 unlink($file_name);
 
@@ -74,15 +74,11 @@ unlink($file_name);
 echo "\n*** Testing fnmatch() with other types other than files ***";
 
 /* defining a common function */
-function match_( $pattern, $string ) {
+function match( $pattern, $string ) {
   for( $i = 0; $i<count($pattern); $i++ ) {
     echo "-- Iteration $i --\n";
     for( $j = 0; $j<count($string); $j++ ) {
-      try {
-        var_dump( fnmatch($pattern[$i], $string[$j]) );
-      } catch (Error $e) {
-        echo $e->getMessage(), "\n";
-      }
+    var_dump( fnmatch($pattern[$i], $string[$j]) );
     }
   }
 }
@@ -96,7 +92,7 @@ $int_arr = array(
   0xF,
   0xF0000
 );
-match_($int_arr, $int_arr);
+match($int_arr, $int_arr);
 
 echo "\n--- With Strings ---\n";
 $str_arr = array(
@@ -109,7 +105,7 @@ $str_arr = array(
   /* binary input */
   b"string"
 );
-match_($str_arr, $str_arr);
+match($str_arr, $str_arr);
 
 echo "\n--- With booleans ---\n";
 $bool_arr = array(
@@ -123,20 +119,22 @@ $bool_arr = array(
   "",
   "string"
 );
-match_($bool_arr, $bool_arr);
+match($bool_arr, $bool_arr);
 
 echo "\n--- With NULL ---\n";
 $null_arr = array(
+  NULL,
+  null,
   "",
   "\0",
   "string",
   0
 );
-match_($null_arr, $null_arr);
+match($null_arr, $null_arr);
 
 echo "\n*** Done ***\n";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing fnmatch() with file and various patterns ***
 -- Iteration 0 --
 bool(true)
@@ -185,9 +183,13 @@ bool(false)
 -- Iteration 22 --
 bool(false)
 -- Iteration 23 --
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 -- Iteration 24 --
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 -- Iteration 25 --
 bool(false)
 -- Iteration 26 --
@@ -261,44 +263,84 @@ bool(true)
 --- With Strings ---
 -- Iteration 0 --
 bool(true)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(true)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(false)
 bool(true)
 -- Iteration 1 --
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 -- Iteration 2 --
 bool(true)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(true)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(false)
 bool(true)
 -- Iteration 3 --
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 -- Iteration 4 --
 bool(false)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(false)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(true)
 bool(false)
 -- Iteration 5 --
 bool(true)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(true)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(false)
 bool(true)
 
@@ -397,22 +439,66 @@ bool(true)
 --- With NULL ---
 -- Iteration 0 --
 bool(true)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+bool(true)
+bool(true)
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(false)
 bool(false)
 -- Iteration 1 --
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
-fnmatch(): Argument #1 ($pattern) must not contain any null bytes
--- Iteration 2 --
-bool(false)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
 bool(true)
+bool(true)
+bool(true)
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
+bool(false)
+bool(false)
+-- Iteration 2 --
+bool(true)
+bool(true)
+bool(true)
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
+bool(false)
 bool(false)
 -- Iteration 3 --
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: fnmatch() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+-- Iteration 4 --
 bool(false)
-fnmatch(): Argument #2 ($filename) must not contain any null bytes
+bool(false)
+bool(false)
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
+bool(true)
+bool(false)
+-- Iteration 5 --
+bool(false)
+bool(false)
+bool(false)
+
+Warning: fnmatch() expects parameter 2 to be a valid path, string given in %s on line %d
+NULL
 bool(false)
 bool(true)
 

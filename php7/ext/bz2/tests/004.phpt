@@ -1,7 +1,7 @@
 --TEST--
 bzread() tests with invalid files
---EXTENSIONS--
-bz2
+--SKIPIF--
+<?php if (!extension_loaded("bz2")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -36,30 +36,14 @@ var_dump(bzerrstr($fd2));
 var_dump(bzerrno($fd2));
 
 bzclose($fd2);
-try {
-    var_dump(bzread($fd2));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(bzerror($fd2));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(bzerrstr($fd2));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(bzerrno($fd2));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(bzread($fd2));
+var_dump(bzerror($fd2));
+var_dump(bzerrstr($fd2));
+var_dump(bzerrno($fd2));
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 array(2) {
   ["errno"]=>
   int(0)
@@ -112,8 +96,16 @@ array(2) {
 }
 string(10) "DATA_ERROR"
 int(-4)
-bzread(): supplied resource is not a valid stream resource
-bzerror(): supplied resource is not a valid stream resource
-bzerrstr(): supplied resource is not a valid stream resource
-bzerrno(): supplied resource is not a valid stream resource
+
+Warning: bzread(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
+
+Warning: bzerror(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
+
+Warning: bzerrstr(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
+
+Warning: bzerrno(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
 Done

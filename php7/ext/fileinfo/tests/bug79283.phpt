@@ -1,7 +1,9 @@
 --TEST--
 Bug #79283 (Segfault in libmagic patch contains a buffer overflow)
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php
+if (!extension_loaded('fileinfo')) die('skip fileinfo extension not available');
+?>
 --FILE--
 <?php
 $magic_file = __DIR__ . '/bug79283.db';

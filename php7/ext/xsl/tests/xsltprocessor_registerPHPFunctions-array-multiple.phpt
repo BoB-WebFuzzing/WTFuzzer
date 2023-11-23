@@ -4,8 +4,12 @@ Check xsltprocessor::registerPHPFunctions with array called multiple times
 When being called multiple times with an array,
 registerPHPFunctions adds the new functions to the allowed parameter
 list - it does not replace the previously allowed functions.
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+        if (!extension_loaded('xsl')) {
+                die("skip\n");
+        }
+?>
 --FILE--
 <?php
 include __DIR__ .'/prepare.inc';
@@ -20,7 +24,6 @@ var_dump($proc->registerPHPFunctions(array('strpos', 'ucwords')));
 var_dump($proc->registerPHPFunctions(array('strrev', 'array_key_exists')));
 var_dump($proc->registerPHPFunctions(array()));
 var_dump($proc->transformToXml($dom));
-?>
 --EXPECT--
 NULL
 NULL

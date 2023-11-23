@@ -2,6 +2,12 @@
 Test join() function : usage variations - unexpected values for 'pieces' argument(Bug#42789)
 --FILE--
 <?php
+/* Prototype  : string join( string $glue, array $pieces )
+ * Description: Join array elements with a string
+ * Source code: ext/standard/string.c
+ * Alias of function: implode()
+*/
+
 /*
  * test join() by passing different unexpected value for pieces argument
 */
@@ -14,7 +20,7 @@ $glue = '::';
 $unset_var = array(1, 2);
 unset($unset_var);
 
-// get a resource variable
+// get a resouce variable
 $fp = fopen(__FILE__, "r");
 
 // define a class
@@ -80,16 +86,12 @@ $values =  array (
 echo "\n--- Testing join() by supplying different values for 'pieces' argument ---\n";
 $counter = 1;
 for($index = 0; $index < count($values); $index ++) {
-    echo "-- Iteration $counter --\n";
-    $pieces = $values [$index];
+  echo "-- Iteration $counter --\n";
+  $pieces = $values [$index];
 
-    try {
-        var_dump( join($glue, $pieces) );
-    } catch (TypeError $e) {
-        echo $e->getMessage(), "\n";
-    }
+  var_dump( join($glue, $pieces) );
 
-    $counter ++;
+  $counter ++;
 }
 
 // close the resources used
@@ -97,54 +99,100 @@ fclose($fp);
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing join() : usage variations ***
 
 --- Testing join() by supplying different values for 'pieces' argument ---
 -- Iteration 1 --
-join(): Argument #2 ($array) must be of type ?array, int given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 2 --
-join(): Argument #2 ($array) must be of type ?array, int given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 3 --
-join(): Argument #2 ($array) must be of type ?array, int given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 4 --
-join(): Argument #2 ($array) must be of type ?array, int given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 5 --
-join(): Argument #2 ($array) must be of type ?array, float given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 6 --
-join(): Argument #2 ($array) must be of type ?array, float given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 7 --
-join(): Argument #2 ($array) must be of type ?array, float given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 8 --
-join(): Argument #2 ($array) must be of type ?array, float given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 9 --
-join(): Argument #2 ($array) must be of type ?array, float given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 10 --
-join(): Argument #2 ($array) must be of type ?array, true given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 11 --
-join(): Argument #2 ($array) must be of type ?array, false given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 12 --
-join(): Argument #2 ($array) must be of type ?array, true given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 13 --
-join(): Argument #2 ($array) must be of type ?array, false given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 14 --
-join(): Argument #2 ($array) must be of type ?array, string given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 15 --
-join(): Argument #2 ($array) must be of type ?array, string given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 16 --
-join(): Argument #2 ($array) must be of type ?array, test given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 17 --
-join(): Argument #2 ($array) must be of type ?array, string given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 18 --
-join(): Argument #2 ($array) must be of type ?array, string given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 19 --
-join(): Argument #1 ($array) must be of type array, string given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 20 --
-join(): Argument #1 ($array) must be of type array, string given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 21 --
-join(): Argument #2 ($array) must be of type ?array, resource given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 22 --
-join(): Argument #1 ($array) must be of type array, string given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 -- Iteration 23 --
-join(): Argument #1 ($array) must be of type array, string given
+
+Warning: join(): Invalid arguments passed in %s on line %d
+NULL
 Done

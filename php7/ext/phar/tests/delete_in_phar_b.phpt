@@ -1,7 +1,7 @@
 --TEST--
 Phar: delete a file within a .phar
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly=1
 phar.require_hash=0
@@ -29,6 +29,7 @@ include $pname . '/b.php';
 include $pname . '/b/c.php';
 ?>
 
+===DONE===
 --CLEAN--
 <?php unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.php'); ?>
 --EXPECTF--
@@ -42,3 +43,4 @@ This is a
 This is b
 This is b/c
 
+===DONE===

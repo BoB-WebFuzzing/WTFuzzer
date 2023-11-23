@@ -3,6 +3,11 @@ Test fscanf() function: usage variations - return type without third argument
 --FILE--
 <?php
 
+/*
+  Prototype: mixed fscanf ( resource $handle, string $format [, mixed &$...] );
+  Description: Parses input from a file according to a format
+*/
+
 /* test fscanf() for its return type */
 
 $file_path = __DIR__;

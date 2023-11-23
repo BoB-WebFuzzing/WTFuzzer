@@ -2,8 +2,8 @@
 XMLReader: libxml2 XML Reader, Move cursor to an attribute, with invalid arguments
 --CREDITS--
 Mark Baker mark@lange.demon.co.uk at the PHPNW2017 Conference for PHP Testfest 2017
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 // Set up test data in a new file
@@ -31,12 +31,8 @@ while ($reader->read()) {
             echo $reader->value . "\n";
 
             // Test for call with an empty string argument
-            try {
-                $reader->moveToAttribute('');
-            } catch (ValueError $exception) {
-                echo $exception->getMessage() . "\n";
-            }
-
+            $attr = $reader->moveToAttribute('');
+            var_dump($attr);
             // Ensure that node pointer has not changed position
             echo $reader->name . ": ";
             echo $reader->value . "\n";
@@ -60,17 +56,21 @@ while ($reader->read()) {
 // clean up
 $reader->close();
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__.'/003-move-errors.xml');
 ?>
---EXPECT--
+--EXPECTF--
 book
 bool(true)
 num: 1
-XMLReader::moveToAttribute(): Argument #1 ($name) cannot be empty
+
+Warning: XMLReader::moveToAttribute(): Attribute Name is required in %s on line %d
+bool(false)
 num: 1
 bool(false)
 num: 1
 bool(false)
 book
+===DONE===

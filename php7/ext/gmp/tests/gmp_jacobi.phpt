@@ -1,12 +1,12 @@
 --TEST--
 gmp_jacobi() basic tests
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 
 for ($i = -1; $i < 10; $i++) {
-    var_dump(gmp_strval(gmp_jacobi(($i*$i)-1, 3)));
+	var_dump(gmp_strval(gmp_jacobi(($i*$i)-1, 3)));
 }
 
 var_dump(gmp_strval(gmp_jacobi(7, 23)));
@@ -20,25 +20,17 @@ var_dump(gmp_strval(gmp_jacobi($n, $n1)));
 var_dump(gmp_strval(gmp_jacobi($n, 3)));
 var_dump(gmp_strval(gmp_jacobi(3, $n1)));
 
-try {
-    var_dump(gmp_jacobi(3, array()));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(gmp_jacobi(array(), 3));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(gmp_jacobi(array(), array()));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gmp_jacobi(3, array()));
+var_dump(gmp_jacobi(array(), 3));
+var_dump(gmp_jacobi(array(), array()));
+
+var_dump(gmp_jacobi(array(), array(), 1));
+var_dump(gmp_jacobi(array()));
+var_dump(gmp_jacobi());
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 string(1) "0"
 string(2) "-1"
 string(1) "0"
@@ -56,7 +48,22 @@ string(1) "0"
 string(2) "-1"
 string(1) "0"
 string(2) "-1"
-gmp_jacobi(): Argument #2 ($num2) must be of type GMP|string|int, array given
-gmp_jacobi(): Argument #1 ($num1) must be of type GMP|string|int, array given
-gmp_jacobi(): Argument #1 ($num1) must be of type GMP|string|int, array given
+
+Warning: gmp_jacobi(): Unable to convert variable to GMP - wrong type in %s on line %d
+bool(false)
+
+Warning: gmp_jacobi(): Unable to convert variable to GMP - wrong type in %s on line %d
+bool(false)
+
+Warning: gmp_jacobi(): Unable to convert variable to GMP - wrong type in %s on line %d
+bool(false)
+
+Warning: gmp_jacobi() expects exactly 2 parameters, 3 given in %s on line %d
+NULL
+
+Warning: gmp_jacobi() expects exactly 2 parameters, 1 given in %s on line %d
+NULL
+
+Warning: gmp_jacobi() expects exactly 2 parameters, 0 given in %s on line %d
+NULL
 Done

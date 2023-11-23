@@ -1,5 +1,11 @@
 --TEST--
 header() and friends
+--SKIPIF--
+<?php
+if (php_sapi_name() != "cli") {
+	die("skip this test is for CLI");
+}
+?>
 --FILE--
 <?php
 

@@ -1,9 +1,17 @@
 --TEST--
 Test mb_strtoupper() function : basic functionality
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_strtoupper') or die("skip mb_strtoupper() is not available in this build");
+?>
 --FILE--
 <?php
+/* Prototype  : string mb_strtoupper(string $sourcestring [, string $encoding]
+ * Description: Returns a uppercased version of $sourcestring
+ * Source code: ext/mbstring/mbstring.c
+ */
+
 /*
  * Test basic functionality of mb_strtoupper
  */
@@ -21,9 +29,9 @@ $ascii = mb_strtoupper($ascii_lower);
 var_dump(base64_encode($ascii));
 
 if($ascii == $ascii_upper) {
-    echo "Correctly converted\n";
+	echo "Correctly converted\n";
 } else {
-    echo "Incorrectly converted\n";
+	echo "Incorrectly converted\n";
 }
 
 echo "\n-- Multibyte String --\n";
@@ -31,9 +39,9 @@ $mb = mb_strtoupper($greek_lower, 'UTF-8');
 var_dump(base64_encode($mb));
 
 if ($mb == $greek_upper) {
-    echo "Correctly converted\n";
+	echo "Correctly converted\n";
 } else {
-    echo "Incorrectly converted\n";
+	echo "Incorreclty converted\n";
 }
 
 echo "Done";

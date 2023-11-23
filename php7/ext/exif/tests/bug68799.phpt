@@ -1,14 +1,13 @@
 --TEST--
 Bug #68799 (Free called on uninitialized pointer)
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
 --FILE--
 <?php
 /*
 * Pollute the heap. Helps trigger bug. Sometimes not needed.
 */
 class A {
-    public $a;
     function __construct() {
         $a = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa';
         $this->a = $a . $a . $a . $a . $a . $a;

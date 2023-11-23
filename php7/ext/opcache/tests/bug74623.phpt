@@ -1,7 +1,7 @@
 --TEST--
 Bug #74623: Infinite loop in type inference when using HTMLPurifier
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

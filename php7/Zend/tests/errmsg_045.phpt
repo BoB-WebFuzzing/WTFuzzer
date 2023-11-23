@@ -4,17 +4,17 @@ Error message in error handler during compilation
 <?php
 
 set_error_handler(function($_, $msg, $file) {
-    var_dump($msg, $file);
-    echo $undefined;
+	var_dump($msg, $file);
+	echo $undefined;
 });
 
 /* This is just a particular example of a non-fatal compile-time error
  * If this breaks in future, just find another example and use it instead */
-eval('class A { private function __invoke() { } }');
+eval('class A { function test() { } } class B extends A { function test($a) { } }');
 
 ?>
 --EXPECTF--
-string(%d) "The magic method A::__invoke() must have public visibility"
+string(62) "Declaration of B::test($a) should be compatible with A::test()"
 string(%d) "%s(%d) : eval()'d code"
 
-Warning: Undefined variable $undefined in %s on line %d
+Notice: Undefined variable: undefined in %s on line %d

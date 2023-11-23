@@ -18,4 +18,5 @@ class bar extends foo
 serialize(new bar());
 ?>
 --EXPECTF--
-Warning: serialize(): bar::__sleep() should return an array only containing the names of instance-variables to serialize in %s on line %d
+Notice: serialize(): "private" returned as member variable from __sleep() but does not exist in %s on line %d
+

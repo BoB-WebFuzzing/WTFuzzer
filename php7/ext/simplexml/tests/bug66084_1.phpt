@@ -1,7 +1,8 @@
 --TEST--
 Bug #66084 simplexml_load_string() mangles empty node name, json variant
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip simplexml not available"; ?>
+<?php if (!extension_loaded("json")) print "skip json not available"; ?>
 --FILE--
 <?php
 echo json_encode(simplexml_load_string('<a><b/><c><x/></c></a>')->c), "\n";

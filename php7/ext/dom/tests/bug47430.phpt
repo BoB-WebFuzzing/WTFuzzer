@@ -1,7 +1,7 @@
 --TEST--
 Bug #47430 (Errors after writing to nodeValue parameter of an absent previousSibling).
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $xml = '<?xml
@@ -11,11 +11,7 @@ $dom->loadXML($xml);
 
 $elements = $dom->getElementsByTagName('i');
 foreach ($elements as $i) {
-    try {
-        $i->previousSibling->nodeValue = '';
-    } catch (Error $e) {
-        echo $e->getMessage(), "\n";
-    }
+  $i->previousSibling->nodeValue = '';
 }
 
 $arr = array();
@@ -24,9 +20,10 @@ $arr[0] = 'Value';
 print_r($arr);
 
 ?>
---EXPECT--
-Attempt to assign property "nodeValue" on null
-Attempt to assign property "nodeValue" on null
+--EXPECTF--
+Warning: Creating default object from empty value in %s on line %d
+
+Warning: Creating default object from empty value in %s on line %d
 Array
 (
     [0] => Value

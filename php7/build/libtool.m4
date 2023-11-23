@@ -271,7 +271,7 @@ $rm -r conftest*
 
 dnl autoconf 2.13 compatibility
 dnl _LT_AC_TRY_LINK()
-AC_DEFUN([_LT_AC_TRY_LINK], [
+AC_DEFUN(_LT_AC_TRY_LINK, [
 cat > conftest.$ac_ext <<EOF
 dnl This sometimes fails to find confdefs.h, for some reason.
 dnl [#]line __oline__ "[$]0"
@@ -675,9 +675,10 @@ s390*-*linux*|sparc*-*linux*)
   SAVE_CFLAGS="$CFLAGS"
   CFLAGS="$CFLAGS -belf"
   AC_CACHE_CHECK([whether the C compiler needs -belf], lt_cv_cc_needs_belf,
-    [AC_LANG_PUSH([C])
-     AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[lt_cv_cc_needs_belf=yes],[lt_cv_cc_needs_belf=no])
-    AC_LANG_POP([C])])
+    [AC_LANG_SAVE
+     AC_LANG_C
+     AC_TRY_LINK([],[],[lt_cv_cc_needs_belf=yes],[lt_cv_cc_needs_belf=no])
+     AC_LANG_RESTORE])
   if test x"$lt_cv_cc_needs_belf" != x"yes"; then
     # this is probably gcc 2.8.0, egcs 1.0 or newer; no need for -belf
     CFLAGS="$SAVE_CFLAGS"
@@ -944,7 +945,6 @@ else
 #endif
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #ifdef RTLD_GLOBAL
 #  define LT_DLGLOBAL		RTLD_GLOBAL
@@ -1026,7 +1026,7 @@ else
   lt_cv_dlopen_libs=
 
   case $host_os in
-  beos* | haiku*)
+  beos*)
     lt_cv_dlopen="load_add_on"
     lt_cv_dlopen_libs=
     lt_cv_dlopen_self=yes
@@ -1196,7 +1196,7 @@ if test "$_LT_AC_TAGVAR(lt_cv_prog_compiler_c_o, $1)" = no && test "$need_locks"
   ln conftest.a conftest.b 2>/dev/null && hard_links=no
   AC_MSG_RESULT([$hard_links])
   if test "$hard_links" = no; then
-    AC_MSG_WARN(['$CC' does not support '-c -o', so 'make -j' may be unsafe])
+    AC_MSG_WARN([\`$CC' does not support \`-c -o', so \`make -j' may be unsafe])
     need_locks=warn
   fi
 else
@@ -1435,17 +1435,6 @@ beos*)
   library_names_spec='${libname}${shared_ext}'
   dynamic_linker="$host_os ld.so"
   shlibpath_var=LIBRARY_PATH
-  ;;
-
-haiku*)
-  # Since haiku provides gcc, use GNU style here
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LIBRARY_PATH
-  hardcode_into_libs=yes
   ;;
 
 bsdi[[45]]*)
@@ -1934,15 +1923,15 @@ AC_ARG_WITH([tags],
 
 if test -f "$ltmain" && test -n "$tagnames"; then
   if test ! -f "${ofile}"; then
-    AC_MSG_WARN([output file '$ofile' does not exist])
+    AC_MSG_WARN([output file \`$ofile' does not exist])
   fi
 
   if test -z "$LTCC"; then
     eval "`$SHELL ${ofile} --config | grep '^LTCC='`"
     if test -z "$LTCC"; then
-      AC_MSG_WARN([output file '$ofile' does not look like a libtool script])
+      AC_MSG_WARN([output file \`$ofile' does not look like a libtool script])
     else
-      AC_MSG_WARN([using 'LTCC=$LTCC', extracted from '$ofile'])
+      AC_MSG_WARN([using \`LTCC=$LTCC', extracted from \`$ofile'])
     fi
   fi
   if test -z "$LTCFLAGS"; then
@@ -1965,7 +1954,7 @@ if test -f "$ltmain" && test -n "$tagnames"; then
 
     if grep "^# ### BEGIN LIBTOOL TAG CONFIG: $tagname$" < "${ofile}" > /dev/null
     then
-      AC_MSG_ERROR([tag name "$tagname" already exists])
+      AC_MSG_ERROR([tag name \"$tagname\" already exists])
     fi
 
     # Update the list of available tags.
@@ -2400,7 +2389,7 @@ aix[[4-9]]*)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-beos* | haiku*)
+beos*)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
@@ -2626,7 +2615,7 @@ AC_DEFUN([AC_CHECK_LIBM],
 [AC_REQUIRE([AC_CANONICAL_HOST])dnl
 LIBM=
 case $host in
-*-*-beos* | *-*-cygwin* | *-*-pw32* | *-*-darwin* | *-*-haiku*)
+*-*-beos* | *-*-cygwin* | *-*-pw32* | *-*-darwin*)
   # These system don't have libm, or don't need it
   ;;
 *-ncr-sysv4.3*)
@@ -2737,7 +2726,8 @@ fi
 AC_DEFUN([AC_LIBTOOL_LANG_C_CONFIG], [_LT_AC_LANG_C_CONFIG])
 AC_DEFUN([_LT_AC_LANG_C_CONFIG],
 [lt_save_CC="$CC"
-AC_LANG_PUSH([C])
+AC_LANG_SAVE
+AC_LANG_C
 
 # Source file extension for C test sources.
 ac_ext=c
@@ -2805,7 +2795,7 @@ AC_MSG_RESULT([$enable_static])
 
 AC_LIBTOOL_CONFIG($1)
 
-AC_LANG_POP([C])
+AC_LANG_RESTORE
 CC="$lt_save_CC"
 ])# AC_LIBTOOL_LANG_C_CONFIG
 
@@ -2817,7 +2807,8 @@ CC="$lt_save_CC"
 # AC_LIBTOOL_CONFIG to write the compiler configuration to `libtool'.
 AC_DEFUN([AC_LIBTOOL_LANG_CXX_CONFIG], [_LT_AC_LANG_CXX_CONFIG(CXX)])
 AC_DEFUN([_LT_AC_LANG_CXX_CONFIG],
-[AC_LANG_PUSH([C++])
+[AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
 AC_REQUIRE([AC_PROG_CXX])
 AC_REQUIRE([_LT_AC_PROG_CXXCPP])
 
@@ -3803,7 +3794,7 @@ AC_LIBTOOL_PROG_LD_HARDCODE_LIBPATH($1)
 
 AC_LIBTOOL_CONFIG($1)
 
-AC_LANG_POP([C++])
+AC_LANG_RESTORE
 CC=$lt_save_CC
 LDCXX=$LD
 LD=$lt_save_LD
@@ -4764,7 +4755,7 @@ AC_MSG_CHECKING([for $compiler option to produce PIC])
       # like `-m68040'.
       _LT_AC_TAGVAR(lt_prog_compiler_pic, $1)='-m68020 -resident32 -malways-restore-a4'
       ;;
-    beos* | haiku* | irix5* | irix6* | nonstopux* | osf3* | osf4* | osf5*)
+    beos* | irix5* | irix6* | nonstopux* | osf3* | osf4* | osf5*)
       # PIC is the default for these OSes.
       ;;
     mingw* | cygwin* | os2* | pw32*)
@@ -5053,7 +5044,7 @@ AC_MSG_CHECKING([for $compiler option to produce PIC])
       _LT_AC_TAGVAR(lt_prog_compiler_pic, $1)='-m68020 -resident32 -malways-restore-a4'
       ;;
 
-    beos* | haiku* | irix5* | irix6* | nonstopux* | osf3* | osf4* | osf5*)
+    beos* | irix5* | irix6* | nonstopux* | osf3* | osf4* | osf5*)
       # PIC is the default for these OSes.
       ;;
 

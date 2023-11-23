@@ -2,6 +2,11 @@
 Test vsprintf() function : basic functionality - integer format
 --FILE--
 <?php
+/* Prototype  : string vsprintf(string $format , array $args)
+ * Description: Return a formatted string
+ * Source code: ext/standard/formatted_print.c
+*/
+
 /*
  *  Testing vsprintf() : basic functionality - using integer format
 */

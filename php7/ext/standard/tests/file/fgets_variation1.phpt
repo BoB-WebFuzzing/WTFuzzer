@@ -2,6 +2,10 @@
 Test fgets() function : usage variations - write only modes (Bug #42036)
 --FILE--
 <?php
+/*
+ Prototype: string fgets ( resource $handle [, int $length] );
+ Description: Gets a line from file pointer
+*/
 /* try fgets on files which are opened in non readable modes
     w, wb, wt,
     a, ab, at,
@@ -51,7 +55,7 @@ bool(true)
 int(0)
 bool(false)
 
-Notice: fgets(): Read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fgets(): read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
@@ -60,7 +64,7 @@ bool(true)
 int(0)
 bool(false)
 
-Notice: fgets(): Read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fgets(): read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
@@ -69,7 +73,7 @@ bool(true)
 int(0)
 bool(false)
 
-Notice: fgets(): Read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fgets(): read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
@@ -78,7 +82,7 @@ bool(true)
 int(0)
 bool(false)
 
-Notice: fgets(): Read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fgets(): read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
@@ -87,7 +91,7 @@ bool(true)
 int(0)
 bool(false)
 
-Notice: fgets(): Read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fgets(): read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
@@ -96,7 +100,7 @@ bool(true)
 int(0)
 bool(false)
 
-Notice: fgets(): Read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fgets(): read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
@@ -105,7 +109,7 @@ bool(true)
 int(0)
 bool(false)
 
-Notice: fgets(): Read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fgets(): read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
@@ -114,7 +118,7 @@ bool(true)
 int(0)
 bool(false)
 
-Notice: fgets(): Read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fgets(): read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
@@ -123,7 +127,7 @@ bool(true)
 int(0)
 bool(false)
 
-Notice: fgets(): Read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fgets(): read of 8192 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)

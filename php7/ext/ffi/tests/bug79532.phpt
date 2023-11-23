@@ -1,8 +1,10 @@
 --TEST--
 Bug #79532 (sizeof off_t can be wrong)
---EXTENSIONS--
-ffi
-zend_test
+--SKIPIF--
+<?php
+if (!extension_loaded('ffi')) die('skip ffi extension not available');
+if (!extension_loaded('zend-test')) die('skip zend-test extension not available');
+?>
 --FILE--
 <?php
 require_once('utils.inc');
@@ -21,7 +23,7 @@ if (PHP_OS_FAMILY !== 'Windows') {
     }
 }
 
-$array = FFI::cdef()->new("off_t[3]");
+$array = FFI::new("off_t[3]");
 $ffi->bug79532($array, 3);
 var_dump($array);
 ?>

@@ -5,19 +5,21 @@ precision=14
 --FILE--
 <?php
 /*
+  Prototype: mixed str_replace(mixed $search, mixed $replace,
+                               mixed $subject [, int &$count]);
   Description: Replace all occurrences of the search string with
                the replacement string
 */
 
 
-echo "\n*** Testing Miscellaneous input data ***\n";
+echo "\n*** Testing Miscelleneous input data ***\n";
 /*  If replace has fewer values than search, then an empty
     string is used for the rest of replacement values */
 var_dump( str_replace(array("a", "a", "b"),
-              array("q", "q"),
-              "aaabb", $count
-             )
-    );
+		      array("q", "q"),
+		      "aaabb", $count
+		     )
+	);
 var_dump($count);
 var_dump( str_replace(array("a", "a", "b"),
                       array("q", "q"),
@@ -80,11 +82,8 @@ var_dump(str_replace( array("a", "a", "b"),
 );
 var_dump($count);
 
-try {
-    str_replace("a", array("q", "q", "c"), array("aaa"), $count);
-} catch (TypeError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(str_replace("a", array("q", "q", "c"), array("aaa"), $count));
+var_dump($count);
 
 var_dump(str_replace("a", 1, array("aaa", "bbb"), $count));
 var_dump($count);
@@ -96,16 +95,10 @@ var_dump($count);
 echo "\n-- Testing Resources --\n";
 $resource1 = fopen( __FILE__, "r" );
 $resource2 = opendir( "." );
-try {
-    var_dump(str_replace("stream", "FOUND", $resource1, $count));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(str_replace("stream", "FOUND", $resource2, $count));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(str_replace("stream", "FOUND", $resource1, $count));
+var_dump($count);
+var_dump(str_replace("stream", "FOUND", $resource2, $count));
+var_dump($count);
 
 
 echo "\n-- Testing a longer and heredoc string --\n";
@@ -148,10 +141,9 @@ fclose($resource1);
 closedir($resource2);
 
 ?>
+===DONE===
 --EXPECTF--
-Deprecated: Using ${var} in strings is deprecated, use {$var} instead in %s on line %d
-
-*** Testing Miscellaneous input data ***
+*** Testing Miscelleneous input data ***
 string(3) "qqq"
 int(5)
 array(3) {
@@ -180,7 +172,13 @@ array(2) {
   string(3) "ccc"
 }
 int(6)
-str_replace(): Argument #2 ($replace) must be of type string when argument #1 ($search) is a string
+
+Notice: Array to string conversion in %s on line %d
+array(1) {
+  [0]=>
+  string(15) "ArrayArrayArray"
+}
+int(3)
 array(2) {
   [0]=>
   string(3) "111"
@@ -197,8 +195,10 @@ array(2) {
 int(1)
 
 -- Testing Resources --
-str_replace(): Argument #3 ($subject) must be of type array|string, resource given
-str_replace(): Argument #3 ($subject) must be of type array|string, resource given
+string(%d) "Resource id #%d"
+int(0)
+string(%d) "Resource id #%d"
+int(0)
 
 -- Testing a longer and heredoc string --
 string(623) "FOUNDghijklmnopqrstuvwxyz0123456789FOUNDghijklmnopqrstuvwxyz0123456789
@@ -220,7 +220,8 @@ int(0)
 string(5) "FOUND"
 string(5) "FOUND"
 
-Warning: Undefined variable $strS in %s on line %d
+Notice: Undefined variable: strS in %s on line %d
 string(0) ""
 string(5) "FOUND"
 string(5) "FOUND"
+===DONE===

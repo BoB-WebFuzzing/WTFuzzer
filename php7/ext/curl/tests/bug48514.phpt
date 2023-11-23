@@ -1,23 +1,27 @@
 --TEST--
 Bug #48514 (cURL extension uses same resource name for simple and multi APIs)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+
+if (!extension_loaded('curl')) {
+	exit("skip curl extension not loaded");
+}
+
+?>
 --FILE--
 <?php
 
 $ch1 = curl_init();
 var_dump($ch1);
-var_dump($ch1::class);
+var_dump(get_resource_type($ch1));
 
 $ch2 = curl_multi_init();
 var_dump($ch2);
-var_dump($ch2::class);
+var_dump(get_resource_type($ch2));
 
 ?>
---EXPECT--
-object(CurlHandle)#1 (0) {
-}
-string(10) "CurlHandle"
-object(CurlMultiHandle)#2 (0) {
-}
-string(15) "CurlMultiHandle"
+--EXPECTF--
+resource(%d) of type (curl)
+string(4) "curl"
+resource(%d) of type (curl_multi)
+string(10) "curl_multi"

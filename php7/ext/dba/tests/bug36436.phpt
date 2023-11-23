@@ -1,20 +1,22 @@
 --TEST--
 Bug #36436 (DBA problem with Berkeley DB4)
---EXTENSIONS--
-dba
 --SKIPIF--
 <?php
-require_once __DIR__ . '/setup/setup_dba_tests.inc';
-check_skip('db4');
+	$handler = 'db4';
+	require_once(__DIR__ .'/skipif.inc');
 ?>
 --FILE--
 <?php
-require_once __DIR__ . '/setup/setup_dba_tests.inc';
-$db_name = 'bug36436.db';
 
-$db = set_up_db_ex('db4', $db_name, LockFlag::DbLock, persistent: true);
+$handler = 'db4';
+require_once(__DIR__ .'/test.inc');
 
-var_dump($db, dba_fetch('key1', $db));
+$db = dba_popen($db_filename, 'c', 'db4');
+
+dba_insert('X', 'XYZ', $db);
+dba_insert('Y', '123', $db);
+
+var_dump($db, dba_fetch('X', $db));
 
 var_dump(dba_firstkey($db));
 var_dump(dba_nextkey($db));
@@ -22,14 +24,14 @@ var_dump(dba_nextkey($db));
 dba_close($db);
 
 ?>
+===DONE===
 --CLEAN--
 <?php
-require_once __DIR__ . '/setup/setup_dba_tests.inc';
-$db_name = 'bug36436.db';
-cleanup_standard_db($db_name);
+	require(__DIR__ .'/clean.inc');
 ?>
 --EXPECTF--
 resource(%d) of type (dba persistent)
-string(16) "Content String 1"
-string(13) "[key10]name10"
-string(13) "[key30]name30"
+string(3) "XYZ"
+string(1) "X"
+string(1) "Y"
+===DONE===

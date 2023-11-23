@@ -1,51 +1,43 @@
 --TEST--
 close() called twice
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 
 echo "Procedural\n";
 $zip = zip_open(__DIR__ . '/test.zip');
 if (!is_resource($zip)) {
-    die("Failure");
-}
+	die("Failure");
+	}
 var_dump(zip_close($zip));
-try {
-    var_dump(zip_close($zip));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(zip_close($zip));
 
 echo "Object\n";
 $zip = new ZipArchive();
 if (!$zip->open(__DIR__ . '/test.zip')) {
-    die('Failure');
+	die('Failure');
 }
 if ($zip->status == ZIPARCHIVE::ER_OK) {
-    var_dump($zip->close());
-    try {
-        $zip->close();
-    } catch (ValueError $err) {
-        echo $err->getMessage(), PHP_EOL;
-    }
+	var_dump($zip->close());
+	var_dump($zip->close());
 } else {
-    die("Failure");
+	die("Failure");
 }
 
 ?>
 Done
 --EXPECTF--
 Procedural
-
-Deprecated: Function zip_open() is deprecated in %s on line %d
-
-Deprecated: Function zip_close() is deprecated in %s on line %d
 NULL
 
-Deprecated: Function zip_close() is deprecated in %s on line %d
-zip_close(): supplied resource is not a valid Zip Directory resource
+Warning: zip_close(): supplied resource is not a valid Zip Directory resource in %s
+bool(false)
 Object
 bool(true)
-Invalid or uninitialized Zip object
+
+Warning: ZipArchive::close(): Invalid or uninitialized Zip object in %s
+bool(false)
 Done

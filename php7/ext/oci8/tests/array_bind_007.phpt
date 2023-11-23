@@ -1,11 +1,7 @@
 --TEST--
 oci_bind_array_by_name() and invalid values 7
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --FILE--
 <?php
 

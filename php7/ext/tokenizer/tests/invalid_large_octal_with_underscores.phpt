@@ -1,7 +1,5 @@
 --TEST--
 Large invalid octal number with underscores
---EXTENSIONS--
-tokenizer
 --FILE--
 <?php
 

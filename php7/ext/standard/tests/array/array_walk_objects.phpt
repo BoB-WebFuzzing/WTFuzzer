@@ -4,13 +4,13 @@ array_walk() and objects
 <?php
 
 function walk($key, $value) {
-    var_dump($value, $key);
+	var_dump($value, $key);
 }
 
 class test {
-    private $var_pri = "test_private";
-    protected $var_pro = "test_protected";
-    public $var_pub = "test_public";
+	private $var_pri = "test_private";
+	protected $var_pro = "test_protected";
+	public $var_pub = "test_public";
 }
 
 $stdclass = new stdclass;
@@ -24,11 +24,7 @@ array_walk($t, "walk");
 $var = array();
 array_walk($var, "walk");
 $var = "";
-try {
-    array_walk($var, "walk");
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+array_walk($var, "walk");
 
 echo "Done\n";
 ?>
@@ -43,5 +39,6 @@ string(10) "%r\0%r*%r\0%rvar_pro"
 string(14) "test_protected"
 string(7) "var_pub"
 string(11) "test_public"
-array_walk(): Argument #1 ($array) must be of type array, string given
+
+Warning: array_walk() expects parameter 1 to be array, string given in %s on line %d
 Done

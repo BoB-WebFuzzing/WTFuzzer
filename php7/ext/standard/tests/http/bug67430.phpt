@@ -3,7 +3,7 @@ Bug #67430 (http:// wrapper doesn't follow 308 redirects)
 --INI--
 allow_url_fopen=1
 --SKIPIF--
-<?php require 'server.inc'; http_server_skipif(); ?>
+<?php require 'server.inc'; http_server_skipif('tcp://127.0.0.1:12342'); ?>
 --FILE--
 <?php
 require 'server.inc';
@@ -22,9 +22,9 @@ function do_test($follow) {
     "data://text/plain,HTTP/1.1 308\r\nLocation: /foo\r\n\r\n",
     "data://text/plain,HTTP/1.1 200\r\nConnection: close\r\n\r\n",
   ];
-  ['pid' => $pid, 'uri' => $uri] = http_server($responses, $output);
+  $pid = http_server('tcp://127.0.0.1:12342', $responses, $output);
 
-  $fd = fopen($uri, 'rb', false, $ctx);
+  $fd = fopen('http://127.0.0.1:12342/', 'rb', false, $ctx);
   fseek($output, 0, SEEK_SET);
   echo stream_get_contents($output);
 
@@ -36,17 +36,17 @@ do_test(false);
 
 ?>
 Done
---EXPECTF--
-POST / HTTP/1.1
-Host: %s:%d
+--EXPECT--
+POST / HTTP/1.0
+Host: 127.0.0.1:12342
 Connection: close
 
-POST /foo HTTP/1.1
-Host: %s:%d
+GET /foo HTTP/1.0
+Host: 127.0.0.1:12342
 Connection: close
 
-POST / HTTP/1.1
-Host: %s:%d
+POST / HTTP/1.0
+Host: 127.0.0.1:12342
 Connection: close
 
 Done

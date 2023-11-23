@@ -12,5 +12,5 @@ echo implode(':', array('foo', array('bar', 'baz'), 'burp'))."\n";
 foobarbaz
 foo:bar:baz
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %s on line %d
 foo:Array:burp

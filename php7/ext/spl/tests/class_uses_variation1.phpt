@@ -2,15 +2,21 @@
 SPL: Test class_uses() function : variation
 --FILE--
 <?php
+/* Prototype  : array class_uses(mixed what [, bool autoload ])
+ * Description: Return all traits used by a class
+ * Source code: ext/spl/php_spl.c
+ * Alias to functions:
+ */
+
 echo "*** Testing class_uses() : variation ***\n";
 
 
 // Define error handler
-function test_error_handler($err_no, $err_msg, $filename, $linenum) {
-    if (error_reporting() & $err_no) {
-        // report non-silenced errors
-        echo "Error: $err_no - $err_msg, $filename($linenum)\n";
-    }
+function test_error_handler($err_no, $err_msg, $filename, $linenum, $vars) {
+	if (error_reporting() != 0) {
+		// report non-silenced errors
+		echo "Error: $err_no - $err_msg, $filename($linenum)\n";
+	}
 }
 set_error_handler('test_error_handler');
 
@@ -27,9 +33,9 @@ unset ($unset_var);
 // define some classes
 class classWithToString
 {
-    public function __toString() {
-        return "Class A object";
-    }
+	public function __toString() {
+		return "Class A object";
+	}
 }
 
 class classWithoutToString
@@ -99,75 +105,91 @@ $inputs = array(
 
 foreach($inputs as $key =>$value) {
       echo "\n--$key--\n";
-      try {
-        var_dump( class_uses($value, $autoload) );
-      } catch (\TypeError $e) {
-          echo $e->getMessage() . \PHP_EOL;
-      }
+      var_dump( class_uses($value, $autoload) );
 };
 
 fclose($res);
 
 ?>
+===DONE===
 --EXPECTF--
 *** Testing class_uses() : variation ***
 
 --int 0--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, int given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --int 1--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, int given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --int 12345--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, int given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --int -12345--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, int given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --float 10.5--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --float -10.5--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --float 12.3456789000e10--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --float -12.3456789000e10--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --float .5--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --empty array--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, array given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --int indexed array--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, array given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --associative array--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, array given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --nested arrays--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, array given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --uppercase NULL--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, null given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --lowercase null--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, null given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --lowercase true--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, true given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --lowercase false--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, false given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --uppercase TRUE--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, true given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --uppercase FALSE--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, false given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --empty string DQ--
 Error: 2 - class_uses(): Class  does not exist and could not be loaded, %s(%d)
@@ -186,10 +208,14 @@ array(0) {
 }
 
 --undefined var--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, null given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --unset var--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, null given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
 
 --resource--
-class_uses(): Argument #1 ($object_or_class) must be of type object|string, resource given
+Error: 2 - class_uses(): object or string expected, %s(%d)
+bool(false)
+===DONE===

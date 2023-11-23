@@ -1,12 +1,12 @@
 --TEST--
 mysqli_report(), change user, MySQL 5.6+
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'connect.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 
-if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
+if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
     die(sprintf("SKIP Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
         $host, $user, $db, $port, $socket));
 
@@ -16,7 +16,12 @@ if (mysqli_get_server_version($link) < 50600)
 ?>
 --FILE--
 <?php
-    require_once 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    require('table.inc');
 
     /*
     Internal macro MYSQL_REPORT_ERROR
@@ -37,7 +42,7 @@ if (mysqli_get_server_version($link) < 50600)
 ?>
 --CLEAN--
 <?php
-require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
 Warning: mysqli_change_user(): (%d/%d): Access denied for user '%s'@'%s' (using password: %s) in %s on line %d

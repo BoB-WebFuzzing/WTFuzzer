@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -31,7 +33,7 @@
 #include "zend_stack.h"
 #include "php_output.h"
 
-PHPAPI ZEND_DECLARE_MODULE_GLOBALS(output)
+PHPAPI ZEND_DECLARE_MODULE_GLOBALS(output);
 
 const char php_output_default_handler_name[sizeof("default output handler")] = "default output handler";
 const char php_output_devnull_handler_name[sizeof("null output handler")] = "null output handler";
@@ -105,18 +107,14 @@ static void php_output_header(void)
 	if (!SG(headers_sent)) {
 		if (!OG(output_start_filename)) {
 			if (zend_is_compiling()) {
-				OG(output_start_filename) = zend_get_compiled_filename();
+				OG(output_start_filename) = ZSTR_VAL(zend_get_compiled_filename());
 				OG(output_start_lineno) = zend_get_compiled_lineno();
 			} else if (zend_is_executing()) {
-				OG(output_start_filename) = zend_get_executed_filename_ex();
+				OG(output_start_filename) = zend_get_executed_filename();
 				OG(output_start_lineno) = zend_get_executed_lineno();
 			}
-			if (OG(output_start_filename)) {
-				zend_string_addref(OG(output_start_filename));
-			}
 #if PHP_OUTPUT_DEBUG
-			fprintf(stderr, "!!! output started at: %s (%d)\n",
-				ZSTR_VAL(OG(output_start_filename)), OG(output_start_lineno));
+			fprintf(stderr, "!!! output started at: %s (%d)\n", OG(output_start_filename), OG(output_start_lineno));
 #endif
 		}
 		if (!php_header()) {
@@ -156,7 +154,7 @@ PHPAPI void php_output_shutdown(void)
 /* }}} */
 
 /* {{{ SUCCESS|FAILURE php_output_activate(void)
- * Reset output globals and set up the output handler stack */
+ * Reset output globals and setup the output handler stack */
 PHPAPI int php_output_activate(void)
 {
 #ifdef ZTS
@@ -194,11 +192,26 @@ PHPAPI void php_output_deactivate(void)
 		}
 		zend_stack_destroy(&OG(handlers));
 	}
+}
+/* }}} */
 
-	if (OG(output_start_filename)) {
-		zend_string_release(OG(output_start_filename));
-		OG(output_start_filename) = NULL;
-	}
+/* {{{ void php_output_register_constants() */
+PHPAPI void php_output_register_constants(void)
+{
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_START", PHP_OUTPUT_HANDLER_START, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_WRITE", PHP_OUTPUT_HANDLER_WRITE, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_FLUSH", PHP_OUTPUT_HANDLER_FLUSH, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_CLEAN", PHP_OUTPUT_HANDLER_CLEAN, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_FINAL", PHP_OUTPUT_HANDLER_FINAL, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_CONT", PHP_OUTPUT_HANDLER_WRITE, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_END", PHP_OUTPUT_HANDLER_FINAL, CONST_CS | CONST_PERSISTENT);
+
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_CLEANABLE", PHP_OUTPUT_HANDLER_CLEANABLE, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_FLUSHABLE", PHP_OUTPUT_HANDLER_FLUSHABLE, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_REMOVABLE", PHP_OUTPUT_HANDLER_REMOVABLE, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_STDFLAGS", PHP_OUTPUT_HANDLER_STDFLAGS, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_STARTED", PHP_OUTPUT_HANDLER_STARTED, CONST_CS | CONST_PERSISTENT);
+	REGISTER_MAIN_LONG_CONSTANT("PHP_OUTPUT_HANDLER_DISABLED", PHP_OUTPUT_HANDLER_DISABLED, CONST_CS | CONST_PERSISTENT);
 }
 /* }}} */
 
@@ -348,7 +361,7 @@ PHPAPI void php_output_discard_all(void)
 /* }}} */
 
 /* {{{ int php_output_get_level(void)
- * Get output buffering level, i.e. how many output handlers the stack contains */
+ * Get output buffering level, ie. how many output handlers the stack contains */
 PHPAPI int php_output_get_level(void)
 {
 	return OG(active) ? zend_stack_count(&OG(handlers)) : 0;
@@ -474,7 +487,6 @@ PHPAPI php_output_handler *php_output_handler_create_user(zval *output_handler, 
 				handler = alias(Z_STRVAL_P(output_handler), Z_STRLEN_P(output_handler), chunk_size, flags);
 				break;
 			}
-			ZEND_FALLTHROUGH;
 		default:
 			user = ecalloc(1, sizeof(php_output_handler_user_func_t));
 			if (SUCCESS == zend_fcall_info_init(output_handler, 0, &user->fci, &user->fcc, &handler_name, &error)) {
@@ -540,7 +552,7 @@ PHPAPI int php_output_handler_start(php_output_handler *handler)
 		}
 	}
 	if (NULL != (rconflicts = zend_hash_find_ptr(&php_output_handler_reverse_conflicts, handler->name))) {
-		ZEND_HASH_PACKED_FOREACH_PTR(rconflicts, conflict) {
+		ZEND_HASH_FOREACH_PTR(rconflicts, conflict) {
 			if (SUCCESS != conflict(ZSTR_VAL(handler->name), ZSTR_LEN(handler->name))) {
 				return FAILURE;
 			}
@@ -564,7 +576,7 @@ PHPAPI int php_output_handler_started(const char *name, size_t name_len)
 		handlers = (php_output_handler **) zend_stack_base(&OG(handlers));
 
 		for (i = 0; i < count; ++i) {
-			if (zend_string_equals_cstr(handlers[i]->name, name, name_len)) {
+			if (name_len == ZSTR_LEN(handlers[i]->name) && !memcmp(ZSTR_VAL(handlers[i]->name), name, name_len)) {
 				return 1;
 			}
 		}
@@ -580,9 +592,9 @@ PHPAPI int php_output_handler_conflict(const char *handler_new, size_t handler_n
 {
 	if (php_output_handler_started(handler_set, handler_set_len)) {
 		if (handler_new_len != handler_set_len || memcmp(handler_new, handler_set, handler_set_len)) {
-			php_error_docref("ref.outcontrol", E_WARNING, "Output handler '%s' conflicts with '%s'", handler_new, handler_set);
+			php_error_docref("ref.outcontrol", E_WARNING, "output handler '%s' conflicts with '%s'", handler_new, handler_set);
 		} else {
-			php_error_docref("ref.outcontrol", E_WARNING, "Output handler '%s' cannot be used twice", handler_new);
+			php_error_docref("ref.outcontrol", E_WARNING, "output handler '%s' cannot be used twice", handler_new);
 		}
 		return 1;
 	}
@@ -597,7 +609,7 @@ PHPAPI int php_output_handler_conflict_register(const char *name, size_t name_le
 	zend_string *str;
 
 	if (!EG(current_module)) {
-		zend_error_noreturn(E_ERROR, "Cannot register an output handler conflict outside of MINIT");
+		zend_error(E_ERROR, "Cannot register an output handler conflict outside of MINIT");
 		return FAILURE;
 	}
 	str = zend_string_init_interned(name, name_len, 1);
@@ -614,7 +626,7 @@ PHPAPI int php_output_handler_reverse_conflict_register(const char *name, size_t
 	HashTable rev, *rev_ptr = NULL;
 
 	if (!EG(current_module)) {
-		zend_error_noreturn(E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT");
+		zend_error(E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT");
 		return FAILURE;
 	}
 
@@ -651,7 +663,7 @@ PHPAPI int php_output_handler_alias_register(const char *name, size_t name_len, 
 	zend_string *str;
 
 	if (!EG(current_module)) {
-		zend_error_noreturn(E_ERROR, "Cannot register an output handler alias outside of MINIT");
+		zend_error(E_ERROR, "Cannot register an output handler alias outside of MINIT");
 		return FAILURE;
 	}
 	str = zend_string_init_interned(name, name_len, 1);
@@ -675,7 +687,7 @@ PHPAPI int php_output_handler_hook(php_output_handler_hook_t type, void *arg)
 				return SUCCESS;
 			case PHP_OUTPUT_HANDLER_HOOK_GET_LEVEL:
 				*(int *) arg = OG(running)->level;
-				return SUCCESS;
+                return SUCCESS;
 			case PHP_OUTPUT_HANDLER_HOOK_IMMUTABLE:
 				OG(running)->flags &= ~(PHP_OUTPUT_HANDLER_REMOVABLE|PHP_OUTPUT_HANDLER_CLEANABLE);
 				return SUCCESS;
@@ -739,7 +751,7 @@ PHPAPI void php_output_set_implicit_flush(int flush)
  * Get the file name where output has started */
 PHPAPI const char *php_output_get_start_filename(void)
 {
-	return OG(output_start_filename) ? ZSTR_VAL(OG(output_start_filename)) : NULL;
+	return OG(output_start_filename);
 }
 /* }}} */
 
@@ -788,7 +800,7 @@ static inline void php_output_context_reset(php_output_context *context)
 
 /* {{{ static void php_output_context_feed(php_output_context *context, char *, size_t, size_t)
  * Feed output contexts input buffer */
-static inline void php_output_context_feed(php_output_context *context, char *data, size_t size, size_t used, bool free)
+static inline void php_output_context_feed(php_output_context *context, char *data, size_t size, size_t used, zend_bool free)
 {
 	if (context->in.free && context->in.data) {
 		efree(context->in.data);
@@ -865,7 +877,7 @@ static inline php_output_handler *php_output_handler_init(zend_string *name, siz
 }
 /* }}} */
 
-/* {{{ static int php_output_handler_append(php_output_handler *handler, const php_output_buffer *buf)
+/* {{{ static int php_output_handler_appen(php_output_handler *handler, const php_output_buffer *buf)
  * Appends input to the output handlers buffer and indicates whether the buffer does not have to be processed by the output handler */
 static inline int php_output_handler_append(php_output_handler *handler, const php_output_buffer *buf)
 {
@@ -939,25 +951,19 @@ static inline php_output_handler_status_t php_output_handler_op(php_output_handl
 
 		OG(running) = handler;
 		if (handler->flags & PHP_OUTPUT_HANDLER_USER) {
-			zval ob_args[2];
-			zval retval;
+			zval retval, ob_data, ob_mode;
 
-			/* ob_data */
-			ZVAL_STRINGL(&ob_args[0], handler->buffer.data, handler->buffer.used);
-			/* ob_mode */
-			ZVAL_LONG(&ob_args[1], (zend_long) context->op);
-
-			/* Set FCI info */
-			handler->func.user->fci.param_count = 2;
-			handler->func.user->fci.params = ob_args;
-			handler->func.user->fci.retval = &retval;
+			ZVAL_STRINGL(&ob_data, handler->buffer.data, handler->buffer.used);
+			ZVAL_LONG(&ob_mode, (zend_long) context->op);
+			zend_fcall_info_argn(&handler->func.user->fci, 2, &ob_data, &ob_mode);
+			zval_ptr_dtor(&ob_data);
 
 #define PHP_OUTPUT_USER_SUCCESS(retval) ((Z_TYPE(retval) != IS_UNDEF) && !(Z_TYPE(retval) == IS_FALSE))
-			if (SUCCESS == zend_call_function(&handler->func.user->fci, &handler->func.user->fcc) && PHP_OUTPUT_USER_SUCCESS(retval)) {
+			if (SUCCESS == zend_fcall_info_call(&handler->func.user->fci, &handler->func.user->fcc, &retval, NULL) && PHP_OUTPUT_USER_SUCCESS(retval)) {
 				/* user handler may have returned TRUE */
 				status = PHP_OUTPUT_HANDLER_NO_DATA;
 				if (Z_TYPE(retval) != IS_FALSE && Z_TYPE(retval) != IS_TRUE) {
-					convert_to_string(&retval);
+					convert_to_string_ex(&retval);
 					if (Z_STRLEN(retval)) {
 						context->out.data = estrndup(Z_STRVAL(retval), Z_STRLEN(retval));
 						context->out.used = Z_STRLEN(retval);
@@ -970,9 +976,7 @@ static inline php_output_handler_status_t php_output_handler_op(php_output_handl
 				status = PHP_OUTPUT_HANDLER_FAILURE;
 			}
 
-			/* Free arguments and return value */
-			zval_ptr_dtor(&ob_args[0]);
-			zval_ptr_dtor(&ob_args[1]);
+			zend_fcall_info_argn(&handler->func.user->fci, 0);
 			zval_ptr_dtor(&retval);
 
 		} else {
@@ -1012,7 +1016,7 @@ static inline php_output_handler_status_t php_output_handler_op(php_output_handl
 		case PHP_OUTPUT_HANDLER_NO_DATA:
 			/* handler ate all */
 			php_output_context_reset(context);
-			ZEND_FALLTHROUGH;
+			/* no break */
 		case PHP_OUTPUT_HANDLER_SUCCESS:
 			/* no more buffered data */
 			handler->buffer.used = 0;
@@ -1195,12 +1199,12 @@ static int php_output_stack_pop(int flags)
 
 	if (!orphan) {
 		if (!(flags & PHP_OUTPUT_POP_SILENT)) {
-			php_error_docref("ref.outcontrol", E_NOTICE, "Failed to %s buffer. No buffer to %s", (flags&PHP_OUTPUT_POP_DISCARD)?"discard":"send", (flags&PHP_OUTPUT_POP_DISCARD)?"discard":"send");
+			php_error_docref("ref.outcontrol", E_NOTICE, "failed to %s buffer. No buffer to %s", (flags&PHP_OUTPUT_POP_DISCARD)?"discard":"send", (flags&PHP_OUTPUT_POP_DISCARD)?"discard":"send");
 		}
 		return 0;
 	} else if (!(flags & PHP_OUTPUT_POP_FORCE) && !(orphan->flags & PHP_OUTPUT_HANDLER_REMOVABLE)) {
 		if (!(flags & PHP_OUTPUT_POP_SILENT)) {
-			php_error_docref("ref.outcontrol", E_NOTICE, "Failed to %s buffer of %s (%d)", (flags&PHP_OUTPUT_POP_DISCARD)?"discard":"send", ZSTR_VAL(orphan->name), orphan->level);
+			php_error_docref("ref.outcontrol", E_NOTICE, "failed to %s buffer of %s (%d)", (flags&PHP_OUTPUT_POP_DISCARD)?"discard":"send", ZSTR_VAL(orphan->name), orphan->level);
 		}
 		return 0;
 	} else {
@@ -1288,7 +1292,8 @@ static int php_output_handler_devnull_func(void **handler_context, php_output_co
  * USERLAND (nearly 1:1 of old output.c)
  */
 
-/* {{{ Turn on Output Buffering (specifying an optional output handler). */
+/* {{{ proto bool ob_start([string|array user_function [, int chunk_size [, int flags]]])
+   Turn on Output Buffering (specifying an optional output handler). */
 PHP_FUNCTION(ob_start)
 {
 	zval *output_handler = NULL;
@@ -1296,7 +1301,7 @@ PHP_FUNCTION(ob_start)
 	zend_long flags = PHP_OUTPUT_HANDLER_STDFLAGS;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|zll", &output_handler, &chunk_size, &flags) == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (chunk_size < 0) {
@@ -1304,62 +1309,65 @@ PHP_FUNCTION(ob_start)
 	}
 
 	if (php_output_start_user(output_handler, chunk_size, flags) == FAILURE) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to create buffer");
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to create buffer");
 		RETURN_FALSE;
 	}
 	RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ Flush (send) contents of the output buffer. The last buffer content is sent to next buffer */
+/* {{{ proto bool ob_flush(void)
+   Flush (send) contents of the output buffer. The last buffer content is sent to next buffer */
 PHP_FUNCTION(ob_flush)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (!OG(active)) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to flush buffer. No buffer to flush");
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to flush buffer. No buffer to flush");
 		RETURN_FALSE;
 	}
 
 	if (SUCCESS != php_output_flush()) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to flush buffer of %s (%d)", ZSTR_VAL(OG(active)->name), OG(active)->level);
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to flush buffer of %s (%d)", ZSTR_VAL(OG(active)->name), OG(active)->level);
 		RETURN_FALSE;
 	}
 	RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ Clean (delete) the current output buffer */
+/* {{{ proto bool ob_clean(void)
+   Clean (delete) the current output buffer */
 PHP_FUNCTION(ob_clean)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (!OG(active)) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to delete buffer. No buffer to delete");
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete buffer. No buffer to delete");
 		RETURN_FALSE;
 	}
 
 	if (SUCCESS != php_output_clean()) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to delete buffer of %s (%d)", ZSTR_VAL(OG(active)->name), OG(active)->level);
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete buffer of %s (%d)", ZSTR_VAL(OG(active)->name), OG(active)->level);
 		RETURN_FALSE;
 	}
 	RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ Flush (send) the output buffer, and delete current output buffer */
+/* {{{ proto bool ob_end_flush(void)
+   Flush (send) the output buffer, and delete current output buffer */
 PHP_FUNCTION(ob_end_flush)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (!OG(active)) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to delete and flush buffer. No buffer to delete or flush");
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete and flush buffer. No buffer to delete or flush");
 		RETURN_FALSE;
 	}
 
@@ -1367,15 +1375,16 @@ PHP_FUNCTION(ob_end_flush)
 }
 /* }}} */
 
-/* {{{ Clean the output buffer, and delete current output buffer */
+/* {{{ proto bool ob_end_clean(void)
+   Clean the output buffer, and delete current output buffer */
 PHP_FUNCTION(ob_end_clean)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (!OG(active)) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to delete buffer. No buffer to delete");
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete buffer. No buffer to delete");
 		RETURN_FALSE;
 	}
 
@@ -1383,29 +1392,31 @@ PHP_FUNCTION(ob_end_clean)
 }
 /* }}} */
 
-/* {{{ Get current buffer contents, flush (send) the output buffer, and delete current output buffer */
+/* {{{ proto bool ob_get_flush(void)
+   Get current buffer contents, flush (send) the output buffer, and delete current output buffer */
 PHP_FUNCTION(ob_get_flush)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (php_output_get_contents(return_value) == FAILURE) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to delete and flush buffer. No buffer to delete or flush");
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete and flush buffer. No buffer to delete or flush");
 		RETURN_FALSE;
 	}
 
 	if (SUCCESS != php_output_end()) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to delete buffer of %s (%d)", ZSTR_VAL(OG(active)->name), OG(active)->level);
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete buffer of %s (%d)", ZSTR_VAL(OG(active)->name), OG(active)->level);
 	}
 }
 /* }}} */
 
-/* {{{ Get current buffer contents and delete current output buffer */
+/* {{{ proto bool ob_get_clean(void)
+   Get current buffer contents and delete current output buffer */
 PHP_FUNCTION(ob_get_clean)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if(!OG(active)) {
@@ -1413,21 +1424,22 @@ PHP_FUNCTION(ob_get_clean)
 	}
 
 	if (php_output_get_contents(return_value) == FAILURE) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to delete buffer. No buffer to delete");
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete buffer. No buffer to delete");
 		RETURN_FALSE;
 	}
 
 	if (SUCCESS != php_output_discard()) {
-		php_error_docref("ref.outcontrol", E_NOTICE, "Failed to delete buffer of %s (%d)", ZSTR_VAL(OG(active)->name), OG(active)->level);
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete buffer of %s (%d)", ZSTR_VAL(OG(active)->name), OG(active)->level);
 	}
 }
 /* }}} */
 
-/* {{{ Return the contents of the output buffer */
+/* {{{ proto string ob_get_contents(void)
+   Return the contents of the output buffer */
 PHP_FUNCTION(ob_get_contents)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (php_output_get_contents(return_value) == FAILURE) {
@@ -1436,22 +1448,24 @@ PHP_FUNCTION(ob_get_contents)
 }
 /* }}} */
 
-/* {{{ Return the nesting level of the output buffer */
+/* {{{ proto int ob_get_level(void)
+   Return the nesting level of the output buffer */
 PHP_FUNCTION(ob_get_level)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	RETURN_LONG(php_output_get_level());
 }
 /* }}} */
 
-/* {{{ Return the length of the output buffer */
+/* {{{ proto int ob_get_length(void)
+   Return the length of the output buffer */
 PHP_FUNCTION(ob_get_length)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (php_output_get_length(return_value) == FAILURE) {
@@ -1460,11 +1474,12 @@ PHP_FUNCTION(ob_get_length)
 }
 /* }}} */
 
-/* {{{ List all output_buffers in an array */
+/* {{{ proto false|array ob_list_handlers()
+   List all output_buffers in an array */
 PHP_FUNCTION(ob_list_handlers)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	array_init(return_value);
@@ -1477,13 +1492,14 @@ PHP_FUNCTION(ob_list_handlers)
 }
 /* }}} */
 
-/* {{{ Return the status of the active or all output buffers */
+/* {{{ proto false|array ob_get_status([bool full_status])
+   Return the status of the active or all output buffers */
 PHP_FUNCTION(ob_get_status)
 {
-	bool full_status = 0;
+	zend_bool full_status = 0;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|b", &full_status) == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (!OG(active)) {
@@ -1500,24 +1516,26 @@ PHP_FUNCTION(ob_get_status)
 }
 /* }}} */
 
-/* {{{ Turn implicit flush on/off and is equivalent to calling flush() after every output call */
+/* {{{ proto void ob_implicit_flush([int flag])
+   Turn implicit flush on/off and is equivalent to calling flush() after every output call */
 PHP_FUNCTION(ob_implicit_flush)
 {
 	zend_long flag = 1;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|b", &flag) == FAILURE) {
-		RETURN_THROWS();
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|l", &flag) == FAILURE) {
+		return;
 	}
 
-	php_output_set_implicit_flush((int) flag);
+	php_output_set_implicit_flush(flag);
 }
 /* }}} */
 
-/* {{{ Reset(clear) URL rewriter values */
+/* {{{ proto bool output_reset_rewrite_vars(void)
+   Reset(clear) URL rewriter values */
 PHP_FUNCTION(output_reset_rewrite_vars)
 {
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (php_url_scanner_reset_vars() == SUCCESS) {
@@ -1528,14 +1546,15 @@ PHP_FUNCTION(output_reset_rewrite_vars)
 }
 /* }}} */
 
-/* {{{ Add URL rewriter values */
+/* {{{ proto bool output_add_rewrite_var(string name, string value)
+   Add URL rewriter values */
 PHP_FUNCTION(output_add_rewrite_var)
 {
 	char *name, *value;
 	size_t name_len, value_len;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss", &name, &name_len, &value, &value_len) == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (php_url_scanner_add_var(name, name_len, value, value_len, 1) == SUCCESS) {

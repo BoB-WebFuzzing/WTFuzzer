@@ -3,12 +3,8 @@ strncasecmp() tests
 --FILE--
 <?php
 
-try {
-    var_dump(strncasecmp("", "", -1));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-
+var_dump(strncasecmp(""));
+var_dump(strncasecmp("", "", -1));
 var_dump(strncasecmp("aef", "dfsgbdf", 0));
 var_dump(strncasecmp("aef", "dfsgbdf", 10));
 var_dump(strncasecmp("qwe", "qwer", 3));
@@ -17,13 +13,19 @@ var_dump(strncasecmp("qwErtY", "qwer", 7));
 var_dump(strncasecmp("q123", "Q123", 3));
 var_dump(strncasecmp("01", "01", 1000));
 
+echo "Done\n";
 ?>
---EXPECT--
-strncasecmp(): Argument #3 ($length) must be greater than or equal to 0
+--EXPECTF--
+Warning: strncasecmp() expects exactly 3 parameters, 1 given in %s on line %d
+NULL
+
+Warning: Length must be greater than or equal to 0 in %s on line %d
+bool(false)
 int(0)
 int(-3)
 int(0)
 int(0)
-int(1)
+int(2)
 int(0)
 int(0)
+Done

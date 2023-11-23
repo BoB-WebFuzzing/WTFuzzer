@@ -6,8 +6,10 @@ DOM_NOT_FOUND is raised if refnode is not a child
 This test checks the error message is raised when the refnode is a descendant but not a child
 --CREDITS--
 Antonio Diaz Ruiz <dejalatele@gmail.com>
---EXTENSIONS--
-dom
+--INI--
+assert.bail=true
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --FILE--
 <?php
 $dom = new DOMDocument();
@@ -30,7 +32,7 @@ $dom->saveXML();
 try {
     $parent_node->insertBefore($new_node, $ref_node);
 } catch(DOMException $e) {
-    echo $e->getMessage();
+	echo $e->getMessage();
 }
 
 ?>

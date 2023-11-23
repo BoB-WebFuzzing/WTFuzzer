@@ -4,6 +4,13 @@ Test gettype() & settype() functions : basic functionalities
 precision=14
 --FILE--
 <?php
+/* Prototype: string gettype ( mixed $var );
+   Description: Returns the type of the PHP variable var
+
+   Prototype: bool settype ( mixed &$var, string $type );
+   Description: Set the type of variable var to type
+*/
+
 /* Test the basic functionalities of settype() & gettype() functions.
    Use the gettype() to get the type of regular data and use settype()
    to change its type to other types */
@@ -86,19 +93,14 @@ foreach ($types as $type) {
   $loop_count = 1;
   foreach ($values as $var) {
      echo "-- Iteration $loop_count --\n"; $loop_count ++;
+     // set to new type
+     var_dump( settype($var, $type) );
 
-     try {
-        // set to new type
-        var_dump( settype($var, $type) );
+     // dump the var
+     var_dump( $var );
 
-        // dump the var
-        var_dump( $var );
-
-        // check the new type
-        var_dump( gettype($var) );
-     } catch (ValueError $exception) {
-         echo $exception->getMessage() . "\n";
-     }
+     // check the new type
+     var_dump( gettype($var) );
   }
 }
 
@@ -237,7 +239,7 @@ bool(true)
 int(%d)
 string(7) "integer"
 -- Iteration 14 --
-2: Object of class point could not be converted to int
+8: Object of class point could not be converted to int
 bool(true)
 int(1)
 string(7) "integer"
@@ -296,7 +298,7 @@ bool(true)
 int(%d)
 string(7) "integer"
 -- Iteration 14 --
-2: Object of class point could not be converted to int
+8: Object of class point could not be converted to int
 bool(true)
 int(1)
 string(7) "integer"
@@ -348,14 +350,14 @@ float(0)
 string(6) "double"
 -- Iteration 12 --
 bool(true)
-float(%f)
+float(%d)
 string(6) "double"
 -- Iteration 13 --
 bool(true)
-float(%f)
+float(%d)
 string(6) "double"
 -- Iteration 14 --
-2: Object of class point could not be converted to float
+8: Object of class point could not be converted to float
 bool(true)
 float(1)
 string(6) "double"
@@ -407,14 +409,14 @@ float(0)
 string(6) "double"
 -- Iteration 12 --
 bool(true)
-float(%f)
+float(%d)
 string(6) "double"
 -- Iteration 13 --
 bool(true)
-float(%f)
+float(%d)
 string(6) "double"
 -- Iteration 14 --
-2: Object of class point could not be converted to float
+8: Object of class point could not be converted to float
 bool(true)
 float(1)
 string(6) "double"
@@ -537,33 +539,94 @@ string(7) "boolean"
 
 -- Setting type of data to resource --
 -- Iteration 1 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+array(3) {
+  [0]=>
+  int(1)
+  [1]=>
+  int(2)
+  [2]=>
+  int(3)
+}
+string(5) "array"
 -- Iteration 2 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+string(14) "another string"
+string(6) "string"
 -- Iteration 3 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+array(3) {
+  [0]=>
+  int(2)
+  [1]=>
+  int(3)
+  [2]=>
+  int(4)
+}
+string(5) "array"
 -- Iteration 4 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+int(1)
+string(7) "integer"
 -- Iteration 5 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+int(-20)
+string(7) "integer"
 -- Iteration 6 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+float(2.54)
+string(6) "double"
 -- Iteration 7 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+float(-2.54)
+string(6) "double"
 -- Iteration 8 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+NULL
+string(4) "NULL"
 -- Iteration 9 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+bool(false)
+string(7) "boolean"
 -- Iteration 10 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+string(11) "some string"
+string(6) "string"
 -- Iteration 11 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+string(6) "string"
+string(6) "string"
 -- Iteration 12 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+resource(%d) of type (stream)
+string(8) "resource"
 -- Iteration 13 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+resource(%d) of type (stream)
+string(8) "resource"
 -- Iteration 14 --
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
+object(point)#1 (2) {
+  ["x"]=>
+  int(10)
+  ["y"]=>
+  int(20)
+}
+string(6) "object"
 
 -- Setting type of data to array --
 -- Iteration 1 --
@@ -783,7 +846,7 @@ string(6) "object"
 
 -- Setting type of data to string --
 -- Iteration 1 --
-2: Array to string conversion
+8: Array to string conversion
 bool(true)
 string(5) "Array"
 string(6) "string"
@@ -792,7 +855,7 @@ bool(true)
 string(14) "another string"
 string(6) "string"
 -- Iteration 3 --
-2: Array to string conversion
+8: Array to string conversion
 bool(true)
 string(5) "Array"
 string(6) "string"

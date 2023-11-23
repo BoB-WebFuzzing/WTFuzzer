@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: Attributes
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -45,6 +45,7 @@ var_dump($a);
 $dummy = $sxe->elem1[$a];
 var_dump($a);
 ?>
+===Done===
 --EXPECTF--
 ===Property===
 object(SimpleXMLElement)#%d (3) {
@@ -93,3 +94,4 @@ NULL
 ===Misc.===
 int(4)
 int(4)
+===Done===

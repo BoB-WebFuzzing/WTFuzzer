@@ -7,7 +7,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt.                                 |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -21,7 +21,9 @@
 #include "phar_internal.h"
 #include "dirstream.h"
 
-void phar_dostat(phar_archive_data *phar, phar_entry_info *data, php_stream_statbuf *ssb, bool is_dir);
+BEGIN_EXTERN_C()
+void phar_dostat(phar_archive_data *phar, phar_entry_info *data, php_stream_statbuf *ssb, zend_bool is_dir);
+END_EXTERN_C()
 
 const php_stream_ops phar_dir_ops = {
 	phar_dir_write, /* write */
@@ -89,28 +91,25 @@ static int phar_dir_seek(php_stream *stream, zend_off_t offset, int whence, zend
  */
 static ssize_t phar_dir_read(php_stream *stream, char *buf, size_t count) /* {{{ */
 {
+	size_t to_read;
 	HashTable *data = (HashTable *)stream->abstract;
 	zend_string *str_key;
 	zend_ulong unused;
-
-	if (count != sizeof(php_stream_dirent)) {
-		return -1;
-	}
 
 	if (HASH_KEY_NON_EXISTENT == zend_hash_get_current_key(data, &str_key, &unused)) {
 		return 0;
 	}
 
 	zend_hash_move_forward(data);
+	to_read = MIN(ZSTR_LEN(str_key), count);
 
-	php_stream_dirent *dirent = (php_stream_dirent *) buf;
-
-	if (sizeof(dirent->d_name) <= ZSTR_LEN(str_key)) {
+	if (to_read == 0 || count < ZSTR_LEN(str_key)) {
 		return 0;
 	}
 
-	memset(dirent, 0, sizeof(php_stream_dirent));
-	PHP_STRLCPY(dirent->d_name, ZSTR_VAL(str_key), sizeof(dirent->d_name), ZSTR_LEN(str_key));
+	memset(buf, 0, sizeof(php_stream_dirent));
+	memcpy(((php_stream_dirent *) buf)->d_name, ZSTR_VAL(str_key), to_read);
+	((php_stream_dirent *) buf)->d_name[to_read + 1] = '\0';
 
 	return sizeof(php_stream_dirent);
 }
@@ -153,11 +152,23 @@ static int phar_add_empty(HashTable *ht, char *arKey, uint32_t nKeyLength)  /* {
 /**
  * Used for sorting directories alphabetically
  */
-static int phar_compare_dir_name(Bucket *f, Bucket *s)  /* {{{ */
+static int phar_compare_dir_name(const void *a, const void *b)  /* {{{ */
 {
-	int result = zend_binary_strcmp(
-		ZSTR_VAL(f->key), ZSTR_LEN(f->key), ZSTR_VAL(s->key), ZSTR_LEN(s->key));
-	return ZEND_NORMALIZE_BOOL(result);
+	Bucket *f;
+	Bucket *s;
+	int result;
+
+	f = (Bucket *) a;
+	s = (Bucket *) b;
+	result = zend_binary_strcmp(ZSTR_VAL(f->key), ZSTR_LEN(f->key), ZSTR_VAL(s->key), ZSTR_LEN(s->key));
+
+	if (result < 0) {
+		return -1;
+	} else if (result > 0) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 /* }}} */
 
@@ -274,7 +285,10 @@ PHAR_ADD_ENTRY:
 
 	if (FAILURE != zend_hash_has_more_elements(data)) {
 		efree(dir);
-		zend_hash_sort(data, phar_compare_dir_name, 0);
+		if (zend_hash_sort(data, phar_compare_dir_name, 0) == FAILURE) {
+			FREE_HASHTABLE(data);
+			return NULL;
+		}
 		return php_stream_alloc(&phar_dir_ops, data, NULL, "r");
 	} else {
 		efree(dir);

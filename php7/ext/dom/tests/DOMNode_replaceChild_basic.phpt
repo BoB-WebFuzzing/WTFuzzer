@@ -1,7 +1,7 @@
 --TEST--
 Replacing a child node
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --CREDITS--
 Matt Raines <matt@raines.me.uk>
 #London TestFest 2008

@@ -30,6 +30,7 @@ $closure2 ();
 $closure2->__invoke ();
 
 ?>
+===DONE===
 --EXPECT--
 Invoked!
 Invoked!
@@ -39,3 +40,4 @@ Invoked!
 Invoked!
 Invoked!
 Invoked!
+===DONE===

@@ -18,38 +18,38 @@ var_dump(unserialize('a:1:{i:0;R:-1;}'));
 
 ?>
 --EXPECTF--
-Warning: unserialize(): Error at offset 0 of 9 bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of 9 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 0 of 9 bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of 9 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 0 of 7 bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of 7 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 0 of 7 bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of 7 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 0 of 20 bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of 20 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 0 of 20 bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of 20 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 0 of 24 bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of 24 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 0 of 24 bytes in %s on line %d
+Notice: unserialize(): Error at offset 0 of 24 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 9 of 15 bytes in %s on line %d
+Notice: unserialize(): Error at offset 9 of 15 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 9 of 15 bytes in %s on line %d
+Notice: unserialize(): Error at offset 9 of 15 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 9 of 15 bytes in %s on line %d
+Notice: unserialize(): Error at offset 9 of 15 bytes in %s on line %d
 bool(false)
 
-Warning: unserialize(): Error at offset 9 of 15 bytes in %s on line %d
+Notice: unserialize(): Error at offset 9 of 15 bytes in %s on line %d
 bool(false)

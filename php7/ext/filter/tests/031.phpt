@@ -1,7 +1,7 @@
 --TEST--
 filter_var() and FLOAT
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --INI--
 precision=14
 --FILE--
@@ -19,8 +19,8 @@ $floats = array(
 );
 
 foreach ($floats as $float) {
-    $out = filter_var($float, FILTER_VALIDATE_FLOAT);
-    var_dump($out);
+	$out = filter_var($float, FILTER_VALIDATE_FLOAT);
+	var_dump($out);
 }
 
 $floats = array(
@@ -33,15 +33,12 @@ $floats = array(
 
 echo "\ncustom decimal:\n";
 foreach ($floats as $float => $dec) {
-    try {
-        var_dump(filter_var($float, FILTER_VALIDATE_FLOAT, array("options"=>array('decimal' => $dec))));
-    } catch (ValueError $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+	$out = filter_var($float, FILTER_VALIDATE_FLOAT, array("options"=>array('decimal' => $dec)));
+	var_dump($out);
 }
 
 ?>
---EXPECT--
+--EXPECTF--
 float(1.234)
 float(1.234)
 float(1.234)
@@ -55,5 +52,7 @@ custom decimal:
 bool(false)
 float(1.234)
 float(1.234)
-filter_var(): "decimal" option must be one character long
+
+Warning: filter_var(): decimal separator must be one char in %s on line %d
+bool(false)
 bool(false)

@@ -11,19 +11,6 @@ PHP_ARG_ENABLE([huge-code-pages],
   [yes],
   [no])
 
-PHP_ARG_ENABLE([opcache-jit],
-  [whether to enable JIT],
-  [AS_HELP_STRING([--disable-opcache-jit],
-    [Disable JIT])],
-  [yes],
-  [no])
-
-PHP_ARG_WITH([capstone],,
-  [AS_HELP_STRING([--with-capstone],
-    [support opcache JIT disassembly through capstone])],
-  [no],
-  [no])
-
 if test "$PHP_OPCACHE" != "no"; then
 
   dnl Always build as shared extension
@@ -33,73 +20,7 @@ if test "$PHP_OPCACHE" != "no"; then
     AC_DEFINE(HAVE_HUGE_CODE_PAGES, 1, [Define to enable copying PHP CODE pages into HUGE PAGES (experimental)])
   fi
 
-  if test "$PHP_OPCACHE_JIT" = "yes"; then
-    case $host_cpu in
-      i[[34567]]86*|x86*|aarch64|amd64)
-        ;;
-      *)
-        AC_MSG_WARN([JIT not supported by host architecture])
-        PHP_OPCACHE_JIT=no
-        ;;
-    esac
-  fi
-
-  if test "$PHP_OPCACHE_JIT" = "yes" ; then
-    AC_DEFINE(HAVE_JIT, 1, [Define to enable JIT])
-    AC_DEFINE(ZEND_JIT_IR, 1, [Use JIT IR framework])
-    ZEND_JIT_SRC="jit/zend_jit.c jit/zend_jit_vm_helpers.c jit/ir/ir.c jit/ir/ir_strtab.c \
-		jit/ir/ir_cfg.c	jit/ir/ir_sccp.c jit/ir/ir_gcm.c jit/ir/ir_ra.c jit/ir/ir_save.c \
-		jit/ir/ir_dump.c jit/ir/ir_gdb.c jit/ir/ir_perf.c jit/ir/ir_check.c \
-		jit/ir/ir_patch.c jit/ir/ir_emit.c"
-
-    dnl Find out which ABI we are using.
-    case $host_alias in
-      x86_64-*-darwin*)
-        IR_TARGET=IR_TARGET_X64
-        DASM_FLAGS="-D X64APPLE=1 -D X64=1"
-        DASM_ARCH="x86"
-        ;;
-      *x86_64*|amd64-*-freebsd*)
-        IR_TARGET=IR_TARGET_X64
-        DASM_FLAGS="-D X64=1"
-        DASM_ARCH="x86"
-        ;;
-      i[[34567]]86*)
-        IR_TARGET=IR_TARGET_X86
-        DASM_ARCH="x86"
-        ;;
-      x86*)
-        IR_TARGET=IR_TARGET_X86
-        DASM_ARCH="x86"
-        ;;
-      aarch64*)
-        IR_TARGET=IR_TARGET_AARCH64
-        DASM_ARCH="aarch64"
-        ;;
-     esac
-
-    AS_IF([test x"$with_capstone" = "xyes"],[
-      PKG_CHECK_MODULES([CAPSTONE],[capstone >= 3.0.0],[
-        AC_DEFINE([HAVE_CAPSTONE], [1], [Capstone is available])
-        PHP_EVAL_LIBLINE($CAPSTONE_LIBS, OPCACHE_SHARED_LIBADD)
-        PHP_EVAL_INCLINE($CAPSTONE_CFLAGS)
-        ZEND_JIT_SRC+=" jit/ir/ir_disasm.c"
-      ],[
-        AC_MSG_ERROR([capstone >= 3.0 required but not found])
-      ])
-    ])
-
-    PHP_SUBST(IR_TARGET)
-    PHP_SUBST(DASM_FLAGS)
-    PHP_SUBST(DASM_ARCH)
-
-    JIT_CFLAGS="-I@ext_builddir@/jit/ir -D${IR_TARGET} -DIR_PHP"
-    if test "$ZEND_DEBUG" = "yes"; then
-      JIT_CFLAGS="${JIT_CFLAGS} -DIR_DEBUG"
-    fi
-  fi
-
-  AC_CHECK_FUNCS([mprotect memfd_create shm_create_largepage])
+  AC_CHECK_FUNCS([mprotect])
 
   AC_MSG_CHECKING(for sysvipc shared memory support)
   AC_RUN_IFELSE([AC_LANG_SOURCE([[
@@ -110,7 +31,7 @@ if test "$PHP_OPCACHE" != "no"; then
 #include <unistd.h>
 #include <string.h>
 
-int main(void) {
+int main() {
   pid_t pid;
   int status;
   int ipc_id;
@@ -166,11 +87,10 @@ int main(void) {
   }
   return 0;
 }
-]])],[have_shm_ipc=yes],[have_shm_ipc=no],[have_shm_ipc=no])
-  if test "$have_shm_ipc" = "yes"; then
+]])],[dnl
     AC_DEFINE(HAVE_SHM_IPC, 1, [Define if you have SysV IPC SHM support])
-  fi
-  AC_MSG_RESULT([$have_shm_ipc])
+    msg=yes],[msg=no],[msg=no])
+  AC_MSG_RESULT([$msg])
 
   AC_MSG_CHECKING(for mmap() using MAP_ANON shared memory support)
   AC_RUN_IFELSE([AC_LANG_SOURCE([[
@@ -189,7 +109,7 @@ int main(void) {
 # define MAP_FAILED ((void*)-1)
 #endif
 
-int main(void) {
+int main() {
   pid_t pid;
   int status;
   char *shm;
@@ -219,22 +139,12 @@ int main(void) {
   }
   return 0;
 }
-]])],[have_shm_mmap_anon=yes],[have_shm_mmap_anon=no],[
-  case $host_alias in
-    *linux*)
-      have_shm_mmap_anon=yes
-      ;;
-    *)
-      have_shm_mmap_anon=no
-      ;;
-  esac
-])
-  if test "$have_shm_mmap_anon" = "yes"; then
+]])],[dnl
     AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support])
-  fi
-  AC_MSG_RESULT([$have_shm_mmap_anon])
+    msg=yes],[msg=no],[msg=no])
+  AC_MSG_RESULT([$msg])
 
-  PHP_CHECK_FUNC_LIB(shm_open, rt, root)
+  PHP_CHECK_FUNC_LIB(shm_open, rt)
   AC_MSG_CHECKING(for mmap() using shm_open() shared memory support)
   AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <sys/types.h>
@@ -251,7 +161,7 @@ int main(void) {
 # define MAP_FAILED ((void*)-1)
 #endif
 
-int main(void) {
+int main() {
   pid_t pid;
   int status;
   int fd;
@@ -299,12 +209,15 @@ int main(void) {
   }
   return 0;
 }
-]])],[have_shm_mmap_posix=yes],[have_shm_mmap_posix=no],[have_shm_mmap_posix=no])
-  if test "$have_shm_mmap_posix" = "yes"; then
+]])],[dnl
     AC_DEFINE(HAVE_SHM_MMAP_POSIX, 1, [Define if you have POSIX mmap() SHM support])
+    AC_MSG_RESULT([yes])
     PHP_CHECK_LIBRARY(rt, shm_unlink, [PHP_ADD_LIBRARY(rt,1,OPCACHE_SHARED_LIBADD)])
-  fi
-  AC_MSG_RESULT([$have_shm_mmap_posix])
+  ],[
+    AC_MSG_RESULT([no])
+  ],[
+    AC_MSG_RESULT([no])
+  ])
 
   PHP_NEW_EXTENSION(opcache,
 	ZendAccelerator.c \
@@ -320,19 +233,31 @@ int main(void) {
 	shared_alloc_shm.c \
 	shared_alloc_mmap.c \
 	shared_alloc_posix.c \
-	$ZEND_JIT_SRC,
-	shared,,"-Wno-implicit-fallthrough -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 ${JIT_CFLAGS}",,yes)
+	Optimizer/zend_optimizer.c \
+	Optimizer/pass1_5.c \
+	Optimizer/pass2.c \
+	Optimizer/pass3.c \
+	Optimizer/optimize_func_calls.c \
+	Optimizer/block_pass.c \
+	Optimizer/optimize_temp_vars_5.c \
+	Optimizer/nop_removal.c \
+	Optimizer/compact_literals.c \
+	Optimizer/zend_cfg.c \
+	Optimizer/zend_dfg.c \
+	Optimizer/dfa_pass.c \
+	Optimizer/zend_ssa.c \
+	Optimizer/zend_inference.c \
+	Optimizer/zend_func_info.c \
+	Optimizer/zend_call_graph.c \
+	Optimizer/sccp.c \
+	Optimizer/scdf.c \
+	Optimizer/dce.c \
+	Optimizer/escape_analysis.c \
+	Optimizer/compact_vars.c \
+	Optimizer/zend_dump.c,
+	shared,,-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1,,yes)
 
+  PHP_ADD_BUILD_DIR([$ext_builddir/Optimizer], 1)
   PHP_ADD_EXTENSION_DEP(opcache, pcre)
-
-  if test "$have_shm_ipc" != "yes" && test "$have_shm_mmap_posix" != "yes" && test "$have_shm_mmap_anon" != "yes"; then
-    AC_MSG_ERROR([No supported shared memory caching support was found when configuring opcache. Check config.log for any errors or missing dependencies.])
-  fi
-
-  if test "$PHP_OPCACHE_JIT" = "yes"; then
-    PHP_ADD_BUILD_DIR([$ext_builddir/jit], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/jit/ir], 1)
-    PHP_ADD_MAKEFILE_FRAGMENT($ext_srcdir/jit/Makefile.frag)
-  fi
   PHP_SUBST(OPCACHE_SHARED_LIBADD)
 fi

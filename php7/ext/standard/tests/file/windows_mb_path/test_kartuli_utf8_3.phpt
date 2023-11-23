@@ -33,8 +33,10 @@ system("dir /b " . $fn);
 remove_data("file_kartuli");
 
 ?>
+===DONE===
 --EXPECTF--
 string(%d) "%s\ქართველები55"
 bool(true)
 bool(true)
 ქართველები55
+===DONE===

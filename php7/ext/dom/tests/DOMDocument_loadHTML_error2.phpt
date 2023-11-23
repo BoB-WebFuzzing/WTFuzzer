@@ -2,16 +2,14 @@
 DOMDocument::loadHTML() should fail if empty string provided as input
 --CREDITS--
 Knut Urdalen <knut@php.net>
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 $doc = new DOMDocument();
-try {
-    $doc->loadHTML('');
-} catch (ValueError $e) {
-    echo $e->getMessage() . "\n";
-}
+$doc->loadHTML('');
 ?>
---EXPECT--
-DOMDocument::loadHTML(): Argument #1 ($source) must not be empty
+--EXPECTF--
+Warning: DOMDocument::loadHTML(): Empty string supplied as input in %s on line %d

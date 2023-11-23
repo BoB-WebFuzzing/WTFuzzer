@@ -1,12 +1,14 @@
 /*
    +----------------------------------------------------------------------+
-   | This source file is subject to version 3.01 of the PHP license,      |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | PHP Version 7														  |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,	  |
+   | that is bundled with this package in the file LICENSE, and is		  |
+   | available through the world-wide-web at the following url:			  |
+   | http://www.php.net/license/3_01.txt								  |
    | If you did not receive a copy of the PHP license and are unable to   |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@php.net so we can mail you a copy immediately.               |
+   | obtain it through the world-wide-web, please send a note to		  |
+   | license@php.net so we can mail you a copy immediately.				  |
    +----------------------------------------------------------------------+
    | Author: Ed Batutis <ed@batutis.com>								  |
    +----------------------------------------------------------------------+
@@ -27,9 +29,30 @@
 #include <unicode/ustring.h>
 #include <unicode/ubrk.h>
 
+#include "ext/standard/php_string.h"
+
 /* }}} */
 
-/* {{{ Get number of graphemes in a string */
+#define GRAPHEME_EXTRACT_TYPE_COUNT		0
+#define GRAPHEME_EXTRACT_TYPE_MAXBYTES	1
+#define GRAPHEME_EXTRACT_TYPE_MAXCHARS	2
+#define GRAPHEME_EXTRACT_TYPE_MIN	GRAPHEME_EXTRACT_TYPE_COUNT
+#define GRAPHEME_EXTRACT_TYPE_MAX	GRAPHEME_EXTRACT_TYPE_MAXCHARS
+
+
+/* {{{ grapheme_register_constants
+ * Register API constants
+ */
+void grapheme_register_constants( INIT_FUNC_ARGS )
+{
+	REGISTER_LONG_CONSTANT("GRAPHEME_EXTR_COUNT", GRAPHEME_EXTRACT_TYPE_COUNT, CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("GRAPHEME_EXTR_MAXBYTES", GRAPHEME_EXTRACT_TYPE_MAXBYTES, CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("GRAPHEME_EXTR_MAXCHARS", GRAPHEME_EXTRACT_TYPE_MAXCHARS, CONST_CS | CONST_PERSISTENT);
+}
+/* }}} */
+
+/* {{{ proto size_t grapheme_strlen(string str)
+   Get number of graphemes in a string */
 PHP_FUNCTION(grapheme_strlen)
 {
 	char* string;
@@ -40,7 +63,9 @@ PHP_FUNCTION(grapheme_strlen)
 	UErrorCode status;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &string, &string_len) == FAILURE) {
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			 "grapheme_strlen: unable to parse input param", 0 );
+		RETURN_FALSE;
 	}
 
 	ret_len = grapheme_ascii_check((unsigned char *)string, string_len);
@@ -78,7 +103,8 @@ PHP_FUNCTION(grapheme_strlen)
 }
 /* }}} */
 
-/* {{{ Find position of first occurrence of a string within another */
+/* {{{ proto int grapheme_strpos(string haystack, string needle [, int offset ])
+   Find position of first occurrence of a string within another */
 PHP_FUNCTION(grapheme_strpos)
 {
 	char *haystack, *needle;
@@ -90,12 +116,14 @@ PHP_FUNCTION(grapheme_strpos)
 	zend_long ret_pos;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|l", &haystack, &haystack_len, &needle, &needle_len, &loffset) == FAILURE) {
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			 "grapheme_strpos: unable to parse input param", 0 );
+		RETURN_FALSE;
 	}
 
 	if ( OUTSIDE_STRING(loffset, haystack_len) ) {
-		zend_argument_value_error(3, "must be contained in argument #1 ($haystack)");
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_strpos: Offset not contained in string", 1 );
+		RETURN_FALSE;
 	}
 
 	/* we checked that it will fit: */
@@ -104,17 +132,26 @@ PHP_FUNCTION(grapheme_strpos)
 
 	/* the offset is 'grapheme count offset' so it still might be invalid - we'll check it later */
 
-	if (offset >= 0 && grapheme_ascii_check((unsigned char *)haystack, haystack_len) >= 0) {
+	if (needle_len == 0) {
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_strpos: Empty delimiter", 1 );
+		RETURN_FALSE;
+	}
+
+	if (offset >= 0) {
 		/* quick check to see if the string might be there
 		 * I realize that 'offset' is 'grapheme count offset' but will work in spite of that
 		*/
 		found = php_memnstr(haystack + noffset, needle, needle_len, haystack + haystack_len);
 
 		/* if it isn't there the we are done */
-		if (found) {
+		if (!found) {
+			RETURN_FALSE;
+		}
+
+		/* if it is there, and if the haystack is ascii, we are all done */
+		if ( grapheme_ascii_check((unsigned char *)haystack, haystack_len) >= 0 ) {
 			RETURN_LONG(found - haystack);
 		}
-		RETURN_FALSE;
 	}
 
 	/* do utf16 part of the strpos */
@@ -125,10 +162,12 @@ PHP_FUNCTION(grapheme_strpos)
 	} else {
 		RETURN_FALSE;
 	}
+
 }
 /* }}} */
 
-/* {{{ Find position of first occurrence of a string within another, ignoring case differences */
+/* {{{ proto int grapheme_stripos(string haystack, string needle [, int offset ])
+   Find position of first occurrence of a string within another, ignoring case differences */
 PHP_FUNCTION(grapheme_stripos)
 {
 	char *haystack, *needle;
@@ -140,12 +179,14 @@ PHP_FUNCTION(grapheme_stripos)
 	int is_ascii;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|l", &haystack, &haystack_len, &needle, &needle_len, &loffset) == FAILURE) {
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			 "grapheme_stripos: unable to parse input param", 0 );
+		RETURN_FALSE;
 	}
 
 	if ( OUTSIDE_STRING(loffset, haystack_len) ) {
-		zend_argument_value_error(3, "must be contained in argument #1 ($haystack)");
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_stripos: Offset not contained in string", 1 );
+		RETURN_FALSE;
 	}
 
 	/* we checked that it will fit: */
@@ -153,15 +194,20 @@ PHP_FUNCTION(grapheme_stripos)
 
 	/* the offset is 'grapheme count offset' so it still might be invalid - we'll check it later */
 
+	if (needle_len == 0) {
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_stripos: Empty delimiter", 1 );
+		RETURN_FALSE;
+	}
+
 	is_ascii = ( grapheme_ascii_check((unsigned char*)haystack, haystack_len) >= 0 );
 
 	if ( is_ascii ) {
 		char *haystack_dup, *needle_dup;
 		int32_t noffset = offset >= 0 ? offset : (int32_t)haystack_len + offset;
 		needle_dup = estrndup(needle, needle_len);
-		zend_str_tolower(needle_dup, needle_len);
+		php_strtolower(needle_dup, needle_len);
 		haystack_dup = estrndup(haystack, haystack_len);
-		zend_str_tolower(haystack_dup, haystack_len);
+		php_strtolower(haystack_dup, haystack_len);
 
 		found = php_memnstr(haystack_dup + noffset, needle_dup, needle_len, haystack_dup + haystack_len);
 
@@ -190,7 +236,8 @@ PHP_FUNCTION(grapheme_stripos)
 }
 /* }}} */
 
-/* {{{ Find position of last occurrence of a string within another */
+/* {{{ proto int grapheme_strrpos(string haystack, string needle [, int offset])
+   Find position of last occurrence of a string within another */
 PHP_FUNCTION(grapheme_strrpos)
 {
 	char *haystack, *needle;
@@ -201,18 +248,25 @@ PHP_FUNCTION(grapheme_strrpos)
 	int is_ascii;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|l", &haystack, &haystack_len, &needle, &needle_len, &loffset) == FAILURE) {
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			 "grapheme_strrpos: unable to parse input param", 0 );
+		RETURN_FALSE;
 	}
 
 	if ( OUTSIDE_STRING(loffset, haystack_len) ) {
-		zend_argument_value_error(3, "must be contained in argument #1 ($haystack)");
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_strpos: Offset not contained in string", 1 );
+		RETURN_FALSE;
 	}
 
 	/* we checked that it will fit: */
 	offset = (int32_t) loffset;
 
 	/* the offset is 'grapheme count offset' so it still might be invalid - we'll check it later */
+
+	if (needle_len == 0) {
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_strpos: Empty delimiter", 1 );
+		RETURN_FALSE;
+	}
 
 	is_ascii = grapheme_ascii_check((unsigned char *)haystack, haystack_len) >= 0;
 
@@ -245,7 +299,8 @@ PHP_FUNCTION(grapheme_strrpos)
 }
 /* }}} */
 
-/* {{{ Find position of last occurrence of a string within another, ignoring case */
+/* {{{ proto int grapheme_strripos(string haystack, string needle [, int offset])
+   Find position of last occurrence of a string within another, ignoring case */
 PHP_FUNCTION(grapheme_strripos)
 {
 	char *haystack, *needle;
@@ -256,12 +311,14 @@ PHP_FUNCTION(grapheme_strripos)
 	int is_ascii;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|l", &haystack, &haystack_len, &needle, &needle_len, &loffset) == FAILURE) {
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			 "grapheme_strrpos: unable to parse input param", 0 );
+		RETURN_FALSE;
 	}
 
 	if ( OUTSIDE_STRING(loffset, haystack_len) ) {
-		zend_argument_value_error(3, "must be contained in argument #1 ($haystack)");
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_strpos: Offset not contained in string", 1 );
+		RETURN_FALSE;
 	}
 
 	/* we checked that it will fit: */
@@ -269,15 +326,20 @@ PHP_FUNCTION(grapheme_strripos)
 
 	/* the offset is 'grapheme count offset' so it still might be invalid - we'll check it later */
 
+	if (needle_len == 0) {
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_strpos: Empty delimiter", 1 );
+		RETURN_FALSE;
+	}
+
 	is_ascii = grapheme_ascii_check((unsigned char *)haystack, haystack_len) >= 0;
 
 	if ( is_ascii ) {
 		char *needle_dup, *haystack_dup;
 
 		needle_dup = estrndup(needle, needle_len);
-		zend_str_tolower(needle_dup, needle_len);
+		php_strtolower(needle_dup, needle_len);
 		haystack_dup = estrndup(haystack, haystack_len);
-		zend_str_tolower(haystack_dup, haystack_len);
+		php_strtolower(haystack_dup, haystack_len);
 
 		ret_pos = grapheme_strrpos_ascii(haystack_dup, haystack_len, needle_dup, needle_len, offset);
 
@@ -309,7 +371,8 @@ PHP_FUNCTION(grapheme_strripos)
 }
 /* }}} */
 
-/* {{{ Returns part of a string */
+/* {{{ proto string grapheme_substr(string str, int start [, int length])
+   Returns part of a string */
 PHP_FUNCTION(grapheme_substr)
 {
 	char *str;
@@ -325,26 +388,30 @@ PHP_FUNCTION(grapheme_substr)
 	UBreakIterator* bi = NULL;
 	int sub_str_start_pos, sub_str_end_pos;
 	int32_t (*iter_func)(UBreakIterator *);
-	bool no_length = 1;
+	zend_bool no_length = 1;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "sl|l!", &str, &str_len, &lstart, &length, &no_length) == FAILURE) {
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			 "grapheme_substr: unable to parse input param", 0 );
+		RETURN_FALSE;
 	}
 
-	if (lstart < INT32_MIN || lstart > INT32_MAX) {
-		zend_argument_value_error(2, "is too large");
-		RETURN_THROWS();
+	if ( OUTSIDE_STRING(lstart, str_len)) {
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_substr: start not contained in string", 1 );
+		RETURN_FALSE;
 	}
 
+	/* we checked that it will fit: */
 	start = (int32_t) lstart;
 
-	if (no_length) {
+	if(no_length) {
 		length = str_len;
 	}
 
-	if (length < INT32_MIN || length > INT32_MAX) {
-		zend_argument_value_error(3, "is too large");
-		RETURN_THROWS();
+	if(length < INT32_MIN) {
+		length = INT32_MIN;
+	} else if(length > INT32_MAX) {
+		length = INT32_MAX;
 	}
 
 	/* the offset is 'grapheme count offset' so it still might be invalid - we'll check it later */
@@ -409,17 +476,15 @@ PHP_FUNCTION(grapheme_substr)
 		start += iter_val;
 	}
 
-	if (0 != start) {
-		if (start > 0) {
-			if (ustr) {
-				efree(ustr);
-			}
-			ubrk_close(bi);
-			RETURN_EMPTY_STRING();
-		}
+	if ( 0 != start || sub_str_start_pos >= ustr_len ) {
 
-		sub_str_start_pos = 0;
-		ubrk_first(bi);
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_substr: start not contained in string", 1 );
+
+		if (ustr) {
+			efree(ustr);
+		}
+		ubrk_close(bi);
+		RETURN_FALSE;
 	}
 
 	/* OK to convert here since if str_len were big, convert above would fail */
@@ -486,17 +551,21 @@ PHP_FUNCTION(grapheme_substr)
 	ubrk_close(bi);
 
 	if ( UBRK_DONE == sub_str_end_pos) {
-		if (length < 0) {
+		if(length < 0) {
+			intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_substr: length not contained in string", 1 );
+
 			efree(ustr);
-			RETURN_EMPTY_STRING();
+			RETURN_FALSE;
 		} else {
 			sub_str_end_pos = ustr_len;
 		}
 	}
 
-	if (sub_str_start_pos > sub_str_end_pos) {
+	if(sub_str_start_pos > sub_str_end_pos) {
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_substr: length is beyond start", 1 );
+
 		efree(ustr);
-		RETURN_EMPTY_STRING();
+		RETURN_FALSE;
 	}
 
 	status = U_ZERO_ERROR;
@@ -526,15 +595,29 @@ static void strstr_common_handler(INTERNAL_FUNCTION_PARAMETERS, int f_ignore_cas
 	const char *found;
 	size_t haystack_len, needle_len;
 	int32_t ret_pos, uchar_pos;
-	bool part = 0;
+	zend_bool part = 0;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|b", &haystack, &haystack_len, &needle, &needle_len, &part) == FAILURE) {
-		RETURN_THROWS();
+
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			 "grapheme_strstr: unable to parse input param", 0 );
+
+		RETURN_FALSE;
 	}
+
+	if (needle_len == 0) {
+
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_strpos: Empty delimiter", 1 );
+
+		RETURN_FALSE;
+	}
+
 
 	if ( !f_ignore_case ) {
 
-		/* ASCII optimization: quick check to see if the string might be there */
+		/* ASCII optimization: quick check to see if the string might be there
+		 * I realize that 'offset' is 'grapheme count offset' but will work in spite of that
+		*/
 		found = php_memnstr(haystack, needle, needle_len, haystack + haystack_len);
 
 		/* if it isn't there the we are done */
@@ -576,14 +659,16 @@ static void strstr_common_handler(INTERNAL_FUNCTION_PARAMETERS, int f_ignore_cas
 }
 /* }}} */
 
-/* {{{ Finds first occurrence of a string within another */
+/* {{{ proto string grapheme_strstr(string haystack, string needle[, bool part])
+   Finds first occurrence of a string within another */
 PHP_FUNCTION(grapheme_strstr)
 {
 	strstr_common_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU, 0 /* f_ignore_case */);
 }
 /* }}} */
 
-/* {{{ Finds first occurrence of a string within another */
+/* {{{ proto string grapheme_stristr(string haystack, string needle[, bool part])
+   Finds first occurrence of a string within another */
 PHP_FUNCTION(grapheme_stristr)
 {
 	strstr_common_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU, 1 /* f_ignore_case */);
@@ -679,14 +764,15 @@ grapheme_extract_count_iter(UBreakIterator *bi, int32_t size, unsigned char *pst
 /* {{{ grapheme extract iter function pointer array */
 typedef int32_t (*grapheme_extract_iter)(UBreakIterator * /*bi*/, int32_t /*size*/, unsigned char * /*pstr*/, int32_t /*str_len*/);
 
-static const grapheme_extract_iter grapheme_extract_iters[] = {
+static grapheme_extract_iter grapheme_extract_iters[] = {
 	&grapheme_extract_count_iter,
 	&grapheme_extract_bytecount_iter,
 	&grapheme_extract_charcount_iter,
 };
 /* }}} */
 
-/* {{{ Function to extract a sequence of default grapheme clusters */
+/* {{{ proto string grapheme_extract(string str, int size[, int extract_type[, int start[, int next]]])
+	Function to extract a sequence of default grapheme clusters */
 PHP_FUNCTION(grapheme_extract)
 {
 	char *str, *pstr;
@@ -703,7 +789,9 @@ PHP_FUNCTION(grapheme_extract)
 	zval *next = NULL; /* return offset of next part of the string */
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "sl|llz", &str, &str_len, &size, &extract_type, &lstart, &next) == FAILURE) {
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			 "grapheme_extract: unable to parse input param", 0 );
+		RETURN_FALSE;
 	}
 
 	if (lstart < 0) {
@@ -719,13 +807,14 @@ PHP_FUNCTION(grapheme_extract)
 			ZVAL_DEREF(next);
 			/* initialize next */
 			zval_ptr_dtor(next);
-			ZVAL_LONG(next, lstart);
+            ZVAL_LONG(next, lstart);
 		}
 	}
 
 	if ( extract_type < GRAPHEME_EXTRACT_TYPE_MIN || extract_type > GRAPHEME_EXTRACT_TYPE_MAX ) {
-		zend_argument_value_error(3, "must be one of GRAPHEME_EXTR_COUNT, GRAPHEME_EXTR_MAXBYTES, or GRAPHEME_EXTR_MAXCHARS");
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			 "grapheme_extract: unknown extract type param", 0 );
+		RETURN_FALSE;
 	}
 
 	if ( lstart > INT32_MAX || lstart < 0 || (size_t)lstart >= str_len ) {
@@ -733,16 +822,10 @@ PHP_FUNCTION(grapheme_extract)
 		RETURN_FALSE;
 	}
 
-	if (size < 0) {
-		zend_argument_value_error(2, "must be greater than or equal to 0");
-		RETURN_THROWS();
+	if ( size > INT32_MAX || size < 0) {
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "grapheme_extract: size is invalid", 0 );
+		RETURN_FALSE;
 	}
-
-	if (size > INT32_MAX) {
-		zend_argument_value_error(2, "is too large");
-		RETURN_THROWS();
-	}
-
 	if (size == 0) {
 		RETURN_EMPTY_STRING();
 	}
@@ -774,7 +857,7 @@ PHP_FUNCTION(grapheme_extract)
 	 */
 
 	if ( -1 != grapheme_ascii_check((unsigned char *)pstr, MIN(size + 1, str_len)) ) {
-		size_t nsize = MIN(size, str_len);
+        size_t nsize = MIN(size, str_len);
 		if ( NULL != next ) {
 			ZVAL_LONG(next, start+nsize);
 		}

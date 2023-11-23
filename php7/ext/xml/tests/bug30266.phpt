@@ -1,7 +1,9 @@
 --TEST--
 Bug #30266 (Invalid opcode 137/1/8)
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+require_once("skipif.inc");
+?>
 --FILE--
 <?php
 /*
@@ -31,7 +33,7 @@ class XML_Parser
     function startHandler($XmlParser, $tag, $attr)
     {
             $this->dummy = "b";
-            throw new Exception("ex");
+		    throw new Exception("ex");
     }
 
     function endHandler($XmlParser, $tag)
@@ -42,9 +44,8 @@ class XML_Parser
 $p1 = new Xml_Parser();
 try {
     $p1->parse('<tag1><tag2></tag2></tag1>');
-    echo "Exception swallowed\n";
 } catch (Exception $e) {
-    echo "OK\n";
+	echo "OK\n";
 }
 ?>
 --EXPECT--

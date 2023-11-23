@@ -1,9 +1,19 @@
 --TEST--
 Test xml_parse_into_struct() function : variation
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+if (!extension_loaded("xml")) {
+	print "skip - XML extension not loaded";
+}
+?>
 --FILE--
 <?php
+/* Prototype  : proto int xml_parse_into_struct(resource parser, string data, array &struct, array &index)
+ * Description: Parsing a XML document
+ * Source code: ext/xml/xml.c
+ * Alias to functions:
+ */
+
 echo "*** Testing xml_parse_into_struct() : variation ***\n";
 
 $simple = "<main><para><note>simple note</note></para><para><note>simple note</note></para></main>";

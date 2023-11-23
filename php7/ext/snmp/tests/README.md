@@ -34,8 +34,7 @@ in `snmp_include.inc`.
 
 ### On Linux/FreeBSD
 
-* On Ubuntu, install `snmpd` and `snmp-mibs-downloader`. (May be `net-snmpd`
-  on other distributions.)
+* Install package `net-snmpd` (name may differ based on your distribution).
 * Replace config file (by default this is `/etc/snmp/snmpd.conf` on Linux and
   `/usr/local/etc/snmp/snmpd.conf` on FreeBSD) with `snmpd.conf` supplied.
 

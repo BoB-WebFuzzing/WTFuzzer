@@ -14,7 +14,7 @@
    +----------------------------------------------------------------------+
    | Authors: Andi Gutmans <andi@php.net>                                 |
    |          Zeev Suraski <zeev@php.net>                                 |
-   |          Dmitry Stogov <dmitry@php.net>                              |
+   |          Dmitry Stogov <zeev@php.net>                                |
    +----------------------------------------------------------------------+
 */
 
@@ -63,6 +63,10 @@
 
 #include <limits.h>
 
+#if HAVE_ALLOCA_H && !defined(_ALLOCA_H)
+# include <alloca.h>
+#endif
+
 #if defined(ZEND_WIN32) && !defined(__clang__)
 #include <intrin.h>
 #endif
@@ -89,10 +93,7 @@
 
 #if defined(ZEND_WIN32) && !defined(__clang__)
 # define ZEND_ASSUME(c)	__assume(c)
-#elif defined(__clang__) && __has_builtin(__builtin_assume)
-# pragma clang diagnostic ignored "-Wassume"
-# define ZEND_ASSUME(c)	__builtin_assume(c)
-#elif PHP_HAVE_BUILTIN_UNREACHABLE && PHP_HAVE_BUILTIN_EXPECT
+#elif ((defined(__GNUC__) && ZEND_GCC_VERSION >= 4005) || __has_builtin(__builtin_unreachable)) && PHP_HAVE_BUILTIN_EXPECT
 # define ZEND_ASSUME(c)	do { \
 		if (__builtin_expect(!(c), 0)) __builtin_unreachable(); \
 	} while (0)
@@ -106,28 +107,13 @@
 # define ZEND_ASSERT(c) ZEND_ASSUME(c)
 #endif
 
-#ifdef PHP_HAVE_BUILTIN_UNREACHABLE
-# define _ZEND_UNREACHABLE() __builtin_unreachable()
-#else
-# define _ZEND_UNREACHABLE() ZEND_ASSUME(0)
-#endif
-
-#if ZEND_DEBUG
-# define ZEND_UNREACHABLE() do {ZEND_ASSERT(0); _ZEND_UNREACHABLE();} while (0)
-#else
-# define ZEND_UNREACHABLE() _ZEND_UNREACHABLE()
-#endif
-
-/* pseudo fallthrough keyword; */
-#if defined(__GNUC__) && __GNUC__ >= 7
-# define ZEND_FALLTHROUGH __attribute__((__fallthrough__))
-#else
-# define ZEND_FALLTHROUGH ((void)0)
-#endif
-
 /* Only use this macro if you know for sure that all of the switches values
    are covered by its case statements */
-#define EMPTY_SWITCH_DEFAULT_CASE() default: ZEND_UNREACHABLE(); break;
+#if ZEND_DEBUG
+# define EMPTY_SWITCH_DEFAULT_CASE() default: ZEND_ASSERT(0); break;
+#else
+# define EMPTY_SWITCH_DEFAULT_CASE() default: ZEND_ASSUME(0); break;
+#endif
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 # define ZEND_IGNORE_VALUE(x) (({ __typeof__ (x) __x = (x); (void) __x; }))
@@ -186,9 +172,6 @@
 # define ZEND_EXTENSIONS_SUPPORT	0
 #endif
 
-#if defined(HAVE_ALLOCA_H) && !defined(_ALLOCA_H)
-# include <alloca.h>
-#endif
 /* AIX requires this to be the first thing in the file.  */
 #ifndef __GNUC__
 # ifndef HAVE_ALLOCA_H
@@ -202,29 +185,8 @@ char *alloca();
 # endif
 #endif
 
-#if !ZEND_DEBUG && (defined(HAVE_ALLOCA) || (defined (__GNUC__) && __GNUC__ >= 2)) && !(defined(ZTS) && defined(HPUX)) && !defined(DARWIN)
-# define ZEND_ALLOCA_MAX_SIZE (32 * 1024)
-# define ALLOCA_FLAG(name) \
-	bool name;
-# define SET_ALLOCA_FLAG(name) \
-	name = true
-# define do_alloca_ex(size, limit, use_heap) \
-	((use_heap = (UNEXPECTED((size) > (limit)))) ? emalloc(size) : alloca(size))
-# define do_alloca(size, use_heap) \
-	do_alloca_ex(size, ZEND_ALLOCA_MAX_SIZE, use_heap)
-# define free_alloca(p, use_heap) \
-	do { if (UNEXPECTED(use_heap)) efree(p); } while (0)
-#else
-# define ALLOCA_FLAG(name)
-# define SET_ALLOCA_FLAG(name)
-# define do_alloca(p, use_heap)		emalloc(p)
-# define free_alloca(p, use_heap)	efree(p)
-#endif
-
 #if ZEND_GCC_VERSION >= 2096 || __has_attribute(__malloc__)
 # define ZEND_ATTRIBUTE_MALLOC __attribute__ ((__malloc__))
-#elif defined(ZEND_WIN32)
-# define ZEND_ATTRIBUTE_MALLOC __declspec(allocator) __declspec(restrict)
 #else
 # define ZEND_ATTRIBUTE_MALLOC
 #endif
@@ -235,12 +197,6 @@ char *alloca();
 #else
 # define ZEND_ATTRIBUTE_ALLOC_SIZE(X)
 # define ZEND_ATTRIBUTE_ALLOC_SIZE2(X,Y)
-#endif
-
-#if ZEND_GCC_VERSION >= 3000
-# define ZEND_ATTRIBUTE_CONST __attribute__((const))
-#else
-# define ZEND_ATTRIBUTE_CONST
 #endif
 
 #if ZEND_GCC_VERSION >= 2007 || __has_attribute(format)
@@ -271,6 +227,7 @@ char *alloca();
 
 #if defined(__GNUC__) && ZEND_GCC_VERSION >= 4003
 # define ZEND_COLD __attribute__((cold))
+# define ZEND_HOT __attribute__((hot))
 # ifdef __OPTIMIZE__
 #  define ZEND_OPT_SIZE  __attribute__((optimize("Os")))
 #  define ZEND_OPT_SPEED __attribute__((optimize("Ofast")))
@@ -280,16 +237,19 @@ char *alloca();
 # endif
 #else
 # define ZEND_COLD
+# define ZEND_HOT
 # define ZEND_OPT_SIZE
 # define ZEND_OPT_SPEED
 #endif
 
 #if defined(__GNUC__) && ZEND_GCC_VERSION >= 5000
-# define ZEND_ATTRIBUTE_UNUSED_LABEL __attribute__((unused));
+# define ZEND_ATTRIBUTE_UNUSED_LABEL __attribute__((cold, unused));
 # define ZEND_ATTRIBUTE_COLD_LABEL __attribute__((cold));
+# define ZEND_ATTRIBUTE_HOT_LABEL __attribute__((hot));
 #else
 # define ZEND_ATTRIBUTE_UNUSED_LABEL
 # define ZEND_ATTRIBUTE_COLD_LABEL
+# define ZEND_ATTRIBUTE_HOT_LABEL
 #endif
 
 #if defined(__GNUC__) && ZEND_GCC_VERSION >= 3004 && defined(__i386__)
@@ -312,12 +272,6 @@ char *alloca();
 # define ZEND_NORETURN
 #endif
 
-#if __has_attribute(force_align_arg_pointer)
-# define ZEND_STACK_ALIGNED __attribute__((force_align_arg_pointer))
-#else
-# define ZEND_STACK_ALIGNED
-#endif
-
 #if (defined(__GNUC__) && __GNUC__ >= 3 && !defined(__INTEL_COMPILER) && !defined(DARWIN) && !defined(__hpux) && !defined(_AIX) && !defined(__osf__))
 # define HAVE_NORETURN_ALIAS
 # define HAVE_ATTRIBUTE_WEAK
@@ -325,14 +279,6 @@ char *alloca();
 
 #if ZEND_GCC_VERSION >= 3001 || __has_builtin(__builtin_constant_p)
 # define HAVE_BUILTIN_CONSTANT_P
-#endif
-
-#if __has_attribute(element_count)
-#define ZEND_ELEMENT_COUNT(m) __attribute__((element_count(m)))
-#elif __has_attribute(counted_by)
-#define ZEND_ELEMENT_COUNT(m) __attribute__((counted_by(m)))
-#else
-#define ZEND_ELEMENT_COUNT(m)
 #endif
 
 #ifdef HAVE_BUILTIN_CONSTANT_P
@@ -372,7 +318,7 @@ char *alloca();
 # endif
 #endif /* ZEND_DEBUG */
 
-#ifdef PHP_HAVE_BUILTIN_EXPECT
+#if PHP_HAVE_BUILTIN_EXPECT
 # define EXPECTED(condition)   __builtin_expect(!!(condition), 1)
 # define UNEXPECTED(condition) __builtin_expect(!!(condition), 0)
 #else
@@ -381,7 +327,47 @@ char *alloca();
 #endif
 
 #ifndef XtOffsetOf
+# if defined(CRAY) || (defined(__ARMCC_VERSION) && !defined(LINUX))
+#  ifdef __STDC__
+#   define XtOffset(p_type, field) _Offsetof(p_type, field)
+#  else
+#   ifdef CRAY2
+#    define XtOffset(p_type, field) \
+       (sizeof(int)*((unsigned int)&(((p_type)NULL)->field)))
+#   else /* !CRAY2 */
+#    define XtOffset(p_type, field) ((unsigned int)&(((p_type)NULL)->field))
+#   endif /* !CRAY2 */
+#  endif /* __STDC__ */
+# else /* ! (CRAY || __arm) */
+#  define XtOffset(p_type, field) \
+     ((zend_long) (((char *) (&(((p_type)NULL)->field))) - ((char *) NULL)))
+# endif /* !CRAY */
+
+# ifdef offsetof
 # define XtOffsetOf(s_type, field) offsetof(s_type, field)
+# else
+# define XtOffsetOf(s_type, field) XtOffset(s_type*, field)
+# endif
+
+#endif
+
+#if (HAVE_ALLOCA || (defined (__GNUC__) && __GNUC__ >= 2)) && !(defined(ZTS) && defined(HPUX)) && !defined(DARWIN)
+# define ZEND_ALLOCA_MAX_SIZE (32 * 1024)
+# define ALLOCA_FLAG(name) \
+	zend_bool name;
+# define SET_ALLOCA_FLAG(name) \
+	name = 1
+# define do_alloca_ex(size, limit, use_heap) \
+	((use_heap = (UNEXPECTED((size) > (limit)))) ? emalloc(size) : alloca(size))
+# define do_alloca(size, use_heap) \
+	do_alloca_ex(size, ZEND_ALLOCA_MAX_SIZE, use_heap)
+# define free_alloca(p, use_heap) \
+	do { if (UNEXPECTED(use_heap)) efree(p); } while (0)
+#else
+# define ALLOCA_FLAG(name)
+# define SET_ALLOCA_FLAG(name)
+# define do_alloca(p, use_heap)		emalloc(p)
+# define free_alloca(p, use_heap)	efree(p)
 #endif
 
 #ifdef HAVE_SIGSETJMP
@@ -452,23 +438,49 @@ char *alloca();
 #define ZEND_BIT_TEST(bits, bit) \
 	(((bits)[(bit) / (sizeof((bits)[0])*8)] >> ((bit) & (sizeof((bits)[0])*8-1))) & 1)
 
-#define ZEND_INFINITY INFINITY
-
-#define ZEND_NAN NAN
-
-#if defined(__cplusplus) && __cplusplus >= 201103L
-extern "C++" {
-# include <cmath>
-}
-# define zend_isnan std::isnan
-# define zend_isinf std::isinf
-# define zend_finite std::isfinite
+/* We always define a function, even if there's a macro or expression we could
+ * alias, so that using it in contexts where we can't make function calls
+ * won't fail to compile on some machines and not others.
+ */
+static zend_always_inline double _zend_get_inf(void) /* {{{ */
+{
+#ifdef INFINITY
+	return INFINITY;
+#elif HAVE_HUGE_VAL_INF
+	return HUGE_VAL;
+#elif defined(__i386__) || defined(_X86_) || defined(ALPHA) || defined(_ALPHA) || defined(__alpha)
+# define _zend_DOUBLE_INFINITY_HIGH       0x7ff00000
+	double val = 0.0;
+	((uint32_t*)&val)[1] = _zend_DOUBLE_INFINITY_HIGH;
+	((uint32_t*)&val)[0] = 0;
+	return val;
+#elif HAVE_ATOF_ACCEPTS_INF
+	return atof("INF");
 #else
-# include <math.h>
-# define zend_isnan(a) isnan(a)
-# define zend_isinf(a) isinf(a)
-# define zend_finite(a) isfinite(a)
+	return 1.0/0.0;
 #endif
+} /* }}} */
+#define ZEND_INFINITY (_zend_get_inf())
+
+static zend_always_inline double _zend_get_nan(void) /* {{{ */
+{
+#ifdef NAN
+	return NAN;
+#elif HAVE_HUGE_VAL_NAN
+	return HUGE_VAL + -HUGE_VAL;
+#elif defined(__i386__) || defined(_X86_) || defined(ALPHA) || defined(_ALPHA) || defined(__alpha)
+# define _zend_DOUBLE_QUIET_NAN_HIGH      0xfff80000
+	double val = 0.0;
+	((uint32_t*)&val)[1] = _zend_DOUBLE_QUIET_NAN_HIGH;
+	((uint32_t*)&val)[0] = 0;
+	return val;
+#elif HAVE_ATOF_ACCEPTS_NAN
+	return atof("NAN");
+#else
+	return 0.0/0.0;
+#endif
+} /* }}} */
+#define ZEND_NAN (_zend_get_nan())
 
 #define ZEND_STRL(str)		(str), (sizeof(str)-1)
 #define ZEND_STRS(str)		(str), (sizeof(str))
@@ -476,12 +488,6 @@ extern "C++" {
 	((n) ? (((n)<0) ? -1 : 1) : 0)
 #define ZEND_TRUTH(x)		((x) ? 1 : 0)
 #define ZEND_LOG_XOR(a, b)		(ZEND_TRUTH(a) ^ ZEND_TRUTH(b))
-
-/**
- * Do a three-way comparison of two integers and returns -1, 0 or 1
- * depending on whether #a is smaller, equal or larger than #b.
- */
-#define ZEND_THREEWAY_COMPARE(a, b) ((a) == (b) ? 0 : ((a) < (b) ? -1 : 1))
 
 #define ZEND_MAX_RESERVED_RESOURCES	6
 
@@ -501,62 +507,66 @@ extern "C++" {
 #define ZEND_VALID_SOCKET(sock) ((sock) >= 0)
 #endif
 
+/* va_copy() is __va_copy() in old gcc versions.
+ * According to the autoconf manual, using
+ * memcpy(&dst, &src, sizeof(va_list))
+ * gives maximum portability. */
+#ifndef va_copy
+# ifdef __va_copy
+#  define va_copy(dest, src) __va_copy((dest), (src))
+# else
+#  define va_copy(dest, src) memcpy(&(dest), &(src), sizeof(va_list))
+# endif
+#endif
+
 /* Intrinsics macros start. */
 
 /* Memory sanitizer is incompatible with ifunc resolvers. Even if the resolver
  * is marked as no_sanitize("memory") it will still be instrumented and crash. */
-#if __has_feature(memory_sanitizer) || __has_feature(thread_sanitizer) || \
-	__has_feature(dataflow_sanitizer)
+#if __has_feature(memory_sanitizer) || __has_feature(thread_sanitizer)
 # undef HAVE_FUNC_ATTRIBUTE_IFUNC
 #endif
 
-/* Only use ifunc resolvers if we have __builtin_cpu_supports() and __builtin_cpu_init(),
- * otherwise the use of zend_cpu_supports() may not be safe inside ifunc resolvers. */
-#if defined(HAVE_FUNC_ATTRIBUTE_IFUNC) && defined(HAVE_FUNC_ATTRIBUTE_TARGET) && \
-	defined(PHP_HAVE_BUILTIN_CPU_SUPPORTS) && defined(PHP_HAVE_BUILTIN_CPU_INIT)
+#if defined(HAVE_FUNC_ATTRIBUTE_IFUNC) && defined(HAVE_FUNC_ATTRIBUTE_TARGET)
 # define ZEND_INTRIN_HAVE_IFUNC_TARGET 1
 #endif
 
 #if (defined(__i386__) || defined(__x86_64__))
-# if defined(HAVE_TMMINTRIN_H)
-#  define PHP_HAVE_SSSE3
+# if PHP_HAVE_SSSE3_INSTRUCTIONS && defined(HAVE_TMMINTRIN_H)
+# define PHP_HAVE_SSSE3
 # endif
 
-# if defined(HAVE_NMMINTRIN_H)
-#  define PHP_HAVE_SSE4_2
-# endif
-
-# if defined(HAVE_WMMINTRIN_H)
-#  define PHP_HAVE_PCLMUL
+# if PHP_HAVE_SSE4_2_INSTRUCTIONS && defined(HAVE_NMMINTRIN_H)
+# define PHP_HAVE_SSE4_2
 # endif
 
 /*
  * AVX2 support was added in gcc 4.7, but AVX2 intrinsics don't work in
  * __attribute__((target("avx2"))) functions until gcc 4.9.
  */
-# if defined(HAVE_IMMINTRIN_H) && \
+# if PHP_HAVE_AVX2_INSTRUCTIONS && defined(HAVE_IMMINTRIN_H) && \
   (defined(__llvm__) || defined(__clang__) || (defined(__GNUC__) && ZEND_GCC_VERSION >= 4009))
-#  define PHP_HAVE_AVX2
+# define PHP_HAVE_AVX2
 # endif
 #endif
 
 #ifdef __SSSE3__
 /* Instructions compiled directly. */
 # define ZEND_INTRIN_SSSE3_NATIVE 1
-#elif (defined(HAVE_FUNC_ATTRIBUTE_TARGET) && defined(PHP_HAVE_SSSE3)) || (defined(ZEND_WIN32) && (!defined(_M_ARM64)))
+#elif (defined(HAVE_FUNC_ATTRIBUTE_TARGET) && defined(PHP_HAVE_SSSE3)) || defined(ZEND_WIN32)
 /* Function resolved by ifunc or MINIT. */
 # define ZEND_INTRIN_SSSE3_RESOLVER 1
 #endif
 
 /* Do not use for conditional declaration of API functions! */
-#if defined(ZEND_INTRIN_SSSE3_RESOLVER) && defined(ZEND_INTRIN_HAVE_IFUNC_TARGET)
+#if ZEND_INTRIN_SSSE3_RESOLVER && ZEND_INTRIN_HAVE_IFUNC_TARGET
 # define ZEND_INTRIN_SSSE3_FUNC_PROTO 1
-#elif defined(ZEND_INTRIN_SSSE3_RESOLVER)
+#elif ZEND_INTRIN_SSSE3_RESOLVER
 # define ZEND_INTRIN_SSSE3_FUNC_PTR 1
 #endif
 
-#ifdef ZEND_INTRIN_SSSE3_RESOLVER
-# ifdef HAVE_FUNC_ATTRIBUTE_TARGET
+#if ZEND_INTRIN_SSSE3_RESOLVER
+# if defined(HAVE_FUNC_ATTRIBUTE_TARGET)
 #  define ZEND_INTRIN_SSSE3_FUNC_DECL(func) ZEND_API func __attribute__((target("ssse3")))
 # else
 #  define ZEND_INTRIN_SSSE3_FUNC_DECL(func) func
@@ -568,20 +578,20 @@ extern "C++" {
 #ifdef __SSE4_2__
 /* Instructions compiled directly. */
 # define ZEND_INTRIN_SSE4_2_NATIVE 1
-#elif (defined(HAVE_FUNC_ATTRIBUTE_TARGET) && defined(PHP_HAVE_SSE4_2)) || (defined(ZEND_WIN32) && (!defined(_M_ARM64)))
+#elif (defined(HAVE_FUNC_ATTRIBUTE_TARGET) && defined(PHP_HAVE_SSE4_2)) || defined(ZEND_WIN32)
 /* Function resolved by ifunc or MINIT. */
 # define ZEND_INTRIN_SSE4_2_RESOLVER 1
 #endif
 
 /* Do not use for conditional declaration of API functions! */
-#if defined(ZEND_INTRIN_SSE4_2_RESOLVER) && defined(ZEND_INTRIN_HAVE_IFUNC_TARGET)
+#if ZEND_INTRIN_SSE4_2_RESOLVER && ZEND_INTRIN_HAVE_IFUNC_TARGET
 # define ZEND_INTRIN_SSE4_2_FUNC_PROTO 1
-#elif defined(ZEND_INTRIN_SSE4_2_RESOLVER)
+#elif ZEND_INTRIN_SSE4_2_RESOLVER
 # define ZEND_INTRIN_SSE4_2_FUNC_PTR 1
 #endif
 
-#ifdef ZEND_INTRIN_SSE4_2_RESOLVER
-# ifdef HAVE_FUNC_ATTRIBUTE_TARGET
+#if ZEND_INTRIN_SSE4_2_RESOLVER
+# if defined(HAVE_FUNC_ATTRIBUTE_TARGET)
 #  define ZEND_INTRIN_SSE4_2_FUNC_DECL(func) ZEND_API func __attribute__((target("sse4.2")))
 # else
 #  define ZEND_INTRIN_SSE4_2_FUNC_DECL(func) func
@@ -590,73 +600,21 @@ extern "C++" {
 # define ZEND_INTRIN_SSE4_2_FUNC_DECL(func)
 #endif
 
-#ifdef __PCLMUL__
-/* Instructions compiled directly. */
-# define ZEND_INTRIN_PCLMUL_NATIVE 1
-#elif (defined(HAVE_FUNC_ATTRIBUTE_TARGET) && defined(PHP_HAVE_PCLMUL)) || (defined(ZEND_WIN32) && (!defined(_M_ARM64)))
-/* Function resolved by ifunc or MINIT. */
-# define ZEND_INTRIN_PCLMUL_RESOLVER 1
-#endif
-
-/* Do not use for conditional declaration of API functions! */
-#if defined(ZEND_INTRIN_PCLMUL_RESOLVER) && defined(ZEND_INTRIN_HAVE_IFUNC_TARGET) && (!defined(__GNUC__) || (ZEND_GCC_VERSION >= 9000))
-/* __builtin_cpu_supports has pclmul from gcc9 */
-# define ZEND_INTRIN_PCLMUL_FUNC_PROTO 1
-#elif defined(ZEND_INTRIN_PCLMUL_RESOLVER)
-# define ZEND_INTRIN_PCLMUL_FUNC_PTR 1
-#endif
-
-#ifdef ZEND_INTRIN_PCLMUL_RESOLVER
-# ifdef HAVE_FUNC_ATTRIBUTE_TARGET
-#  define ZEND_INTRIN_PCLMUL_FUNC_DECL(func) ZEND_API func __attribute__((target("pclmul")))
-# else
-#  define ZEND_INTRIN_PCLMUL_FUNC_DECL(func) func
-# endif
-#else
-# define ZEND_INTRIN_PCLMUL_FUNC_DECL(func)
-#endif
-
-#if defined(ZEND_INTRIN_SSE4_2_NATIVE) && defined(ZEND_INTRIN_PCLMUL_NATIVE)
-/* Instructions compiled directly. */
-# define ZEND_INTRIN_SSE4_2_PCLMUL_NATIVE 1
-#elif (defined(HAVE_FUNC_ATTRIBUTE_TARGET) && defined(PHP_HAVE_SSE4_2) && defined(PHP_HAVE_PCLMUL)) || (defined(ZEND_WIN32) && (!defined(_M_ARM64)))
-/* Function resolved by ifunc or MINIT. */
-# define ZEND_INTRIN_SSE4_2_PCLMUL_RESOLVER 1
-#endif
-
-/* Do not use for conditional declaration of API functions! */
-#if defined(ZEND_INTRIN_SSE4_2_PCLMUL_RESOLVER) && defined(ZEND_INTRIN_HAVE_IFUNC_TARGET) && (!defined(__GNUC__) || (ZEND_GCC_VERSION >= 9000))
-/* __builtin_cpu_supports has pclmul from gcc9 */
-# define ZEND_INTRIN_SSE4_2_PCLMUL_FUNC_PROTO 1
-#elif defined(ZEND_INTRIN_SSE4_2_PCLMUL_RESOLVER)
-# define ZEND_INTRIN_SSE4_2_PCLMUL_FUNC_PTR 1
-#endif
-
-#ifdef ZEND_INTRIN_SSE4_2_PCLMUL_RESOLVER
-# ifdef HAVE_FUNC_ATTRIBUTE_TARGET
-#  define ZEND_INTRIN_SSE4_2_PCLMUL_FUNC_DECL(func) ZEND_API func __attribute__((target("sse4.2,pclmul")))
-# else
-#  define ZEND_INTRIN_SSE4_2_PCLMUL_FUNC_DECL(func) func
-# endif
-#else
-# define ZEND_INTRIN_SSE4_2_PCLMUL_FUNC_DECL(func)
-#endif
-
 #ifdef __AVX2__
 # define ZEND_INTRIN_AVX2_NATIVE 1
-#elif (defined(HAVE_FUNC_ATTRIBUTE_TARGET) && defined(PHP_HAVE_AVX2)) || (defined(ZEND_WIN32) && (!defined(_M_ARM64)))
+#elif (defined(HAVE_FUNC_ATTRIBUTE_TARGET) && defined(PHP_HAVE_AVX2)) || defined(ZEND_WIN32)
 # define ZEND_INTRIN_AVX2_RESOLVER 1
 #endif
 
 /* Do not use for conditional declaration of API functions! */
-#if defined(ZEND_INTRIN_AVX2_RESOLVER) && defined(ZEND_INTRIN_HAVE_IFUNC_TARGET)
+#if ZEND_INTRIN_AVX2_RESOLVER && ZEND_INTRIN_HAVE_IFUNC_TARGET
 # define ZEND_INTRIN_AVX2_FUNC_PROTO 1
-#elif defined(ZEND_INTRIN_AVX2_RESOLVER)
+#elif ZEND_INTRIN_AVX2_RESOLVER
 # define ZEND_INTRIN_AVX2_FUNC_PTR 1
 #endif
 
-#ifdef ZEND_INTRIN_AVX2_RESOLVER
-# ifdef HAVE_FUNC_ATTRIBUTE_TARGET
+#if ZEND_INTRIN_AVX2_RESOLVER
+# if defined(HAVE_FUNC_ATTRIBUTE_TARGET)
 #  define ZEND_INTRIN_AVX2_FUNC_DECL(func) ZEND_API func __attribute__((target("avx2")))
 # else
 #  define ZEND_INTRIN_AVX2_FUNC_DECL(func) func
@@ -665,57 +623,17 @@ extern "C++" {
 # define ZEND_INTRIN_AVX2_FUNC_DECL(func)
 #endif
 
-#if PHP_HAVE_AVX512_SUPPORTS && defined(HAVE_FUNC_ATTRIBUTE_TARGET) || defined(ZEND_WIN32)
-#define ZEND_INTRIN_AVX512_RESOLVER 1
-#endif
-
-#if defined(ZEND_INTRIN_AVX512_RESOLVER) && defined(ZEND_INTRIN_HAVE_IFUNC_TARGET)
-# define ZEND_INTRIN_AVX512_FUNC_PROTO 1
-#elif defined(ZEND_INTRIN_AVX512_RESOLVER)
-# define ZEND_INTRIN_AVX512_FUNC_PTR 1
-#endif
-
-#ifdef ZEND_INTRIN_AVX512_RESOLVER
-# ifdef HAVE_FUNC_ATTRIBUTE_TARGET
-#  define ZEND_INTRIN_AVX512_FUNC_DECL(func) ZEND_API func __attribute__((target("avx512f,avx512cd,avx512vl,avx512dq,avx512bw")))
-# else
-#  define ZEND_INTRIN_AVX512_FUNC_DECL(func) func
-# endif
-#else
-# define ZEND_INTRIN_AVX512_FUNC_DECL(func)
-#endif
-
-#if PHP_HAVE_AVX512_VBMI_SUPPORTS && defined(HAVE_FUNC_ATTRIBUTE_TARGET)
-#define ZEND_INTRIN_AVX512_VBMI_RESOLVER 1
-#endif
-
-#if defined(ZEND_INTRIN_AVX512_VBMI_RESOLVER) && defined(ZEND_INTRIN_HAVE_IFUNC_TARGET)
-# define ZEND_INTRIN_AVX512_VBMI_FUNC_PROTO 1
-#elif defined(ZEND_INTRIN_AVX512_VBMI_RESOLVER)
-# define ZEND_INTRIN_AVX512_VBMI_FUNC_PTR 1
-#endif
-
-#ifdef ZEND_INTRIN_AVX512_VBMI_RESOLVER
-# ifdef HAVE_FUNC_ATTRIBUTE_TARGET
-#  define ZEND_INTRIN_AVX512_VBMI_FUNC_DECL(func) ZEND_API func __attribute__((target("avx512f,avx512cd,avx512vl,avx512dq,avx512bw,avx512vbmi")))
-# else
-#  define ZEND_INTRIN_AVX512_VBMI_FUNC_DECL(func) func
-# endif
-#else
-# define ZEND_INTRIN_AVX512_VBMI_FUNC_DECL(func)
-#endif
-
 /* Intrinsics macros end. */
 
 #ifdef ZEND_WIN32
 # define ZEND_SET_ALIGNED(alignment, decl) __declspec(align(alignment)) decl
-#elif defined(HAVE_ATTRIBUTE_ALIGNED)
+#elif HAVE_ATTRIBUTE_ALIGNED
 # define ZEND_SET_ALIGNED(alignment, decl) decl __attribute__ ((__aligned__ (alignment)))
 #else
 # define ZEND_SET_ALIGNED(alignment, decl) decl
 #endif
 
-#define ZEND_SLIDE_TO_ALIGNED(alignment, ptr) (((uintptr_t)(ptr) + ((alignment)-1)) & ~((alignment)-1))
+#define ZEND_SLIDE_TO_ALIGNED(alignment, ptr) (((zend_uintptr_t)(ptr) + ((alignment)-1)) & ~((alignment)-1))
 #define ZEND_SLIDE_TO_ALIGNED16(ptr) ZEND_SLIDE_TO_ALIGNED(Z_UL(16), ptr)
 
 #ifdef ZEND_WIN32
@@ -730,55 +648,12 @@ extern "C++" {
 # define ZEND_PREFER_RELOAD
 #endif
 
-#if defined(ZEND_WIN32) && defined(_DEBUG)
+#if defined(ZEND_WIN32) && defined(_DEBUG) && defined(PHP_WIN32_DEBUG_HEAP)
 # define ZEND_IGNORE_LEAKS_BEGIN() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF)
 # define ZEND_IGNORE_LEAKS_END() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF)
 #else
 # define ZEND_IGNORE_LEAKS_BEGIN()
 # define ZEND_IGNORE_LEAKS_END()
-#endif
-
-/* MSVC yields C4090 when a (const T **) is passed to a (void *); ZEND_VOIDP works around that */
-#ifdef _MSC_VER
-# define ZEND_VOIDP(ptr) ((void *) ptr)
-#else
-# define ZEND_VOIDP(ptr) (ptr)
-#endif
-
-#if __has_attribute(__indirect_return__)
-# define ZEND_INDIRECT_RETURN __attribute__((__indirect_return__))
-#else
-# define ZEND_INDIRECT_RETURN
-#endif
-
-#define __ZEND_DO_PRAGMA(x) _Pragma(#x)
-#define _ZEND_DO_PRAGMA(x) __ZEND_DO_PRAGMA(x)
-#if defined(__clang__)
-# define ZEND_DIAGNOSTIC_IGNORED_START(warning) \
-	_Pragma("clang diagnostic push") \
-	_ZEND_DO_PRAGMA(clang diagnostic ignored warning)
-# define ZEND_DIAGNOSTIC_IGNORED_END \
-	_Pragma("clang diagnostic pop")
-#elif defined(__GNUC__)
-# define ZEND_DIAGNOSTIC_IGNORED_START(warning) \
-	_Pragma("GCC diagnostic push") \
-	_ZEND_DO_PRAGMA(GCC diagnostic ignored warning)
-# define ZEND_DIAGNOSTIC_IGNORED_END \
-	_Pragma("GCC diagnostic pop")
-#else
-# define ZEND_DIAGNOSTIC_IGNORED_START(warning)
-# define ZEND_DIAGNOSTIC_IGNORED_END
-#endif
-
-/** @deprecated */
-#define ZEND_CGG_DIAGNOSTIC_IGNORED_START ZEND_DIAGNOSTIC_IGNORED_START
-/** @deprecated */
-#define ZEND_CGG_DIAGNOSTIC_IGNORED_END ZEND_DIAGNOSTIC_IGNORED_END
-
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) /* C11 */
-# define ZEND_STATIC_ASSERT(c, m) _Static_assert((c), m)
-#else
-# define ZEND_STATIC_ASSERT(c, m)
 #endif
 
 #endif /* ZEND_PORTABILITY_H */

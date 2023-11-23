@@ -1,12 +1,10 @@
 --TEST--
 Bug #76548 pg_fetch_result did not fetch the next row
---EXTENSIONS--
-pgsql
 --SKIPIF--
-<?php include("inc/skipif.inc"); ?>
+<?php include("skipif.inc"); ?>
 --FILE--
 <?php
-include('inc/config.inc');
+include('config.inc');
 
 $conn = pg_connect($conn_str);
 
@@ -17,7 +15,9 @@ while ($value = pg_fetch_result($result, 0)) {
 }
 
 ?>
+==DONE==
 --EXPECT--
 string(1) "1"
 string(1) "2"
 string(1) "3"
+==DONE==

@@ -8,7 +8,7 @@ var_dump($a instanceof stdClass);
 
 var_dump(new stdCLass instanceof stdClass);
 
-$b = function() { return new stdClass; };
+$b = create_function('', 'return new stdClass;');
 var_dump($b() instanceof stdClass);
 
 $c = array(new stdClass);
@@ -17,9 +17,11 @@ var_dump($c[0] instanceof stdClass);
 var_dump(@$inexistent instanceof stdClass);
 
 ?>
---EXPECT--
+--EXPECTF--
 bool(true)
 bool(true)
+
+Deprecated: Function create_function() is deprecated in %s on line %d
 bool(true)
 bool(true)
 bool(false)

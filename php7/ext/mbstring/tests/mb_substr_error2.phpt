@@ -1,9 +1,17 @@
 --TEST--
 Test mb_substr() function : error conditions - Pass an unknown encoding
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_substr') or die("skip mb_substr() is not available in this build");
+?>
 --FILE--
 <?php
+/* Prototype  : string mb_substr(string $str, int $start [, int $length [, string $encoding]])
+ * Description: Returns part of a string
+ * Source code: ext/mbstring/mbstring.c
+ */
+
 /*
  * Pass an unknown encoding to mb_substr() to test behaviour
  */
@@ -15,13 +23,13 @@ $start = 1;
 $length = 5;
 $encoding = 'unknown-encoding';
 
-try {
-    var_dump( mb_substr($str, $start, $length, $encoding));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump( mb_substr($str, $start, $length, $encoding));
 
+echo "Done";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing mb_substr() : error conditions ***
-mb_substr(): Argument #4 ($encoding) must be a valid encoding, "unknown-encoding" given
+
+Warning: mb_substr(): Unknown encoding "unknown-encoding" in %s on line %d
+bool(false)
+Done

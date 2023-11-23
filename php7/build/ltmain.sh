@@ -811,13 +811,6 @@ if test -z "$show_help"; then
 
     for arg in $later; do
       case $arg in
-      -shared)
-	test yes = "$build_libtool_libs" \
-	  || func_fatal_configuration "cannot build a shared library"
-	build_old_libs=no
-	continue
-	;;
-
       -static)
 	build_old_libs=yes
 	continue
@@ -1184,12 +1177,6 @@ EOF
     for arg
     do
       case $arg in
-      -shared)
-	test yes != "$build_libtool_libs" \
-	  && func_fatal_configuration "cannot build a shared library"
-	build_old_libs=no
-	break
-	;;
       -all-static | -static | -static-libtool-libs)
 	case $arg in
 	-all-static)

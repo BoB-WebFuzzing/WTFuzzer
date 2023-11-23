@@ -314,32 +314,27 @@ gdImagePtr gdImageCreateFromPngCtx (gdIOCtx * infile)
 
 		case PNG_COLOR_TYPE_GRAY_ALPHA:
 			png_set_gray_to_rgb(png_ptr);
-			ZEND_FALLTHROUGH;
-		case PNG_COLOR_TYPE_RGB:
-		case PNG_COLOR_TYPE_RGB_ALPHA:
-			/* gd 2.0: we now support truecolor. See the comment above
-			 * for a rare situation in which the transparent pixel may not
-			 * work properly with 16-bit channels.
-			 */
-			if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) {
-				png_get_tRNS(png_ptr, info_ptr, NULL, NULL, &trans_color_rgb);
-				if (bit_depth == 16) { /* png_set_strip_16() not yet in effect */
-					transparent = gdTrueColor(trans_color_rgb->red >> 8,
-								trans_color_rgb->green >> 8,
-								trans_color_rgb->blue >> 8);
-				} else {
-					transparent = gdTrueColor(trans_color_rgb->red,
-								trans_color_rgb->green,
-								trans_color_rgb->blue);
-				}
-			}
-			break;
-	}
 
-	/* enable the interlace transform if supported */
-#ifdef PNG_READ_INTERLACING_SUPPORTED
-	(void)png_set_interlace_handling(png_ptr);
-#endif
+			case PNG_COLOR_TYPE_RGB:
+			case PNG_COLOR_TYPE_RGB_ALPHA:
+				/* gd 2.0: we now support truecolor. See the comment above
+				 * for a rare situation in which the transparent pixel may not
+				 * work properly with 16-bit channels.
+				 */
+				if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) {
+					png_get_tRNS(png_ptr, info_ptr, NULL, NULL, &trans_color_rgb);
+					if (bit_depth == 16) { /* png_set_strip_16() not yet in effect */
+						transparent = gdTrueColor(trans_color_rgb->red >> 8,
+									trans_color_rgb->green >> 8,
+									trans_color_rgb->blue >> 8);
+					} else {
+						transparent = gdTrueColor(trans_color_rgb->red,
+									trans_color_rgb->green,
+									trans_color_rgb->blue);
+					}
+				}
+				break;
+	}
 
 	png_read_update_info(png_ptr, info_ptr);
 

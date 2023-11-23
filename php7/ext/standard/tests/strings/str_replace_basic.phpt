@@ -4,6 +4,13 @@ Test str_replace() function basic function
 precision=14
 --FILE--
 <?php
+/*
+  Prototype: mixed str_replace(mixed $search, mixed $replace,
+                               mixed $subject [, int &$count]);
+  Description: Replace all occurrences of the search string with
+               the replacement string
+*/
+
 echo "\n*** Testing str_replace() on basic operations ***\n";
 
 var_dump( str_replace("", "", "") );
@@ -21,15 +28,12 @@ var_dump( $count );
 
 $fp = fopen( __FILE__, "r" );
 $fp_copy = $fp;
-try {
-    var_dump( str_replace($fp_copy, $fp_copy, $fp_copy, $fp_copy) );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump( str_replace($fp_copy, $fp_copy, $fp_copy, $fp_copy) );
 var_dump( $fp_copy );
 fclose($fp);
 
 ?>
+===DONE===
 --EXPECTF--
 *** Testing str_replace() on basic operations ***
 string(0) ""
@@ -40,5 +44,6 @@ string(1) "q"
 int(1)
 string(0) ""
 int(0)
-str_replace(): Argument #1 ($search) must be of type array|string, resource given
-resource(%d) of type (stream)
+string(%d) "Resource id #%d"
+int(1)
+===DONE===

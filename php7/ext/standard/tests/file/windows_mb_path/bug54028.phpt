@@ -1,14 +1,12 @@
 --TEST--
 Bug #54028 Directory::read() cannot handle non-unicode chars properly
---EXTENSIONS--
-mbstring
 --SKIPIF--
 <?php
 include __DIR__ . DIRECTORY_SEPARATOR . "util.inc";
 
 skip_if_not_win();
 if (getenv("SKIP_SLOW_TESTS")) die("skip slow test");
-skip_if_no_required_exts();
+skip_if_no_required_exts("mbstring");
 
 ?>
 --FILE--
@@ -24,27 +22,28 @@ $dirs = array("a", "ソ", "ゾ", "şŞıİğĞ", "多国語", "王", "汚れて�
 
 mkdir($prefix);
 foreach ($dirs as $d) {
-    mkdir($prefix . $d);
+	mkdir($prefix . $d);
 }
 
 $directory = dir($prefix);
 while (false !== ($content = $directory->read())) {
-    if ("." == $content || ".." == $content) continue;
+	if ("." == $content || ".." == $content) continue;
 
         printf("Returned (%s)\n", $content);
         printf("Encoding: %s\n", mb_detect_encoding($content));
         if ($content != get_basename_with_cp($prefix . $content, 65001, false)) {
-        echo "Verification failed!\n";
-    }
-    echo "\n";
+		echo "Verification failed!\n";
+	}
+	echo "\n";
 }
 
 foreach ($dirs as $d) {
-    rmdir($prefix . $d);
+	rmdir($prefix . $d);
 }
 rmdir($prefix);
 
 ?>
+===DONE===
 --EXPECT--
 Returned (a)
 Encoding: ASCII
@@ -67,3 +66,4 @@ Encoding: UTF-8
 Returned (王)
 Encoding: UTF-8
 
+===DONE===

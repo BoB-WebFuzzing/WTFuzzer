@@ -1,13 +1,14 @@
 --TEST--
 Bug #7515 (weird & invisible referencing of objects)
+--INI--
+error_reporting=2039
 --FILE--
 <?php
 class obj {
-    function method() {}
+	function method() {}
 }
 
-$o = new stdClass;
-$o->root = new obj();
+$o->root=new obj();
 
 ob_start();
 var_dump($o);
@@ -29,5 +30,6 @@ y=$y
 ";
 }
 ?>
---EXPECT--
+--EXPECTF--
+Warning: Creating default object from empty value in %s on line %d
 success

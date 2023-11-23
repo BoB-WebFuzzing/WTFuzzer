@@ -9,7 +9,7 @@ trait MyTrait
     {
         echo __CLASS__, "\n";
 
-        if (get_parent_class(__CLASS__) !== false) {
+        if (\is_callable(array('parent', __FUNCTION__))) {
             parent::hello();
         }
     }
@@ -27,7 +27,6 @@ class ChildClass extends ParentClass
 
 $c = new ChildClass();
 $c->hello();
-?>
 --EXPECT--
 ChildClass
 ParentClass

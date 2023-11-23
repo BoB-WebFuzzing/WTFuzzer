@@ -6,17 +6,19 @@ error_reporting=8191
 <?php
 
 class test {
-    function foo($arg, &$arg2 = NULL) {}
+	function foo($arg, &$arg2 = NULL) {}
 }
 
 class test2 extends test {
-    function foo($arg, &$arg2 = NULL) {}
+	function foo($arg, &$arg2 = NULL) {}
 }
 
 class test3 extends test {
-    function foo($arg, &$arg2) {}
+	function foo($arg, &$arg2) {}
 }
 
+echo "Done\n";
 ?>
 --EXPECTF--
-Fatal error: Declaration of test3::foo($arg, &$arg2) must be compatible with test::foo($arg, &$arg2 = null) in %s on line %d
+Warning: Declaration of test3::foo($arg, &$arg2) should be compatible with test::foo($arg, &$arg2 = NULL) in %s on line %d
+Done

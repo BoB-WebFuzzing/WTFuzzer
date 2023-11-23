@@ -1,16 +1,11 @@
 --TEST--
 gmp_scan1() basic tests
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 
-try {
-    var_dump(gmp_scan1("434234", -10));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-
+var_dump(gmp_scan1("434234", -10));
 var_dump(gmp_scan1("434234", 1));
 var_dump(gmp_scan1(4096, 0));
 var_dump(gmp_scan1("1000000000", 5));
@@ -19,20 +14,27 @@ var_dump(gmp_scan1("1000000000", 200));
 $n = gmp_init("24234527465274");
 var_dump(gmp_scan1($n, 10));
 
-try {
-    var_dump(gmp_scan1(array(), 200));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gmp_scan1(array(), 200));
+var_dump(gmp_scan1(array()));
+var_dump(gmp_scan1());
 
 echo "Done\n";
 ?>
---EXPECT--
-gmp_scan1(): Argument #2 ($start) must be greater than or equal to 0
+--EXPECTF--
+Warning: gmp_scan1(): Starting index must be greater than or equal to zero in %s on line %d
+bool(false)
 int(1)
 int(12)
 int(9)
 int(-1)
 int(10)
-gmp_scan1(): Argument #1 ($num1) must be of type GMP|string|int, array given
+
+Warning: gmp_scan1(): Unable to convert variable to GMP - wrong type in %s on line %d
+bool(false)
+
+Warning: gmp_scan1() expects exactly 2 parameters, 1 given in %s on line %d
+NULL
+
+Warning: gmp_scan1() expects exactly 2 parameters, 0 given in %s on line %d
+NULL
 Done

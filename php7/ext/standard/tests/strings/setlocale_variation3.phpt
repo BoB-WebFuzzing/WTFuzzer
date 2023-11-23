@@ -2,7 +2,6 @@
 Test setlocale() function : usage variations - setting system locale = 0
 --SKIPIF--
 <?php
-if (setlocale(LC_ALL, 'invalid') === 'invalid') { die('skip setlocale() is broken /w musl'); }
 if (substr(PHP_OS, 0, 3) == 'WIN') {
     die('skip Not valid for windows');
 }
@@ -12,6 +11,13 @@ if (setlocale(LC_ALL,'en_US.utf8') === false) {
 ?>
 --FILE--
 <?php
+/* Prototype  : string setlocale (int $category , string $locale [,string $..] )
+ *            : string setlocale(int $category , array $locale);
+ * Description: Sets locale information.Returns the new current locale , or FALSE
+ *              if locale functionality is not implemented in this platform.
+ * Source code: ext/standard/string.c
+*/
+
 /* If locale is "0", the locale setting is not affected, only the current setting is returned */
 
 echo "*** Testing setlocale() : usage variations - setting system locale = 0 ***\n";

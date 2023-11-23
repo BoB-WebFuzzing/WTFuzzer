@@ -11,8 +11,10 @@ $class = new ReflectionClass('bogus');
 
 var_dump($class->getStaticProperties());
 ?>
+===DONE===
 --EXPECT--
 array(1) {
   ["a"]=>
   string(4) "test"
 }
+===DONE===

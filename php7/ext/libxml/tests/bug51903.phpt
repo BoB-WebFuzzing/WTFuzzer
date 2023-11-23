@@ -1,11 +1,10 @@
 --TEST--
 Bug #51903 (simplexml_load_file() doesn't use HTTP headers)
---EXTENSIONS--
-simplexml
 --SKIPIF--
 <?php
+if (!extension_loaded('simplexml')) die('skip simplexml extension not available');
 if (@!include "./ext/standard/tests/http/server.inc") die('skip server.inc not available');
-http_server_skipif();
+http_server_skipif('tcp://127.0.0.1:12342');
 ?>
 --FILE--
 <?php
@@ -24,10 +23,10 @@ $responses = [
     . "<?xml version=\"1.0\"?>\n"
     . "<root>\xE4\xF6\xFC</root>\n",
 ];
-['pid' => $pid, 'uri' => $uri] = http_server($responses);
+$pid = http_server('tcp://127.0.0.1:12342', $responses);
 
 for ($i = 0; $i < count($responses); $i++) {
-    $sxe = simplexml_load_file($uri);
+    $sxe = simplexml_load_file('http://127.0.0.1:12342/');
     echo "$sxe\n";
 }
 

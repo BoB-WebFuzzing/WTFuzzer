@@ -10,7 +10,5 @@ $e = NULL;
 $dummy =& $r[0];
 
 print stream_select($r, $w, $e, 0.5);
-?>
---EXPECTF--
-Deprecated: Implicit conversion from float 0.5 to int loses precision in %s on line %d
+--EXPECT--
 0

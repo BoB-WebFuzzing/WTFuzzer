@@ -3,65 +3,78 @@ Bug #75921: Inconsistent error when creating stdObject from empty variable
 --FILE--
 <?php
 
-try {
-    $null->a = 42;
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+$null->a = 42;
 var_dump($null);
 unset($null);
 
-try {
-    $null->a['hello'] = 42;
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+$null->a['hello'] = 42;
 var_dump($null);
 unset($null);
 
-try {
-    $null->a->b = 42;
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+$null->a->b = 42;
 var_dump($null);
 unset($null);
 
-try {
-    $null->a['hello']->b = 42;
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+$null->a['hello']->b = 42;
 var_dump($null);
 unset($null);
 
-try {
-    $null->a->b['hello'] = 42;
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+$null->a->b['hello'] = 42;
 var_dump($null);
 unset($null);
 
 ?>
 --EXPECTF--
-Attempt to assign property "a" on null
+Warning: Creating default object from empty value in %sbug75921.php on line 3
+object(stdClass)#1 (1) {
+  ["a"]=>
+  int(42)
+}
 
-Warning: Undefined variable $null in %s on line %d
-NULL
-Attempt to modify property "a" on null
+Warning: Creating default object from empty value in %sbug75921.php on line 7
+object(stdClass)#1 (1) {
+  ["a"]=>
+  array(1) {
+    ["hello"]=>
+    int(42)
+  }
+}
 
-Warning: Undefined variable $null in %s on line %d
-NULL
-Attempt to modify property "a" on null
+Warning: Creating default object from empty value in %sbug75921.php on line 11
 
-Warning: Undefined variable $null in %s on line %d
-NULL
-Attempt to modify property "a" on null
+Warning: Creating default object from empty value in %sbug75921.php on line 11
+object(stdClass)#1 (1) {
+  ["a"]=>
+  object(stdClass)#2 (1) {
+    ["b"]=>
+    int(42)
+  }
+}
 
-Warning: Undefined variable $null in %s on line %d
-NULL
-Attempt to modify property "a" on null
+Warning: Creating default object from empty value in %sbug75921.php on line 15
 
-Warning: Undefined variable $null in %s on line %d
-NULL
+Warning: Creating default object from empty value in %sbug75921.php on line 15
+object(stdClass)#1 (1) {
+  ["a"]=>
+  array(1) {
+    ["hello"]=>
+    object(stdClass)#2 (1) {
+      ["b"]=>
+      int(42)
+    }
+  }
+}
+
+Warning: Creating default object from empty value in %sbug75921.php on line 19
+
+Warning: Creating default object from empty value in %sbug75921.php on line 19
+object(stdClass)#1 (1) {
+  ["a"]=>
+  object(stdClass)#2 (1) {
+    ["b"]=>
+    array(1) {
+      ["hello"]=>
+      int(42)
+    }
+  }
+}

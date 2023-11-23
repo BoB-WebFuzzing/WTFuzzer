@@ -1,14 +1,13 @@
 --TEST--
 Bug #45289 (Bogus store_result on PS)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require('table.inc');
 
     $link->close();
 
@@ -25,14 +24,17 @@ require_once 'skipifconnectfailure.inc';
         printf("[003] [%d] %s\n", $stmt->errno, $stmt->error);
 
     if ($res = $link->store_result()) {
-        printf("[004] Can store result!\n");
+        if ($IS_MYSQLND)
+            printf("[004] Can store result!\n");
+        else
+            printf("[004] [007] http://bugs.mysql.com/bug.php?id=47485\n");
     } else {
         printf("[004] [%d] %s\n", $link->errno, $link->error);
     }
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
 [004] [%s

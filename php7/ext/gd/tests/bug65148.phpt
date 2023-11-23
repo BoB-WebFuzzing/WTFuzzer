@@ -1,7 +1,9 @@
 --TEST--
 Bug #65148 (imagerotate may alter image dimensions)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension is not available');
+?>
 --FILE--
 <?php
 
@@ -43,6 +45,7 @@ foreach ($interpolations as $name => $interpolation) {
 imagedestroy($img);
 print_r($results);
 ?>
+===DONE===
 --EXPECT--
 Array
 (
@@ -173,3 +176,4 @@ Array
         )
 
 )
+===DONE===

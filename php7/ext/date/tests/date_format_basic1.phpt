@@ -2,6 +2,12 @@
 Test date_format() function : basic functionality
 --FILE--
 <?php
+/* Prototype  : string date_format  ( DateTime $object  , string $format  )
+ * Description: Returns date formatted according to given format
+ * Source code: ext/date/php_date.c
+ * Alias to functions: DateTime::format
+ */
+
 //Set the default time zone
 date_default_timezone_set("Europe/London");
 
@@ -19,6 +25,7 @@ var_dump( date_format($date, 'H:m:s \m \i\s\ \m\o\n\t\h') );
 var_dump( date_format($date, "H:i:s") );
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing date_format() : basic functionality ***
 string(23) "July 14, 2005, 10:30 pm"
@@ -30,3 +37,4 @@ string(19) "it is the 14th day."
 string(28) "Thu Jul 14 22:30:41 BST 2005"
 string(19) "22:07:41 m is month"
 string(8) "22:30:41"
+===DONE===

@@ -2,22 +2,27 @@
 Testing imagetruecolortopalette(): wrong parameters for parameter 3
 --CREDITS--
 Rafael Dohms <rdohms [at] gmail [dot] com>
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
-    if (!function_exists("imagecreatetruecolor")) die("skip GD Version not compatible");
+	if (!extension_loaded("gd")) die("skip GD not present");
+	if (!function_exists("imagecreatetruecolor")) die("skip GD Version not compatible");
 ?>
 --FILE--
 <?php
-require __DIR__  . '/func.inc';
-
 $image = imagecreatetruecolor(50, 50);
+$resource = tmpfile();
 
-trycatch_dump(
-    fn() => imagetruecolortopalette($image, true, 0)
-);
+imagetruecolortopalette($image, true, 'string');
+imagetruecolortopalette($image, true, $resource);
+imagetruecolortopalette($image, true, array());
+imagetruecolortopalette($image, true, null);
 
 ?>
---EXPECT--
-!! [ValueError] imagetruecolortopalette(): Argument #3 ($num_colors) must be greater than 0 and less than 2147483647
+--EXPECTF--
+Warning: imagetruecolortopalette() expects parameter 3 to be int, string given in %s on line %d
+
+Warning: imagetruecolortopalette() expects parameter 3 to be int, resource given in %s on line %d
+
+Warning: imagetruecolortopalette() expects parameter 3 to be int, array given in %s on line %d
+
+Warning: imagetruecolortopalette(): Number of colors has to be greater than zero and no more than %d in %s on line %d

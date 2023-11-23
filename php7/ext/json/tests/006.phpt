@@ -1,5 +1,7 @@
 --TEST--
 json_encode() & extended encoding
+--SKIPIF--
+<?php if (!extension_loaded("json")) print "skip"; ?>
 --FILE--
 <?php
 $a = array('<foo>', "'bar'", '"baz"', '&blong&');

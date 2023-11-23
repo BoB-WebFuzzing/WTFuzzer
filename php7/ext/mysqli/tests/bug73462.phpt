@@ -1,32 +1,28 @@
 --TEST--
 Bug #73462 (Persistent connections don't set $connect_errno)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     /* Initial persistent connection */
-    $mysql_1 = new mysqli('p:'.$host, $user, $passwd, $db, $port);
+    $mysql_1 = new mysqli('p:'.$host, $user, $passwd, $db);
     $result = $mysql_1->query("SHOW STATUS LIKE 'Connections'");
     $c1 = $result->fetch_row();
     $result->free();
     $mysql_1->close();
 
     /* Failed connection to invalid host */
-    $mysql_2 = @new mysqli(' !!! invalid !!! ', $user, $passwd, $db, $port);
-    try {
-        $mysql_2->close();
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    $mysql_2 = @new mysqli(' !!! invalid !!! ', $user, $passwd, $db);
+    @$mysql_2->close();
 
     /* Re-use persistent connection */
-    $mysql_3 = new mysqli('p:'.$host, $user, $passwd, $db, $port);
+    $mysql_3 = new mysqli('p:'.$host, $user, $passwd, $db);
     $error = mysqli_connect_errno();
     $result = $mysql_3->query("SHOW STATUS LIKE 'Connections'");
     $c3 = $result->fetch_row();
@@ -42,5 +38,4 @@ require_once 'skipifconnectfailure.inc';
     print "done!";
 ?>
 --EXPECT--
-mysqli object is already closed
 done!

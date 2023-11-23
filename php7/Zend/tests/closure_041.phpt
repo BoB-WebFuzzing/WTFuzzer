@@ -8,29 +8,29 @@ Closure 041: Rebinding: preservation of previous scope when not given as arg unl
  * to having a bound instance. */
 
 $staticUnscoped = static function () {
-    echo "scoped to A: "; var_dump(isset(A::$priv));
-    echo "bound: ", isset($this)?get_class($this):"no";
+	echo "scoped to A: "; var_dump(isset(A::$priv));
+	echo "bound: ", isset($this)?get_class($this):"no";
 };
 
 $nonstaticUnscoped = function () {
-    echo "scoped to A: "; var_dump(isset(A::$priv));
-    echo "bound: ", isset($this)?get_class($this):"no";
+	echo "scoped to A: "; var_dump(isset(A::$priv));
+	echo "bound: ", isset($this)?get_class($this):"no";
 };
 
 class A {
-    private static $priv = 7;
-    function getClosure() {
-        return function () {
-            echo "scoped to A: "; var_dump(isset(A::$priv));
-            echo "bound: ", isset($this)?get_class($this):"no";
-        };
-    }
-    function getStaticClosure() {
-        return static function () {
-            echo "scoped to A: "; var_dump(isset(A::$priv));
-            echo "bound: ", isset($this)?get_class($this):"no";
-        };
-    }
+	private static $priv = 7;
+	function getClosure() {
+		return function () {
+			echo "scoped to A: "; var_dump(isset(A::$priv));
+			echo "bound: ", isset($this)?get_class($this):"no";
+		};
+	}
+	function getStaticClosure() {
+		return static function () {
+			echo "scoped to A: "; var_dump(isset(A::$priv));
+			echo "bound: ", isset($this)?get_class($this):"no";
+		};
+	}
 }
 class B extends A {}
 
@@ -48,7 +48,9 @@ echo "After binding, no instance", "\n";
 $d = $staticUnscoped->bindTo(null); $d(); echo "\n";
 $d = $nonstaticUnscoped->bindTo(null); $d(); echo "\n";
 $d = $staticScoped->bindTo(null); $d(); echo "\n";
-$d = $nonstaticScoped->bindTo(null); var_dump($d); echo "\n";
+$d = $nonstaticScoped->bindTo(null); $d(); echo "\n";
+// $d is still non-static
+$d->bindTo($d);
 
 echo "After binding, with same-class instance for the bound ones", "\n";
 $d = $staticUnscoped->bindTo(new A);
@@ -61,7 +63,6 @@ $d = $nonstaticUnscoped->bindTo(new B); $d(); echo " (should be scoped to dummy 
 $d = $nonstaticScoped->bindTo(new B); $d(); echo "\n";
 
 echo "Done.\n";
-?>
 --EXPECTF--
 Before binding
 scoped to A: bool(false)
@@ -80,9 +81,9 @@ bound: no
 scoped to A: bool(true)
 bound: no
 
-Warning: Cannot unbind $this of closure using $this in %s on line %d
-NULL
-
+Deprecated: Unbinding $this of closure is deprecated in %s on line %d
+scoped to A: bool(true)
+bound: no
 After binding, with same-class instance for the bound ones
 
 Warning: Cannot bind an instance to a static closure in %s on line %d

@@ -1,7 +1,5 @@
 --TEST--
 Test session_save_path() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc');?>
 --INI--
@@ -14,15 +12,21 @@ session.name=PHPSESSID
 
 ob_start();
 
+/*
+ * Prototype : string session_save_path([string $path])
+ * Description : Get and/or set the current session save path
+ * Source code : ext/session/session.c
+ */
+
 echo "*** Testing session_save_path() : variation ***\n";
 $initdir = __DIR__;
-$sessions = ($initdir."/session_save_path_variation4");
+$sessions = ($initdir."/sessions");
 
 chdir($initdir);
 
 // Delete the existing directory
 if (file_exists($sessions) === TRUE) {
-    @rmdir($sessions);
+	@rmdir($sessions);
 }
 
 var_dump(mkdir($sessions));
@@ -38,26 +42,25 @@ echo "Done";
 ob_end_flush();
 ?>
 --CLEAN--
-<?php
 $initdir = __DIR__;
-$sessions = ($initdir."/session_save_path_variation4");
-rmdir($sessions);
-?>
+$sessions = ($initdir."/sessions");
+chdir($initdir);
+var_dump(rmdir($sessions));
 --EXPECTF--
 *** Testing session_save_path() : variation ***
 bool(true)
 bool(true)
 
-Warning: ini_set(): open_basedir restriction in effect. File(%s) is not within the allowed path(s): (.) in %s on line %d
+Warning: ini_set(): open_basedir restriction in effect. File(%s) is not within the allowed path(s): (.) in %s on line 24
 string(0) ""
 
-Warning: session_start(): open_basedir restriction in effect. File(%s) is not within the allowed path(s): (.) in %s on line %d
+Warning: session_start(): open_basedir restriction in effect. File(%s) is not within the allowed path(s): (.) in %s on line 26
 
-Warning: session_start(): Failed to initialize storage module: files (path: ) in %s on line %d
+Warning: session_start(): Failed to initialize storage module: files (path: ) in %s on line 26
 bool(false)
 string(0) ""
 
-Warning: session_destroy(): Trying to destroy uninitialized session in %s on line %d
+Warning: session_destroy(): Trying to destroy uninitialized session in %s on line 28
 bool(false)
 string(0) ""
 Done

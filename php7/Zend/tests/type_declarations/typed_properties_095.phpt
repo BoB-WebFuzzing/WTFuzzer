@@ -1,8 +1,7 @@
 --TEST--
 Typed properties in internal classes
---EXTENSIONS--
-zend_test
-spl
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip requires zend-test'); ?>
 --FILE--
 <?php
 
@@ -61,41 +60,25 @@ var_dump(_ZendTestClass::$staticIntProp);
 ?>
 --EXPECT--
 int(123)
-Cannot assign string to property _ZendTestClass::$intProp of type int
-Cannot assign _ZendTestClass to property _ZendTestClass::$classProp of type ?stdClass
-object(_ZendTestClass)#1 (3) {
+Typed property _ZendTestClass::$intProp must be int, string used
+Typed property _ZendTestClass::$classProp must be an instance of stdClass or null, _ZendTestClass used
+object(_ZendTestClass)#1 (2) {
   ["intProp"]=>
   int(456)
   ["classProp"]=>
   object(stdClass)#2 (0) {
   }
-  ["classUnionProp"]=>
-  NULL
-  ["classIntersectionProp"]=>
-  uninitialized(Traversable&Countable)
-  ["readonlyProp"]=>
-  uninitialized(int)
-  ["dnfProperty"]=>
-  uninitialized(Iterator|(Traversable&Countable))
 }
 int(123)
-Cannot assign string to property _ZendTestClass::$intProp of type int
-Cannot assign Test to property _ZendTestClass::$classProp of type ?stdClass
-object(Test)#4 (3) {
+Typed property _ZendTestClass::$intProp must be int, string used
+Typed property _ZendTestClass::$classProp must be an instance of stdClass or null, Test used
+object(Test)#4 (2) {
   ["intProp"]=>
   int(456)
   ["classProp"]=>
   object(stdClass)#1 (0) {
   }
-  ["classUnionProp"]=>
-  NULL
-  ["classIntersectionProp"]=>
-  uninitialized(Traversable&Countable)
-  ["readonlyProp"]=>
-  uninitialized(int)
-  ["dnfProperty"]=>
-  uninitialized(Iterator|(Traversable&Countable))
 }
 int(123)
-Cannot assign string to property _ZendTestClass::$staticIntProp of type int
+Typed property _ZendTestClass::$staticIntProp must be int, string used
 int(456)

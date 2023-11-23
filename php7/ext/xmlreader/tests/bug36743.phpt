@@ -1,7 +1,7 @@
 --TEST--
 Bug #36743 (In a class extending XMLReader array properties are not writable)
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 

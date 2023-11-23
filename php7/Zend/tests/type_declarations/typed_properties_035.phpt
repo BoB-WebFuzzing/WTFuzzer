@@ -9,6 +9,5 @@ class Foo{
 class Baz extends Foo{
     public int $bar = 33;
 }
-?>
 --EXPECTF--
-Fatal error: Type of Baz::$bar must not be defined (as in class Foo) in %s on line 6
+Fatal error: Type of Baz::$bar must not be defined (as in class Foo) in %s on line 8

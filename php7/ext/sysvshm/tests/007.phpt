@@ -1,10 +1,8 @@
 --TEST--
 shm_remove() tests
---EXTENSIONS--
-sysvshm
 --SKIPIF--
 <?php
-
+if (!extension_loaded("sysvshm")){ print 'skip'; }
 if (!function_exists('ftok')){ print 'skip'; }
 ?>
 --FILE--
@@ -13,18 +11,32 @@ if (!function_exists('ftok')){ print 'skip'; }
 $key = ftok(__FILE__, 't');
 $s = shm_attach($key, 1024);
 
+var_dump(shm_remove());
+var_dump(shm_remove(-1));
+var_dump(shm_remove(0));
+var_dump(shm_remove(""));
+
 var_dump(shm_remove($s));
 
 shm_detach($s);
-try {
-    shm_remove($s);
-} catch (Error $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(shm_remove($s));
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
+Warning: shm_remove() expects exactly 1 parameter, 0 given in %s007.php on line %d
+NULL
+
+Warning: shm_remove() expects parameter 1 to be resource, int given in %s007.php on line %d
+NULL
+
+Warning: shm_remove() expects parameter 1 to be resource, int given in %s007.php on line %d
+NULL
+
+Warning: shm_remove() expects parameter 1 to be resource, string given in %s007.php on line %d
+NULL
 bool(true)
-Shared memory block has already been destroyed
+
+Warning: shm_remove(): supplied resource is not a valid sysvshm resource in %s007.php on line %d
+bool(false)
 Done

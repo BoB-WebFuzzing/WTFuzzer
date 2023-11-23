@@ -2,6 +2,11 @@
 Test abs() function : usage variations - different data types as $number arg
 --FILE--
 <?php
+/* Prototype  : number abs  ( mixed $number  )
+ * Description: Returns the absolute value of number.
+ * Source code: ext/standard/math.c
+ */
+
 /*
  * Pass different data types as $number argument to abs() to test behaviour
  */
@@ -67,28 +72,21 @@ $inputs = array(
 // loop through each element of $inputs to check the behavior of abs()
 $iterator = 1;
 foreach($inputs as $input) {
-    echo "\n-- Iteration $iterator --\n";
-    try {
-        var_dump(abs($input));
-    } catch (TypeError $e) {
-        echo $e->getMessage(), "\n";
-    }
-    $iterator++;
+	echo "\n-- Iteration $iterator --\n";
+	var_dump(abs($input) );
+	$iterator++;
 };
 
 fclose($fp);
 ?>
+===Done===
 --EXPECTF--
 *** Testing abs() : usage variations ***
 
 -- Iteration 1 --
-
-Deprecated: abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 int(0)
 
 -- Iteration 2 --
-
-Deprecated: abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 int(0)
 
 -- Iteration 3 --
@@ -104,35 +102,34 @@ int(1)
 int(0)
 
 -- Iteration 7 --
-abs(): Argument #1 ($num) must be of type int|float, string given
+int(0)
 
 -- Iteration 8 --
-abs(): Argument #1 ($num) must be of type int|float, string given
+int(0)
 
 -- Iteration 9 --
-abs(): Argument #1 ($num) must be of type int|float, array given
+bool(false)
 
 -- Iteration 10 --
-abs(): Argument #1 ($num) must be of type int|float, string given
+int(0)
 
 -- Iteration 11 --
-abs(): Argument #1 ($num) must be of type int|float, string given
+int(0)
 
 -- Iteration 12 --
-abs(): Argument #1 ($num) must be of type int|float, string given
+int(0)
 
 -- Iteration 13 --
-abs(): Argument #1 ($num) must be of type int|float, classA given
+
+Notice: Object of class classA could not be converted to number in %s on line %d
+int(1)
 
 -- Iteration 14 --
-
-Deprecated: abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 int(0)
 
 -- Iteration 15 --
-
-Deprecated: abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 int(0)
 
 -- Iteration 16 --
-abs(): Argument #1 ($num) must be of type int|float, resource given
+int(%d)
+===Done===

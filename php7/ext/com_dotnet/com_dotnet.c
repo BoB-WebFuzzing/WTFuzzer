@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -117,44 +119,6 @@ struct dotnet_runtime_stuff {
 	DISPID create_instance;
 };
 
-/* We link dynamically to mscoree.dll to avoid the hard dependency on .NET
- * framework, which is only required if a dotnet instance is to be created.
- */
-static HRESULT dotnet_bind_runtime(LPVOID FAR *ppv)
-{
-	HRESULT hr;
-	HMODULE mscoree;
-	typedef HRESULT (STDAPICALLTYPE *cbtr_t)(LPCWSTR pwszVersion, LPCWSTR pwszBuildFlavor, REFCLSID rclsid, REFIID riid, LPVOID FAR *ppv);
-	cbtr_t CorBindToRuntime;
-	OLECHAR *oleversion;
-	char *version;
-
-	mscoree = LoadLibraryA("mscoree.dll");
-	if (mscoree == NULL) {
-		return S_FALSE;
-	}
-
-	CorBindToRuntime = (cbtr_t) GetProcAddress(mscoree, "CorBindToRuntime");
-	if (CorBindToRuntime == NULL) {
-		FreeLibrary(mscoree);
-		return S_FALSE;
-	}
-
-	version = INI_STR("com.dotnet_version");
-	if (version == NULL || *version == '\0') {
-		oleversion = NULL;
-	} else {
-		oleversion = php_com_string_to_olestring(version, strlen(version), COMG(code_page));
-	}
-
-	hr = CorBindToRuntime(oleversion, NULL, &CLSID_CorRuntimeHost, &IID_ICorRuntimeHost, ppv);
-
-	efree(oleversion);
-	FreeLibrary(mscoree);
-
-	return hr;
-}
-
 static HRESULT dotnet_init(char **p_where)
 {
 	HRESULT hr;
@@ -168,8 +132,10 @@ static HRESULT dotnet_init(char **p_where)
 	}
 	memset(stuff, 0, sizeof(*stuff));
 
-	where = "dotnet_bind_runtime";
-	hr = dotnet_bind_runtime((LPVOID*)&stuff->dotnet_host);
+	where = "CoCreateInstance";
+	hr = CoCreateInstance(&CLSID_CorRuntimeHost, NULL, CLSCTX_ALL,
+			&IID_ICorRuntimeHost, (LPVOID*)&stuff->dotnet_host);
+
 	if (FAILED(hr))
 		goto out;
 
@@ -215,7 +181,7 @@ out:
 }
 
 /* {{{ com_dotnet_create_instance - ctor for DOTNET class */
-PHP_METHOD(dotnet, __construct)
+PHP_FUNCTION(com_dotnet_create_instance)
 {
 	zval *object = getThis();
 	php_com_dotnet_object *obj;
@@ -231,13 +197,6 @@ PHP_METHOD(dotnet, __construct)
 	zend_long cp = GetACP();
 	const struct php_win32_cp *cp_it;
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "ss|l",
-			&assembly_name, &assembly_name_len,
-			&datatype_name, &datatype_name_len,
-			&cp)) {
-		RETURN_THROWS();
-	}
-
 	php_com_initialize();
 	stuff = (struct dotnet_runtime_stuff*)COMG(dotnet_runtime_stuff);
 	if (stuff == NULL) {
@@ -248,7 +207,7 @@ PHP_METHOD(dotnet, __construct)
 			snprintf(buf, sizeof(buf), "Failed to init .Net runtime [%s] %s", where, err);
 			php_win32_error_msg_free(err);
 			php_com_throw_exception(hr, buf);
-			RETURN_THROWS();
+			return;
 		}
 		stuff = (struct dotnet_runtime_stuff*)COMG(dotnet_runtime_stuff);
 
@@ -262,7 +221,7 @@ PHP_METHOD(dotnet, __construct)
 			php_win32_error_msg_free(err);
 			php_com_throw_exception(hr, buf);
 			ZVAL_NULL(object);
-			RETURN_THROWS();
+			return;
 		}
 
 		where = "QI: System._AppDomain";
@@ -274,16 +233,24 @@ PHP_METHOD(dotnet, __construct)
 			php_win32_error_msg_free(err);
 			php_com_throw_exception(hr, buf);
 			ZVAL_NULL(object);
-			RETURN_THROWS();
+			return;
 		}
 	}
 
 	obj = CDNO_FETCH(object);
 
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "ss|l",
+			&assembly_name, &assembly_name_len,
+			&datatype_name, &datatype_name_len,
+			&cp)) {
+		php_com_throw_exception(E_INVALIDARG, "Could not create .Net object - invalid arguments!");
+		return;
+	}
+
 	cp_it = php_win32_cp_get_by_id((DWORD)cp);
 	if (!cp_it) {
 		php_com_throw_exception(E_INVALIDARG, "Could not create .Net object - invalid codepage!");
-		RETURN_THROWS();
+		return;
 	}
 	obj->code_page = (int)cp_it->id;
 
@@ -347,7 +314,7 @@ PHP_METHOD(dotnet, __construct)
 		snprintf(buf, sizeof(buf), "Failed to instantiate .Net object [%s] [0x%08x] %s", where, hr, err);
 		php_win32_error_msg_free(err);
 		php_com_throw_exception(hr, buf);
-		RETURN_THROWS();
+		return;
 	}
 }
 /* }}} */

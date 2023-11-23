@@ -1,14 +1,18 @@
 --TEST--
 mysqli_poll() & INSERT SELECT
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('connect.inc');
+require_once('skipifconnectfailure.inc');
+
+if (!$IS_MYSQLND)
+    die("skip mysqlnd only feature, compile PHP using --with-mysqli=mysqlnd");
 ?>
 --FILE--
 <?php
-    require_once 'table.inc';
+    require_once('table.inc');
 
     function get_connection() {
         global $host, $user, $passwd, $db, $port, $socket;
@@ -115,7 +119,7 @@ require_once 'skipifconnectfailure.inc';
                 $links[$thread_id]['query'], $saved_errors[$thread_id]);
             if ($saved_errors[$thread_id] != mysqli_errno($link['link'])) {
                 printf("[004] Error state not saved for query '%s', %d != %d\n", $link['query'],
-                    $saved_errors[$thread_id], mysqli_errno($link['link']));
+                        $saved_errors[$thread_id], mysqli_errno($link['link']));
             }
         }
 
@@ -157,7 +161,7 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-require_once 'connect.inc';
+require_once("connect.inc");
 if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
    printf("[c001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 

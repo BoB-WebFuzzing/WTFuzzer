@@ -7,5 +7,7 @@ $h = opendir($d);
 var_dump(fstat($h));
 closedir($h);
 ?>
+===DONE===
 --EXPECT--
 bool(false)
+===DONE===

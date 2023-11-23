@@ -1,14 +1,25 @@
 --TEST--
 mysqli_num_fields()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_num_fields()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_num_fields($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
 
     function func_test_mysqli_num_fields($link, $query, $expected, $offset, $test_free = false) {
 
@@ -24,11 +35,8 @@ require_once 'skipifconnectfailure.inc';
 
         mysqli_free_result($res);
 
-        try {
-            mysqli_num_fields($res);
-        } catch (Error $exception) {
-            echo $exception->getMessage() . "\n";
-        }
+        if ($test_free && (false !== ($tmp = mysqli_num_fields($res))))
+            printf("[%03d] Expecting false, got %s/%s\n", $offset + 2, gettype($tmp), $tmp);
     }
 
     func_test_mysqli_num_fields($link, "SELECT 1 AS a", 1, 5);
@@ -42,11 +50,8 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
-mysqli_result object is already closed
-mysqli_result object is already closed
-mysqli_result object is already closed
-mysqli_result object is already closed
+--EXPECTF--
+Warning: mysqli_num_fields(): Couldn't fetch mysqli_result in %s on line %d
 done!

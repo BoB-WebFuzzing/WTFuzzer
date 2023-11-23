@@ -1,12 +1,11 @@
 --TEST--
 Bug #50845 (exif_read_data() returns corrupted exif headers)
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
 --FILE--
 <?php
 $infile = __DIR__.'/bug50845.jpg';
 var_dump(exif_read_data($infile));
-?>
 --EXPECTF--
 array(44) {
   ["FileName"]=>

@@ -6,5 +6,7 @@ var_dump(
     strtr(11, array('aaa' => 'bbb'))
 );
 ?>
+===DONE===
 --EXPECT--
 string(2) "11"
+===DONE===

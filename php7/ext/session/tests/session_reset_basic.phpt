@@ -1,7 +1,5 @@
 --TEST--
 Test session_reset() function : basic functionality
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -12,6 +10,12 @@ session.save_handler=files
 <?php
 
 ob_start();
+
+/*
+ * Prototype : void session_reset(void)
+ * Description : Should abort session. Session data should not be written.
+ * Source code : ext/session/session.c
+ */
 
 echo "*** Testing session_abort() : basic functionality ***\n";
 

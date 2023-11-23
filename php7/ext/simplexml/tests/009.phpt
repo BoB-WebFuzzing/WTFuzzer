@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: foreach
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $sxe = simplexml_load_string(<<<EOF
@@ -29,11 +29,12 @@ $sxe = simplexml_load_string(<<<EOF
 EOF
 );
 foreach($sxe->children() as $name=>$val) {
-    var_dump($name);
-    var_dump(get_class($val));
-    var_dump(trim($val));
+	var_dump($name);
+	var_dump(get_class($val));
+	var_dump(trim($val));
 }
 ?>
+===DONE===
 --EXPECT--
 string(5) "elem1"
 string(16) "SimpleXMLElement"
@@ -41,3 +42,4 @@ string(10) "Bla bla 1."
 string(6) "elem11"
 string(16) "SimpleXMLElement"
 string(10) "Bla bla 2."
+===DONE===

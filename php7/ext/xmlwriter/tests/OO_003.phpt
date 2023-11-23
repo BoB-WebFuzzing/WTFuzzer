@@ -1,7 +1,7 @@
 --TEST--
 XMLWriter: libxml2 XML Writer, membuffer, flush, text, attribute
---EXTENSIONS--
-xmlwriter
+--SKIPIF--
+<?php if (!extension_loaded("xmlwriter")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -21,14 +21,16 @@ $xw->endAttribute();
 $xw->text("Test text for tag1");
 $res = $xw->startElement('tag2');
 if ($res < 1) {
-    echo "StartElement context validation failed\n";
-    exit();
+	echo "StartElement context validation failed\n";
+	exit();
 }
 $xw->endDocument();
 
 // Force to write and empty the buffer
 echo $xw->flush(true);
 ?>
+===DONE===
 --EXPECT--
 <?xml version="1.0" encoding="UTF-8"?>
 <tag1 attr1="attr1_value" attr2="attr2_value">Test text for tag1<tag2/></tag1>
+===DONE===

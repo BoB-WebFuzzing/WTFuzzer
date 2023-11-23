@@ -3,6 +3,7 @@ Test fgetcsv() : usage variations - with default enclosure and different delimit
 --FILE--
 <?php
 /*
+ Prototype: array fgetcsv ( resource $handle [, int $length [, string $delimiter [, string $enclosure]]] );
  Description: Gets line from file pointer and parse for CSV fields
 */
 

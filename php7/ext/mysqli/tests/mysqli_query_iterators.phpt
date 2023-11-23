@@ -1,14 +1,19 @@
 --TEST--
 mysqli iterators
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    require('table.inc');
 
     echo "--- Testing default ---\n";
     if (!is_object($res = mysqli_query($link, "SELECT id FROM test ORDER BY id")))
@@ -18,17 +23,12 @@ require_once 'skipifconnectfailure.inc';
             var_dump($row);
         }
         echo "======\n";
-
         foreach ($res as $row) {
             var_dump($row);
         }
         mysqli_free_result($res);
-        try {
-            foreach ($res as $row) {
-                $row;
-            }
-        } catch (Error $exception) {
-            echo $exception->getMessage() . "\n";
+        foreach ($res as $row) {
+            var_dump($row);
         }
     }
     echo "--- Testing USE_RESULT ---\n";
@@ -65,7 +65,7 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
 --- Testing default ---
@@ -118,7 +118,8 @@ array(1) {
   ["id"]=>
   string(1) "6"
 }
-mysqli_result object is already closed
+
+Warning: main(): Couldn't fetch mysqli_result in %s on line %d
 --- Testing USE_RESULT ---
 array(1) {
   ["id"]=>
@@ -146,7 +147,7 @@ array(1) {
 }
 ======
 
-Warning: Data fetched with MYSQLI_USE_RESULT can be iterated only once in %s on line %d
+Warning: main(): Data fetched with MYSQLI_USE_RESULT can be iterated only once in %s on line %d
 --- Testing STORE_RESULT ---
 array(1) {
   ["id"]=>

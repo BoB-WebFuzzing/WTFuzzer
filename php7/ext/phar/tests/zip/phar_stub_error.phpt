@@ -1,7 +1,7 @@
 --TEST--
 Phar::setStub()/getStub() zip-based
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -22,11 +22,11 @@ var_dump($phar->getStub() == $stub);
 $newstub = '<?php echo "second stub\n"; _x_HALT_COMPILER(); ?>';
 try
 {
-    $phar->setStub($newstub);
+	$phar->setStub($newstub);
 }
 catch(exception $e)
 {
-    echo 'Exception: ' . $e->getMessage() . "\n";
+	echo 'Exception: ' . $e->getMessage() . "\n";
 }
 var_dump($phar->getStub());
 var_dump($phar->getStub() == $stub);
@@ -35,6 +35,7 @@ var_dump($phar->getStub());
 var_dump($phar->getStub() == $stub);
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.zip');
@@ -51,3 +52,4 @@ bool(true)
 string(50) "<?php echo "first stub\n"; __HALT_COMPILER(); ?>
 "
 bool(true)
+===DONE===

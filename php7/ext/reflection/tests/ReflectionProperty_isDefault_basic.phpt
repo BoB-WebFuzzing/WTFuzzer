@@ -24,8 +24,12 @@ reflectProperty("TestClass", "stat");
 reflectProperty("TestClass", "prot");
 reflectProperty("TestClass", "priv");
 
+echo "Wrong number of params:\n";
+$propInfo = new ReflectionProperty('TestClass', 'pub');
+$propInfo->isDefault(1);
+
 ?>
---EXPECT--
+--EXPECTF--
 **********************************
 Reflecting on property TestClass::pub
 
@@ -54,3 +58,6 @@ isDefault():
 bool(true)
 
 **********************************
+Wrong number of params:
+
+Warning: ReflectionProperty::isDefault() expects exactly 0 parameters, 1 given in %s on line %d

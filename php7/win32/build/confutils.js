@@ -1,12 +1,14 @@
 // Utils for configure script
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -94,11 +96,11 @@ if (typeof(CWD) == "undefined") {
 
 if (!MODE_PHPIZE) {
 	/* defaults; we pick up the precise versions from configure.ac */
-	var PHP_VERSION = 8;
+	var PHP_VERSION = 7;
 	var PHP_MINOR_VERSION = 4;
 	var PHP_RELEASE_VERSION = 0;
 	var PHP_EXTRA_VERSION = "";
-	var PHP_VERSION_STRING = "8.4.0";
+	var PHP_VERSION_STRING = "7.4.0";
 }
 
 /* Get version numbers and DEFINE as a string */
@@ -127,17 +129,6 @@ build_dirs = new Array();
 
 extension_include_code = "";
 extension_module_ptrs = "";
-
-(function () {
-	var wmiservice = GetObject("winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2");
-	var oss = wmiservice.ExecQuery("Select * from Win32_OperatingSystem");
-	var os = oss.ItemIndex(0);
-	AC_DEFINE("PHP_BUILD_SYSTEM", os.Caption + " [" + os.Version + "]", "Windows build system version");
-	var build_provider = WshShell.Environment("Process").Item("PHP_BUILD_PROVIDER");
-	if (build_provider) {
-		AC_DEFINE("PHP_BUILD_PROVIDER", build_provider);
-	}
-}());
 
 if (!MODE_PHPIZE) {
 	get_version_numbers();
@@ -168,13 +159,9 @@ function probe_binary(EXE, what)
 	}
 	var version = execute(command + '" 2>&1"');
 
-	if (what == "arch") {
-		if (version.match(/x86/)) {
-			return "x86";
-		} else if (version.match(/x64/)) {
-			return "x64";
-		} else if (version.match(/ARM64/)) {
-			return "arm64";
+	if (what == "64") {
+		if (version.match(/x64/)) {
+			return 1;
 		}
 	} else {
 		if (version.match(/(\d+\.\d+(\.\d+)?(\.\d+)?)/)) {
@@ -454,9 +441,13 @@ can be built that way. \
 	}
 
 	var snapshot_build_exclusions = new Array(
-		'debug', 'lzf-better-compression', 'php-build', 'snapshot-template', 'zts',
-		'ipv6', 'fd-setsize', 'pgi', 'pgo', 'all-shared', 'config-profile', 'sanitizer'
-	);
+		'debug', 'crt-debug', 'lzf-better-compression',
+		 'php-build', 'snapshot-template', 'ereg',
+		 'pcre-regex', 'fastcgi', 'force-cgi-redirect',
+		 'path-info-check', 'zts', 'ipv6', 'memory-limit',
+		 'zend-multibyte', 'fd-setsize', 'memory-manager',
+		 'pgi', 'pgo', 'all-shared', 'config-profile'
+		);
 	var force;
 
 	// Now set any defaults we might have missed out earlier
@@ -1076,7 +1067,7 @@ function generate_version_info_resource(makefiletarget, basename, creditspath, s
 	var thanks = "";
 	var logo = "";
 	var debug = "";
-	var project_url = "https://www.php.net";
+	var project_url = "http://www.php.net";
 	var project_header = creditspath + "/php_" + basename + ".h";
 	var versioning = "";
 
@@ -1097,14 +1088,14 @@ function generate_version_info_resource(makefiletarget, basename, creditspath, s
 		if (thanks == null) {
 			thanks = "";
 		} else {
-			thanks = "Thanks to " + thanks.replace(/([<>&|%])/g, "^$1").replace(/"/g, '\\"\\"');
+			thanks = "Thanks to " + thanks;
 		}
 		credits.Close();
 	}
 
 	if (creditspath.match(new RegExp("pecl"))) {
 		/* PECL project url - this will eventually work correctly for all */
-		project_url = "https://pecl.php.net/" + basename;
+		project_url = "http://pecl.php.net/" + basename;
 
 		/* keep independent versioning PECL-specific for now */
 		if (FSO.FileExists(project_header)) {
@@ -1431,7 +1422,7 @@ function EXTENSION(extname, file_list, shared, cflags, dllname, obj_dir)
 
 	if (shared) {
 		STDOUT.WriteLine("Enabling extension " + extname_for_printing + " [shared]");
-		cflags = "/D ZEND_COMPILE_DL_EXT=1 /D COMPILE_DL_" + EXT + " /D " + EXT + "_EXPORTS=1 " + cflags;
+		cflags = "/D COMPILE_DL_" + EXT + " /D " + EXT + "_EXPORTS=1 " + cflags;
 		ADD_FLAG("CFLAGS_PHP", "/D COMPILE_DL_" + EXT);
 	} else {
 		STDOUT.WriteLine("Enabling extension " + extname_for_printing);
@@ -1543,6 +1534,7 @@ function EXTENSION(extname, file_list, shared, cflags, dllname, obj_dir)
 			var _tmp = FSO.CreateTextFile(PHP_DIR + "/include/main/config.pickle.h", true);
 			_tmp.Close();
 		}
+		cflags = "/FI main/config.pickle.h " + cflags;
 	}
 	ADD_FLAG("CFLAGS_" + EXT, cflags);
 
@@ -1669,7 +1661,7 @@ function ADD_SOURCES(dir, file_list, target, obj_dir)
 		}
 
 		if (PHP_ANALYZER == "clang") {
-			var analyzer_base_args = TARGET_ARCH == 'x86' ? "-m32" : "-m64";
+			var analyzer_base_args = X64 ? "-m64" : "-m32";
 			var analyzer_base_flags = "";
 
 			analyzer_base_args += " --analyze";
@@ -1692,14 +1684,10 @@ function ADD_SOURCES(dir, file_list, target, obj_dir)
 				analyzer_base_flags += " -D _MSC_VER=" + probe_binary(PATH_PROG('cl', null));
 			}
 
-			if (TARGET_ARCH == 'x64') {
+			if (X64) {
 				analyzer_base_flags += " -D _M_X64 -D _WIN64";
-			} else if (TARGET_ARCH == 'ARM64') {
-				analyzer_base_flags += " -D _M_ARM64 -D _WIN64";
-			} else if (TARGET_ARCH == 'x86') {
-				analyzer_base_flags += " -D _M_IX86 ";
 			} else {
-				ERROR("analyzer is not supported at arch " + TARGET_ARCH);
+				analyzer_base_flags += " -D _M_IX86 ";
 			}
 			analyzer_base_flags += " -D _WIN32 -D WIN32 -D _WINDOWS";
 
@@ -1711,8 +1699,8 @@ function ADD_SOURCES(dir, file_list, target, obj_dir)
 				analyzer_base_flags += " -I " + "\"" + vc_incs[i] + "\"";
 			}
 
-			var cppcheck_platform = TARGET_ARCH == 'x86' ? "win32A" : "win64";
-			var cppcheck_lib = "win32\\build\\cppcheck_" + (TARGET_ARCH == 'x86' ? "x86" : "x64") + ".cfg"; // use x64 for arm64 yet
+			var cppcheck_platform = X64 ? "win64" : "win32A";
+			var cppcheck_lib = "win32\\build\\cppcheck_" + (X64 ? "x64" : "x86") + ".cfg";
 			analyzer_base_args += "--enable=warning,performance,portability,information,missingInclude " +
 						"--platform=" + cppcheck_platform + " " +
 						"--library=windows.cfg --library=microsoft_sal.cfg " +
@@ -1963,8 +1951,7 @@ function write_summary()
 	ar[k++] = ['Build type', PHP_DEBUG == "yes" ? "Debug" : "Release"];
 	ar[k++] = ['Thread Safety', PHP_ZTS == "yes" ? "Yes" : "No"];
 	ar[k++] = ['Compiler', COMPILER_NAME_LONG];
-	ar[k++] = ['Target Architecture', TARGET_ARCH];
-	ar[k++] = ['Host Architecture', HOST_ARCH];
+	ar[k++] = ['Architecture', X64 ? 'x64' : 'x86'];
 	if (PHP_PGO == "yes") {
 		ar[k++] = ['Optimization', "PGO"];
 	} else if (PHP_PGI == "yes") {
@@ -2031,6 +2018,9 @@ function generate_tmp_php_ini()
 		var directive = (extensions_enabled[i][2] ? 'zend_extension' : 'extension');
 
 		var ext_name = extensions_enabled[i][0];
+		if ("gd" == ext_name) {
+			ext_name = "gd2";
+		}
 
 		if (!is_on_exclude_list_for_test_ini(ext_list, ext_name)) {
 			INI.WriteLine(directive + "=php_" + ext_name + ".dll");
@@ -2087,7 +2077,9 @@ function generate_files()
 	}
 
 	STDOUT.WriteLine("Generating files...");
-	generate_tmp_php_ini();
+	if (!MODE_PHPIZE) {
+		generate_tmp_php_ini();
+	}
 	generate_makefile();
 	if (!MODE_PHPIZE) {
 		generate_internal_functions();
@@ -2210,7 +2202,7 @@ function generate_config_pickle_h()
 			var ln = outfile.ReadLine();
 
 			for (var i in keys) {
-				var reg = new RegExp("#define[\s ]+" + keys[i] + "[\s ]*.*|#undef[\s ]+" + keys[i], "g");
+				var reg = new RegExp("#define[\s ]+" + keys[i] + "[\s ]*.*", "g");
 
 				if (ln.match(reg)) {
 					found = true;
@@ -2236,7 +2228,6 @@ function generate_config_pickle_h()
 			continue;
 		}*/
 
-		lines.push("#undef " + keys[i]);
 		lines.push("#define " + keys[i] + " " + item[0]);
 	}
 
@@ -2313,10 +2304,18 @@ function generate_config_h()
 		outfile.WriteLine("#define " + keys[i] + " " + pieces);
 	}
 
-	outfile.WriteBlankLines(1);
-	outfile.WriteLine("#if __has_include(\"main/config.pickle.h\")");
-	outfile.WriteLine("#include \"main/config.pickle.h\"");
-	outfile.WriteLine("#endif");
+	if (VS_TOOLSET) {
+		if (VCVERS >= 1800) {
+			outfile.WriteLine("");
+			outfile.WriteLine("#define HAVE_ACOSH 1");
+			outfile.WriteLine("#define HAVE_ASINH 1");
+			outfile.WriteLine("#define HAVE_ATANH 1");
+		}
+		if (VCVERS >= 1900) {
+			outfile.WriteLine("#define HAVE_LOG1P 1");
+		}
+	}
+
 
 	outfile.Close();
 }
@@ -2346,7 +2345,7 @@ function generate_phpize()
 	MF.WriteLine("var PHP_EXTRA_VERSION=\"" + PHP_EXTRA_VERSION + "\"");
 	MF.WriteLine("var PHP_VERSION_STRING=\"" + PHP_VERSION_STRING + "\"");
 	MF.WriteBlankLines(1);
-	MF.WriteLine("/* Generated extensions list with mode (static/shared) */");
+	MF.WriteLine("/* Genereted extensions list with mode (static/shared) */");
 
 	var count = extensions_enabled.length;
 	for (i in extensions_enabled) {
@@ -2357,7 +2356,7 @@ function generate_phpize()
 	}
 
 	MF.WriteBlankLines(2);
-	MF.WriteLine("/* Generated win32/build/phpize.js.in */");
+	MF.WriteLine("/* Genereted win32/build/phpize.js.in */");
 	MF.WriteBlankLines(1);
 	MF.Write(file_get_contents("win32/build/phpize.js.in"));
 	MF.Close();
@@ -2441,7 +2440,7 @@ function handle_analyzer_makefile_flags(fd, key, val)
 {
 	var relevant = false;
 
-	/* VS integrates /analyze with the build process,
+	/* VS integrates /analyze with the bulid process,
 		no further action is required. */
 	if ("no" == PHP_ANALYZER || "vs" == PHP_ANALYZER) {
 		return;
@@ -2530,9 +2529,11 @@ function generate_makefile()
 		handle_analyzer_makefile_flags(MF, keys[i], val);
 	}
 
-	var val = "yes" == PHP_TEST_INI ? PHP_TEST_INI_PATH : "";
-	/* Be sure it's done after generate_tmp_php_ini(). */
-	MF.WriteLine("PHP_TEST_INI_PATH=\"" + val + "\"");
+	if (!MODE_PHPIZE) {
+		var val = "yes" == PHP_TEST_INI ? PHP_TEST_INI_PATH : "";
+		/* Be sure it's done after generate_tmp_php_ini(). */
+		MF.WriteLine("PHP_TEST_INI_PATH=\"" + val + "\"");
+	}
 
 	MF.WriteBlankLines(1);
 	if (MODE_PHPIZE) {
@@ -2944,25 +2945,25 @@ function toolset_setup_compiler()
 
 			WARNING("Using unknown MSVC version " + tmp);
 
-			AC_DEFINE('PHP_BUILD_COMPILER', COMPILER_NAME_LONG, "Detected compiler version");
+			AC_DEFINE('COMPILER', COMPILER_NAME_LONG, "Detected compiler version");
 			DEFINE("PHP_COMPILER_SHORT", tmp);
 			AC_DEFINE('PHP_COMPILER_ID', tmp, "Compiler compatibility ID");
 		} else {
-			AC_DEFINE('PHP_BUILD_COMPILER', COMPILER_NAME_LONG, "Detected compiler version");
+			AC_DEFINE('COMPILER', COMPILER_NAME_LONG, "Detected compiler version");
 			DEFINE("PHP_COMPILER_SHORT", COMPILER_NAME_SHORT.toLowerCase());
 			AC_DEFINE('PHP_COMPILER_ID', COMPILER_NAME_SHORT.toUpperCase(), "Compiler compatibility ID");
 		}
 	} else if (CLANG_TOOLSET) {
 		CLANGVERS = COMPILER_NUMERIC_VERSION;
 
-		AC_DEFINE('PHP_BUILD_COMPILER', COMPILER_NAME_LONG, "Detected compiler version");
+		AC_DEFINE('COMPILER', COMPILER_NAME_LONG, "Detected compiler version");
 		DEFINE("PHP_COMPILER_SHORT", "clang");
 		AC_DEFINE('PHP_COMPILER_ID', "clang"); /* XXX something better were to write here */
 
 	} else if (ICC_TOOLSET) {
 		INTELVERS = COMPILER_NUMERIC_VERSION;
 
-		AC_DEFINE('PHP_BUILD_COMPILER', COMPILER_NAME_LONG, "Detected compiler version");
+		AC_DEFINE('COMPILER', COMPILER_NAME_LONG, "Detected compiler version");
 		DEFINE("PHP_COMPILER_SHORT", "icc");
 		AC_DEFINE('PHP_COMPILER_ID', "icc"); /* XXX something better were to write here */
 	}
@@ -3101,14 +3102,12 @@ function toolset_get_compiler_name(short)
 
 		version = probe_binary(PHP_CL).substr(0, 5).replace('.', '');
 
-		if (version >= 1940) {
+		if (version >= 1930) {
 			return name;
-		} else if (version >= 1930) {
-			name = short ? "VS17" : "Visual C++ 2022";
-		} else if (version >= 1920) {
+		} if (version >= 1920) {
 			/* NOTE - VS is intentional. Due to changes in recent Visual Studio
-						versioning scheme referring to the exact VC++ version is
-						hardly predictable. From this version on, it refers to
+						versioning scheme refering to the exact VC++ version is
+						hardly predictable. From this version on, it refers to 
 						Visual Studio version and implies the default toolset.
 						When new versions are introduced, adapt also checks in
 						php_win32_image_compatible(), if needed. */
@@ -3133,32 +3132,10 @@ function toolset_get_compiler_name(short)
 }
 
 
-function toolset_host_arch()
-{
-	var command = 'cmd /c "where cl.exe"';
-	var clpath = execute(command).split(/\n/)[0].replace(/\s$/, '');
-
-	var command = 'cmd /c "dumpbin "' + clpath + '" /nologo /headers"';
-	var full = execute(command);
-
-	/*
-	output is something like
-	FILE HEADER VALUES
-		8664 machine (x64)
-	*/
-	var matches = full.match(/FILE HEADER VALUES\s+[A-F0-9]{3,4}\smachine \((x64|x86|ARM64)\)/);
-
-	if(!matches){
-		ERROR("Unsupported toolset host");
-	}
-
-	return matches[1].toLowerCase();
-}
-
-function toolset_target_arch()
+function toolset_is_64()
 {
 	if (VS_TOOLSET) {
-		return probe_binary(PHP_CL, 'arch');
+		return probe_binary(PHP_CL, 64);
 	} else if (CLANG_TOOLSET) {
 		/*var command = 'cmd /c ""' + PHP_CL + '" -v"';
 		var full = execute(command + '" 2>&1"');
@@ -3168,22 +3145,26 @@ function toolset_target_arch()
 		/* Even executed within an environment setup with vcvars32.bat,
 		clang-cl doesn't recognize the arch toolset. But as it needs
 		the VS environment, checking the arch of cl.exe is correct. */
-		return probe_binary(PATH_PROG('cl', null), 'arch');
+		return probe_binary(PATH_PROG('cl', null), 64);
 	} else if (ICC_TOOLSET) {
-		var command = 'cmd /c "where cl"';
+		var command = 'cmd /c ""' + PHP_CL + '" -v"';
 		var full = execute(command + '" 2>&1"');
 
 		return null != full.match(/Intel\(R\) 64/);
 	}
 
-	ERROR("Unsupported toolset target");
+	ERROR("Unsupported toolset");
 }
 
 function toolset_setup_arch()
 {
-	STDOUT.WriteLine("  Detected " + TARGET_ARCH + " compiler" + (TARGET_ARCH == HOST_ARCH ? "" : " (cross compile from " + HOST_ARCH + ")"));
-	AC_DEFINE('PHP_BUILD_ARCH', TARGET_ARCH, "Detected compiler architecture");
-	DEFINE("PHP_ARCHITECTURE", TARGET_ARCH);
+	if (X64) {
+		STDOUT.WriteLine("  Detected 64-bit compiler");
+	} else {
+		STDOUT.WriteLine("  Detected 32-bit compiler");
+	}
+	AC_DEFINE('ARCHITECTURE', X64 ? 'x64' : 'x86', "Detected compiler architecture");
+	DEFINE("PHP_ARCHITECTURE", X64 ? 'x64' : 'x86');
 }
 
 function toolset_setup_codegen_arch()
@@ -3197,7 +3178,7 @@ function toolset_setup_codegen_arch()
 
 		if ("IA32" != arc) {
 			ERROR("Only IA32 arch is supported by --with-codegen-arch, got '" + arc + "'");
-		} else if (TARGET_ARCH != 'x86') {
+		} else if (X64) {
 			ERROR("IA32 arch is only supported with 32-bit build");
 		}
 		ADD_FLAG("CFLAGS", "/arch:" + arc);
@@ -3244,7 +3225,7 @@ function toolset_setup_common_cflags()
 
 	// General CFLAGS for building objects
 	DEFINE("CFLAGS", "/nologo $(BASE_INCLUDES) /D _WINDOWS /D WINDOWS=1 \
-		/D ZEND_WIN32=1 /D PHP_WIN32=1 /D WIN32 /D _MBCS \
+		/D ZEND_WIN32=1 /D PHP_WIN32=1 /D WIN32 /D _MBCS /W3 \
 		/D _USE_MATH_DEFINES");
 
 	if (envCFLAGS) {
@@ -3257,10 +3238,10 @@ function toolset_setup_common_cflags()
 		// fun stuff: MS deprecated ANSI stdio and similar functions
 		// disable annoying warnings.  In addition, time_t defaults
 		// to 64-bit.  Ask for 32-bit.
-		if (TARGET_ARCH == 'x86') {
-			ADD_FLAG('CFLAGS', ' /wd4996 /D_USE_32BIT_TIME_T=1 ');
-		} else {
+		if (X64) {
 			ADD_FLAG('CFLAGS', ' /wd4996 ');
+		} else {
+			ADD_FLAG('CFLAGS', ' /wd4996 /D_USE_32BIT_TIME_T=1 ');
 		}
 
 		if (PHP_DEBUG == "yes") {
@@ -3312,10 +3293,10 @@ function toolset_setup_common_cflags()
 
 		ADD_FLAG("CFLAGS", "/Zc:wchar_t");
 	} else if (CLANG_TOOLSET) {
-		if (TARGET_ARCH == 'x86') {
-			ADD_FLAG('CFLAGS', '-m32');
-		} else {
+		if (X64) {
 			ADD_FLAG('CFLAGS', '-m64');
+		} else {
+			ADD_FLAG('CFLAGS', '-m32');
 		}
 		ADD_FLAG("CFLAGS", " /fallback ");
 		ADD_FLAG("CFLAGS", "-Xclang -fmodules");
@@ -3345,14 +3326,6 @@ function toolset_setup_intrinsic_cflags()
 			ERROR("Can't enable intrinsics, --with-codegen-arch passed with an incompatible option. ")
 		}
 
-		if (TARGET_ARCH == 'arm64') {
-			/* arm64 supports neon */
-			configure_subst.Add("PHP_SIMD_SCALE", 'NEON');
-			/* all officially supported arm64 cpu supports crc32 (TODO: to be confirmed) */
-			AC_DEFINE('HAVE_ARCH64_CRC32', 1);
-			return;
-		}
-
 		if ("no" == PHP_NATIVE_INTRINSICS || "yes" == PHP_NATIVE_INTRINSICS) {
 			PHP_NATIVE_INTRINSICS = default_enabled;
 		}
@@ -3380,7 +3353,7 @@ function toolset_setup_intrinsic_cflags()
 					}
 				}
 			}
-			if (TARGET_ARCH == 'x86') {
+			if (!X64) {
 				/* SSE2 is currently the default on 32-bit. It could change later,
 					for now no need to pass it. But, if SSE only was chosen,
 					/arch:SSE is required. */
@@ -3432,26 +3405,20 @@ function toolset_setup_common_ldlags()
 				ADD_FLAG('LDFLAGS', "/GUARD:CF");
 			}
 		}
-		if (PHP_VS_LINK_COMPAT != "no") {
-			// Allow compatible IL versions, do not require an exact match.
-			// Prevents build failures where different libs were built with different (but compatible) IL versions.
-			// See fatal error C1047.
-			ADD_FLAG("LDFLAGS", "/d2:-AllowCompatibleILVersions ");
-		}
 	}
 }
 
 function toolset_setup_common_libs()
 {
 	// urlmon.lib ole32.lib oleaut32.lib uuid.lib gdi32.lib winspool.lib comdlg32.lib
-	DEFINE("LIBS", "kernel32.lib ole32.lib user32.lib advapi32.lib shell32.lib ws2_32.lib Dnsapi.lib psapi.lib bcrypt.lib");
+	DEFINE("LIBS", "kernel32.lib ole32.lib user32.lib advapi32.lib shell32.lib ws2_32.lib Dnsapi.lib psapi.lib bcrypt.lib imagehlp.lib");
 }
 
 function toolset_setup_build_mode()
 {
 	if (PHP_DEBUG == "yes") {
-		ADD_FLAG("CFLAGS", "/LDd /MDd /Od /D _DEBUG /D ZEND_DEBUG=1 " +
-			(TARGET_ARCH == 'x86'?"/ZI":"/Zi"));
+		ADD_FLAG("CFLAGS", "/LDd /MDd /W3 /Od /D _DEBUG /D ZEND_DEBUG=1 " +
+			(X64?"/Zi":"/ZI"));
 		ADD_FLAG("LDFLAGS", "/debug");
 		// Avoid problems when linking to release libraries that use the release
 		// version of the libc
@@ -3462,12 +3429,12 @@ function toolset_setup_build_mode()
 			ADD_FLAG("CFLAGS", "/Zi");
 			ADD_FLAG("LDFLAGS", "/incremental:no /debug /opt:ref,icf");
 		}
-		ADD_FLAG("CFLAGS", "/LD /MD");
+		ADD_FLAG("CFLAGS", "/LD /MD /W3");
 		if (PHP_SANITIZER == "yes" && CLANG_TOOLSET) {
 			ADD_FLAG("CFLAGS", "/Od /D NDebug /D NDEBUG /D ZEND_WIN32_NEVER_INLINE /D ZEND_DEBUG=0");
 		} else {
 			// Equivalent to Release_TSInline build -> best optimization
-			ADD_FLAG("CFLAGS", "/Ox /D NDebug /D NDEBUG /GF /D ZEND_DEBUG=0");
+			ADD_FLAG("CFLAGS", "/Ox /D NDebug /D NDEBUG /D ZEND_WIN32_FORCE_INLINE /GF /D ZEND_DEBUG=0");
 		}
 
 		// if you have VS.Net /GS hardens the binary against buffer overruns
@@ -3486,13 +3453,8 @@ function object_out_dir_option_handle()
 	} else {
 		PHP_OBJECT_OUT_DIR = FSO.GetAbsolutePathName(".") + '\\';
 
-		if (TARGET_ARCH == 'x64') {
+		if (X64) {
 			PHP_OBJECT_OUT_DIR += 'x64\\';
-			if (!FSO.FolderExists(PHP_OBJECT_OUT_DIR)) {
-				FSO.CreateFolder(PHP_OBJECT_OUT_DIR);
-			}
-		} else if (TARGET_ARCH == 'arm64') {
-			PHP_OBJECT_OUT_DIR += 'arm64\\';
 			if (!FSO.FolderExists(PHP_OBJECT_OUT_DIR)) {
 				FSO.CreateFolder(PHP_OBJECT_OUT_DIR);
 			}
@@ -3552,7 +3514,7 @@ function php_build_option_handle()
 			if (FSO.FolderExists("..\\php_build")) {
 				PHP_PHP_BUILD = "..\\php_build";
 			} else {
-				if (TARGET_ARCH != 'x86') {
+				if (X64) {
 					if (FSO.FolderExists("..\\win64build")) {
 						PHP_PHP_BUILD = "..\\win64build";
 					} else if (FSO.FolderExists("..\\php-win64-dev\\php_build")) {
@@ -3711,10 +3673,10 @@ function get_clang_lib_dir()
 	if (COMPILER_NAME_LONG.match(/clang version ([\d\.]+) \((.*)\)/)) {
 		ver = RegExp.$1;
 	} else {
-		ERROR("Failed to determine clang lib path");
+		ERROR("Faled to determine clang lib path");
 	}
 
-	if (TARGET_ARCH != 'x86') {
+	if (X64) {
 		ret = PROGRAM_FILES + "\\LLVM\\lib\\clang\\" + ver + "\\lib";
 		if (!FSO.FolderExists(ret)) {
 			ret = null;
@@ -3744,20 +3706,17 @@ function add_asan_opts(cflags_name, libs_name, ldflags_name)
 	if (COMPILER_NAME_LONG.match(/clang version ([\d\.]+) \((.*)\)/)) {
 		ver = RegExp.$1;
 	} else {
-		ERROR("Failed to determine clang lib path");
+		ERROR("Faled to determine clang lib path");
 	}
 
 	if (!!cflags_name) {
 		ADD_FLAG(cflags_name, "-fsanitize=address,undefined");
 	}
 	if (!!libs_name) {
-		if (TARGET_ARCH == 'x64') {
+		if (X64) {
 			ADD_FLAG(libs_name, "clang_rt.asan_dynamic-x86_64.lib clang_rt.asan_dynamic_runtime_thunk-x86_64.lib");
-		} else if (TARGET_ARCH == 'x86') {
-			ADD_FLAG(libs_name, "clang_rt.asan_dynamic-i386.lib clang_rt.asan_dynamic_runtime_thunk-i386.lib");
 		} else {
-			// TODO: support arm64?
-			ERROR("Failed to determine clang lib path");
+			ADD_FLAG(libs_name, "clang_rt.asan_dynamic-i386.lib clang_rt.asan_dynamic_runtime_thunk-i386.lib");
 		}
 	}
 
@@ -3794,10 +3753,4 @@ function setup_verbosity()
 		CMD_MOD1 = "@";
 		CMD_MOD2 = "@";
 	}
-}
-
-try {
-	ARG_ENABLE('vs-link-compat', 'Allow linking of libraries built with compatible versions of VS toolset', 'yes');
-} catch (e) {
-	STDOUT.WriteLine("problem: " + e);
 }

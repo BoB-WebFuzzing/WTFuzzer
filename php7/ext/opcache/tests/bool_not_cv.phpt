@@ -4,8 +4,8 @@ $v = !$v/(bool)$v checks for undefined variables
 opcache.enable=1
 opcache.enable_cli=1
 opcache.file_cache_only=0
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function undef_negation() {
@@ -26,9 +26,9 @@ undef_bool_cast();
 --EXPECTF--
 In undef_negation
 
-Warning: Undefined variable $v in %s on line 4
+Notice: Undefined variable: v in %s on line 4
 true
 In undef_bool_cast
 
-Warning: Undefined variable $v in %s on line 10
+Notice: Undefined variable: v in %s on line 10
 false

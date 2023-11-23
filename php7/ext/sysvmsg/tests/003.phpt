@@ -1,7 +1,7 @@
 --TEST--
 msg_queue_exists()
---EXTENSIONS--
-sysvmsg
+--SKIPIF--
+<?php if (!extension_loaded("sysvmsg")) die("skip sysvmsg extension is not available")?>
 --FILE--
 <?php
 $id = ftok(__FILE__, 'r');
@@ -16,10 +16,9 @@ var_dump(msg_remove_queue($res));
 var_dump(msg_queue_exists($id));
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 bool(false)
-object(SysvMessageQueue)#1 (0) {
-}
+resource(%d) of type (sysvmsg queue)
 bool(true)
 bool(true)
 bool(false)

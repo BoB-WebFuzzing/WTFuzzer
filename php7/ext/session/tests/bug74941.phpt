@@ -1,7 +1,5 @@
 --TEST--
 Bug #74941 session_start() triggers a warning after headers have been sent but cookies are not used
---EXTENSIONS--
-session
 --SKIPIF--
 <?php
 include('skipif.inc');
@@ -17,6 +15,8 @@ echo ".\n";
 session_id('BUG74941');
 var_dump(session_start());
 ?>
+===DONE===
 --EXPECT--
 .
 bool(true)
+===DONE===

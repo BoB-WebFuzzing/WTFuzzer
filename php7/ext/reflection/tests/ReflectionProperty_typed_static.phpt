@@ -19,11 +19,11 @@ try {
     echo $e->getMessage(), "\n";
 }
 
-$rp->setValue(null, "24");
+$rp->setValue("24");
 var_dump($rp->getValue());
 
 try {
-    $rp->setValue(null, "foo");
+    $rp->setValue("foo");
 } catch (TypeError $e) {
     echo $e->getMessage(), "\n";
 }
@@ -33,7 +33,7 @@ Test::$z =& Test::$y;
 
 $rp = new ReflectionProperty('Test', 'z');
 try {
-    $rp->setValue(null, "foo");
+    $rp->setValue("foo");
 } catch (TypeError $e) {
     echo $e->getMessage(), "\n";
 }
@@ -45,7 +45,7 @@ var_dump($rp->getValue());
 int(42)
 Typed static property Test::$y must not be accessed before initialization
 int(24)
-Cannot assign string to property Test::$y of type int
+Typed property Test::$y must be int, string used
 int(24)
 Cannot assign string to reference held by property Test::$y of type int
 int(24)

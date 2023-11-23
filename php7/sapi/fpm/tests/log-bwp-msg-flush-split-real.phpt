@@ -31,12 +31,13 @@ $tester->start();
 $tester->expectLogStartNotices();
 $tester->request()->expectEmptyBody();
 $tester->terminate();
-$tester->expectLogLine(str_repeat('a', 1022), decorated: false);
+var_dump($tester->getLastLogLine() === str_repeat('a', 1022) . "\n");
 $tester->close();
 
 ?>
 Done
 --EXPECT--
+bool(true)
 Done
 --CLEAN--
 <?php

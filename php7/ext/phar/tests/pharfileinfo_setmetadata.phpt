@@ -1,7 +1,7 @@
 --TEST--
 Phar: PharFileInfo::setMetadata/delMetadata extra code coverage
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly=0
 --FILE--
@@ -36,12 +36,18 @@ $b->delMetadata();
 } catch (Exception $e) {
 echo $e->getMessage(), "\n";
 }
+ini_set('phar.readonly', 0);
+$b->setMetadata(1,2,3);
 ?>
+===DONE===
 --CLEAN--
 <?php unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar'); ?>
 <?php unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.tar'); ?>
---EXPECT--
+--EXPECTF--
 Phar entry is a temporary directory (not an actual entry in the archive), cannot set metadata
 Phar entry is a temporary directory (not an actual entry in the archive), cannot delete metadata
 Write operations disabled by the php.ini setting phar.readonly
 Write operations disabled by the php.ini setting phar.readonly
+
+Warning: PharFileInfo::setMetadata() expects exactly 1 parameter, 3 given in %spharfileinfo_setmetadata.php on line %d
+===DONE===

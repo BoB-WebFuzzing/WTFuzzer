@@ -1,23 +1,23 @@
 --TEST--
 mysqli->affected_rows
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-    require_once 'skipifconnectfailure.inc';
+    require_once('skipif.inc');
+    require_once('skipifemb.inc');
+    require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     $mysqli = new mysqli();
-    try {
-        $mysqli->affected_rows;
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = @$mysqli->affected_rows))
+        printf("[000a] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
-    $mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket)) {
+        printf("[001] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+            $host, $user, $db, $port, $socket);
+    }
 
     if (0 !== ($tmp = $mysqli->affected_rows))
     printf("[002] Expecting int/0, got %s/%s\n", gettype($tmp), $tmp);
@@ -101,19 +101,14 @@ mysqli
 
     $mysqli->close();
 
-    try {
-        $mysqli->affected_rows;
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = @$mysqli->affected_rows))
+        printf("[026] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
-Property access is not allowed yet
-Property access is not allowed yet
 done!

@@ -1,12 +1,9 @@
 --TEST--
 oci_bind_array_by_name() and NUMBERs
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -50,8 +47,8 @@ $statement = oci_parse($c, $create_pkg_body);
 oci_execute($statement);
 
 for ($i = 1; $i < 6; $i++) {
-    $statement = oci_parse($c, "INSERT INTO bind_test VALUES (".$i.")");
-    oci_execute($statement);
+	$statement = oci_parse($c, "INSERT INTO bind_test VALUES (".$i.")");
+	oci_execute($statement);
 }
 
 $statement = oci_parse($c, "BEGIN array_bind_014_pkg.iobind(:c1); END;");

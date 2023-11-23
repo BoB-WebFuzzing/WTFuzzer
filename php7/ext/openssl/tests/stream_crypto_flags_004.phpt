@@ -1,9 +1,8 @@
 --TEST--
 Specific protocol method specification
---EXTENSIONS--
-openssl
 --SKIPIF--
 <?php
+if (!extension_loaded("openssl")) die("skip openssl not loaded");
 if (!function_exists("proc_open")) die("skip no proc_open");
 ?>
 --FILE--
@@ -17,7 +16,7 @@ $serverCode = <<<'CODE'
     $serverCtx = stream_context_create(['ssl' => [
         'local_cert' => '%s',
         'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_0_SERVER,
-        'security_level' => 0,
+        'security_level' => 1,
     ]]);
 
     $server = stream_socket_server($serverUri, $errno, $errstr, $serverFlags, $serverCtx);
@@ -38,7 +37,7 @@ $clientCode = <<<'CODE'
         'verify_peer' => true,
         'cafile' => '%s',
         'peer_name' => '%s',
-        'security_level' => 0,
+        'security_level' => 1,
     ]]);
 
     phpt_wait();

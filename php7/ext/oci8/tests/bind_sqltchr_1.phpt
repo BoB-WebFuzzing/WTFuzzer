@@ -1,15 +1,11 @@
 --TEST--
 Bind with SQLT_CHR
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Initialization
 
@@ -137,6 +133,8 @@ $stmtarray = array(
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 TEST241 bind SQLT_CHR
 array(1) {
@@ -227,3 +225,4 @@ array(1) {
     NULL
   }
 }
+===DONE===

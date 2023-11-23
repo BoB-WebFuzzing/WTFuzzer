@@ -1,15 +1,28 @@
 --TEST--
 $mysqli->fetch_all() (introduced with mysqlnd)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
+
+if (!function_exists('mysqli_fetch_all'))
+    die("skip: function only available with mysqlnd");
 ?>
 --FILE--
 <?php
-    require 'table.inc';
-    $mysqli = $link;
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    $mysqli = new mysqli();
+
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket))
+        printf("[002] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+            $host, $user, $db, $port, $socket);
+
+    require('table.inc');
     if (!$res = $mysqli->query("SELECT * FROM test ORDER BY id LIMIT 2")) {
         printf("[004] [%d] %s\n", $mysqli->errno, $mysqli->error);
     }
@@ -68,14 +81,14 @@ require_once 'skipifconnectfailure.inc';
         exit(1);
     }
 
-    try {
-        $tmp = $res->fetch_all(-10);
-        if (false !== $tmp)
-            printf("[019] Expecting boolean/false although, got %s/%s. [%d] %s\n",
-                gettype($tmp), $tmp, $mysqli->errno, $mysqli->error);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    do {
+        $illegal_mode = mt_rand(-10000, 10000);
+    } while (in_array($illegal_mode, array(MYSQLI_ASSOC, MYSQLI_NUM, MYSQLI_BOTH)));
+    // NOTE: for BC reasons with ext/mysql, ext/mysqli accepts invalid result modes.
+    $tmp = $res->fetch_all($illegal_mode);
+    if (false !== $tmp)
+        printf("[019] Expecting boolean/false although, got %s/%s. [%d] %s\n",
+            gettype($tmp), $tmp, $mysqli->errno, $mysqli->error);
 
     $res->free_result();
 
@@ -285,19 +298,16 @@ require_once 'skipifconnectfailure.inc';
 
     mysqli_close($link);
 
-    try {
-        $res->fetch_array(MYSQLI_ASSOC);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = $res->fetch_array(MYSQLI_ASSOC)))
+        printf("[015] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
+--EXPECTF--
 [005]
 array(2) {
   [0]=>
@@ -423,6 +433,8 @@ array(1) {
     string(1) "1"
   }
 }
-mysqli_result::fetch_all(): Argument #1 ($mode) must be one of MYSQLI_NUM, MYSQLI_ASSOC, or MYSQLI_BOTH
-mysqli_result object is already closed
+
+Warning: mysqli_result::fetch_all(): Mode can be only MYSQLI_FETCH_NUM, MYSQLI_FETCH_ASSOC or MYSQLI_FETCH_BOTH in %s on line %d
+
+Warning: mysqli_result::fetch_array(): Couldn't fetch mysqli_result in %s on line %d
 done!

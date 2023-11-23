@@ -1,15 +1,13 @@
 --TEST--
 Bind with various unsupported 10g+ bind types
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+if (!extension_loaded('oci8')) die("skip no oci8 extension");
 ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 $types = array(
     "SQLT_BDOUBLE" => SQLT_BDOUBLE,
@@ -26,6 +24,8 @@ foreach ($types as $t => $v) {
 }
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 Test - SQLT_BDOUBLE
 
@@ -33,3 +33,4 @@ Warning: oci_bind_by_name(): Unknown or unsupported datatype given: 22 in %sbind
 Test - SQLT_BFLOAT
 
 Warning: oci_bind_by_name(): Unknown or unsupported datatype given: 21 in %sbind_unsupported_2.php on line %d
+===DONE===

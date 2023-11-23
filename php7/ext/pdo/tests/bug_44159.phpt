@@ -1,48 +1,43 @@
 --TEST--
 PDO Common: Bug #44159 (Crash: $pdo->setAttribute(PDO::STATEMENT_ATTR_CLASS, NULL))
---EXTENSIONS--
-pdo
 --SKIPIF--
 <?php
-$dir = getenv('REDIR_TEST_DIR');
-if (false == $dir) die('skip no driver');
-require_once $dir . 'pdo_test.inc';
-PDOTest::skip();
+if (!extension_loaded('pdo')) die('skip PDO not available');
+try {
+	$pdo = new PDO("sqlite:".__DIR__."/foo.db");
+} catch (Exception $e) {
+	die("skip PDP_SQLITE not available");
+}
 ?>
 --FILE--
 <?php
-if (getenv('REDIR_TEST_DIR') === false) putenv('REDIR_TEST_DIR='.__DIR__ . '/../../pdo/tests/');
-require_once getenv('REDIR_TEST_DIR') . 'pdo_test.inc';
-$pdo = PDOTest::factory();
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+$pdo = new PDO("sqlite:".__DIR__."/foo.db");
 
-$attrs = array(PDO::ATTR_STATEMENT_CLASS, PDO::ATTR_STRINGIFY_FETCHES);
+$attrs = array(PDO::ATTR_STATEMENT_CLASS, PDO::ATTR_STRINGIFY_FETCHES, PDO::NULL_TO_STRING);
 
 foreach ($attrs as $attr) {
-    try {
-        var_dump($pdo->setAttribute($attr, NULL));
-    } catch (\Error $e) {
-        echo  get_class($e), ': ', $e->getMessage(), \PHP_EOL;
-    }
-    try {
-        var_dump($pdo->setAttribute($attr, 1));
-    } catch (\Error $e) {
-        echo  get_class($e), ': ', $e->getMessage(), \PHP_EOL;
-    }
-    try {
-        var_dump($pdo->setAttribute($attr, 'nonsense'));
-    } catch (\Error $e) {
-        echo  get_class($e), ': ', $e->getMessage(), \PHP_EOL;
-    }
+	var_dump($pdo->setAttribute($attr, NULL));
+	var_dump($pdo->setAttribute($attr, 1));
+	var_dump($pdo->setAttribute($attr, 'nonsense'));
 }
 
 @unlink(__DIR__."/foo.db");
 
 ?>
---EXPECT--
-TypeError: PDO::ATTR_STATEMENT_CLASS value must be of type array, null given
-TypeError: PDO::ATTR_STATEMENT_CLASS value must be of type array, int given
-TypeError: PDO::ATTR_STATEMENT_CLASS value must be of type array, string given
-TypeError: Attribute value must be of type bool for selected attribute, null given
+--EXPECTF--
+Warning: PDO::setAttribute(): SQLSTATE[HY000]: General error: PDO::ATTR_STATEMENT_CLASS requires format array(classname, array(ctor_args)); the classname must be a string specifying an existing class in %s on line %d
+bool(false)
+
+Warning: PDO::setAttribute(): SQLSTATE[HY000]: General error: PDO::ATTR_STATEMENT_CLASS requires format array(classname, array(ctor_args)); the classname must be a string specifying an existing class in %s on line %d
+bool(false)
+
+Warning: PDO::setAttribute(): SQLSTATE[HY000]: General error: PDO::ATTR_STATEMENT_CLASS requires format array(classname, array(ctor_args)); the classname must be a string specifying an existing class in %s on line %d
+bool(false)
+
+Warning: PDO::setAttribute(): SQLSTATE[HY000]: General error: attribute value must be an integer in %s on line %d
+bool(false)
 bool(true)
-TypeError: Attribute value must be of type bool for selected attribute, string given
+bool(true)
+bool(true)
+bool(true)
+bool(true)

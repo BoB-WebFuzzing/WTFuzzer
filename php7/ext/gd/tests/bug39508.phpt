@@ -1,7 +1,9 @@
 --TEST--
 Bug #39508 (imagefill crashes with small images 3 pixels or less)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+	if (!extension_loaded('gd')) die("skip gd extension not available\n");
+?>
 --FILE--
 <?php
 $im = imagecreatetruecolor(3,1);

@@ -1,7 +1,9 @@
 --TEST--
 Bug #73054 (default option ignored when object passed to int filter)
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php
+if (!extension_loaded('filter')) die('skip filter extension not available');
+?>
 --FILE--
 <?php
 var_dump(
@@ -14,6 +16,8 @@ var_dump(
     ])
 );
 ?>
+===DONE===
 --EXPECT--
 int(2)
 int(2)
+===DONE===

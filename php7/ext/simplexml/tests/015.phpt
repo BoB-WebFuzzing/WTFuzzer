@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: accessing singular subnode as array
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $xml =<<<EOF
@@ -35,6 +35,7 @@ $people = simplexml_load_string($xml2);
 var_dump($people->person[0]['name']);
 var_dump($people->person[1]['name']);
 ?>
+===DONE===
 --EXPECTF--
 object(SimpleXMLElement)#%d (1) {
   [0]=>
@@ -52,3 +53,4 @@ object(SimpleXMLElement)#%d (1) {
   [0]=>
   string(3) "Boe"
 }
+===DONE===

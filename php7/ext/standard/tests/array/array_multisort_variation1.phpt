@@ -2,14 +2,20 @@
 Test array_multisort() function : usage variation
 --FILE--
 <?php
+/* Prototype  : bool array_multisort(array ar1 [, SORT_ASC|SORT_DESC [, SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_NATURAL|SORT_FLAG_CASE]] [, array ar2 [, SORT_ASC|SORT_DESC [, SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_NATURAL|SORT_FLAG_CASE]], ...])
+ * Description: Sort multiple arrays at once similar to how ORDER BY clause works in SQL
+ * Source code: ext/standard/array.c
+ * Alias to functions:
+ */
+
 echo "*** Testing array_multisort() : usage variation ***\n";
 
 // Define error handler
-function test_error_handler($err_no, $err_msg, $filename, $linenum) {
-    if (error_reporting() & $err_no) {
-        // report non-silenced errors
-        echo "Error: $err_no - $err_msg, $filename($linenum)\n";
-    }
+function test_error_handler($err_no, $err_msg, $filename, $linenum, $vars) {
+	if (error_reporting() != 0) {
+		// report non-silenced errors
+		echo "Error: $err_no - $err_msg, $filename($linenum)\n";
+	}
 }
 set_error_handler('test_error_handler');
 
@@ -22,9 +28,9 @@ unset ($unset_var);
 // define some classes
 class classWithToString
 {
-    public function __toString() {
-        return "Class A object";
-    }
+	public function __toString() {
+		return "Class A object";
+	}
 }
 
 class classWithoutToString
@@ -91,88 +97,111 @@ $inputs = array(
 
 foreach($inputs as $key =>$value) {
       echo "\n--$key--\n";
-      try {
-          var_dump( array_multisort($value));
-      } catch (\ValueError | \TypeError $e) {
-          echo $e->getMessage() . "\n";
-      }
+      var_dump( array_multisort($value));
 };
 
 ?>
---EXPECT--
+===DONE===
+--EXPECTF--
 *** Testing array_multisort() : usage variation ***
 
 --int 0--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag that has not already been specified
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or sorting flag that has not already been specified, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --int 1--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag that has not already been specified
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or sorting flag that has not already been specified, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --int 12345--
-array_multisort(): Argument #1 ($array) must be a valid sort flag
+Error: 2 - array_multisort(): Argument #1 is an unknown sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --int -12345--
-array_multisort(): Argument #1 ($array) must be a valid sort flag
+Error: 2 - array_multisort(): Argument #1 is an unknown sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --float 10.5--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --float -10.5--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --float 12.3456789000e10--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --float -12.3456789000e10--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --float .5--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --uppercase NULL--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --lowercase null--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --lowercase true--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --lowercase false--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --uppercase TRUE--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --uppercase FALSE--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --empty string DQ--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --empty string SQ--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --string DQ--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --string SQ--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --mixed case string--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --heredoc--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --instance of classWithToString--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --instance of classWithoutToString--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --undefined var--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
 
 --unset var--
-array_multisort(): Argument #1 ($array) must be an array or a sort flag
+Error: 2 - array_multisort(): Argument #1 is expected to be an array or a sort flag, %sarray_multisort_variation1.php(%d)
+bool(false)
+===DONE===

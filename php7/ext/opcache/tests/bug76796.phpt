@@ -5,17 +5,14 @@ opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
 disable_functions=strpos
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
-try {
-    var_dump(strpos('foo', 'bar'));
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(strpos('foo', 'bar'));
 
 ?>
---EXPECT--
-Call to undefined function strpos()
+--EXPECTF--
+Warning: strpos() has been disabled for security reasons in %s on line %d
+NULL

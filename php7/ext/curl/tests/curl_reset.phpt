@@ -1,7 +1,9 @@
 --TEST--
 Test curl_reset
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php if (!extension_loaded("curl")) print "skip";
+if (!function_exists("curl_reset")) exit("skip curl_reset doesn't exists (require libcurl >= 7.12.1)");
+?>
 --FILE--
 <?php
 
@@ -32,6 +34,10 @@ echo file_get_contents($test_file);
 // cleanup
 unlink($test_file);
 unlink($log_file);
+
 ?>
+
+===DONE===
 --EXPECT--
 testtest
+===DONE===

@@ -30,6 +30,8 @@ var_dump(class_implements(new a),
 );
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 Warning: class_parents(): Class foo does not exist in %sspl_003.php on line %d
 string(3) "foo"
@@ -70,3 +72,4 @@ array(0) {
 }
 bool(false)
 bool(false)
+===DONE===

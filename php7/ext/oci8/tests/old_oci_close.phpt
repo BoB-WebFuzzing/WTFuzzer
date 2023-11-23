@@ -1,11 +1,7 @@
 --TEST--
 oci8.old_oci_close_semantics On
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --INI--
 oci8.old_oci_close_semantics=1
 --FILE--
@@ -21,7 +17,6 @@ echo "Done\n";
 
 ?>
 --EXPECTF--
-Deprecated: Directive oci8.old_oci_close_semantics is deprecated%s
 resource(%d) of type (oci8 connection)
 NULL
 resource(%d) of type (oci8 statement)

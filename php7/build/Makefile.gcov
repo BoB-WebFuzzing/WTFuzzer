@@ -14,6 +14,7 @@ LCOV_EXCLUDES = \
 	'$(top_srcdir)/ext/mbstring/libmbfl/*' \
 	'$(top_srcdir)/ext/opcache/jit/libudis86/*' \
 	'$(top_srcdir)/ext/pcre/pcre2lib/*' \
+	'$(top_srcdir)/ext/xmlrpc/libxmlrpc/*' \
 	'$(top_srcdir)/parse_date.re' \
 	'$(top_srcdir)/parse_iso_intervals.re'
 
@@ -25,7 +26,8 @@ GCOVR_EXCLUDES = \
 	'ext/hash/sha3/.*' \
 	'ext/mbstring/libmbfl/.*' \
 	'ext/opcache/jit/libudis86/.*' \
-	'ext/pcre/pcre2lib/.*'
+	'ext/pcre/pcre2lib/.*' \
+	'ext/xmlrpc/libxmlrpc/.*'
 
 lcov: lcov-html
 

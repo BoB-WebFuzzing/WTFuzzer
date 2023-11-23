@@ -11,7 +11,7 @@ class test2
 {
     function __toString()
     {
-        echo __METHOD__ . "()\n";
+    	echo __METHOD__ . "()\n";
         return "Converted\n";
     }
 }
@@ -20,8 +20,8 @@ class test3
 {
     function __toString()
     {
-        echo __METHOD__ . "()\n";
-        return [];
+    	echo __METHOD__ . "()\n";
+        return 42;
     }
 }
 echo "====test1====\n";
@@ -56,11 +56,7 @@ echo $o , $o;
 echo "====test7====\n";
 $ar = array();
 $ar[$o->__toString()] = "ERROR";
-try {
-    echo $ar[$o];
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+echo $ar[$o];
 
 echo "====test8====\n";
 var_dump(trim($o));
@@ -80,7 +76,7 @@ try {
 
 ?>
 ====DONE====
---EXPECT--
+--EXPECTF--
 ====test1====
 test1 Object
 (
@@ -118,7 +114,8 @@ test2::__toString()
 Converted
 ====test7====
 test2::__toString()
-Cannot access offset of type test2 on array
+
+Warning: Illegal offset type in %s on line %d
 ====test8====
 test2::__toString()
 string(9) "Converted"
@@ -128,8 +125,8 @@ string(9) "Converted"
 test2::__toString()
 Converted
 ====test10====
-object(test3)#2 (0) {
+object(test3)#1 (0) {
 }
 test3::__toString()
-test3::__toString(): Return value must be of type string, array returned
+Method test3::__toString() must return a string value
 ====DONE====

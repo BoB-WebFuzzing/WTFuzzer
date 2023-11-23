@@ -1,8 +1,9 @@
 --TEST--
 Internal static methods should not be confused with global functions
---EXTENSIONS--
-opcache
-zend_test
+--SKIPIF--
+<?php
+if (!extension_loaded('zend-test')) die('skip requires zend-test');
+?>
 --FILE--
 <?php
 

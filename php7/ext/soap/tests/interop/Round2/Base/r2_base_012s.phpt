@@ -1,7 +1,7 @@
 --TEST--
 SOAP Interop Round2 base 012 (soap/direct): echoFloat
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--

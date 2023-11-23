@@ -39,6 +39,8 @@ var_dump(file_exists($outputfile_zip));
 
 remove_data("bug71509");
 ?>
+===DONE===
 --EXPECT--
 bool(true)
 bool(true)
+===DONE===

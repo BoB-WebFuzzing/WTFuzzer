@@ -1,7 +1,9 @@
 --TEST--
 IntlGregorianCalendar::get/setGregorianChange(): basic test
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -20,9 +22,11 @@ var_dump(intlgregcal_set_gregorian_change($intlcal, 1));
 var_dump($intlcal->getGregorianChange());
 
 ?>
+==DONE==
 --EXPECT--
 float(-12219292800000)
 bool(true)
 float(0)
 bool(true)
-float(1)
+float(1)
+==DONE==

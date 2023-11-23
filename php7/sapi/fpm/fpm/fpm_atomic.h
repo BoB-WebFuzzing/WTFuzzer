@@ -3,7 +3,11 @@
 #ifndef FPM_ATOMIC_H
 #define FPM_ATOMIC_H 1
 
-#include <inttypes.h>
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# include <stdint.h>
+#endif
 #include <sched.h>
 
 #ifdef HAVE_BUILTIN_ATOMIC
@@ -133,7 +137,7 @@ static inline atomic_uint_t atomic_cmp_set(atomic_t *lock, atomic_uint_t old, at
 
 #else
 
-#error Unsupported processor. Please open a bug report (https://github.com/php/php-src/issues).
+#error Unsupported processor. Please open a bug report (bugs.php.net).
 
 #endif
 

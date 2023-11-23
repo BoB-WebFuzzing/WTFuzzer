@@ -2,6 +2,12 @@
 Test array_chunk() function : usage variations - array with diff. sub arrays
 --FILE--
 <?php
+/* Prototype  : array array_chunk(array $array, int $size [, bool $preserve_keys])
+ * Description: Split array into chunks
+ *            : Chunks an array into size large chunks
+ * Source code: ext/standard/array.c
+*/
+
 /*
 * Testing array_chunk() function - input array containing different sub arrays
 */
@@ -17,7 +23,7 @@ $input_array = array (
   "array3" =>  array(1)
 );
 
-echo "\n-- Testing array_chunk() by supplying an array containing different sub arrays & 'preserve_key' as default --\n";
+echo "\n-- Testing array_chunk() by supplying an array containing different sub arrays & 'preserve_key' as defualt --\n";
 var_dump( array_chunk($input_array, $size) );
 
 echo "\n-- Testing array_chunk() by supplying an array containing different sub arrays & 'preserve_key' = true --\n";
@@ -31,7 +37,7 @@ echo "Done";
 --EXPECT--
 *** Testing array_chunk() : usage variations ***
 
--- Testing array_chunk() by supplying an array containing different sub arrays & 'preserve_key' as default --
+-- Testing array_chunk() by supplying an array containing different sub arrays & 'preserve_key' as defualt --
 array(2) {
   [0]=>
   array(2) {

@@ -1,7 +1,11 @@
 --TEST--
 OSS-Fuzz: Temporary buffer leak in tag reading
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php
+if (!extension_loaded('exif')) {
+    die('skip exif extension not available');
+}
+?>
 --FILE--
 <?php
 

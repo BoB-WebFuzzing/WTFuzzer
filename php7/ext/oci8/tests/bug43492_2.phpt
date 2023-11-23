@@ -1,12 +1,9 @@
 --TEST--
 Bug #43492 (Nested cursor leaks after related bug #44206 fixed)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -35,21 +32,21 @@ $stmtarray = array(
 oci8_test_sql_execute($c, $stmtarray);
 
 function fetch($c, $i) {
-    $s = oci_parse($c, 'select cursor(select * from bug43492_tab) c from bug43492_tab');
-    oci_execute($s, OCI_DEFAULT);
-    $result = oci_fetch_assoc($s);
-    oci_execute($result['C'], OCI_DEFAULT);
+    $s = ociparse($c, 'select cursor(select * from bug43492_tab) c from bug43492_tab');
+    ociexecute($s, OCI_DEFAULT);
+    ocifetchinto($s, $result, OCI_ASSOC);
+    ociexecute($result['C'], OCI_DEFAULT);
     return $result['C'];
 }
 
 for($i = 0; $i < 300; $i++) {
     $cur = fetch($c, $i);
     for($j = 0; $j < 10; $j++) {
-        $row = oci_fetch_row($cur);
+        ocifetchinto($cur, $row, OCI_NUM);
         echo "$row[0] ";
     }
     echo "\n";
-    oci_free_statement($cur);
+    ocifreestatement($cur);
 }
 
 echo "Done\n";

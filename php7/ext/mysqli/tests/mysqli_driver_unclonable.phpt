@@ -1,7 +1,8 @@
 --TEST--
 Trying to clone mysqli_driver object
---EXTENSIONS--
-mysqli
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
+<?php require_once('skipifemb.inc'); ?>
 --FILE--
 <?php
     $driver = new mysqli_driver;

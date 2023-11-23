@@ -1,8 +1,8 @@
 --TEST--
 Phar::mapPhar valid file (gzipped)
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
+<?php if (!extension_loaded("zlib")) die("skip zlib not present"); ?>
 --INI--
 phar.require_hash=0
 --FILE--

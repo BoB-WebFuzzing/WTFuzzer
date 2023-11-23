@@ -1,10 +1,9 @@
 --TEST--
 libgd FS#191 (A circle becomes square)
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
-    if (!GD_BUNDLED) die("skip requires bundled GD library\n");
+	if (!extension_loaded('gd')) die("skip gd extension not available\n");
+	if (!GD_BUNDLED) die("skip requires bundled GD library\n");
 ?>
 --FILE--
 <?php
@@ -15,9 +14,9 @@ imagefilledellipse($im, 30, 50, 20, 20, imagecolorallocate($im, 0, 0, 0));
 $index = imagecolorat($im, 12, 28);
 $arr = imagecolorsforindex($im, $index);
 if ($arr['red'] == 255 && $arr['green'] == 255 && $arr['blue'] == 255) {
-    echo "Ok";
+	echo "Ok";
 } else {
-    echo "failed";
+	echo "failed";
 }
 ?>
 --EXPECT--

@@ -7,8 +7,8 @@ PHP_ARG_WITH([external-pcre],,
   [no])
 
 PHP_ARG_WITH([pcre-jit],,
-  [AS_HELP_STRING([--without-pcre-jit],
-    [Disable PCRE JIT functionality])],
+  [AS_HELP_STRING([--with-pcre-jit],
+    [Enable PCRE JIT functionality])],
   [yes],
   [no])
 
@@ -19,6 +19,7 @@ if test "$PHP_EXTERNAL_PCRE" != "no"; then
   PHP_EVAL_INCLINE($PCRE2_CFLAGS)
   PHP_EVAL_LIBLINE($PCRE2_LIBS)
   AC_DEFINE(PCRE2_CODE_UNIT_WIDTH, 8, [ ])
+  AC_DEFINE(HAVE_PCRE, 1, [ ])
 
   if test "$PHP_PCRE_JIT" != "no"; then
     AC_CACHE_CHECK([for JIT support in PCRE2], ac_cv_have_pcre2_jit, [
@@ -40,7 +41,7 @@ if test "$PHP_EXTERNAL_PCRE" != "no"; then
         [
           AC_CANONICAL_HOST
           case $host_cpu in
-          arm*|i[[34567]]86|x86_64|mips*|powerpc*|sparc)
+          arm*|i[34567]86|x86_64|mips*|powerpc*|sparc)
             ac_cv_have_pcre2_jit=yes
             ;;
           *)
@@ -66,7 +67,7 @@ else
   pcre2lib/pcre2_string_utils.c pcre2lib/pcre2_study.c pcre2lib/pcre2_substitute.c  pcre2lib/pcre2_substring.c \
   pcre2lib/pcre2_tables.c pcre2lib/pcre2_ucd.c pcre2lib/pcre2_valid_utf.c pcre2lib/pcre2_xclass.c \
   pcre2lib/pcre2_find_bracket.c pcre2lib/pcre2_convert.c pcre2lib/pcre2_extuni.c pcre2lib/pcre2_script_run.c"
-  PHP_PCRE_CFLAGS="-Wno-implicit-fallthrough -DHAVE_CONFIG_H -I@ext_srcdir@/pcre2lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
+  PHP_PCRE_CFLAGS="-DHAVE_CONFIG_H -I@ext_srcdir@/pcre2lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
   AC_DEFINE(HAVE_BUNDLED_PCRE, 1, [ ])
   AC_DEFINE(PCRE2_CODE_UNIT_WIDTH, 8, [ ])
 

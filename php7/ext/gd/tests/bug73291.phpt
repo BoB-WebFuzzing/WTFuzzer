@@ -1,7 +1,9 @@
 --TEST--
 Bug #73291 (imagecropauto() $threshold differs from external libgd)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 
@@ -24,8 +26,10 @@ foreach ([0.1, 0.5, 1.0, 10.0] as $threshold) {
 }
 
 ?>
+===DONE===
 --EXPECT--
 size: 247*247
 size: 237*237
 size: 229*229
 size: 175*175
+===DONE===

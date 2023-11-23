@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -24,8 +26,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <stdint.h>
 
+#include "php_stdint.h"
 #include "php_session.h"
 #include "mod_mm.h"
 #include "SAPI.h"
@@ -45,7 +47,7 @@ typedef struct ps_sd {
 	void *data;
 	size_t datalen;		/* amount of valid data */
 	size_t alloclen;	/* amount of allocated memory for data */
-	zend_string *key;
+	char key[1];		/* inline key */
 } ps_sd;
 
 typedef struct {
@@ -64,15 +66,14 @@ static ps_mm *ps_mm_instance = NULL;
 # define ps_mm_debug(a)
 #endif
 
-static inline uint32_t ps_sd_hash(const zend_string *data)
+static inline uint32_t ps_sd_hash(const char *data, int len)
 {
 	uint32_t h;
-	const char *data_char = ZSTR_VAL(data);
-	const char *e = ZSTR_VAL(data) + ZSTR_LEN(data);
+	const char *e = data + len;
 
-	for (h = 2166136261U; data_char < e; ) {
+	for (h = 2166136261U; data < e; ) {
 		h *= 16777619;
-		h ^= *data_char++;
+		h ^= *data++;
 	}
 
 	return h;
@@ -107,19 +108,22 @@ static void hash_split(ps_mm *data)
 	data->hash_max = nmax;
 }
 
-static ps_sd *ps_sd_new(ps_mm *data, zend_string *key)
+static ps_sd *ps_sd_new(ps_mm *data, const char *key)
 {
 	uint32_t hv, slot;
 	ps_sd *sd;
+	int keylen;
 
-	sd = mm_malloc(data->mm, sizeof(ps_sd) + ZSTR_LEN(key));
+	keylen = strlen(key);
+
+	sd = mm_malloc(data->mm, sizeof(ps_sd) + keylen);
 	if (!sd) {
 
 		php_error_docref(NULL, E_WARNING, "mm_malloc failed, avail %ld, err %s", mm_available(data->mm), mm_error());
 		return NULL;
 	}
 
-	hv = ps_sd_hash(key);
+	hv = ps_sd_hash(key, keylen);
 	slot = hv & data->hash_max;
 
 	sd->ctime = 0;
@@ -127,7 +131,7 @@ static ps_sd *ps_sd_new(ps_mm *data, zend_string *key)
 	sd->data = NULL;
 	sd->alloclen = sd->datalen = 0;
 
-	sd->key = zend_string_copy(key);
+	memcpy(sd->key, key, keylen + 1);
 
 	sd->next = data->hash[slot];
 	data->hash[slot] = sd;
@@ -140,7 +144,7 @@ static ps_sd *ps_sd_new(ps_mm *data, zend_string *key)
 		}
 	}
 
-	ps_mm_debug(("inserting %s(%p) into slot %d\n", ZSTR_VAL(key), sd, slot));
+	ps_mm_debug(("inserting %s(%p) into slot %d\n", key, sd, slot));
 
 	return sd;
 }
@@ -149,7 +153,7 @@ static void ps_sd_destroy(ps_mm *data, ps_sd *sd)
 {
 	uint32_t slot;
 
-	slot = ps_sd_hash(sd->key) & data->hash_max;
+	slot = ps_sd_hash(sd->key, strlen(sd->key)) & data->hash_max;
 
 	if (data->hash[slot] == sd) {
 		data->hash[slot] = sd->next;
@@ -166,21 +170,20 @@ static void ps_sd_destroy(ps_mm *data, ps_sd *sd)
 	if (sd->data) {
 		mm_free(data->mm, sd->data);
 	}
-	zend_string_release(sd->key);
 
 	mm_free(data->mm, sd);
 }
 
-static ps_sd *ps_sd_lookup(ps_mm *data, const zend_string *key, bool rw)
+static ps_sd *ps_sd_lookup(ps_mm *data, const char *key, int rw)
 {
 	uint32_t hv, slot;
 	ps_sd *ret, *prev;
 
-	hv = ps_sd_hash(key);
+	hv = ps_sd_hash(key, strlen(key));
 	slot = hv & data->hash_max;
 
 	for (prev = NULL, ret = data->hash[slot]; ret; prev = ret, ret = ret->next) {
-		if (ret->hv == hv && zend_string_equals(ret->key, key)) {
+		if (ret->hv == hv && !strcmp(ret->key, key)) {
 			break;
 		}
 	}
@@ -195,12 +198,12 @@ static ps_sd *ps_sd_lookup(ps_mm *data, const zend_string *key, bool rw)
 		data->hash[slot] = ret;
 	}
 
-	ps_mm_debug(("lookup(%s): ret=%p,hv=%u,slot=%d\n", ZSTR_VAL(key), ret, hv, slot));
+	ps_mm_debug(("lookup(%s): ret=%p,hv=%u,slot=%d\n", key, ret, hv, slot));
 
 	return ret;
 }
 
-static zend_result ps_mm_key_exists(ps_mm *data, const zend_string *key)
+static int ps_mm_key_exists(ps_mm *data, const char *key)
 {
 	ps_sd *sd;
 
@@ -220,7 +223,7 @@ const ps_module ps_mod_mm = {
 
 #define PS_MM_DATA ps_mm *data = PS_GET_MOD_DATA()
 
-static zend_result ps_mm_initialize(ps_mm *data, const char *path)
+static int ps_mm_initialize(ps_mm *data, const char *path)
 {
 	data->owner = getpid();
 	data->mm = mm_create(0, path);
@@ -241,6 +244,7 @@ static zend_result ps_mm_initialize(ps_mm *data, const char *path)
 
 static void ps_mm_destroy(ps_mm *data)
 {
+	int h;
 	ps_sd *sd, *next;
 
 	/* This function is called during each module shutdown,
@@ -250,7 +254,7 @@ static void ps_mm_destroy(ps_mm *data)
 		return;
 	}
 
-	for (int h = 0; h < data->hash_max + 1; h++) {
+	for (h = 0; h < data->hash_max + 1; h++) {
 		for (sd = data->hash[h]; sd; sd = next) {
 			next = sd->next;
 			ps_sd_destroy(data, sd);
@@ -264,11 +268,11 @@ static void ps_mm_destroy(ps_mm *data)
 
 PHP_MINIT_FUNCTION(ps_mm)
 {
-	size_t save_path_len = strlen(PS(save_path));
-	size_t mod_name_len = strlen(sapi_module.name);
-	size_t euid_len;
+	int save_path_len = strlen(PS(save_path));
+	int mod_name_len = strlen(sapi_module.name);
+	int euid_len;
 	char *ps_mm_path, euid[30];
-	zend_result ret;
+	int ret;
 
 	ps_mm_instance = calloc(sizeof(*ps_mm_instance), 1);
 	if (!ps_mm_instance) {
@@ -300,7 +304,7 @@ PHP_MINIT_FUNCTION(ps_mm)
 
 	efree(ps_mm_path);
 
-	if (ret == FAILURE) {
+	if (ret != SUCCESS) {
 		free(ps_mm_instance);
 		ps_mm_instance = NULL;
 		return FAILURE;
@@ -342,13 +346,13 @@ PS_READ_FUNC(mm)
 {
 	PS_MM_DATA;
 	ps_sd *sd;
-	zend_result ret = FAILURE;
+	int ret = FAILURE;
 
 	mm_lock(data->mm, MM_LOCK_RD);
 
 	/* If there is an ID and strict mode, verify existence */
 	if (PS(use_strict_mode)
-		&& ps_mm_key_exists(data, key) == FAILURE) {
+		&& ps_mm_key_exists(data, key->val) == FAILURE) {
 		/* key points to PS(id), but cannot change here. */
 		if (key) {
 			efree(PS(id));
@@ -365,7 +369,7 @@ PS_READ_FUNC(mm)
 		PS(session_status) = php_session_active;
 	}
 
-	sd = ps_sd_lookup(data, PS(id), 0);
+	sd = ps_sd_lookup(data, PS(id)->val, 0);
 	if (sd) {
 		*val = zend_string_init(sd->data, sd->datalen, 0);
 		ret = SUCCESS;
@@ -383,10 +387,10 @@ PS_WRITE_FUNC(mm)
 
 	mm_lock(data->mm, MM_LOCK_RW);
 
-	sd = ps_sd_lookup(data, key, 1);
+	sd = ps_sd_lookup(data, key->val, 1);
 	if (!sd) {
-		sd = ps_sd_new(data, key);
-		ps_mm_debug(("new entry for %s\n", ZSTR_VAL(key)));
+		sd = ps_sd_new(data, key->val);
+		ps_mm_debug(("new entry for %s\n", key->val));
 	}
 
 	if (sd) {
@@ -399,7 +403,7 @@ PS_WRITE_FUNC(mm)
 
 			if (!sd->data) {
 				ps_sd_destroy(data, sd);
-				php_error_docref(NULL, E_WARNING, "Cannot allocate new data segment");
+				php_error_docref(NULL, E_WARNING, "cannot allocate new data segment");
 				sd = NULL;
 			}
 		}
@@ -422,7 +426,7 @@ PS_DESTROY_FUNC(mm)
 
 	mm_lock(data->mm, MM_LOCK_RW);
 
-	sd = ps_sd_lookup(data, key, 0);
+	sd = ps_sd_lookup(data, key->val, 0);
 	if (sd) {
 		ps_sd_destroy(data, sd);
 	}
@@ -453,7 +457,7 @@ PS_GC_FUNC(mm)
 		for (sd = *ohash; sd; sd = next) {
 			next = sd->next;
 			if (sd->ctime < limit) {
-				ps_mm_debug(("purging %s\n", ZSTR_VAL(sd->key)));
+				ps_mm_debug(("purging %s\n", sd->key));
 				ps_sd_destroy(data, sd);
 				(*nrdels)++;
 			}
@@ -474,7 +478,7 @@ PS_CREATE_SID_FUNC(mm)
 	do {
 		sid = php_session_create_id((void **)&data);
 		/* Check collision */
-		if (ps_mm_key_exists(data, sid) == SUCCESS) {
+		if (ps_mm_key_exists(data, sid->val) == SUCCESS) {
 			if (sid) {
 				zend_string_release_ex(sid, 0);
 				sid = NULL;

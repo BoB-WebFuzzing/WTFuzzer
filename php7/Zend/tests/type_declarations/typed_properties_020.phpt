@@ -22,5 +22,5 @@ $foo = new Foo();
 var_dump($foo->bar);
 ?>
 --EXPECT--
-Cannot assign float to property Foo::$bar of type int
+Typed property Foo::$bar must be int, float used
 int(2)

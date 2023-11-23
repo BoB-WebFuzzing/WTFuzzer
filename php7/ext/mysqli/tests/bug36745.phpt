@@ -1,16 +1,15 @@
 --TEST--
 Bug #36745 (LOAD DATA LOCAL INFILE doesn't return correct error message)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --INI--
 mysqli.allow_local_infile=1
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     /*** test mysqli_connect 127.0.0.1 ***/
     $mysql = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket);
@@ -26,12 +25,12 @@ mysqli.allow_local_infile=1
 ?>
 --CLEAN--
 <?php
-require_once 'connect.inc';
+require_once("connect.inc");
 if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
    printf("[c001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
 if (!mysqli_query($link, "DROP TABLE IF EXISTS litest"))
-	printf("[c002] Cannot drop table, [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+    printf("[c002] Cannot drop table, [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 
 mysqli_close($link);
 ?>

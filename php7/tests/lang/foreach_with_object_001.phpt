@@ -15,9 +15,11 @@ foreach ($obj->c()->a as $value) {
 }
 
 ?>
+===DONE===
 --EXPECT--
 1
 2
 3
 4
 5
+===DONE===

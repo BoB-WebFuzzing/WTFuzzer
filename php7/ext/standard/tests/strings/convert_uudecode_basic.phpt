@@ -3,6 +3,11 @@ Test convert_uudecode() function : basic functionality
 --FILE--
 <?php
 
+/* Prototype  : string convert_uudecode  ( string $data  )
+ * Description: Decode a uuencoded string
+ * Source code: ext/standard/uuencode.c
+*/
+
 echo "*** Testing convert_uudecode() : basic functionality ***\n";
 
 // array with different values for $string
@@ -32,8 +37,8 @@ foreach($strings as $string) {
   $decode = convert_uudecode($encode);
 
   if ($decode != $string) {
-    var_dump($encode, $decode, $string);
-    exit("TEST FAILED on iteration $count\n");
+  	var_dump($encode, $decode, $string);
+  	exit("TEST FAILED on iteration $count\n");
   }
 
   $count ++;
@@ -42,6 +47,8 @@ foreach($strings as $string) {
 echo "TEST PASSED\n";
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing convert_uudecode() : basic functionality ***
 TEST PASSED
+===DONE===

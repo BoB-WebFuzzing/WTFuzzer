@@ -6,14 +6,11 @@ XORing arrays
 $a = array(1,2,3);
 $b = array();
 
-try {
-    $c = $a ^ $b;
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+$c = $a ^ $b;
+var_dump($c);
 
 echo "Done\n";
 ?>
 --EXPECT--
-Unsupported operand types: array ^ array
+int(1)
 Done

@@ -2,8 +2,8 @@
 Phar front controller with huge file
 --INI--
 default_charset=UTF-8
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller28.php
 REQUEST_URI=/frontcontroller28.php/bigfile.txt

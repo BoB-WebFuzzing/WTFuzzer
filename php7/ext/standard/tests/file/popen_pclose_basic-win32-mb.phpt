@@ -7,6 +7,14 @@ if(substr(PHP_OS, 0, 3) != 'WIN' )
 ?>
 --FILE--
 <?php
+/*
+ *  Prototype: resource popen ( string command, string mode )
+ *  Description: Opens process file pointer.
+
+ *  Prototype: int pclose ( resource handle );
+ *  Description: Closes process file pointer.
+ */
+
 echo "*** Testing popen(): reading from the pipe ***\n";
 
 $file_path = __DIR__;
@@ -20,7 +28,7 @@ echo "*** Testing popen(): writing to the pipe ***\n";
 $arr = array("ggg", "ddd", "aaa", "sss");
 // popen("sort", "w") fails if variables_order="GPCS"
 // this is set in the default INI file
-// it doesn't seem to be changeable in the--INI-- section
+// it doesn't seem to be changeable in the --INI-- section
 //	also, doing: ini_set('variables_order', ''); doesn't work!
 //
 // the only solution is to either put the absolute path here, or

@@ -1,7 +1,5 @@
 --TEST--
 Check that arguments are freed when calling a deprecated function
---EXTENSIONS--
-zend_test
 --FILE--
 <?php
 
@@ -10,20 +8,20 @@ set_error_handler(function($code, $msg) {
 });
 
 try {
-    zend_test_deprecated(new stdClass);
+    ezmlm_hash(new stdClass);
 } catch (Error $e) {
     echo $e->getMessage(), "\n";
 }
 
 $ret = new stdClass;
 try {
-    $ret = zend_test_deprecated(new stdClass());
+    $ret = ezmlm_hash(new stdClass);
 } catch (Error $e) {
     echo $e->getMessage(), "\n";
 }
 
 try {
-    $fn = 'zend_test_deprecated';
+    $fn = 'ezmlm_hash';
     $fn(new stdClass);
 } catch (Error $e) {
     echo $e->getMessage(), "\n";
@@ -31,7 +29,7 @@ try {
 
 $ret = new stdClass;
 try {
-    $fn = 'zend_test_deprecated';
+    $fn = 'ezmlm_hash';
     $ret = $fn(new stdClass);
 } catch (Error $e) {
     echo $e->getMessage(), "\n";
@@ -39,7 +37,7 @@ try {
 
 ?>
 --EXPECT--
-Function zend_test_deprecated() is deprecated
-Function zend_test_deprecated() is deprecated
-Function zend_test_deprecated() is deprecated
-Function zend_test_deprecated() is deprecated
+Function ezmlm_hash() is deprecated
+Function ezmlm_hash() is deprecated
+Function ezmlm_hash() is deprecated
+Function ezmlm_hash() is deprecated

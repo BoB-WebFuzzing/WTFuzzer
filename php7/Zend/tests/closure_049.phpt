@@ -17,6 +17,5 @@ class B extends A {}
 $b = new B;
 
 var_dump($b->foo());
-?>
 --EXPECT--
 string(1) "B"

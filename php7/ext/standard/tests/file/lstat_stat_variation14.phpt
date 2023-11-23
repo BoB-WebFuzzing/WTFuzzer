@@ -2,6 +2,13 @@
 Test lstat() and stat() functions: usage variations - hardlink
 --FILE--
 <?php
+/* Prototype: array lstat ( string $filename );
+   Description: Gives information about a file or symbolic link
+
+   Prototype: array stat ( string $filename );
+   Description: Gives information about a file
+*/
+
 /* test the effects of is_link() on stats of hard link */
 
 $file_path = __DIR__;

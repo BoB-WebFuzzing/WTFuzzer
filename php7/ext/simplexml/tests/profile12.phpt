@@ -1,22 +1,22 @@
 --TEST--
 SimpleXML [profile]: Accessing namespaced root and non namespaced children
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 
 $xml =<<<EOF
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
-xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 >
 <soap:Body>
 <businessList foo="bar">
 <businessInfo businessKey="bla"/>
 </businessList>
-</soap:Body>
+</soap:Body> 
 </soap:Envelope>
 EOF;
 
@@ -30,6 +30,7 @@ var_dump($sxe->Body->children(''));
 var_dump($sxe->Body->children('')->businessList);
 
 ?>
+===DONE===
 --EXPECTF--
 array(1) {
   ["soap"]=>
@@ -70,3 +71,4 @@ object(SimpleXMLElement)#%s (2) {
     }
   }
 }
+===DONE===

@@ -1,7 +1,7 @@
 --TEST--
 ldap_explode_dn() test
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -23,6 +23,12 @@ var_dump(ldap_explode_dn("cn=<bob>,dc=example,dc=com", 0));
 /* Explode without attributes and < > characters */
 var_dump(ldap_explode_dn("cn=<bob>,dc=example,dc=com", 1));
 
+/* Too few parameters */
+ldap_explode_dn("cn=bob,dc=example,dc=com");
+
+/* Too many parameters */
+ldap_explode_dn("cn=bob,dc=example,dc=com", 1, 1);
+
 /* Bad DN value with attributes */
 var_dump(ldap_explode_dn("bob,dc=example,dc=com", 0));
 
@@ -32,7 +38,7 @@ var_dump(ldap_explode_dn("bob,dc=example,dc=com", 1));
 echo "Done\n";
 
 ?>
---EXPECT--
+--EXPECTF--
 array(4) {
   ["count"]=>
   int(3)
@@ -79,6 +85,10 @@ array(5) {
 }
 bool(false)
 bool(false)
+
+Warning: ldap_explode_dn() expects exactly 2 parameters, 1 given in %s on line %d
+
+Warning: ldap_explode_dn() expects exactly 2 parameters, 3 given in %s on line %d
 bool(false)
 bool(false)
 Done

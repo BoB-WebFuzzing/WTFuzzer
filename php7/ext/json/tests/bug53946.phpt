@@ -1,5 +1,7 @@
 --TEST--
 bug #53946 (json_encode() with JSON_UNESCAPED_UNICODE)
+--SKIPIF--
+<?php if (!extension_loaded("json")) print "skip"; ?>
 --FILE--
 <?php
 var_dump(json_encode("latin 1234 -/    russian мама мыла раму  specialchars \x02   \x08 \n   U+1D11E >𝄞<"));

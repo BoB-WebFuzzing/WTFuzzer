@@ -1,7 +1,7 @@
 --TEST--
 Phar::setStub()/stopBuffering()
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -12,15 +12,17 @@ $p['file1.txt'] = 'hi';
 $p->stopBuffering();
 var_dump(strlen($p->getStub()));
 $p->setStub("<?php
-spl_autoload_register(function(\$class) {
+function __autoload(\$class)
+{
     include 'phar://' . str_replace('_', '/', \$class);
-});
+}
 Phar::mapPhar('phar_commitwrite.phar');
 include 'phar://phar_commitwrite.phar/startup.php';
 __HALT_COMPILER();
 ?>");
 var_dump($p->getStub());
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/phar_commitwrite.phar');
@@ -29,10 +31,12 @@ __HALT_COMPILER();
 --EXPECTF--
 int(6641)
 string(%d) "<?php
-spl_autoload_register(function($class) {
+function __autoload($class)
+{
     include 'phar://' . str_replace('_', '/', $class);
-});
+}
 Phar::mapPhar('phar_commitwrite.phar');
 include 'phar://phar_commitwrite.phar/startup.php';
 __HALT_COMPILER(); ?>
 "
+===DONE===

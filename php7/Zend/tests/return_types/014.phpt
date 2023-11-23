@@ -4,8 +4,7 @@ Constructors cannot declare a return type
 <?php
 
 class Foo {
-    function __construct() : Foo {}
+	function __construct() : Foo {}
 }
-?>
 --EXPECTF--
-Fatal error: Method Foo::__construct() cannot declare a return type in %s on line %d
+Fatal error: Constructor %s::%s() cannot declare a return type in %s on line %d

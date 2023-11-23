@@ -1,7 +1,5 @@
 --TEST--
 Test interoperability of password_verify()
---EXTENSIONS--
-sodium
 --SKIPIF--
 <?php
 if (!function_exists('sodium_crypto_pwhash_str')) {
@@ -15,17 +13,18 @@ list(, $algo) = explode('$', $hash, 3);
 if (!in_array($algo, password_algos(), true /* strict */)) {
  echo "skip - No $algo support in password_verify()";
 }
-?>
 --FILE--
 <?php
 
 $opsSet = [
   SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
   SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE,
+  SODIUM_CRYPTO_PWHASH_OPSLIMIT_SENSITIVE,
 ];
 $memSet = [
   SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE,
   SODIUM_CRYPTO_PWHASH_MEMLIMIT_MODERATE,
+  SODIUM_CRYPTO_PWHASH_MEMLIMIT_SENSITIVE,
 ];
 
 echo 'Argon2 provider: ';
@@ -45,7 +44,6 @@ foreach($opsSet as $ops) {
     var_dump(password_verify($password, $hash));
   }
 }
-?>
 --EXPECTF--
 Argon2 provider: string(%d) "%s"
 Using password: string(44) "%s"
@@ -57,10 +55,30 @@ Hash: string(98) "$argon2id$v=19$m=262144,t=2,p=1$%s$%s"
 bool(true)
 bool(false)
 Using password: string(44) "%s"
+Hash: string(99) "$argon2id$v=19$m=1048576,t=2,p=1$%s$%s"
+bool(true)
+bool(false)
+Using password: string(44) "%s"
 Hash: string(97) "$argon2id$v=19$m=65536,t=3,p=1$%s$%s"
 bool(true)
 bool(false)
 Using password: string(44) "%s"
 Hash: string(98) "$argon2id$v=19$m=262144,t=3,p=1$%s$%s"
+bool(true)
+bool(false)
+Using password: string(44) "%s"
+Hash: string(99) "$argon2id$v=19$m=1048576,t=3,p=1$%s$%s"
+bool(true)
+bool(false)
+Using password: string(44) "%s"
+Hash: string(97) "$argon2id$v=19$m=65536,t=4,p=1$%s$%s"
+bool(true)
+bool(false)
+Using password: string(44) "%s"
+Hash: string(98) "$argon2id$v=19$m=262144,t=4,p=1$%s$%s"
+bool(true)
+bool(false)
+Using password: string(44) "%s"
+Hash: string(99) "$argon2id$v=19$m=1048576,t=4,p=1$%s$%s"
 bool(true)
 bool(false)

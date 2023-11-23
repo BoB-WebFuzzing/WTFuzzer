@@ -1,7 +1,9 @@
 --TEST--
 Phar: fopen a .phar for writing (new file)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.readonly=1
 phar.require_hash=0
@@ -17,19 +19,26 @@ $files['b.php'] = '<?php echo "This is b\n"; ?>';
 $files['b/c.php'] = '<?php echo "This is b/c\n"; ?>';
 include 'files/phar_test.inc';
 
-var_dump(fopen($pname . '/b/new.php', 'wb'));
+$fp = fopen($pname . '/b/new.php', 'wb');
+fwrite($fp, 'extra');
+fclose($fp);
 include $pname . '/b/c.php';
 include $pname . '/b/new.php';
 ?>
 
+===DONE===
 --CLEAN--
 <?php unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.php'); ?>
 --EXPECTF--
-Warning: fopen(phar://%sopen_for_write_newfile_b.phar.php/b/new.php): Failed to open stream: phar error: write operations disabled by the php.ini setting phar.readonly in %sopen_for_write_newfile_b.php on line %d
-bool(false)
+Warning: fopen(phar://%sopen_for_write_newfile_b.phar.php/b/new.php): failed to open stream: phar error: write operations disabled by the php.ini setting phar.readonly in %sopen_for_write_newfile_b.php on line %d
+
+Warning: fwrite() expects parameter 1 to be resource, bool given in %sopen_for_write_newfile_b.php on line %d
+
+Warning: fclose() expects parameter 1 to be resource, bool given in %sopen_for_write_newfile_b.php on line %d
 This is b/c
 
-Warning: include(phar://%sopen_for_write_newfile_b.phar.php/b/new.php): Failed to open stream: phar error: "b/new.php" is not a file in phar "%sopen_for_write_newfile_b.phar.php" in %sopen_for_write_newfile_b.php on line %d
+Warning: include(phar://%sopen_for_write_newfile_b.phar.php/b/new.php): failed to open stream: phar error: "b/new.php" is not a file in phar "%sopen_for_write_newfile_b.phar.php" in %sopen_for_write_newfile_b.php on line %d
 
 Warning: include(): Failed opening 'phar://%sopen_for_write_newfile_b.phar.php/b/new.php' for inclusion (include_path='%s') in %sopen_for_write_newfile_b.php on line %d
 
+===DONE===

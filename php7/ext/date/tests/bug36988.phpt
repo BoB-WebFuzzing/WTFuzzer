@@ -6,11 +6,7 @@ Bug #36988 (mktime freezes on long numbers)
 <?php
 date_default_timezone_set('GMT');
 $start = microtime(true);
-try {
-    $a = mktime(1, 1, 1, 1, 1, 11111111111);
-} catch (TypeError $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
-}
+$a = mktime(1, 1, 1, 1, 1, 11111111111);
 ?>
---EXPECT--
-TypeError: mktime(): Argument #6 ($year) must be of type ?int, float given
+--EXPECTF--
+Warning: mktime() expects parameter 6 to be int, float given in %s on line %d

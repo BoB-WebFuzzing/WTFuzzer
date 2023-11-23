@@ -6,6 +6,13 @@ if (getenv("SKIP_SLOW_TESTS")) die("skip slow test");
 ?>
 --FILE--
 <?php
+/* Prototype: array lstat ( string $filename );
+   Description: Gives information about a file or symbolic link
+
+   Prototype: array stat ( string $filename );
+   Description: Gives information about a file
+*/
+
 /* test the effects of is_dir() on stats of a dir */
 
 $file_path = __DIR__;
@@ -21,7 +28,7 @@ echo "*** Testing stat() on directory after using is_dir() on it ***\n";
 $old_stat = stat($dirname);
 // clear the cache
 clearstatcache();
-sleep(1);
+sleep(2);
 var_dump( is_dir($dirname) );
 $new_stat = stat($dirname);
 

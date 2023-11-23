@@ -1,15 +1,14 @@
 --TEST--
 SOAP XML Schema 13: simpleType/union
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";
 $schema = <<<EOF
-    <simpleType name="testType">
-        <union memberTypes="string int float"/>
-    </simpleType>
+	<simpleType name="testType">
+		<union memberTypes="string int float"/>
+	</simpleType>
 EOF;
 test_schema($schema,'type="tns:testType"',"str");
 echo "ok";

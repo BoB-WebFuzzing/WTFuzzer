@@ -2,6 +2,10 @@
 Test ksort() function : object functionality - sort objects
 --FILE--
 <?php
+/* Prototype  : bool ksort ( array &$array [, int $sort_flags] )
+ * Description: Sort an array by key, maintaining key to data correlation.
+ * Source code: ext/standard/array.c
+*/
 /*
  * testing ksort() by providing array ofinteger/string objects with following flag values:
  *  1.SORT_NUMERIC - compare items numerically
@@ -51,14 +55,14 @@ $unsorted_str_obj = array (
   "apple" => new StringObject("apple"), "Orange" => new StringObject("Orange"),
   "Lemon" => new StringObject("Lemon"), "aPPle" => new StringObject("aPPle")
 );
-echo "\n-- Testing ksort() by supplying various object arrays, 'flag' value is default --\n";
+echo "\n-- Testing ksort() by supplying various object arrays, 'flag' value is defualt --\n";
 
-// testing ksort() function by supplying integer object array, flag value is default
+// testing ksort() function by supplying integer object array, flag value is defualt
 $temp_array = $unsorted_int_obj;
 var_dump(ksort($temp_array) );
 var_dump($temp_array);
 
-// testing ksort() function by supplying string object array, flag value is default
+// testing ksort() function by supplying string object array, flag value is defualt
 $temp_array = $unsorted_str_obj;
 var_dump(ksort($temp_array) );
 var_dump($temp_array);
@@ -79,7 +83,7 @@ echo "Done\n";
 --EXPECTF--
 *** Testing ksort() : object functionality ***
 
--- Testing ksort() by supplying various object arrays, 'flag' value is default --
+-- Testing ksort() by supplying various object arrays, 'flag' value is defualt --
 bool(true)
 array(6) {
   [-5]=>

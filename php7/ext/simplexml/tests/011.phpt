@@ -1,7 +1,9 @@
 --TEST--
 SimpleXML: echo/print
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php
+	if (!extension_loaded('simplexml')) print 'skip';
+?>
 --FILE--
 <?php
 
@@ -32,6 +34,7 @@ echo "===BAZ1===\n";
 print $sxe->baz[1];
 echo "\n";
 ?>
+===DONE===
 --EXPECT--
 ===BAR===
 bar
@@ -41,3 +44,4 @@ baz1
 baz1
 ===BAZ1===
 baz2
+===DONE===

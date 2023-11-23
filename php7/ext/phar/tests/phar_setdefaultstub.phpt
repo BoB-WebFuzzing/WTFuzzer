@@ -1,7 +1,7 @@
 --TEST--
 Phar: Phar::setDefaultStub() with and without arg
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly=0
 --FILE--
@@ -35,19 +35,20 @@ echo "==========================================================================
 echo "============================================================================\n";
 
 try {
-    $phar->setDefaultStub(str_repeat('a', 400));
-    $phar->stopBuffering();
-    var_dump(strlen($phar->getStub()));
+	$phar->setDefaultStub(str_repeat('a', 400));
+	$phar->stopBuffering();
+	var_dump(strlen($phar->getStub()));
 
-    $phar->setDefaultStub(str_repeat('a', 401));
-    $phar->stopBuffering();
-    var_dump(strlen($phar->getStub()));
+	$phar->setDefaultStub(str_repeat('a', 401));
+	$phar->stopBuffering();
+	var_dump(strlen($phar->getStub()));
 
 } catch(Exception $e) {
-    echo $e->getMessage() . "\n";
+	echo $e->getMessage() . "\n";
 }
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar');
@@ -940,3 +941,4 @@ __HALT_COMPILER(); ?>
 ============================================================================
 int(7034)
 Illegal filename passed in for stub creation, was 401 characters long, and only 400 or less is allowed
+===DONE===

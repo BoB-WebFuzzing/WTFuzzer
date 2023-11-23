@@ -2,6 +2,12 @@
 Test array_diff_uassoc() function : error conditions
 --FILE--
 <?php
+/* Prototype  : array array_diff_uassoc(array arr1, array arr2 [, array ...], callback key_comp_func)
+ * Description: Computes the difference of arrays with additional index check which is performed by a
+ * 				user supplied callback function
+ * Source code: ext/standard/array.c
+ */
+
 echo "*** Testing array_diff_uassoc() : error conditions ***\n";
 
 //Initialize array
@@ -21,32 +27,36 @@ function key_compare_func($a, $b)
 
 //Test array_diff_uassoc with one more than the expected number of arguments
 echo "\n-- Testing array_diff_uassoc() function with more than expected no. of arguments --\n";
-try {
-    var_dump( array_diff_uassoc($array1, $array2, "key_compare_func", $extra_arg) );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump( array_diff_uassoc($array1, $array2, $array3, $array4, "key_compare_func", $extra_arg) );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump( array_diff_uassoc($array1, $array2, "key_compare_func", $extra_arg) );
+var_dump( array_diff_uassoc($array1, $array2, $array3, $array4, "key_compare_func", $extra_arg) );
 
 // Testing array_diff_uassoc with one less than the expected number of arguments
 echo "\n-- Testing array_diff_uassoc() function with less than expected no. of arguments --\n";
-try {
-    var_dump( array_diff_uassoc($array1, $array2) );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump( array_diff_uassoc($array1, $array2) );
 
+// Testing array_diff_uassoc with no arguments
+echo "\n-- Testing array_diff_uassoc() function with no arguments --\n";
+var_dump( array_diff_uassoc() );
 ?>
---EXPECT--
+===DONE===
+--EXPECTF--
 *** Testing array_diff_uassoc() : error conditions ***
 
 -- Testing array_diff_uassoc() function with more than expected no. of arguments --
-array_diff_uassoc(): Argument #4 must be a valid callback, array callback must have exactly two members
-array_diff_uassoc(): Argument #6 must be a valid callback, array callback must have exactly two members
+
+Warning: array_diff_uassoc() expects parameter 4 to be a valid callback, array must have exactly two members in %s on line %d
+NULL
+
+Warning: array_diff_uassoc() expects parameter 6 to be a valid callback, array must have exactly two members in %s on line %d
+NULL
 
 -- Testing array_diff_uassoc() function with less than expected no. of arguments --
-array_diff_uassoc(): Argument #2 must be a valid callback, array callback must have exactly two members
+
+Warning: array_diff_uassoc(): at least 3 parameters are required, 2 given in %s on line %d
+NULL
+
+-- Testing array_diff_uassoc() function with no arguments --
+
+Warning: array_diff_uassoc(): at least 3 parameters are required, 0 given in %s on line %d
+NULL
+===DONE===

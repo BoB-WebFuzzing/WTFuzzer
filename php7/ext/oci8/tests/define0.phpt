@@ -1,15 +1,11 @@
 --TEST--
 oci_define_by_name()
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__."/connect.inc");
 
 // Initialize
 
@@ -33,7 +29,7 @@ $string = '';
 oci_define_by_name($stmt, "STRING", $string, 20);
 oci_execute($stmt);
 while (oci_fetch($stmt)) {
-    var_dump($string);
+	var_dump($string);
 }
 
 echo "Test 2\n";
@@ -55,8 +51,11 @@ $stmtarray = array(
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 Test 1
 string(%d) "some"
 Test 2
 string(%d) "some"
+===DONE===

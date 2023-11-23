@@ -1,268 +1,207 @@
 --TEST--
 Phar: bad parameters to various methods
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly=0
 --FILE--
 <?php
 ini_set('phar.readonly', 1);
 
+function print_exception($e) {
+	echo "\nException: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine() . "\n";
+}
+
+Phar::mungServer('hi');
+Phar::createDefaultStub(array());
+Phar::loadPhar(array());
+Phar::canCompress('hi');
 try {
-    Phar::mungServer('hi');
+	$a = new Phar(array());
 } catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
+	print_exception($e);
 }
 try {
-    Phar::createDefaultStub(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    Phar::loadPhar(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    Phar::canCompress('hi');
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a = new Phar(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a = new Phar(__DIR__ . '/files/frontcontroller10.phar');
+	$a = new Phar(__DIR__ . '/files/frontcontroller10.phar');
 } catch (PharException $e) {
-    echo $e->getMessage(), "\n";
+	print_exception($e);
 }
+$a->convertToExecutable(array());
+$a->convertToData(array());
 try {
-    $a->convertToExecutable(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->convertToData(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $b = new PharData(__DIR__ . '/whatever.tar');
+	$b = new PharData(__DIR__ . '/whatever.tar');
 } catch (PharException $e) {
-    echo $e->getMessage(), "\n";
+	print_exception($e);
 }
 try {
-    $c = new PharData(__DIR__ . '/whatever.zip');
+	$c = new PharData(__DIR__ . '/whatever.zip');
 } catch (PharException $e) {
-    echo $e->getMessage(), "\n";
+	print_exception($e);
 }
+$b->delete(array());
 try {
-    $b->delete(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->delete('oops');
+$a->delete('oops');
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
 try {
-    $b->delete('oops');
+$b->delete('oops');
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
+echo $a->getPath() . "\n";
 try {
-    echo $a->getPath() . "\n";
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->setAlias('oops');
+$a->setAlias('oops');
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
 try {
-    $b->setAlias('oops');
+$b->setAlias('oops');
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
 ini_set('phar.readonly', 0);
-try {
-    $a->setAlias(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+$a->setAlias(array());
 ini_set('phar.readonly', 1);
 try {
-    $b->stopBuffering();
+$b->stopBuffering();
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
 try {
-    $a->setStub('oops');
+$a->setStub('oops');
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
 try {
-    $b->setStub('oops');
+$b->setStub('oops');
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
 ini_set('phar.readonly', 0);
-try {
-    $a->setStub(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+$a->setStub(array());
 ini_set('phar.readonly', 1);
 try {
-    $b->setDefaultStub('oops');
+$b->setDefaultStub('oops');
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
+$a->setDefaultStub(array());
 try {
-    $a->setDefaultStub(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->setDefaultStub('oops');
+$a->setDefaultStub('oops');
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
 try {
-    $a->setSignatureAlgorithm(Phar::MD5);
+$a->setSignatureAlgorithm(Phar::MD5);
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
+$a->compress(array());
 try {
-    $a->compress(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->compress(1);
+$a->compress(1);
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
+$a->compressFiles(array());
 try {
-    $a->compressFiles(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->decompressFiles();
+$a->decompressFiles();
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
+$a->copy(array());
 try {
-    $a->copy(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->copy('a', 'b');
+$a->copy('a', 'b');
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
+$a->offsetExists(array());
+$a->offsetGet(array());
+ini_set('phar.readonly', 0);
+$a->offsetSet(array());
+ini_set('phar.readonly', 1);
+$b->offsetUnset(array());
 try {
-    $a->offsetExists(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
+$a->offsetUnset('a');
+} catch (Exception $e) {
+echo $e->getMessage() . "\n";
 }
+$a->addEmptyDir(array());
+$a->addFile(array());
+$a->addFromString(array());
 try {
-    $a->offsetGet(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
+$a->setMetadata('a');
+} catch (Exception $e) {
+echo $e->getMessage() . "\n";
 }
 ini_set('phar.readonly', 0);
-try {
-    $a->offsetSet(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+$a->setMetadata(1,2);
 ini_set('phar.readonly', 1);
 try {
-    $b->offsetUnset(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->offsetUnset('a');
+$a->delMetadata();
 } catch (Exception $e) {
-    echo $e->getMessage() . "\n";
-}
-try {
-    $a->addEmptyDir(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->addFile(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->addFromString(array());
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    $a->setMetadata('a');
-} catch (Exception $e) {
-    echo $e->getMessage() . "\n";
-}
-ini_set('phar.readonly', 0);
-try {
-    $a->setMetadata(1,2);
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-ini_set('phar.readonly', 1);
-try {
-    $a->delMetadata();
-} catch (Exception $e) {
-    echo $e->getMessage() . "\n";
+echo $e->getMessage() . "\n";
 }
 ?>
+===DONE===
 --EXPECTF--
-Phar::mungServer(): Argument #1 ($variables) must be of type array, string given
-Phar::createDefaultStub(): Argument #1 ($index) must be of type ?string, array given
-Phar::loadPhar(): Argument #1 ($filename) must be of type string, array given
-Phar::canCompress(): Argument #1 ($compression) must be of type int, string given
-Phar::__construct(): Argument #1 ($filename) must be of type string, array given
-Phar::convertToExecutable(): Argument #1 ($format) must be of type ?int, array given
-Phar::convertToData(): Argument #1 ($format) must be of type ?int, array given
-PharData::delete(): Argument #1 ($localName) must be of type string, array given
+Warning: Phar::mungServer() expects parameter 1 to be array, string given in %sbadparameters.php on line %d
+
+Warning: Phar::createDefaultStub() expects parameter 1 to be a valid path, array given in %sbadparameters.php on line %d
+
+Warning: Phar::loadPhar() expects parameter 1 to be a valid path, array given in %sbadparameters.php on line %d
+
+Warning: Phar::canCompress() expects parameter 1 to be int, string given in %sbadparameters.php on line %d
+
+Exception: Phar::__construct() expects parameter 1 to be a valid path, array given in %sbadparameters.php on line %d
+
+Warning: Phar::convertToExecutable() expects parameter 1 to be int, array given in %sbadparameters.php on line %d
+
+Warning: Phar::convertToData() expects parameter 1 to be int, array given in %sbadparameters.php on line %d
+
+Warning: PharData::delete() expects parameter 1 to be a valid path, array given in %sbadparameters.php on line %d
 Cannot write out phar archive, phar is read-only
 Entry oops does not exist and cannot be deleted
-%sfrontcontroller10.phar
+%sfiles/frontcontroller10.phar
 Cannot write out phar archive, phar is read-only
 A Phar alias cannot be set in a plain tar archive
-Phar::setAlias(): Argument #1 ($alias) must be of type string, array given
+
+Warning: Phar::setAlias() expects parameter 1 to be %string, array given in %sbadparameters.php on line %d
 Cannot change stub, phar is read-only
 A Phar stub cannot be set in a plain tar archive
-Phar::setStub(): Argument #1 ($stub) must be of type string, array given
+
+Warning: Phar::setStub() expects parameter 1 to be %string, array given in %sbadparameters.php on line %d
 A Phar stub cannot be set in a plain tar archive
-Phar::setDefaultStub(): Argument #1 ($index) must be of type ?string, array given
+
+Warning: Phar::setDefaultStub() expects parameter 1 to be %string, array given in %sbadparameters.php on line %d
 Cannot change stub: phar.readonly=1
 Cannot set signature algorithm, phar is read-only
-Phar::compress(): Argument #1 ($compression) must be of type int, array given
+
+Warning: Phar::compress() expects parameter 1 to be int, array given in %sbadparameters.php on line %d
 Cannot compress phar archive, phar is read-only
-Phar::compressFiles(): Argument #1 ($compression) must be of type int, array given
+
+Warning: Phar::compressFiles() expects parameter 1 to be int, array given in %sbadparameters.php on line %d
 Phar is readonly, cannot change compression
-Phar::copy() expects exactly 2 arguments, 1 given
+
+Warning: Phar::copy() expects exactly 2 parameters, 1 given in %sbadparameters.php on line %d
 Cannot copy "a" to "b", phar is read-only
-Phar::offsetExists(): Argument #1 ($localName) must be of type string, array given
-Phar::offsetGet(): Argument #1 ($localName) must be of type string, array given
-Phar::offsetSet() expects exactly 2 arguments, 1 given
-PharData::offsetUnset(): Argument #1 ($localName) must be of type string, array given
+
+Warning: Phar::offsetExists() expects parameter 1 to be a valid path, array given in %sbadparameters.php on line %d
+
+Warning: Phar::offsetGet() expects parameter 1 to be a valid path, array given in %sbadparameters.php on line %d
+
+Warning: Phar::offsetSet() expects exactly 2 parameters, 1 given in %sbadparameters.php on line %d
+
+Warning: PharData::offsetUnset() expects parameter 1 to be a valid path, array given in %sbadparameters.php on line %d
 Write operations disabled by the php.ini setting phar.readonly
-Phar::addEmptyDir(): Argument #1 ($directory) must be of type string, array given
-Phar::addFile(): Argument #1 ($filename) must be of type string, array given
-Phar::addFromString() expects exactly 2 arguments, 1 given
+
+Warning: Phar::addEmptyDir() expects parameter 1 to be a valid path, array given in %sbadparameters.php on line %d
+
+Warning: Phar::addFile() expects parameter 1 to be a valid path, array given in %sbadparameters.php on line %d
+
+Warning: Phar::addFromString() expects exactly 2 parameters, 1 given in %sbadparameters.php on line %d
 Write operations disabled by the php.ini setting phar.readonly
-Phar::setMetadata() expects exactly 1 argument, 2 given
+
+Warning: Phar::setMetadata() expects exactly 1 parameter, 2 given in %sbadparameters.php on line %d
 Write operations disabled by the php.ini setting phar.readonly
+===DONE===

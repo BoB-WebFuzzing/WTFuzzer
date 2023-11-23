@@ -1,7 +1,7 @@
 --TEST--
 Check for number base recognition
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
         /* Binary */
@@ -20,22 +20,18 @@ gmp
         $test[] = gmp_init("1234");
         $test[] = gmp_init("1234", 10);
 
-        /* Hexadecimal */
+        /* Hexidecimal */
         $test[] = gmp_init("0x4d2");
         $test[] = gmp_init("0x4d2", 16);
-        try {
-            $test[] = gmp_init("4d2");
-        } catch (\ValueError $e) {
-            echo $e->getMessage() . \PHP_EOL;
-        }
+        $test[] = gmp_init("4d2");
         $test[] = gmp_init("4d2", 16);
 
         for ($i = 0; $i < count($test); $i++) {
                 printf("%s\n", gmp_strval($test[$i]));
         }
 ?>
---EXPECT--
-gmp_init(): Argument #1 ($num) is not an integer string
+--EXPECTF--
+Warning: gmp_init(): Unable to convert variable to GMP - string is not an integer in %s on line %d
 1234
 1234
 10011010010
@@ -48,4 +44,5 @@ gmp_init(): Argument #1 ($num) is not an integer string
 1234
 1234
 1234
+0
 1234

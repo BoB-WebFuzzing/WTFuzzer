@@ -1,7 +1,9 @@
 --TEST--
 Phar: fopen a .phar for writing (existing file) tar-based
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.readonly=0
 phar.require_hash=0
@@ -21,22 +23,29 @@ $files['b.php'] = '<?php echo "This is b\n"; ?>';
 $files['b/c.php'] = '<?php echo "This is b/c\n"; ?>';
 
 foreach ($files as $n => $file) {
-    $phar[$n] = $file;
+	$phar[$n] = $file;
 }
 
 $phar->stopBuffering();
 ini_set('phar.readonly', 1);
 
-var_dump(fopen($alias . '/b/c.php', 'wb'));
+$fp = fopen($alias . '/b/c.php', 'wb');
+fwrite($fp, 'extra');
+fclose($fp);
 
 include $alias . '/b/c.php';
 
 ?>
 
+===DONE===
 --CLEAN--
 <?php unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.tar'); ?>
 --EXPECTF--
-Warning: fopen(phar://%sopen_for_write_existing_c.phar.tar/b/c.php): Failed to open stream: phar error: write operations disabled by the php.ini setting phar.readonly in %sopen_for_write_existing_c.php on line %d
-bool(false)
+Warning: fopen(phar://%sopen_for_write_existing_c.phar.tar/b/c.php): failed to open stream: phar error: write operations disabled by the php.ini setting phar.readonly in %sopen_for_write_existing_c.php on line %d
+
+Warning: fwrite() expects parameter 1 to be resource, bool given in %spen_for_write_existing_c.php on line %d
+
+Warning: fclose() expects parameter 1 to be resource, bool given in %spen_for_write_existing_c.php on line %d
 This is b/c
 
+===DONE===

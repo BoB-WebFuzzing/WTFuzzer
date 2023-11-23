@@ -3,8 +3,8 @@ SPL: ArrayObject::__construct: check impact of ArrayObject::STD_PROP_LIST on var
 --FILE--
 <?php
 class MyArrayObject extends ArrayObject {
-    private $priv1 = 'secret1';
-    public $pub1 = 'public1';
+	private $priv1 = 'secret1';
+	public $pub1 = 'public1';
 }
 
 $ao = new ArrayObject(array(1,2,3));
@@ -21,8 +21,7 @@ var_dump($ao);
 $ao = new MyArrayObject(array(1,2,3), ArrayObject::STD_PROP_LIST);
 var_dump($ao);
 ?>
---EXPECTF--
-Deprecated: Creation of dynamic property ArrayObject::$p is deprecated in %s on line %d
+--EXPECT--
 object(ArrayObject)#1 (2) {
   ["p"]=>
   int(1)
@@ -36,8 +35,6 @@ object(ArrayObject)#1 (2) {
     int(3)
   }
 }
-
-Deprecated: Creation of dynamic property ArrayObject::$p is deprecated in %s on line %d
 object(ArrayObject)#2 (2) {
   ["p"]=>
   int(1)

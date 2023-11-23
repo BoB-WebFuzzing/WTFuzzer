@@ -11,14 +11,18 @@ $regexIterator = new RegexIterator(new ArrayIterator($array), "/f/");
 var_dump($regexIterator->getMode());
 
 try {
-    $regexIterator->setMode(7);
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-    var_dump($e->getCode());
+	$regexIterator->setMode(7);
+} catch (InvalidArgumentException $e) {
+	var_dump($e->getMessage());
+	var_dump($e->getCode());
 }
 
+$regexIterator->setMode('foo');
+
 ?>
---EXPECT--
+--EXPECTF--
 int(0)
-RegexIterator::setMode(): Argument #1 ($mode) must be RegexIterator::MATCH, RegexIterator::GET_MATCH, RegexIterator::ALL_MATCHES, RegexIterator::SPLIT, or RegexIterator::REPLACE
+string(14) "Illegal mode 7"
 int(0)
+
+Warning: RegexIterator::setMode() expects parameter 1 to be int, string given in %s on line %d

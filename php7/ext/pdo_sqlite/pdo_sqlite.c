@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -27,19 +29,27 @@
 #include "php_pdo_sqlite_int.h"
 #include "zend_exceptions.h"
 
-/* {{{ pdo_sqlite_deps */
+/* {{{ pdo_sqlite_functions[] */
+static const zend_function_entry pdo_sqlite_functions[] = {
+	PHP_FE_END
+};
+/* }}} */
+
+/* {{{ pdo_sqlite_deps
+ */
 static const zend_module_dep pdo_sqlite_deps[] = {
 	ZEND_MOD_REQUIRED("pdo")
 	ZEND_MOD_END
 };
 /* }}} */
 
-/* {{{ pdo_sqlite_module_entry */
+/* {{{ pdo_sqlite_module_entry
+ */
 zend_module_entry pdo_sqlite_module_entry = {
 	STANDARD_MODULE_HEADER_EX, NULL,
 	pdo_sqlite_deps,
 	"pdo_sqlite",
-	NULL,
+	pdo_sqlite_functions,
 	PHP_MINIT(pdo_sqlite),
 	PHP_MSHUTDOWN(pdo_sqlite),
 	NULL,
@@ -80,11 +90,12 @@ PHP_MSHUTDOWN_FUNCTION(pdo_sqlite)
 }
 /* }}} */
 
-/* {{{ PHP_MINFO_FUNCTION */
+/* {{{ PHP_MINFO_FUNCTION
+ */
 PHP_MINFO_FUNCTION(pdo_sqlite)
 {
 	php_info_print_table_start();
-	php_info_print_table_row(2, "PDO Driver for SQLite 3.x", "enabled");
+	php_info_print_table_header(2, "PDO Driver for SQLite 3.x", "enabled");
 	php_info_print_table_row(2, "SQLite Library", sqlite3_libversion());
 	php_info_print_table_end();
 }

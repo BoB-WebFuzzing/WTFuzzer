@@ -9,6 +9,10 @@ if(substr(PHP_OS, 0, 3) == "WIN")
 obscure_filename
 --FILE--
 <?php
+/* Prototype:  string tempnam ( string $dir, string $prefix );
+   Description: Create file with unique file name.
+*/
+
 /* Passing invalid/non-existing args for $dir,
      hence the unique files will be created in temporary dir */
 
@@ -19,6 +23,7 @@ $names_arr = array(
   -1,
   TRUE,
   FALSE,
+  NULL,
   "",
   " ",
   "\0",
@@ -32,12 +37,7 @@ $names_arr = array(
 
 for( $i=0; $i<count($names_arr); $i++ ) {
   echo "-- Iteration $i --\n";
-  try {
-    $file_name = tempnam($names_arr[$i], "tempnam_variation3.tmp");
-  } catch (Error $e) {
-    echo $e->getMessage(), "\n";
-    continue;
-  }
+  $file_name = tempnam($names_arr[$i], "tempnam_variation3.tmp");
 
   if( file_exists($file_name) ){
 
@@ -90,22 +90,34 @@ File name is => %s%etempnam_variation3.tmp%s
 File permissions are => 100600
 File created in => temp dir
 -- Iteration 4 --
+File name is => %s%etempnam_variation3.tmp%s
+File permissions are => 100600
+File created in => temp dir
+-- Iteration 5 --
 
 Notice: tempnam(): file created in the system's temporary directory in %stempnam_variation7.php on line %d
 File name is => %s%etempnam_variation3.tmp%s
 File permissions are => 100600
 File created in => temp dir
--- Iteration 5 --
-tempnam(): Argument #1 ($directory) must not contain any null bytes
 -- Iteration 6 --
-tempnam(): Argument #1 ($directory) must be of type string, array given
+
+Warning: tempnam() expects parameter 1 to be a valid path, string given in %s on line %d
+-- File is not created --
+
+Warning: unlink(): %s in %s on line %d
 -- Iteration 7 --
+
+Warning: tempnam() expects parameter 1 to be a valid path, array given in %s on line %d
+-- File is not created --
+
+Warning: unlink(): %s in %s on line %d
+-- Iteration 8 --
 
 Notice: tempnam(): file created in the system's temporary directory in %stempnam_variation7.php on line %d
 File name is => %s/tempnam_variation3.tmp%s
 File permissions are => 100600
 File created in => temp dir
--- Iteration 8 --
+-- Iteration 9 --
 
 Notice: tempnam(): file created in the system's temporary directory in %stempnam_variation7.php on line %d
 File name is => %s/tempnam_variation3.tmp%s

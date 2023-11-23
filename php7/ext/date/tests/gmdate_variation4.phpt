@@ -2,6 +2,12 @@
 Test gmdate() function : usage variation - Passing textual representation of day formats.
 --FILE--
 <?php
+/* Prototype  : string gmdate(string format [, long timestamp])
+ * Description: Format a GMT date/time
+ * Source code: ext/date/php_date.c
+ * Alias to functions:
+ */
+
 echo "*** Testing gmdate() : usage variation ***\n";
 
 // Initialise all required variables
@@ -21,6 +27,7 @@ var_dump( gmdate('S') );
 var_dump( gmdate('S', $timestamp) );
 
 ?>
+===DONE===
 --EXPECTF--
 *** Testing gmdate() : usage variation ***
 
@@ -35,3 +42,4 @@ string(6) "Friday"
 -- Testing gmdate() function with English ordinal suffix --
 string(%d) "%s"
 string(2) "th"
+===DONE===

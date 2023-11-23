@@ -2,7 +2,6 @@
 Test setlocale() function : usage variations - setting system locale as null
 --SKIPIF--
 <?php
-if (setlocale(LC_ALL, 'invalid') === 'invalid') { die('skip setlocale() is broken /w musl'); }
 if (substr(PHP_OS, 0, 3) == 'WIN') {
     die('skip Not valid for windows');
 }
@@ -14,6 +13,13 @@ if (setlocale(LC_ALL,'en_US.utf8') === false || setlocale(LC_ALL,'en_AU.utf8') =
 LC_ALL=en_US.utf8;
 --FILE--
 <?php
+/* Prototype  : string setlocale (int $category , string $locale [,string $..] )
+ *            : string setlocale(int $category , array $locale);
+ * Description: Sets locale information.Returns the new current locale , or FALSE
+ *              if locale functionality is not implemented in this platform.
+ * Source code: ext/standard/string.c
+*/
+
 /*If locale is NULL, the locale names will be set from the values of environment variables with the same names as the above ENV settings */
 
 echo "*** Testing setlocale() : usage variations - Setting system locale = null ***\n";

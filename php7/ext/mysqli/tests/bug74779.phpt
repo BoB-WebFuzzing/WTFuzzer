@@ -1,15 +1,14 @@
 --TEST--
 Bug #74779 (x() and y() truncating floats to integers)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
 if (!setlocale(LC_NUMERIC, "de_DE", "de_DE.UTF-8", "de-DE")) die('skip locale not available');
 ?>
 --FILE--
 <?php
-require_once 'connect.inc';
+require_once("connect.inc");
 
 if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
     printf("[001] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
@@ -39,5 +38,5 @@ mysqli_close($link);
 --EXPECT--
 array(1) {
   ["ST_Y(Point(56.7, 53.34))"]=>
-  float(53.34)
+  float(53,34)
 }

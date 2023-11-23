@@ -1,13 +1,18 @@
 --TEST--
 Test pow() function : usage variations - different data types as $base argument
 --INI--
-serialize_precision = 14
+precision = 14
 --SKIPIF--
 <?php
 if (PHP_INT_SIZE != 4) die("skip this test is for 32bit platform only");
 ?>
 --FILE--
 <?php
+/* Prototype  : number pow  ( number $base  , number $exp  )
+ * Description: Exponential expression.
+ * Source code: ext/standard/math.c
+ */
+
 echo "*** Testing pow() : usage variations ***\n";
 
 //get an unset variable
@@ -79,16 +84,13 @@ $inputs = array(
 // loop through each element of $inputs to check the behaviour of pow()
 $iterator = 1;
 foreach($inputs as $input) {
-    echo "\n-- Iteration $iterator --\n";
-    try {
-        var_dump(pow($input, 3));
-    } catch (Error $e) {
-        echo $e->getMessage(), "\n";
-    }
-    $iterator++;
+	echo "\n-- Iteration $iterator --\n";
+	var_dump(pow($input, 3));
+	$iterator++;
 };
 fclose($fp);
 ?>
+===Done===
 --EXPECTF--
 *** Testing pow() : usage variations ***
 
@@ -141,25 +143,37 @@ int(1)
 int(0)
 
 -- Iteration 17 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 18 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 19 --
-Unsupported operand types: array ** int
+int(0)
 
 -- Iteration 20 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 21 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 22 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 23 --
-Unsupported operand types: classA ** int
+
+Notice: Object of class classA could not be converted to number in %s on line %d
+int(1)
 
 -- Iteration 24 --
 int(0)
@@ -168,4 +182,5 @@ int(0)
 int(0)
 
 -- Iteration 26 --
-Unsupported operand types: resource ** int
+%s
+===Done===

@@ -1,7 +1,7 @@
 --TEST--
 filter_var() and FILTER_VALIDATE_REGEXP
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 
@@ -10,19 +10,17 @@ var_dump(filter_var("data", FILTER_VALIDATE_REGEXP, array("options"=>array("rege
 var_dump(filter_var("data", FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>'/^d(.*)/'))));
 var_dump(filter_var("data", FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>'/blah/'))));
 var_dump(filter_var("data", FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>'/\[/'))));
-try {
-    filter_var("data", FILTER_VALIDATE_REGEXP);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(filter_var("data", FILTER_VALIDATE_REGEXP));
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 string(4) "data"
 bool(false)
 string(4) "data"
 bool(false)
 bool(false)
-filter_var(): "regexp" option is missing
+
+Warning: filter_var(): 'regexp' option missing in %s on line %d
+bool(false)
 Done

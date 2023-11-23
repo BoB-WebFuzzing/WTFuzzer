@@ -23,12 +23,13 @@ $otherVals = array(0, 1, -1, 7, 9, 65, -44, MAX_32Bit, MIN_32Bit, MAX_64Bit, MIN
 
 foreach ($longVals as $longVal) {
    foreach($otherVals as $otherVal) {
-       echo "--- testing: $longVal, $otherVal ---\n";
+	   echo "--- testing: $longVal, $otherVal ---\n";
       var_dump(fmod($longVal, $otherVal));
    }
 }
 
 ?>
+===DONE===
 --EXPECT--
 --- testing: 9223372036854775807, 0 ---
 float(NAN)
@@ -137,9 +138,9 @@ float(1)
 --- testing: 9223372034707292160, -2147483648 ---
 float(0)
 --- testing: 9223372034707292160, 9223372036854775807 ---
-float(9.223372034707292E+18)
+float(9.2233720347073E+18)
 --- testing: 9223372034707292160, -9223372036854775808 ---
-float(9.223372034707292E+18)
+float(9.2233720347073E+18)
 --- testing: -9223372034707292160, 0 ---
 float(NAN)
 --- testing: -9223372034707292160, 1 ---
@@ -159,9 +160,9 @@ float(-1)
 --- testing: -9223372034707292160, -2147483648 ---
 float(-0)
 --- testing: -9223372034707292160, 9223372036854775807 ---
-float(-9.223372034707292E+18)
+float(-9.2233720347073E+18)
 --- testing: -9223372034707292160, -9223372036854775808 ---
-float(-9.223372034707292E+18)
+float(-9.2233720347073E+18)
 --- testing: 2147483648, 0 ---
 float(NAN)
 --- testing: 2147483648, 1 ---
@@ -360,3 +361,4 @@ float(-0)
 float(-0)
 --- testing: -9.2233720368548E+18, -9223372036854775808 ---
 float(-0)
+===DONE===

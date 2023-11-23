@@ -37,5 +37,7 @@ $b->who();
 
 echo "\n";
 ?>
+===DONE===
 --EXPECT--
 firstfirstfirstfirstsecondsecondsecondsecondsecond
+===DONE===

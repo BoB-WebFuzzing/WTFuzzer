@@ -1,13 +1,15 @@
 --TEST--
 Bug #50728 (All PDOExceptions hardcode 'code' property to 0)
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo_sqlite')) print 'skip not loaded';
+?>
 --FILE--
 <?php
 try {
-    $a = new PDO("sqlite:/this/path/should/not/exist.db");
+	$a = new PDO("sqlite:/this/path/should/not/exist.db");
 } catch (PDOException $e) {
-    var_dump($e->getCode());
+	var_dump($e->getCode());
 }
 ?>
 --EXPECT--

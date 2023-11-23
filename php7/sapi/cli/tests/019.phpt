@@ -4,16 +4,16 @@ CLI php -i
 <?php
 include "skipif.inc";
 if (substr(PHP_OS, 0, 3) == 'WIN') {
-    die ("skip not for Windows");
+	die ("skip not for Windows");
 }
 ?>
 --FILE--
 <?php
 
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = getenv('TEST_PHP_EXECUTABLE');
 
 
-echo `$php -n -i`;
+echo `"$php" -n -i`;
 
 echo "\nDone\n";
 ?>

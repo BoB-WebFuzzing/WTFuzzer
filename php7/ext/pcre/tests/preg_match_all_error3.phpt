@@ -3,6 +3,7 @@ Test preg_match_all() function : error conditions
 --FILE--
 <?php
 /*
+* proto int preg_match_all(string pattern, string subject, array subpatterns [, int flags [, int offset]])
 * Function is implemented in ext/pcre/php_pcre.c
 */
 /*
@@ -15,9 +16,4 @@ var_dump(preg_match_all($regex, $subject, 'test'));
 echo "Done";
 ?>
 --EXPECTF--
-*** Testing preg_match_all() : error conditions ***
-
-Fatal error: Uncaught Error: preg_match_all(): Argument #3 ($matches) could not be passed by reference in %s:%d
-Stack trace:
-#0 {main}
-  thrown in %s on line %d
+Fatal error: Only variables can be passed by reference in %spreg_match_all_error3.php on line %d

@@ -1,7 +1,9 @@
 --TEST--
 Bug #77080 (Deflate not working)
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded('zlib')) die('skip zlib extension not available');
+?>
 --FILE--
 <?php
 $string = str_repeat("0123456789", 100);

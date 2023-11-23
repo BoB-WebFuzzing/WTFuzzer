@@ -1,41 +1,39 @@
 --TEST--
 Bind with NUMBER column variants
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+if (!extension_loaded('oci8')) die("skip no oci8 extension");
 ?>
 --INI--
 precision = 14
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Initialization
 
 $stmtarray = array(
-    "drop table bind_number_tab",
-    "create table bind_number_tab (
-                    id				  number,
-                    number_t6		  number(6),
-                    float_t			  float,
-                    binary_float_t	  binary_float,
-                    binary_double_t	  binary_double,
-                    decimal_t		  decimal,
-                    integer_t		  integer)"
+	"drop table bind_number_tab",
+	"create table bind_number_tab (
+					id				  number,
+					number_t6		  number(6),
+					float_t			  float,
+					binary_float_t	  binary_float,
+					binary_double_t	  binary_double,
+					decimal_t		  decimal,
+					integer_t		  integer)"
 );
 
 oci8_test_sql_execute($c, $stmtarray);
 
 function check_col($c, $colname, $id)
 {
-    $s = oci_parse($c, "select $colname from bind_number_tab where id = :id");
-    oci_bind_by_name($s, ":id", $id);
-    oci_execute($s);
-    oci_fetch_all($s, $r);
-    var_dump($r);
+	$s = oci_parse($c, "select $colname from bind_number_tab where id = :id");
+	oci_bind_by_name($s, ":id", $id);
+	oci_execute($s);
+	oci_fetch_all($s, $r);
+	var_dump($r);
 }
 
 // Run Test
@@ -125,12 +123,14 @@ check_col($c, 'integer_t', 76);
 // Clean up
 
 $stmtarray = array(
-    "drop table bind_number_tab"
+	"drop table bind_number_tab"
 );
 
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 Test 1 - invalid number
 
@@ -212,3 +212,4 @@ array(1) {
     string(2) "42"
   }
 }
+===DONE===

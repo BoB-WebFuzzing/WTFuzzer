@@ -19,7 +19,6 @@ foreach ($inputs as $input) {
   print_r(array_keys($input));
   print_r(array_values($input));
 }
-?>
 --EXPECT--
 Array
 (

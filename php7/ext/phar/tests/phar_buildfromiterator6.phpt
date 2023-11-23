@@ -1,7 +1,7 @@
 --TEST--
 Phar::buildFromIterator() iterator, key is int
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -14,35 +14,41 @@ class myIterator implements Iterator
     {
         $this->a = $a;
     }
-    function next(): void {
+    function next() {
         echo "next\n";
-        next($this->a);
+        return next($this->a);
     }
-    function current(): mixed {
+    function current() {
         echo "current\n";
         return current($this->a);
     }
-    function key(): mixed {
+    function key() {
         echo "key\n";
         return key($this->a);
     }
-    function valid(): bool {
+    function valid() {
         echo "valid\n";
         return current($this->a);
     }
-    function rewind(): void {
+    function rewind() {
         echo "rewind\n";
-        reset($this->a);
+        return reset($this->a);
     }
 }
 try {
-    chdir(__DIR__);
-    $phar = new Phar(__DIR__ . '/buildfromiterator6.phar');
-    var_dump($phar->buildFromIterator(new myIterator(array(basename(__FILE__, 'php') . 'phpt'))));
+	chdir(__DIR__);
+	$phar = new Phar(__DIR__ . '/buildfromiterator6.phar');
+	var_dump($phar->buildFromIterator(new myIterator(array(basename(__FILE__, 'php') . 'phpt'))));
 } catch (Exception $e) {
-    var_dump(get_class($e));
-    echo $e->getMessage() . "\n";
+	var_dump(get_class($e));
+	echo $e->getMessage() . "\n";
 }
+?>
+===DONE===
+--CLEAN--
+<?php
+unlink(__DIR__ . '/buildfromiterator6.phar');
+__HALT_COMPILER();
 ?>
 --EXPECTF--
 rewind
@@ -51,3 +57,4 @@ current
 key
 %s(24) "UnexpectedValueException"
 Iterator myIterator returned an invalid key (must return a string)
+===DONE===

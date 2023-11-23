@@ -1,6 +1,8 @@
 #!/bin/sh
 #
 #  +----------------------------------------------------------------------+
+#  | PHP Version 7                                                        |
+#  +----------------------------------------------------------------------+
 #  | Copyright (c) The PHP Group                                          |
 #  +----------------------------------------------------------------------+
 #  | This source file is subject to version 3.01 of the PHP license,      |
@@ -35,7 +37,6 @@
 
 YACC=${YACC:-bison}
 YACC="$YACC -l"
-YFLAGS="-Wall"
 RE2C=${RE2C:-re2c}
 RE2C_FLAGS="-i"
 SED=${SED:-sed}
@@ -101,7 +102,7 @@ if ! test -x "$(command -v $MAKE)"; then
 fi
 
 echo "genfiles: Generating Zend parser and lexer files"
-$MAKE RE2C="$RE2C" RE2C_FLAGS="$RE2C_FLAGS" YACC="$YACC" YFLAGS="$YFLAGS" SED="$SED" srcdir=Zend builddir=Zend top_srcdir=. \
+$MAKE RE2C="$RE2C" RE2C_FLAGS="$RE2C_FLAGS" YACC="$YACC" SED="$SED" srcdir=Zend builddir=Zend top_srcdir=. \
   -f Zend/Makefile.frag \
   Zend/zend_language_parser.c \
   Zend/zend_language_scanner.c \
@@ -109,13 +110,13 @@ $MAKE RE2C="$RE2C" RE2C_FLAGS="$RE2C_FLAGS" YACC="$YACC" YFLAGS="$YFLAGS" SED="$
   Zend/zend_ini_scanner.c
 
 echo "genfiles: Generating phpdbg parser and lexer files"
-$MAKE RE2C="$RE2C" RE2C_FLAGS="$RE2C_FLAGS" YACC="$YACC" YFLAGS="$YFLAGS" srcdir=sapi/phpdbg builddir=sapi/phpdbg top_srcdir=. \
+$MAKE RE2C="$RE2C" RE2C_FLAGS="$RE2C_FLAGS" YACC="$YACC" srcdir=sapi/phpdbg builddir=sapi/phpdbg top_srcdir=. \
   -f sapi/phpdbg/Makefile.frag \
   sapi/phpdbg/phpdbg_parser.c \
   sapi/phpdbg/phpdbg_lexer.c
 
-echo "genfiles: Generating json extension parser and lexer files"
-$MAKE RE2C="$RE2C" RE2C_FLAGS="$RE2C_FLAGS" YACC="$YACC" YFLAGS="$YFLAGS" srcdir=ext/json builddir=ext/json top_srcdir=. \
+echo "genfiles: enerating json extension parser and lexer files"
+$MAKE RE2C="$RE2C" RE2C_FLAGS="$RE2C_FLAGS" YACC="$YACC" srcdir=ext/json builddir=ext/json top_srcdir=. \
   -f ext/json/Makefile.frag \
   ext/json/json_parser.tab.c \
   ext/json/json_scanner.c

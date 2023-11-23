@@ -61,6 +61,8 @@ unset($obj['8th']);
 var_dump($obj->getArrayCopy());
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 array(4) {
   [0]=>
@@ -92,10 +94,10 @@ int(1)
 string(3) "3rd"
 int(4)
 
-Warning: Undefined array key "5th" in %s on line %d
+Notice: Undefined index: 5th in %sarray_010.php on line %d
 NULL
 
-Warning: Undefined array key 6 in %s on line %d
+Notice: Undefined offset: 6 in %sarray_010.php on line %d
 NULL
 ===offsetSet===
 WRITE 1
@@ -125,6 +127,10 @@ array(6) {
   [6]=>
   string(9) "changed 6"
 }
+
+Notice: Undefined offset: 7 in %sarray_010.php on line %d
+
+Notice: Undefined index: 8th in %sarray_010.php on line %d
 array(4) {
   [0]=>
   string(3) "1st"
@@ -135,3 +141,4 @@ array(4) {
   [6]=>
   string(9) "changed 6"
 }
+===DONE===

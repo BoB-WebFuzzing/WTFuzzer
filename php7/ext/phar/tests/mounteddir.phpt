@@ -1,7 +1,9 @@
 --TEST--
 Phar: mounted manifest directory test
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --CONFLICTS--
 tempmanifest1.phar.php
 --INI--
@@ -45,19 +47,19 @@ include $fname;
 $a = opendir($pname . '/testit');
 $out = array();
 while (false !== ($b = readdir($a))) {
-    $out[] = $b;
+	$out[] = $b;
 }
 sort($out);
 foreach ($out as $b) {
-    echo "$b\n";
+	echo "$b\n";
 }
 $out = array();
 foreach (new Phar($pname . '/testit') as $b) {
-    $out[] = $b->getPathName();
+	$out[] = $b->getPathName();
 }
 sort($out);
 foreach ($out as $b) {
-    echo "$b\n";
+	echo "$b\n";
 }
 try {
 Phar::mount($pname . '/testit', 'another\\..\\mistake');
@@ -80,6 +82,7 @@ Phar::mount($pname . '/testit/extfile.php', __DIR__);
 echo $e->getMessage(), "\n";
 }
 ?>
+===DONE===
 --CLEAN--
 <?php
 @unlink(__DIR__ . '/tempmanifest1.phar.php');
@@ -95,7 +98,7 @@ string(%d) "%sextfile.php"
 var_dump(__FILE__);
 ?>
 
-Warning: file_get_contents(phar://%stempmanifest1.phar.php/testit/directory): Failed to open stream: phar error: path "testit/directory" is a directory in phar://%stempmanifest1.phar.php/index.php on line %d
+Warning: file_get_contents(phar://%stempmanifest1.phar.php/testit/directory): failed to open stream: phar error: path "testit/directory" is a directory in phar://%stempmanifest1.phar.php/index.php on line %d
 
 oops
 string(%d) "phar://%sextfile.php"
@@ -113,3 +116,4 @@ Mounting of /testit to another\..\mistake within phar %stempmanifest1.phar.php f
 Mounting of /notfound to %stests/this/does/not/exist within phar %stempmanifest1.phar.php failed
 Mounting of /testit to %stests within phar %stests/tempmanifest1.phar.php failed
 Mounting of /testit/extfile.php to %stests within phar %stests/tempmanifest1.phar.php failed
+===DONE===

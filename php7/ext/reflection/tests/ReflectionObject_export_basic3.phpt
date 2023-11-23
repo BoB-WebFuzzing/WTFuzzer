@@ -3,10 +3,9 @@ ReflectionObject::__toString() - ensure dynamic property with same name as inher
 --FILE--
 <?php
 class C {
-    private $p = 1;
+	private $p = 1;
 }
 
-#[AllowDynamicProperties]
 class D extends C{
 }
 
@@ -16,7 +15,7 @@ echo new ReflectionObject($Obj);
 ?>
 --EXPECTF--
 Object of class [ <user> class D extends C ] {
-  @@ %s
+  @@ %s 6-7
 
   - Constants [0] {
   }

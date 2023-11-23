@@ -38,6 +38,7 @@ $B->copyValue($C);
 var_dump($B);
 
 ?>
+===DONE===
 --EXPECTF--
 object(B)#%d (1) {
   ["value":protected]=>
@@ -51,3 +52,4 @@ object(B)#%d (1) {
   ["value":protected]=>
   string(1) "C"
 }
+===DONE===

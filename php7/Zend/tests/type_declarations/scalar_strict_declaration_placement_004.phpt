@@ -13,6 +13,5 @@ namespace Foo {
 namespace {
     var_dump(Foo\add1(123));
 }
-?>
 --EXPECT--
 int(124)

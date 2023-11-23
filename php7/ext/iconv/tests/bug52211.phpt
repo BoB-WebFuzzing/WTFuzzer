@@ -1,7 +1,9 @@
 --TEST--
 Bug #52211 (iconv() returns part of string on error)
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+include('skipif.inc');
+?>
 --FILE--
 <?php
 

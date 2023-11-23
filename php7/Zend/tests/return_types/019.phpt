@@ -1,11 +1,10 @@
 --TEST--
-__clone can only declare void return
+__clone cannot declare a return type
 --FILE--
 <?php
 
 class Foo {
-    function __clone() : Foo {}
+	function __clone() : Foo {}
 }
-?>
 --EXPECTF--
-Fatal error: Foo::__clone(): Return type must be void when declared in %s on line %d
+Fatal error: %s::%s() cannot declare a return type in %s on line %d

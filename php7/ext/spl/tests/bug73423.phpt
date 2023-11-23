@@ -7,39 +7,39 @@ class foo implements \RecursiveIterator
   {
     public $foo = [];
 
-    public Function current(): mixed
+    public Function current ()
       {
         return current ($this->foo);
       }
 
-    public Function key(): mixed
+    public Function key ()
       {
         return key ($this->foo);
       }
 
-    public Function next(): void
+    public Function next ()
       {
         next ($this->foo);
       }
 
-    public Function rewind(): void
+    public Function rewind ()
       {
         reset ($this->foo);
       }
 
-    public Function valid(): bool
+    public Function valid ()
       {
         return current ($this->foo) !== false;
       }
 
-    public Function getChildren(): ?RecursiveIterator
+    public Function getChildren ()
       {
         return current ($this->foo);
       }
 
-    public Function hasChildren(): bool
+    public Function hasChildren ()
       {
-        return (bool) count($this->foo);
+        return (bool) count ($this->foo);
       }
   }
 
@@ -48,12 +48,12 @@ class fooIterator extends \RecursiveFilterIterator
   {
     public Function __destruct ()
       {
-        eval("class A extends NotExists {}");
+		eval("class A extends NotExists {}");
 
         /* CRASH */
       }
 
-    public Function accept(): bool
+    public Function accept ()
       {
         return true;
       }
@@ -68,13 +68,13 @@ foreach (new \RecursiveIteratorIterator (new fooIterator ($foo)) as $bar) ;
 
 ?>
 --EXPECTF--
-Fatal error: Uncaught Error: Class "NotExists" not found in %s:%d
+Fatal error: Uncaught Error: Class 'NotExists' not found in %s:%d
 Stack trace:
 #0 %s(%d): eval()
 #1 %s(%d): fooIterator->__destruct()
 #2 {main}
 
-Next Error: Class "NotExists" not found in %s:%d
+Next Error: Class 'NotExists' not found in %s:%d
 Stack trace:
 #0 %s(%d): eval()
 #1 %s(%d): fooIterator->__destruct()

@@ -2,6 +2,10 @@
 JSON (http://www.crockford.com/JSON/JSON_checker/test/pass1.json)
 --INI--
 serialize_precision=-1
+--SKIPIF--
+<?php
+if (!extension_loaded('json')) die('skip');
+?>
 --FILE--
 <?php
 
@@ -64,7 +68,7 @@ $test = "
 ,\"rosebud\"]
 ";
 
-echo 'Testing:' . $test . "\n";
+echo 'Testing: ' . $test . "\n";
 echo "DECODE: AS OBJECT\n";
 $obj = json_decode($test);
 var_dump($obj);
@@ -88,7 +92,7 @@ var_dump($arr);
 
 ?>
 --EXPECT--
-Testing:
+Testing: 
 [
     "JSON Test Pattern pass1",
     {"object with 1 member":["array with 1 element"]},

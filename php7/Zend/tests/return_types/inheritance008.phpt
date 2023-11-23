@@ -20,7 +20,6 @@ class Bar extends Foo {
 
 var_dump(Bar::test());
 var_dump(Foo::test());
-?>
 --EXPECTF--
 object(B)#%d (0) {
 }

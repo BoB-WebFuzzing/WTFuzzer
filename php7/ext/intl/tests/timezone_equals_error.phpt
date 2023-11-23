@@ -1,7 +1,9 @@
 --TEST--
 IntlTimeZone equals handler: error test
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -16,10 +18,11 @@ var_dump($tz, $tz2);
 try {
 var_dump($tz == $tz2);
 } catch (Exception $e) {
-    var_dump(get_class($e), $e->getMessage());
+	var_dump(get_class($e), $e->getMessage());
 }
 
 ?>
+==DONE==
 --EXPECT--
 object(A)#1 (1) {
   ["valid"]=>
@@ -36,4 +39,5 @@ object(IntlTimeZone)#2 (4) {
   int(0)
 }
 string(9) "Exception"
-string(63) "Comparison with at least one unconstructed IntlTimeZone operand"
+string(63) "Comparison with at least one unconstructed IntlTimeZone operand"
+==DONE==

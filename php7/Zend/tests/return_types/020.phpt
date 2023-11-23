@@ -7,7 +7,6 @@ function test() : array {
 }
 
 test();
-?>
 --EXPECTF--
 Fatal error: Uncaught Exception in %s:%d
 Stack trace:

@@ -1,30 +1,18 @@
 --TEST--
 PostgreSQL pg_metadata()
---EXTENSIONS--
-pgsql
 --SKIPIF--
-<?php include("inc/skipif.inc"); ?>
+<?php include("skipif.inc"); ?>
 --FILE--
 <?php
 error_reporting(E_ALL);
 
-include 'inc/config.inc';
-$table_name = "table_11pg_meta_data";
+include 'config.inc';
 
 $db = pg_connect($conn_str);
-pg_query($db, "CREATE TABLE {$table_name} (num int, str text, bin bytea)");
 
 $meta = pg_meta_data($db, $table_name);
 
 var_dump($meta);
-?>
---CLEAN--
-<?php
-include('inc/config.inc');
-$table_name = "table_11pg_meta_data";
-
-$db = pg_connect($conn_str);
-pg_query($db, "DROP TABLE IF EXISTS {$table_name}");
 ?>
 --EXPECT--
 array(3) {

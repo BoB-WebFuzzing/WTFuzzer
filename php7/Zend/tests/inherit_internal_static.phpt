@@ -1,7 +1,7 @@
 --TEST--
 Inherit internal static property into userland class
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip requires zend-test'); ?>
 --FILE--
 <?php
 

@@ -2,16 +2,23 @@
 Test imagecolorstotal() function : basic functionality
 --CREDITS--
 Felix De Vliegher <felix.devliegher@gmail.com>
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
-    if (!function_exists("imagecolorstotal")) {
-        die("skip imagecolorstotal() not available.");
-    }
+	if (!extension_loaded('gd')) {
+		die("skip gd extension not available.");
+	}
+	if (!function_exists("imagecolorstotal")) {
+		die("skip imagecolorstotal() not available.");
+	}
 ?>
 --FILE--
 <?php
+/* Prototype  : int imagecolorstotal(resource im)
+ * Description: Find out the number of colors in an image's palette
+ * Source code: ext/gd/gd.c
+ * Alias to functions:
+ */
+
 echo "*** Testing imagecolorstotal() : basic functionality ***\n";
 
 // Palette image
@@ -32,6 +39,7 @@ var_dump( imagecolorstotal( $img ) );
 imagedestroy( $img );
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing imagecolorstotal() : basic functionality ***
 int(0)
@@ -39,3 +47,4 @@ int(1)
 int(3)
 int(0)
 int(0)
+===DONE===

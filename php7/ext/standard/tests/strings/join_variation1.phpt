@@ -2,6 +2,12 @@
 Test join() function : usage variations - unexpected values for 'glue' argument
 --FILE--
 <?php
+/* Prototype  : string join( string $glue, array $pieces )
+ * Description: Join array elements with a string
+ * Source code: ext/standard/string.c
+ * Alias of function: implode()
+*/
+
 /*
  * testing join() by passing different unexpected value for glue argument
 */
@@ -9,6 +15,10 @@ Test join() function : usage variations - unexpected values for 'glue' argument
 echo "*** Testing join() : usage variations ***\n";
 // initialize all required variables
 $pieces = array("element1", "element2");
+
+// get an unset variable
+$unset_var = 'string_val';
+unset($unset_var);
 
 // get a resource variable
 $fp = fopen(__FILE__, "r");
@@ -58,8 +68,18 @@ $values =  array (
   "",
   '',
 
+  // null values
+  NULL,
+  null,
+
   // resource variable
   $fp,
+
+  // undefined variable
+  @$undefined_var,
+
+  // unset variable
+  @$unset_var
 );
 
 
@@ -71,18 +91,14 @@ for($index = 0; $index < count($values); $index ++) {
   echo "-- Iteration $counter --\n";
   $glue = $values [$index];
 
-  try {
-    var_dump(join($glue, $pieces));
-  } catch (TypeError $exception) {
-    echo $exception->getMessage() . "\n";
-  }
+  var_dump( join($glue, $pieces) );
 
-  $counter++;
+  $counter ++;
 }
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing join() : usage variations ***
 
 --- Testing join() by supplying different values for 'glue' argument ---
@@ -105,15 +121,35 @@ string(29) "element11.07654321E-9element2"
 -- Iteration 9 --
 string(19) "element10.5element2"
 -- Iteration 10 --
-join(): Argument #1 ($separator) must be of type string, array given
+
+Notice: Array to string conversion in %s on line %d
+
+Deprecated: join(): Passing glue string after array is deprecated. Swap the parameters in %s on line %d
+string(0) ""
 -- Iteration 11 --
-join(): Argument #1 ($separator) must be of type string, array given
+
+Notice: Array to string conversion in %s on line %d
+
+Deprecated: join(): Passing glue string after array is deprecated. Swap the parameters in %s on line %d
+string(1) "0"
 -- Iteration 12 --
-join(): Argument #1 ($separator) must be of type string, array given
+
+Notice: Array to string conversion in %s on line %d
+
+Deprecated: join(): Passing glue string after array is deprecated. Swap the parameters in %s on line %d
+string(1) "1"
 -- Iteration 13 --
-join(): Argument #1 ($separator) must be of type string, array given
+
+Notice: Array to string conversion in %s on line %d
+
+Deprecated: join(): Passing glue string after array is deprecated. Swap the parameters in %s on line %d
+string(7) "1Array2"
 -- Iteration 14 --
-join(): Argument #1 ($separator) must be of type string, array given
+
+Notice: Array to string conversion in %s on line %d
+
+Deprecated: join(): Passing glue string after array is deprecated. Swap the parameters in %s on line %d
+string(11) "redArraypen"
 -- Iteration 15 --
 string(17) "element11element2"
 -- Iteration 16 --
@@ -129,5 +165,13 @@ string(16) "element1element2"
 -- Iteration 21 --
 string(16) "element1element2"
 -- Iteration 22 --
-join(): Argument #1 ($separator) must be of type array|string, resource given
+string(16) "element1element2"
+-- Iteration 23 --
+string(16) "element1element2"
+-- Iteration 24 --
+string(%d) "element1Resource id #%delement2"
+-- Iteration 25 --
+string(16) "element1element2"
+-- Iteration 26 --
+string(16) "element1element2"
 Done

@@ -19,27 +19,27 @@ class Container implements Iterator
         $this->container->append($element);
     }
 
-    public function current(): mixed
+    public function current()
     {
         return $this->iterator->current();
     }
 
-    public function next(): void
+    public function next()
     {
         $this->iterator->next();
     }
 
-    public function key(): mixed
+    public function key()
     {
         return $this->iterator->key();
     }
 
-    public function valid(): bool
+    public function valid()
     {
         return $this->iterator->valid();
     }
 
-    public function rewind(): void
+    public function rewind()
     {
         $this->iterator->rewind();
     }
@@ -98,15 +98,13 @@ var_dump($selfArray['foo']);
 0 => test1
 1 => test2
 
-Warning: Undefined array key "foo" in %s on line %d
+Notice: Undefined index: foo in %s on line %d
 NULL
 object(SelfArray)#9 (1) {
   ["foo"]=>
   string(3) "bar"
 }
 string(77) "O:9:"SelfArray":4:{i:0;i:16777216;i:1;N;i:2;a:1:{s:3:"foo";s:3:"bar";}i:3;N;}"
-
-Deprecated: Creation of dynamic property SelfArray::$foo is deprecated in %s on line %d
 object(SelfArray)#9 (1) {
   ["foo"]=>
   string(3) "bar"

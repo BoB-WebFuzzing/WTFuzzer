@@ -13,12 +13,12 @@ AC_DEFUN([AC_FPM_STDLIBS],
   AC_SEARCH_LIBS(inet_addr, nsl)
 ])
 
-AC_DEFUN([AC_FPM_SETPFLAGS],
+AC_DEFUN([AC_FPM_PRCTL],
 [
-  AC_MSG_CHECKING([for setpflags])
+  AC_MSG_CHECKING([for prctl])
 
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <priv.h>]], [[setpflags(0, 0);]])], [
-    AC_DEFINE([HAVE_SETPFLAGS], 1, [do we have setpflags?])
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/prctl.h>]], [[prctl(0, 0, 0, 0, 0);]])], [
+    AC_DEFINE([HAVE_PRCTL], 1, [do we have prctl?])
     AC_MSG_RESULT([yes])
   ], [
     AC_MSG_RESULT([no])
@@ -66,7 +66,7 @@ AC_DEFUN([AC_FPM_CLOCK],
       #include <mach/clock.h>
       #include <mach/mach_error.h>
 
-      int main(void)
+      int main()
       {
         kern_return_t ret; clock_serv_t aClock; mach_timespec_t aTime;
         ret = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &aClock);
@@ -134,7 +134,7 @@ AC_DEFUN([AC_FPM_TRACE],
       #define PTRACE_PEEKDATA PT_READ_D
       #endif
 
-      int main(void)
+      int main()
       {
         long v1 = (unsigned int) -1; /* copy will fail if sizeof(long) == 8 and we've got "int ptrace()" */
         long v2;
@@ -239,7 +239,7 @@ AC_DEFUN([AC_FPM_TRACE],
       #include <sys/stat.h>
       #include <fcntl.h>
       #include <stdio.h>
-      int main(void)
+      int main()
       {
         long v1 = (unsigned int) -1, v2 = 0;
         char buf[128];
@@ -317,19 +317,6 @@ AC_DEFUN([AC_FPM_LQ],
 
   if test "$have_lq" = "tcp_info"; then
     AC_DEFINE([HAVE_LQ_TCP_INFO], 1, [do we have TCP_INFO?])
-  fi
-
-  AC_MSG_CHECKING([for TCP_CONNECTION_INFO])
-
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/tcp.h>]], [[struct tcp_connection_info ti; int x = TCP_CONNECTION_INFO;]])], [
-    have_lq=tcp_connection_info
-    AC_MSG_RESULT([yes])
-  ], [
-    AC_MSG_RESULT([no])
-  ])
-
-  if test "$have_lq" = "tcp_connection_info"; then
-    AC_DEFINE([HAVE_LQ_TCP_CONNECTION_INFO], 1, [do we have TCP_CONNECTION_INFO?])
   fi
 
   if test "$have_lq" = "no" ; then
@@ -501,12 +488,28 @@ AC_DEFUN([AC_FPM_SELECT],
 	])
 ])
 
+AC_DEFUN([AC_FPM_APPARMOR],
+[
+	AC_MSG_CHECKING([for apparmor])
+
+	SAVED_LIBS="$LIBS"
+	LIBS="$LIBS -lapparmor"
+
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sys/apparmor.h>]], [[change_hat("test", 0);]])], [
+		AC_DEFINE([HAVE_APPARMOR], 1, [do we have apparmor support?])
+		AC_MSG_RESULT([yes])
+	], [
+		LIBS="$SAVED_LIBS"
+		AC_MSG_RESULT([no])
+	])
+])
+
 AC_MSG_CHECKING(for FPM build)
 if test "$PHP_FPM" != "no"; then
   AC_MSG_RESULT($PHP_FPM)
 
   AC_FPM_STDLIBS
-  AC_FPM_SETPFLAGS
+  AC_FPM_PRCTL
   AC_FPM_CLOCK
   AC_FPM_TRACE
   AC_FPM_BUILTIN_ATOMIC
@@ -518,6 +521,7 @@ if test "$PHP_FPM" != "no"; then
   AC_FPM_DEVPOLL
   AC_FPM_EPOLL
   AC_FPM_SELECT
+  AC_FPM_APPARMOR
 
   PHP_ARG_WITH([fpm-user],,
     [AS_HELP_STRING([[--with-fpm-user[=USER]]],
@@ -544,18 +548,6 @@ if test "$PHP_FPM" != "no"; then
     [no],
     [no])
 
-  PHP_ARG_WITH([fpm-apparmor],,
-    [AS_HELP_STRING([--with-fpm-apparmor],
-      [Support AppArmor confinement through libapparmor])],
-    [no],
-    [no])
-
-  PHP_ARG_WITH([fpm-selinux],,
-    [AS_HELP_STRING([--with-fpm-selinux],
-      [Support SELinux policy library])],
-    [no],
-    [no])
-
   if test "$PHP_FPM_SYSTEMD" != "no" ; then
     PKG_CHECK_MODULES([SYSTEMD], [libsystemd >= 209])
 
@@ -574,75 +566,18 @@ if test "$PHP_FPM" != "no"; then
   fi
 
   if test "$PHP_FPM_ACL" != "no" ; then
-    AC_MSG_CHECKING([for acl user/group permissions support])
     AC_CHECK_HEADERS([sys/acl.h])
-
-    AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <sys/acl.h>
-      int main(void)
-      {
-        acl_t acl;
-        acl_entry_t user, group;
-        acl = acl_init(1);
-        acl_create_entry(&acl, &user);
-        acl_set_tag_type(user, ACL_USER);
-        acl_create_entry(&acl, &group);
-        acl_set_tag_type(user, ACL_GROUP);
-        acl_free(acl);
-        return 0;
-      }
-    ]])], [
-      AC_CHECK_LIB(acl, acl_free,
-        [PHP_ADD_LIBRARY(acl)
-          have_fpm_acl=yes
-          AC_MSG_RESULT([yes])
-        ],[
-          AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <sys/acl.h>
-            int main(void)
-            {
-              acl_t acl;
-              acl_entry_t user, group;
-              acl = acl_init(1);
-              acl_create_entry(&acl, &user);
-              acl_set_tag_type(user, ACL_USER);
-              acl_create_entry(&acl, &group);
-              acl_set_tag_type(user, ACL_GROUP);
-              acl_free(acl);
-              return 0;
-            }
-          ]])], [
-            have_fpm_acl=yes
-            AC_MSG_RESULT([yes])
-          ], [
-            have_fpm_acl=no
-            AC_MSG_RESULT([no])
-          ], [AC_MSG_RESULT([skipped (cross-compiling)])])
-        ])
-    ], [
-      have_fpm_acl=no
-      AC_MSG_RESULT([no])
-    ])
-
-    if test "$have_fpm_acl" = "yes"; then
-      AC_DEFINE([HAVE_FPM_ACL], 1, [do we have acl support?])
-    fi
-  fi
-
-  if test "x$PHP_FPM_APPARMOR" != "xno" ; then
-    AC_CHECK_HEADERS([sys/apparmor.h])
-    AC_CHECK_LIB(apparmor, aa_change_profile, [
-      PHP_ADD_LIBRARY(apparmor)
-      AC_DEFINE(HAVE_APPARMOR, 1, [ AppArmor confinement available ])
+    dnl *BSD has acl_* built into libc.
+    AC_CHECK_FUNC(acl_free, [
+      AC_DEFINE(HAVE_FPM_ACL, 1, [ POSIX Access Control List ])
     ],[
-      AC_MSG_ERROR(libapparmor required but not found)
+      AC_CHECK_LIB(acl, acl_free, [
+        PHP_ADD_LIBRARY(acl)
+        AC_DEFINE(HAVE_FPM_ACL, 1, [ POSIX Access Control List ])
+      ],[
+        AC_MSG_ERROR(libacl required not found)
+      ])
     ])
-  fi
-
-  if test "x$PHP_FPM_SELINUX" != "xno" ; then
-    AC_CHECK_HEADERS([selinux/selinux.h])
-    AC_CHECK_LIB(selinux, security_setenforce, [
-      PHP_ADD_LIBRARY(selinux)
-      AC_DEFINE(HAVE_SELINUX, 1, [ SElinux available ])
-    ],[])
   fi
 
   PHP_SUBST_OLD(php_fpm_systemd)
@@ -725,7 +660,7 @@ if test "$PHP_FPM" != "no"; then
         BUILD_FPM="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_BINARY_OBJS:.lo=.o) \$(PHP_FASTCGI_OBJS:.lo=.o) \$(PHP_FPM_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(FPM_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_FPM_PATH)"
       ;;
       *)
-        BUILD_FPM="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_BINARY_OBJS:.lo=.o) \$(PHP_FASTCGI_OBJS:.lo=.o) \$(PHP_FPM_OBJS:.lo=.o) \$(EXTRA_LIBS) \$(FPM_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_FPM_PATH)"
+        BUILD_FPM="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_FASTCGI_OBJS) \$(PHP_FPM_OBJS) \$(EXTRA_LIBS) \$(FPM_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_FPM_PATH)"
       ;;
   esac
 

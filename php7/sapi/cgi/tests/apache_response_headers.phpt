@@ -31,6 +31,7 @@ file_put_contents( $test_file, $code );
 passthru( "$php -n -q " . escapeshellarg( $test_file ) );
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 @unlink( __DIR__ . DIRECTORY_SEPARATOR ."apache_response_headers.test.php" );
@@ -44,3 +45,4 @@ array(3) {
   ["Content-type"]=>
   string(24) "text/html; charset=UTF-8"
 }
+===DONE===

@@ -1,17 +1,16 @@
 --TEST--
 openssl_x509_free() tests
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 var_dump($res = openssl_x509_read("file://" . __DIR__ . "/cert.crt"));
 openssl_x509_free($res);
 var_dump($res);
+openssl_x509_free(false);
 ?>
 --EXPECTF--
-object(OpenSSLCertificate)#1 (0) {
-}
+resource(%d) of type (OpenSSL X.509)
+resource(%d) of type (Unknown)
 
-Deprecated: Function openssl_x509_free() is deprecated in %s on line %d
-object(OpenSSLCertificate)#1 (0) {
-}
+Warning: openssl_x509_free() expects parameter 1 to be resource, bool given in %s on line %d

@@ -1,7 +1,7 @@
 --TEST--
 SOAP: SoapClient::__setHeaders
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $client = new SoapClient(NULL, array("location"=>"test://","uri"=>"test://",

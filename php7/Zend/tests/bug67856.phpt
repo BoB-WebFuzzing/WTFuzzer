@@ -7,16 +7,5 @@ var_dump(array_reduce($array, function(&$a, &$b) {
     return $a + $b;
 }, 0));
 ?>
---EXPECTF--
-Warning: {closure}(): Argument #1 ($a) must be passed by reference, value given in %s on line %d
-
-Warning: {closure}(): Argument #2 ($b) must be passed by reference, value given in %s on line %d
-
-Warning: {closure}(): Argument #1 ($a) must be passed by reference, value given in %s on line %d
-
-Warning: {closure}(): Argument #2 ($b) must be passed by reference, value given in %s on line %d
-
-Warning: {closure}(): Argument #1 ($a) must be passed by reference, value given in %s on line %d
-
-Warning: {closure}(): Argument #2 ($b) must be passed by reference, value given in %s on line %d
+--EXPECT--
 int(6)

@@ -12,13 +12,20 @@ function gen() {
     yield new stdClass => 5;
 }
 
-try {
-    var_dump(iterator_to_array(gen()));
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(iterator_to_array(gen()));
 
 ?>
 --EXPECTF--
-Deprecated: Implicit conversion from float 2.5 to int loses precision in %s on line %d
-Cannot access offset of type array on array
+Warning: Illegal offset type in %s on line %d
+
+Warning: Illegal offset type in %s on line %d
+array(4) {
+  ["foo"]=>
+  int(0)
+  [1]=>
+  int(1)
+  [2]=>
+  int(2)
+  [""]=>
+  int(3)
+}

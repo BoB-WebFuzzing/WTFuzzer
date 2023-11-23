@@ -1,22 +1,16 @@
 --TEST--
 Bug #72197 pg_lo_create arbitrary read
---EXTENSIONS--
-pgsql
 --SKIPIF--
-<?php include("inc/skipif.inc"); ?>
+<?php include("skipif.inc"); ?>
 --FILE--
 <?php
 /* This shouldn't crash. */
 $var1=-32768;
 $var2="12";
-try {
-    pg_lo_create($var1, $var2);
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+pg_lo_create($var1, $var2);
 
 /* This should work correctly. */
-include('inc/config.inc');
+include('config.inc');
 
 /* Check with explicit link. */
 $conn = pg_connect($conn_str);
@@ -32,9 +26,9 @@ var_dump($oid);
 pg_query($conn, "ROLLBACK");
 pg_close($conn);
 ?>
+==DONE==
 --EXPECTF--
-pg_lo_create(): Argument #1 ($connection) must be of type PgSql\Connection when the connection is provided%w
+Warning: pg_lo_create(): supplied resource is not a valid PostgreSQL link resource in %sbug72197.php on line %d%w
 int(%d)
-
-Deprecated: pg_lo_create(): Automatic fetching of PostgreSQL connection is deprecated in %s on line %d
 int(%d)
+==DONE==

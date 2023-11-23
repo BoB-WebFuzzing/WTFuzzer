@@ -1,7 +1,5 @@
 --TEST--
 session_unset() without a initialized session
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -9,6 +7,5 @@ session
 error_reporting(E_ALL);
 session_unset();
 print "ok\n";
-?>
 --EXPECT--
 ok

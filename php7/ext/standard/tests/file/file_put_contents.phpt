@@ -11,30 +11,22 @@ $file = __DIR__."/file_put_contents.txt";
 
 $context = stream_context_create();
 
-try {
-    var_dump(file_put_contents($file, $context));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(file_put_contents($file, $context));
 var_dump(file_put_contents($file, new stdClass));
 var_dump(file_put_contents($file, new foo));
 $fp = fopen($file, "r");
-try {
-    var_dump(file_put_contents($file, "string", 0, $fp));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(file_put_contents($file, "string", 0, $fp));
+
+@unlink($file);
 
 echo "Done\n";
 ?>
---CLEAN--
-<?php
-$file = __DIR__."/file_put_contents.txt";
-unlink($file);
-?>
---EXPECT--
-file_put_contents(): supplied resource is not a valid stream resource
+--EXPECTF--
+Warning: file_put_contents(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
 bool(false)
 int(15)
-file_put_contents(): supplied resource is not a valid Stream-Context resource
+
+Warning: file_put_contents(): supplied resource is not a valid Stream-Context resource in %s on line %d
+int(6)
 Done

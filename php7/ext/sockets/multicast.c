@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -59,7 +61,7 @@ static const char *_php_source_op_to_string(enum source_op sop);
 static int _php_source_op_to_ipv4_op(enum source_op sop);
 #endif
 
-zend_result php_string_to_if_index(const char *val, unsigned *out)
+int php_string_to_if_index(const char *val, unsigned *out)
 {
 #if HAVE_IF_NAMETOINDEX
 	unsigned int ind;
@@ -67,7 +69,7 @@ zend_result php_string_to_if_index(const char *val, unsigned *out)
 	ind = if_nametoindex(val);
 	if (ind == 0) {
 		php_error_docref(NULL, E_WARNING,
-			"No interface with name \"%s\" could be found", val);
+			"no interface with name \"%s\" could be found", val);
 		return FAILURE;
 	} else {
 		*out = ind;
@@ -75,23 +77,26 @@ zend_result php_string_to_if_index(const char *val, unsigned *out)
 	}
 #else
 	php_error_docref(NULL, E_WARNING,
-			"This platform does not support looking up an interface by "
+			"this platform does not support looking up an interface by "
 			"name, an integer interface index must be supplied instead");
 	return FAILURE;
 #endif
 }
 
-static zend_result php_get_if_index_from_zval(zval *val, unsigned *out)
+static int php_get_if_index_from_zval(zval *val, unsigned *out)
 {
 	int ret;
 
 	if (Z_TYPE_P(val) == IS_LONG) {
 		if (Z_LVAL_P(val) < 0 || (zend_ulong)Z_LVAL_P(val) > UINT_MAX) {
-			zend_value_error("Index must be between 0 and %u", UINT_MAX);
-			return FAILURE;
+			php_error_docref(NULL, E_WARNING,
+				"the interface index cannot be negative or larger than %u;"
+				" given " ZEND_LONG_FMT, UINT_MAX, Z_LVAL_P(val));
+			ret = FAILURE;
+		} else {
+			*out = Z_LVAL_P(val);
+			ret = SUCCESS;
 		}
-		*out = Z_LVAL_P(val);
-		ret = SUCCESS;
 	} else {
 		zend_string *tmp_str;
 		zend_string *str = zval_get_tmp_string(val, &tmp_str);
@@ -104,7 +109,7 @@ static zend_result php_get_if_index_from_zval(zval *val, unsigned *out)
 
 
 
-static zend_result php_get_if_index_from_array(const HashTable *ht, const char *key,
+static int php_get_if_index_from_array(const HashTable *ht, const char *key,
 	php_socket *sock, unsigned int *if_index)
 {
 	zval *val;
@@ -117,14 +122,14 @@ static zend_result php_get_if_index_from_array(const HashTable *ht, const char *
 	return php_get_if_index_from_zval(val, if_index);
 }
 
-static zend_result php_get_address_from_array(const HashTable *ht, const char *key,
+static int php_get_address_from_array(const HashTable *ht, const char *key,
 	php_socket *sock, php_sockaddr_storage *ss, socklen_t *ss_len)
 {
 	zval *val;
 	zend_string *str, *tmp_str;
 
 	if ((val = zend_hash_str_find(ht, key, strlen(key))) == NULL) {
-		zend_value_error("No key \"%s\" passed in optval", key);
+		php_error_docref(NULL, E_WARNING, "no key \"%s\" passed in optval", key);
 		return FAILURE;
 	}
 	str = zval_get_tmp_string(val, &tmp_str);
@@ -136,7 +141,7 @@ static zend_result php_get_address_from_array(const HashTable *ht, const char *k
 	return SUCCESS;
 }
 
-static zend_result php_do_mcast_opt(php_socket *php_sock, int level, int optname, zval *arg4)
+static int php_do_mcast_opt(php_socket *php_sock, int level, int optname, zval *arg4)
 {
 	HashTable		 		*opt_ht;
 	unsigned int			if_index;
@@ -154,12 +159,12 @@ static zend_result php_do_mcast_opt(php_socket *php_sock, int level, int optname
 		goto mcast_req_fun;
 	case PHP_MCAST_LEAVE_GROUP:
 		{
-			mcast_req_fun = &php_mcast_leave;
-mcast_req_fun: ;
 			php_sockaddr_storage	group = {0};
 			socklen_t				glen;
 
-			convert_to_array(arg4);
+			mcast_req_fun = &php_mcast_leave;
+mcast_req_fun:
+			convert_to_array_ex(arg4);
 			opt_ht = Z_ARRVAL_P(arg4);
 
 			if (php_get_address_from_array(opt_ht, "group", php_sock, &group,
@@ -188,14 +193,14 @@ mcast_req_fun: ;
 		goto mcast_sreq_fun;
 	case PHP_MCAST_LEAVE_SOURCE_GROUP:
 		{
-			mcast_sreq_fun = &php_mcast_leave_source;
-		mcast_sreq_fun: ;
 			php_sockaddr_storage	group = {0},
 									source = {0};
 			socklen_t				glen,
 									slen;
 
-			convert_to_array(arg4);
+			mcast_sreq_fun = &php_mcast_leave_source;
+		mcast_sreq_fun:
+			convert_to_array_ex(arg4);
 			opt_ht = Z_ARRVAL_P(arg4);
 
 			if (php_get_address_from_array(opt_ht, "group", php_sock, &group,
@@ -218,14 +223,14 @@ mcast_req_fun: ;
 #endif
 	default:
 		php_error_docref(NULL, E_WARNING,
-			"Unexpected option in php_do_mcast_opt (level %d, option %d). "
+			"unexpected option in php_do_mcast_opt (level %d, option %d). "
 			"This is a bug.", level, optname);
 		return FAILURE;
 	}
 
 	if (retval != 0) {
 		if (retval != -2) { /* error, but message already emitted */
-			PHP_SOCKET_ERROR(php_sock, "Unable to set socket option", errno);
+			PHP_SOCKET_ERROR(php_sock, "unable to set socket option", errno);
 		}
 		return FAILURE;
 	}
@@ -272,14 +277,15 @@ int php_do_setsockopt_ip_mcast(php_socket *php_sock,
 		goto dosockopt;
 
 	case IP_MULTICAST_LOOP:
-		convert_to_boolean(arg4);
+		convert_to_boolean_ex(arg4);
 		ipv4_mcast_ttl_lback = (unsigned char) (Z_TYPE_P(arg4) == IS_TRUE);
 		goto ipv4_loop_ttl;
 
 	case IP_MULTICAST_TTL:
-		convert_to_long(arg4);
+		convert_to_long_ex(arg4);
 		if (Z_LVAL_P(arg4) < 0L || Z_LVAL_P(arg4) > 255L) {
-			zend_argument_value_error(4, "must be between 0 and 255");
+			php_error_docref(NULL, E_WARNING,
+					"Expected a value between 0 and 255");
 			return FAILURE;
 		}
 		ipv4_mcast_ttl_lback = (unsigned char) Z_LVAL_P(arg4);
@@ -294,7 +300,7 @@ ipv4_loop_ttl:
 dosockopt:
 	retval = setsockopt(php_sock->bsd_socket, level, optname, opt_ptr, optlen);
 	if (retval != 0) {
-		PHP_SOCKET_ERROR(php_sock, "Unable to set socket option", errno);
+		PHP_SOCKET_ERROR(php_sock, "unable to set socket option", errno);
 		return FAILURE;
 	}
 
@@ -337,13 +343,14 @@ int php_do_setsockopt_ipv6_mcast(php_socket *php_sock,
 		goto dosockopt;
 
 	case IPV6_MULTICAST_LOOP:
-		convert_to_boolean(arg4);
+		convert_to_boolean_ex(arg4);
 		ov = (int) Z_TYPE_P(arg4) == IS_TRUE;
 		goto ipv6_loop_hops;
 	case IPV6_MULTICAST_HOPS:
-		convert_to_long(arg4);
+		convert_to_long_ex(arg4);
 		if (Z_LVAL_P(arg4) < -1L || Z_LVAL_P(arg4) > 255L) {
-			zend_argument_value_error(4, "must be between -1 and 255");
+			php_error_docref(NULL, E_WARNING,
+					"Expected a value between -1 and 255");
 			return FAILURE;
 		}
 		ov = (int) Z_LVAL_P(arg4);
@@ -358,7 +365,7 @@ ipv6_loop_hops:
 dosockopt:
 	retval = setsockopt(php_sock->bsd_socket, level, optname, opt_ptr, optlen);
 	if (retval != 0) {
-		PHP_SOCKET_ERROR(php_sock, "Unable to set socket option", errno);
+		PHP_SOCKET_ERROR(php_sock, "unable to set socket option", errno);
 		return FAILURE;
 	}
 
@@ -491,7 +498,8 @@ static int _php_mcast_join_leave(
 	}
 #endif
 	else {
-		zend_value_error("Option %s is inapplicable to this socket type",
+		php_error_docref(NULL, E_WARNING,
+			"Option %s is inapplicable to this socket type",
 			join ? "MCAST_JOIN_GROUP" : "MCAST_LEAVE_GROUP");
 		return -2;
 	}
@@ -616,7 +624,7 @@ static int _php_source_op_to_ipv4_op(enum source_op sop)
 #endif /* HAS_MCAST_EXT */
 
 #ifdef PHP_WIN32
-zend_result php_if_index_to_addr4(unsigned if_index, php_socket *php_sock, struct in_addr *out_addr)
+int php_if_index_to_addr4(unsigned if_index, php_socket *php_sock, struct in_addr *out_addr)
 {
 	MIB_IPADDRTABLE *addr_table;
     ULONG size;
@@ -659,7 +667,7 @@ retry:
 	return FAILURE;
 }
 
-zend_result php_add4_to_if_index(struct in_addr *addr, php_socket *php_sock, unsigned *if_index)
+int php_add4_to_if_index(struct in_addr *addr, php_socket *php_sock, unsigned *if_index)
 {
 	MIB_IPADDRTABLE *addr_table;
     ULONG size;
@@ -709,7 +717,7 @@ retry:
 
 #else
 
-zend_result php_if_index_to_addr4(unsigned if_index, php_socket *php_sock, struct in_addr *out_addr)
+int php_if_index_to_addr4(unsigned if_index, php_socket *php_sock, struct in_addr *out_addr)
 {
 	struct ifreq if_req;
 
@@ -718,7 +726,7 @@ zend_result php_if_index_to_addr4(unsigned if_index, php_socket *php_sock, struc
 		return SUCCESS;
 	}
 
-#if !defined(ifr_ifindex) && (defined(ifr_index) || defined(__HAIKU__))
+#if !defined(ifr_ifindex) && defined(ifr_index)
 #define ifr_ifindex ifr_index
 #endif
 
@@ -746,7 +754,7 @@ zend_result php_if_index_to_addr4(unsigned if_index, php_socket *php_sock, struc
 	return SUCCESS;
 }
 
-zend_result php_add4_to_if_index(struct in_addr *addr, php_socket *php_sock, unsigned *if_index)
+int php_add4_to_if_index(struct in_addr *addr, php_socket *php_sock, unsigned *if_index)
 {
 	struct ifconf	if_conf = {0};
 	char			*buf = NULL,
@@ -784,7 +792,7 @@ zend_result php_add4_to_if_index(struct in_addr *addr, php_socket *php_sock, uns
 	}
 
 	for (p = if_conf.ifc_buf;
-		 p < ((char *)if_conf.ifc_buf) + if_conf.ifc_len;
+		 p < if_conf.ifc_buf + if_conf.ifc_len;
 		 p += entry_len) {
 		/* p may be misaligned on macos. */
 		struct ifreq cur_req;

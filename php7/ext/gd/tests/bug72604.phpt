@@ -1,7 +1,9 @@
 --TEST--
 Bug #72604 (imagearc() ignores thickness for full arcs)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip requires ext/gd');
+?>
 --FILE--
 <?php
 $im = imagecreatetruecolor(100, 100);

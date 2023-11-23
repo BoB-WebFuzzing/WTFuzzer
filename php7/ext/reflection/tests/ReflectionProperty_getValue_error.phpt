@@ -18,48 +18,69 @@ $instance = new TestClass();
 $invalidInstance = new AnotherClass();
 $propInfo = new ReflectionProperty('TestClass', 'pub2');
 
+echo "Too few args:\n";
+var_dump($propInfo->getValue());
+
+echo "\nToo many args:\n";
+var_dump($propInfo->getValue($instance, true));
+
+echo "\nWrong type of arg:\n";
+var_dump($propInfo->getValue(true));
+
 echo "\nInstance without property:\n";
 $propInfo = new ReflectionProperty('TestClass', 'stat');
 
 echo "\nStatic property / too many args:\n";
-try {
-    var_dump($propInfo->getValue($instance, true));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump($propInfo->getValue($instance, true));
+
+echo "\nStatic property / wrong type of arg:\n";
+var_dump($propInfo->getValue(true));
 
 echo "\nProtected property:\n";
-$propInfo = new ReflectionProperty('TestClass', 'prot');
-var_dump($propInfo->getValue($instance));
+try {
+    $propInfo = new ReflectionProperty('TestClass', 'prot');
+    var_dump($propInfo->getValue($instance));
+}
+catch(Exception $exc) {
+    echo $exc->getMessage();
+}
 
 echo "\n\nInvalid instance:\n";
 $propInfo = new ReflectionProperty('TestClass', 'pub2');
-try {
-    var_dump($propInfo->getValue($invalidInstance));
-} catch (ReflectionException $e) {
-    echo $e->getMessage();
-}
-
-echo "\n\nMissing instance:\n";
-try {
-    var_dump($propInfo->getValue());
-} catch (TypeError $e) {
-    echo $e->getMessage();
-}
+var_dump($propInfo->getValue($invalidInstance));
 
 ?>
---EXPECT--
+--EXPECTF--
+Too few args:
+
+Warning: ReflectionProperty::getValue() expects exactly 1 parameter, 0 given in %s on line %d
+NULL
+
+Too many args:
+
+Warning: ReflectionProperty::getValue() expects exactly 1 parameter, 2 given in %s on line %d
+NULL
+
+Wrong type of arg:
+
+Warning: ReflectionProperty::getValue() expects parameter 1 to be object, bool given in %s on line %d
+NULL
+
 Instance without property:
 
 Static property / too many args:
-ReflectionProperty::getValue() expects at most 1 argument, 2 given
+string(15) "static property"
+
+Static property / wrong type of arg:
+string(15) "static property"
 
 Protected property:
-int(4)
-
+Cannot access non-public member TestClass::$prot
 
 Invalid instance:
-Given object is not an instance of the class this property was declared in
 
-Missing instance:
-ReflectionProperty::getValue(): Argument #1 ($object) must be provided for instance properties
+Fatal error: Uncaught ReflectionException: Given object is not an instance of the class this property was declared in in %s:47
+Stack trace:
+#0 %s(47): ReflectionProperty->getValue(Object(AnotherClass))
+#1 {main}
+  thrown in %s on line 47

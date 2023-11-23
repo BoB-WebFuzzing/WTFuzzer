@@ -9,6 +9,5 @@ $hash = ['var' => 'new value'];
 
 extract($hash);
 var_dump($var === $ref);
-?>
 --EXPECT--
 bool(true)

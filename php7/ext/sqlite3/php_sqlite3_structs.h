@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -40,6 +42,11 @@ struct php_sqlite3_bound_param  {
 	zval parameter;
 };
 
+struct php_sqlite3_fci {
+	zend_fcall_info fci;
+	zend_fcall_info_cache fcc;
+};
+
 /* Structure for SQLite function. */
 typedef struct _php_sqlite3_func {
 	struct _php_sqlite3_func *next;
@@ -47,9 +54,8 @@ typedef struct _php_sqlite3_func {
 	const char *func_name;
 	int argc;
 
-	zend_fcall_info_cache func;
-	zend_fcall_info_cache step;
-	zend_fcall_info_cache fini;
+	zval func, step, fini;
+	struct php_sqlite3_fci afunc, astep, afini;
 } php_sqlite3_func;
 
 /* Structure for SQLite collation function */
@@ -57,7 +63,8 @@ typedef struct _php_sqlite3_collation {
 	struct _php_sqlite3_collation *next;
 
 	const char *collation_name;
-	zend_fcall_info_cache cmp_func;
+	zval cmp_func;
+	struct php_sqlite3_fci fci;
 } php_sqlite3_collation;
 
 /* Structure for SQLite Database object. */
@@ -66,9 +73,8 @@ typedef struct _php_sqlite3_db_object  {
 	sqlite3 *db;
 	php_sqlite3_func *funcs;
 	php_sqlite3_collation *collations;
-	zend_fcall_info_cache authorizer_fcc;
 
-	bool exception;
+	zend_bool exception;
 
 	zend_llist free_list;
 	zend_object zo;
@@ -101,12 +107,8 @@ struct _php_sqlite3_result_object  {
 	php_sqlite3_stmt *stmt_obj;
 	zval stmt_obj_zval;
 
-	/* Cache of column names to speed up repeated fetchArray(SQLITE3_ASSOC) calls.
-	 * Cache is cleared on reset() and finalize() calls. */
-	int column_count;
-	zend_string **column_names;
-
 	int is_prepared_statement;
+	int complete; // unused
 	zend_object zo;
 };
 

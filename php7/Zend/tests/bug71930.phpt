@@ -1,13 +1,17 @@
 --TEST--
 Bug #71930 (_zval_dtor_func: Assertion `(arr)->gc.refcount <= 1' failed)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+if (!extension_loaded("curl")) {
+  die("skip Require a resource which is able to hold a callbck");
+}
+?>
 --FILE--
 <?php
 
 class A {
-    public static function dummy() {
-    }
+	public static function dummy() {
+	}
 }
 
 $a = array();

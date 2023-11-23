@@ -8,8 +8,11 @@ error_reporting(E_ALL);
 $foo = 'test';
 $x = @$foo[6];
 
-var_dump(@($foo[100] . $foo[130]));
+print @($foo[100] + $foo[130]);
+
+print "\nDone\n";
 
 ?>
 --EXPECT--
-string(0) ""
+0
+Done

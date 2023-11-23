@@ -1,15 +1,11 @@
 --TEST--
 SELECT tests with duplicate column anmes
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Initialization
 
@@ -61,6 +57,8 @@ $stmtarray = array(
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Test 1 - OCI_ASSOC
 array(3) {
@@ -101,3 +99,4 @@ array(7) {
   [3]=>
   string(5) "jones"
 }
+===DONE===

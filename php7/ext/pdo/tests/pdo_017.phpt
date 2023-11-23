@@ -1,28 +1,25 @@
 --TEST--
 PDO Common: transactions
---EXTENSIONS--
-pdo
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo')) die('skip');
 $dir = getenv('REDIR_TEST_DIR');
 if (false == $dir) die('skip no driver');
 require_once $dir . 'pdo_test.inc';
 PDOTest::skip();
-if (str_starts_with(getenv('PDOTEST_DSN'), "firebird")) die('xfail firebird driver does not behave as expected');
 
 $db = PDOTest::factory();
 try {
   $db->beginTransaction();
-  $db->rollback();
 } catch (PDOException $e) {
   die('skip no working transactions: ' . $e->getMessage());
 }
 
 if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) == 'mysql') {
-    require_once(__DIR__ . DIRECTORY_SEPARATOR . '../../pdo_mysql/tests/mysql_pdo_test.inc');
-    if (false === MySQLPDOTest::detect_transactional_mysql_engine($db)) {
-        die('skip your mysql configuration does not support working transactions');
-    }
+	require_once(__DIR__ . DIRECTORY_SEPARATOR . '../../pdo_mysql/tests/mysql_pdo_test.inc');
+	if (false === MySQLPDOTest::detect_transactional_mysql_engine($db)) {
+		die('skip your mysql configuration does not support working transactions');
+	}
 }
 ?>
 --FILE--
@@ -32,22 +29,22 @@ require_once getenv('REDIR_TEST_DIR') . 'pdo_test.inc';
 $db = PDOTest::factory();
 
 if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) == 'mysql') {
-    require_once(__DIR__ . DIRECTORY_SEPARATOR . '../../pdo_mysql/tests/mysql_pdo_test.inc');
-    $suf = ' ENGINE=' . MySQLPDOTest::detect_transactional_mysql_engine($db);
+	require_once(__DIR__ . DIRECTORY_SEPARATOR . '../../pdo_mysql/tests/mysql_pdo_test.inc');
+	$suf = ' ENGINE=' . MySQLPDOTest::detect_transactional_mysql_engine($db);
 } else {
-    $suf = '';
+	$suf = '';
 }
 
-$db->exec('CREATE TABLE test017(id INT NOT NULL PRIMARY KEY, val VARCHAR(10))'.$suf);
-$db->exec("INSERT INTO test017 VALUES(1, 'A')");
-$db->exec("INSERT INTO test017 VALUES(2, 'B')");
-$db->exec("INSERT INTO test017 VALUES(3, 'C')");
-$delete = $db->prepare('DELETE FROM test017');
+$db->exec('CREATE TABLE test(id INT NOT NULL PRIMARY KEY, val VARCHAR(10))'.$suf);
+$db->exec("INSERT INTO test VALUES(1, 'A')");
+$db->exec("INSERT INTO test VALUES(2, 'B')");
+$db->exec("INSERT INTO test VALUES(3, 'C')");
+$delete = $db->prepare('DELETE FROM test');
 
 function countRows($action) {
     global $db;
-    $select = $db->prepare('SELECT COUNT(*) FROM test017');
-    $select->execute();
+	$select = $db->prepare('SELECT COUNT(*) FROM test');
+	$select->execute();
     $res = $select->fetchColumn();
     return "Counted $res rows after $action.\n";
 }
@@ -67,12 +64,7 @@ echo countRows('delete');
 $db->commit();
 
 echo countRows('commit');
-?>
---CLEAN--
-<?php
-require_once getenv('REDIR_TEST_DIR') . 'pdo_test.inc';
-$db = PDOTest::factory();
-PDOTest::dropTableIfExists($db, "test017");
+
 ?>
 --EXPECT--
 Counted 3 rows after insert.

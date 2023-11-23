@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
-  | This source file is subject to version 3.01 of the PHP license,      |
+  | This source file is subject to version 3.0 of the PHP license,       |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_0.txt.                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -19,7 +21,7 @@
 #endif
 #include "php.h"
 
-#include "libmagic/magic.h"
+#include <magic.h>
 /*
  * HOWMANY specifies the maximum offset libmagic will look at
  * this is currently hardcoded in the libmagic source but not exported
@@ -32,7 +34,6 @@
 #include "ext/standard/info.h"
 #include "ext/standard/file.h" /* needed for context stuff */
 #include "php_fileinfo.h"
-#include "fileinfo_arginfo.h"
 #include "fopen_wrappers.h" /* needed for is_url */
 #include "Zend/zend_exceptions.h"
 
@@ -50,23 +51,34 @@ typedef struct _finfo_object {
 	zend_object zo;
 } finfo_object;
 
+#define FILEINFO_DECLARE_INIT_OBJECT(object) \
+	zval *object = getThis();
+
 static inline finfo_object *php_finfo_fetch_object(zend_object *obj) {
 	return (finfo_object *)((char*)(obj) - XtOffsetOf(finfo_object, zo));
 }
 
 #define Z_FINFO_P(zv) php_finfo_fetch_object(Z_OBJ_P((zv)))
 
+#define FILEINFO_REGISTER_OBJECT(_object, _ptr) \
+{ \
+	finfo_object *obj; \
+    obj = Z_FINFO_P(_object); \
+    obj->ptr = _ptr; \
+}
+
 #define FILEINFO_FROM_OBJECT(finfo, object) \
 { \
 	finfo_object *obj = Z_FINFO_P(object); \
 	finfo = obj->ptr; \
 	if (!finfo) { \
-		zend_throw_error(NULL, "Invalid finfo object"); \
-		RETURN_THROWS(); \
+        	php_error_docref(NULL, E_WARNING, "The invalid fileinfo object."); \
+		RETURN_FALSE; \
 	} \
 }
 
-/* {{{ finfo_objects_free */
+/* {{{ finfo_objects_free
+ */
 static void finfo_objects_free(zend_object *object)
 {
 	finfo_object *intern = php_finfo_fetch_object(object);
@@ -80,7 +92,8 @@ static void finfo_objects_free(zend_object *object)
 }
 /* }}} */
 
-/* {{{ finfo_objects_new */
+/* {{{ finfo_objects_new
+ */
 PHP_FILEINFO_API zend_object *finfo_objects_new(zend_class_entry *class_type)
 {
 	finfo_object *intern;
@@ -89,9 +102,71 @@ PHP_FILEINFO_API zend_object *finfo_objects_new(zend_class_entry *class_type)
 
 	zend_object_std_init(&intern->zo, class_type);
 	object_properties_init(&intern->zo, class_type);
+	intern->zo.handlers = &finfo_object_handlers;
 
 	return &intern->zo;
 }
+/* }}} */
+
+/* {{{ arginfo */
+ZEND_BEGIN_ARG_INFO_EX(arginfo_finfo_open, 0, 0, 0)
+	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_INFO(0, arg)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_finfo_close, 0, 0, 1)
+	ZEND_ARG_INFO(0, finfo)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_finfo_set_flags, 0, 0, 2)
+	ZEND_ARG_INFO(0, finfo)
+	ZEND_ARG_INFO(0, options)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_finfo_method_set_flags, 0, 0, 1)
+	ZEND_ARG_INFO(0, options)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_finfo_file, 0, 0, 2)
+	ZEND_ARG_INFO(0, finfo)
+	ZEND_ARG_INFO(0, filename)
+	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_INFO(0, context)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_finfo_method_file, 0, 0, 1)
+	ZEND_ARG_INFO(0, filename)
+	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_INFO(0, context)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_finfo_buffer, 0, 0, 2)
+	ZEND_ARG_INFO(0, finfo)
+	ZEND_ARG_INFO(0, string)
+	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_INFO(0, context)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_finfo_method_buffer, 0, 0, 1)
+	ZEND_ARG_INFO(0, string)
+	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_INFO(0, context)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mime_content_type, 0, 0, 1)
+	ZEND_ARG_INFO(0, string)
+ZEND_END_ARG_INFO()
+/* }}} */
+
+/* {{{ finfo_class_functions
+ */
+static const zend_function_entry finfo_class_functions[] = {
+	ZEND_ME_MAPPING(finfo,          finfo_open,     arginfo_finfo_open, ZEND_ACC_PUBLIC)
+	ZEND_ME_MAPPING(set_flags,      finfo_set_flags,arginfo_finfo_method_set_flags, ZEND_ACC_PUBLIC)
+	ZEND_ME_MAPPING(file,           finfo_file,     arginfo_finfo_method_file, ZEND_ACC_PUBLIC)
+	ZEND_ME_MAPPING(buffer,         finfo_buffer,   arginfo_finfo_method_buffer, ZEND_ACC_PUBLIC)
+	PHP_FE_END
+};
 /* }}} */
 
 #define FINFO_SET_OPTION(magic, options) \
@@ -100,14 +175,44 @@ PHP_FILEINFO_API zend_object *finfo_objects_new(zend_class_entry *class_type)
 				options, magic_errno(magic), magic_error(magic)); \
 		RETURN_FALSE; \
 	}
+
+/* True global resources - no need for thread safety here */
+static int le_fileinfo;
 /* }}} */
 
-/* {{{ PHP_MINIT_FUNCTION */
+void finfo_resource_destructor(zend_resource *rsrc) /* {{{ */
+{
+	if (rsrc->ptr) {
+		php_fileinfo *finfo = (php_fileinfo *) rsrc->ptr;
+		magic_close(finfo->magic);
+		efree(rsrc->ptr);
+		rsrc->ptr = NULL;
+	}
+}
+/* }}} */
+
+
+/* {{{ fileinfo_functions[]
+ */
+static const zend_function_entry fileinfo_functions[] = {
+	PHP_FE(finfo_open,		arginfo_finfo_open)
+	PHP_FE(finfo_close,		arginfo_finfo_close)
+	PHP_FE(finfo_set_flags,	arginfo_finfo_set_flags)
+	PHP_FE(finfo_file,		arginfo_finfo_file)
+	PHP_FE(finfo_buffer,	arginfo_finfo_buffer)
+	PHP_FE(mime_content_type, arginfo_mime_content_type)
+	PHP_FE_END
+};
+/* }}} */
+
+/* {{{ PHP_MINIT_FUNCTION
+ */
 PHP_MINIT_FUNCTION(finfo)
 {
-	finfo_class_entry = register_class_finfo();
-	finfo_class_entry->create_object = finfo_objects_new;
-	finfo_class_entry->default_object_handlers = &finfo_object_handlers;
+	zend_class_entry _finfo_class_entry;
+	INIT_CLASS_ENTRY(_finfo_class_entry, "finfo", finfo_class_functions);
+	_finfo_class_entry.create_object = finfo_objects_new;
+	finfo_class_entry = zend_register_internal_class(&_finfo_class_entry);
 
 	/* copy the standard object handlers to you handler table */
 	memcpy(&finfo_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
@@ -115,17 +220,38 @@ PHP_MINIT_FUNCTION(finfo)
 	finfo_object_handlers.free_obj = finfo_objects_free;
 	finfo_object_handlers.clone_obj = NULL;
 
-	register_fileinfo_symbols(module_number);
+	le_fileinfo = zend_register_list_destructors_ex(finfo_resource_destructor, NULL, "file_info", module_number);
+
+	REGISTER_LONG_CONSTANT("FILEINFO_NONE",			MAGIC_NONE, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("FILEINFO_SYMLINK",		MAGIC_SYMLINK, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("FILEINFO_MIME",			MAGIC_MIME, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("FILEINFO_MIME_TYPE",	MAGIC_MIME_TYPE, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("FILEINFO_MIME_ENCODING",MAGIC_MIME_ENCODING, CONST_CS|CONST_PERSISTENT);
+/*	REGISTER_LONG_CONSTANT("FILEINFO_COMPRESS",		MAGIC_COMPRESS, CONST_CS|CONST_PERSISTENT); disabled, as it does fork now */
+	REGISTER_LONG_CONSTANT("FILEINFO_DEVICES",		MAGIC_DEVICES, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("FILEINFO_CONTINUE",		MAGIC_CONTINUE, CONST_CS|CONST_PERSISTENT);
+#ifdef MAGIC_PRESERVE_ATIME
+	REGISTER_LONG_CONSTANT("FILEINFO_PRESERVE_ATIME",	MAGIC_PRESERVE_ATIME, CONST_CS|CONST_PERSISTENT);
+#endif
+#ifdef MAGIC_RAW
+	REGISTER_LONG_CONSTANT("FILEINFO_RAW",			MAGIC_RAW, CONST_CS|CONST_PERSISTENT);
+#endif
+#if 0
+	/* seems not usable yet. */
+	REGISTER_LONG_CONSTANT("FILEINFO_APPLE",		MAGIC_APPLE, CONST_CS|CONST_PERSISTENT);
+#endif
+	REGISTER_LONG_CONSTANT("FILEINFO_EXTENSION",	MAGIC_EXTENSION, CONST_CS|CONST_PERSISTENT);
 
 	return SUCCESS;
 }
 /* }}} */
 
-/* {{{ fileinfo_module_entry */
+/* {{{ fileinfo_module_entry
+ */
 zend_module_entry fileinfo_module_entry = {
 	STANDARD_MODULE_HEADER,
 	"fileinfo",
-	ext_functions,
+	fileinfo_functions,
 	PHP_MINIT(finfo),
 	NULL,
 	NULL,
@@ -140,7 +266,8 @@ zend_module_entry fileinfo_module_entry = {
 ZEND_GET_MODULE(fileinfo)
 #endif
 
-/* {{{ PHP_MINFO_FUNCTION */
+/* {{{ PHP_MINFO_FUNCTION
+ */
 PHP_MINFO_FUNCTION(fileinfo)
 {
 	char magic_ver[5];
@@ -155,19 +282,21 @@ PHP_MINFO_FUNCTION(fileinfo)
 }
 /* }}} */
 
-/* {{{ Construct a new fileinfo object. */
+/* {{{ proto resource finfo_open([int options [, string arg]])
+   Create a new fileinfo resource. */
 PHP_FUNCTION(finfo_open)
 {
 	zend_long options = MAGIC_NONE;
 	char *file = NULL;
 	size_t file_len = 0;
 	php_fileinfo *finfo;
-	zval *object = getThis();
+	FILEINFO_DECLARE_INIT_OBJECT(object)
 	char resolved_path[MAXPATHLEN];
 	zend_error_handling zeh;
+	int flags = object ? ZEND_PARSE_PARAMS_THROW : 0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|lp!", &options, &file, &file_len) == FAILURE) {
-		RETURN_THROWS();
+	if (zend_parse_parameters_ex(flags, ZEND_NUM_ARGS(), "|lp", &options, &file, &file_len) == FAILURE) {
+		RETURN_FALSE;
 	}
 
 	if (object) {
@@ -225,7 +354,7 @@ PHP_FUNCTION(finfo_open)
 	}
 
 	if (magic_load(finfo->magic, file) == -1) {
-		php_error_docref(NULL, E_WARNING, "Failed to load magic database at \"%s\"", file);
+		php_error_docref(NULL, E_WARNING, "Failed to load magic database at '%s'.", file);
 		magic_close(finfo->magic);
 		efree(finfo);
 		if (object) {
@@ -238,43 +367,57 @@ PHP_FUNCTION(finfo_open)
 	}
 
 	if (object) {
-		finfo_object *obj;
 		zend_restore_error_handling(&zeh);
-		obj = Z_FINFO_P(object);
-		obj->ptr = finfo;
+		FILEINFO_REGISTER_OBJECT(object, finfo);
 	} else {
-		zend_object *zobj = finfo_objects_new(finfo_class_entry);
-		finfo_object *obj = php_finfo_fetch_object(zobj);
-		obj->ptr = finfo;
-		RETURN_OBJ(zobj);
+		RETURN_RES(zend_register_resource(finfo, le_fileinfo));
 	}
 }
 /* }}} */
 
-/* {{{ Close fileinfo object - a NOP. */
+/* {{{ proto resource finfo_close(resource finfo)
+   Close fileinfo resource. */
 PHP_FUNCTION(finfo_close)
 {
-	zval *self;
+	php_fileinfo *finfo;
+	zval *zfinfo;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "O", &self, finfo_class_entry) == FAILURE) {
-		RETURN_THROWS();
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "r", &zfinfo) == FAILURE) {
+		RETURN_FALSE;
 	}
+
+	if ((finfo = (php_fileinfo *)zend_fetch_resource(Z_RES_P(zfinfo), "file_info", le_fileinfo)) == NULL) {
+		RETURN_FALSE;
+	}
+
+	zend_list_close(Z_RES_P(zfinfo));
 
 	RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ Set libmagic configuration options. */
+/* {{{ proto bool finfo_set_flags(resource finfo, int options)
+   Set libmagic configuration options. */
 PHP_FUNCTION(finfo_set_flags)
 {
 	zend_long options;
 	php_fileinfo *finfo;
-	zval *self;
+	zval *zfinfo;
+	FILEINFO_DECLARE_INIT_OBJECT(object)
 
-	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Ol", &self, finfo_class_entry, &options) == FAILURE) {
-		RETURN_THROWS();
+	if (object) {
+		if (zend_parse_parameters(ZEND_NUM_ARGS(), "l", &options) == FAILURE) {
+			RETURN_FALSE;
+		}
+		FILEINFO_FROM_OBJECT(finfo, object);
+	} else {
+		if (zend_parse_parameters(ZEND_NUM_ARGS(), "rl", &zfinfo, &options) == FAILURE) {
+			RETURN_FALSE;
+		}
+		if ((finfo = (php_fileinfo *)zend_fetch_resource(Z_RES_P(zfinfo), "file_info", le_fileinfo)) == NULL) {
+			RETURN_FALSE;
+		}
 	}
-	FILEINFO_FROM_OBJECT(finfo, self);
 
 	FINFO_SET_OPTION(finfo->magic, options)
 	finfo->options = options;
@@ -293,16 +436,18 @@ static void _php_finfo_get_type(INTERNAL_FUNCTION_PARAMETERS, int mode, int mime
 	char *ret_val = NULL, *buffer = NULL;
 	size_t buffer_len;
 	php_fileinfo *finfo = NULL;
-	zval *zcontext = NULL;
+	zval *zfinfo, *zcontext = NULL;
 	zval *what;
 	char mime_directory[] = "directory";
+
 	struct magic_set *magic = NULL;
+	FILEINFO_DECLARE_INIT_OBJECT(object)
 
 	if (mimetype_emu) {
 
 		/* mime_content_type(..) emulation */
 		if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &what) == FAILURE) {
-			RETURN_THROWS();
+			return;
 		}
 
 		switch (Z_TYPE_P(what)) {
@@ -317,21 +462,28 @@ static void _php_finfo_get_type(INTERNAL_FUNCTION_PARAMETERS, int mode, int mime
 				break;
 
 			default:
-				zend_argument_type_error(1, "must be of type resource|string, %s given", zend_zval_value_name(what));
-				RETURN_THROWS();
+				php_error_docref(NULL, E_WARNING, "Can only process string or stream arguments");
+				RETURN_FALSE;
 		}
 
 		magic = magic_open(MAGIC_MIME_TYPE);
 		if (magic_load(magic, NULL) == -1) {
-			php_error_docref(NULL, E_WARNING, "Failed to load magic database");
+			php_error_docref(NULL, E_WARNING, "Failed to load magic database.");
 			goto common;
 		}
-	} else {
-		zval *self;
-		if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Os|lr!", &self, finfo_class_entry, &buffer, &buffer_len, &options, &zcontext) == FAILURE) {
-			RETURN_THROWS();
+	} else if (object) {
+		if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|lr", &buffer, &buffer_len, &options, &zcontext) == FAILURE) {
+			RETURN_FALSE;
 		}
-		FILEINFO_FROM_OBJECT(finfo, self);
+		FILEINFO_FROM_OBJECT(finfo, object);
+		magic = finfo->magic;
+	} else {
+		if (zend_parse_parameters(ZEND_NUM_ARGS(), "rs|lr", &zfinfo, &buffer, &buffer_len, &options, &zcontext) == FAILURE) {
+			RETURN_FALSE;
+		}
+		if ((finfo = (php_fileinfo *)zend_fetch_resource(Z_RES_P(zfinfo), "file_info", le_fileinfo)) == NULL) {
+			RETURN_FALSE;
+		}
 		magic = finfo->magic;
 	}
 
@@ -373,12 +525,14 @@ static void _php_finfo_get_type(INTERNAL_FUNCTION_PARAMETERS, int mode, int mime
 			php_stream_wrapper *wrap;
 			php_stream_statbuf ssb;
 
-			if (buffer == NULL || buffer_len == 0) {
-				zend_argument_value_error(1, "cannot be empty");
+			if (buffer == NULL || !*buffer) {
+				php_error_docref(NULL, E_WARNING, "Empty filename or path");
+				RETVAL_FALSE;
 				goto clean;
 			}
 			if (CHECK_NULL_PATH(buffer, buffer_len)) {
-				zend_argument_type_error(1, "must not contain any null bytes");
+				php_error_docref(NULL, E_WARNING, "Invalid path");
+				RETVAL_FALSE;
 				goto clean;
 			}
 
@@ -416,7 +570,9 @@ static void _php_finfo_get_type(INTERNAL_FUNCTION_PARAMETERS, int mode, int mime
 			}
 			break;
 		}
-		EMPTY_SWITCH_DEFAULT_CASE()
+
+		default:
+			php_error_docref(NULL, E_WARNING, "Can only process string or stream arguments");
 	}
 
 common:
@@ -440,21 +596,24 @@ clean:
 }
 /* }}} */
 
-/* {{{ Return information about a file. */
+/* {{{ proto string finfo_file(resource finfo, char *file_name [, int options [, resource context]])
+   Return information about a file. */
 PHP_FUNCTION(finfo_file)
 {
 	_php_finfo_get_type(INTERNAL_FUNCTION_PARAM_PASSTHRU, FILEINFO_MODE_FILE, 0);
 }
 /* }}} */
 
-/* {{{ Return information about a string buffer. */
+/* {{{ proto string finfo_buffer(resource finfo, char *string [, int options [, resource context]])
+   Return information about a string buffer. */
 PHP_FUNCTION(finfo_buffer)
 {
 	_php_finfo_get_type(INTERNAL_FUNCTION_PARAM_PASSTHRU, FILEINFO_MODE_BUFFER, 0);
 }
 /* }}} */
 
-/* {{{ Return content-type for file */
+/* {{{ proto string mime_content_type(string filename|resource stream)
+   Return content-type for file */
 PHP_FUNCTION(mime_content_type)
 {
 	_php_finfo_get_type(INTERNAL_FUNCTION_PARAM_PASSTHRU, -1, 1);

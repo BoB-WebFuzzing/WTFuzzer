@@ -1,13 +1,14 @@
-%require "3.0"
 %code top {
 /*
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
   +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -41,12 +42,17 @@ int json_yydebug = 1;
 
 }
 
-%define api.prefix {php_json_yy}
 %define api.pure full
-%param  { php_json_parser *parser  }
+%define api.prefix {php_json_yy}
+%lex-param  { php_json_parser *parser  }
+%parse-param { php_json_parser *parser }
 
 %union {
 	zval value;
+	struct {
+		zend_string *key;
+		zval val;
+	} pair;
 }
 
 
@@ -62,8 +68,10 @@ int json_yydebug = 1;
 
 %type <value> start object key value array
 %type <value> members member elements element
+%type <pair> pair
 
 %destructor { zval_ptr_dtor_nogc(&$$); } <value>
+%destructor { zend_string_release_ex($$.key, 0); zval_ptr_dtor_nogc(&$$.val); } <pair>
 
 %code {
 static int php_json_yylex(union YYSTYPE *value, php_json_parser *parser);
@@ -80,7 +88,6 @@ start:
 			{
 				ZVAL_COPY_VALUE(&$$, &$1);
 				ZVAL_COPY_VALUE(parser->return_value, &$1);
-				(void) php_json_yynerrs;
 				YYACCEPT;
 			}
 ;
@@ -113,7 +120,7 @@ object_end:
 ;
 
 members:
-		%empty
+		/* empty */
 			{
 				if ((parser->scanner.options & PHP_JSON_OBJECT_AS_ARRAY) && parser->methods.object_create == php_json_parser_object_create) {
 					ZVAL_EMPTY_ARRAY(&$$);
@@ -125,19 +132,27 @@ members:
 ;
 
 member:
-		key ':' value
+		pair
 			{
 				parser->methods.object_create(parser, &$$);
-				if (parser->methods.object_update(parser, &$$, Z_STR($1), &$3) == FAILURE) {
+				if (parser->methods.object_update(parser, &$$, $1.key, &$1.val) == FAILURE) {
 					YYERROR;
 				}
 			}
-	|	member ',' key ':' value
+	|	member ',' pair
 			{
-				if (parser->methods.object_update(parser, &$1, Z_STR($3), &$5) == FAILURE) {
+				if (parser->methods.object_update(parser, &$1, $3.key, &$3.val) == FAILURE) {
 					YYERROR;
 				}
 				ZVAL_COPY_VALUE(&$$, &$1);
+			}
+;
+
+pair:
+		key ':' value
+			{
+				$$.key = Z_STR($1);
+				ZVAL_COPY_VALUE(&$$.val, &$3);
 			}
 ;
 
@@ -169,7 +184,7 @@ array_end:
 ;
 
 elements:
-		%empty
+		/* empty */
 			{
 				if (parser->methods.array_create == php_json_parser_array_create) {
 					ZVAL_EMPTY_ARRAY(&$$);
@@ -228,10 +243,10 @@ static int php_json_parser_object_create(php_json_parser *parser, zval *object)
 {
 	if (parser->scanner.options & PHP_JSON_OBJECT_AS_ARRAY) {
 		array_init(object);
+		return SUCCESS;
 	} else {
-		object_init(object);
+		return object_init(object);
 	}
-	return SUCCESS;
 }
 
 static int php_json_parser_object_update(php_json_parser *parser, zval *object, zend_string *key, zval *zvalue)
@@ -240,6 +255,7 @@ static int php_json_parser_object_update(php_json_parser *parser, zval *object, 
 	if (Z_TYPE_P(object) == IS_ARRAY) {
 		zend_symtable_update(Z_ARRVAL_P(object), key, zvalue);
 	} else {
+		zval zkey;
 		if (ZSTR_LEN(key) > 0 && ZSTR_VAL(key)[0] == '\0') {
 			parser->scanner.errcode = PHP_JSON_ERROR_INVALID_PROPERTY_NAME;
 			zend_string_release_ex(key, 0);
@@ -247,7 +263,8 @@ static int php_json_parser_object_update(php_json_parser *parser, zval *object, 
 			zval_ptr_dtor_nogc(object);
 			return FAILURE;
 		}
-		zend_std_write_property(Z_OBJ_P(object), key, zvalue, NULL);
+		ZVAL_NEW_STR(&zkey, key);
+		zend_std_write_property(object, &zkey, zvalue, NULL);
 		Z_TRY_DELREF_P(zvalue);
 	}
 	zend_string_release_ex(key, 0);
@@ -255,44 +272,10 @@ static int php_json_parser_object_update(php_json_parser *parser, zval *object, 
 	return SUCCESS;
 }
 
-static int php_json_parser_array_create_validate(php_json_parser *parser, zval *array)
-{
-	ZVAL_NULL(array);
-	return SUCCESS;
-}
-
-static int php_json_parser_array_append_validate(php_json_parser *parser, zval *array, zval *zvalue)
-{
-	return SUCCESS;
-}
-
-static int php_json_parser_object_create_validate(php_json_parser *parser, zval *object)
-{
-	ZVAL_NULL(object);
-	return SUCCESS;
-}
-
-static int php_json_parser_object_update_validate(php_json_parser *parser, zval *object, zend_string *key, zval *zvalue)
-{
-	return SUCCESS;
-}
-
 static int php_json_yylex(union YYSTYPE *value, php_json_parser *parser)
 {
 	int token = php_json_scan(&parser->scanner);
-
-	bool validate = parser->methods.array_create == php_json_parser_array_create_validate
-		&& parser->methods.array_append == php_json_parser_array_append_validate
-		&& parser->methods.object_create == php_json_parser_object_create_validate
-		&& parser->methods.object_update == php_json_parser_object_update_validate;
-
-	if (validate) {
-		zval_ptr_dtor_str(&(parser->scanner.value));
-		ZVAL_UNDEF(&value->value);
-	} else {
-		value->value = parser->scanner.value;
-	}
-
+	value->value = parser->scanner.value;
 	return token;
 }
 
@@ -320,21 +303,9 @@ static const php_json_parser_methods default_parser_methods =
 	NULL,
 };
 
-static const php_json_parser_methods validate_parser_methods =
-{
-	php_json_parser_array_create_validate,
-	php_json_parser_array_append_validate,
-	NULL,
-	NULL,
-	php_json_parser_object_create_validate,
-	php_json_parser_object_update_validate,
-	NULL,
-	NULL,
-};
-
 PHP_JSON_API void php_json_parser_init_ex(php_json_parser *parser,
 		zval *return_value,
-		const char *str,
+		char *str,
 		size_t str_len,
 		int options,
 		int max_depth,
@@ -350,7 +321,7 @@ PHP_JSON_API void php_json_parser_init_ex(php_json_parser *parser,
 
 PHP_JSON_API void php_json_parser_init(php_json_parser *parser,
 		zval *return_value,
-		const char *str,
+		char *str,
 		size_t str_len,
 		int options,
 		int max_depth)
@@ -368,9 +339,4 @@ PHP_JSON_API void php_json_parser_init(php_json_parser *parser,
 PHP_JSON_API int php_json_parse(php_json_parser *parser)
 {
 	return php_json_yyparse(parser);
-}
-
-const php_json_parser_methods* php_json_get_validate_methods(void)
-{
-	return &validate_parser_methods;
 }

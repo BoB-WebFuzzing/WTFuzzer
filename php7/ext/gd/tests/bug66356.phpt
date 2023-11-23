@@ -1,7 +1,9 @@
 --TEST--
 Bug #66356 (Heap Overflow Vulnerability in imagecrop())
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+	if(!extension_loaded('gd')){ die('skip gd extension not available'); }
+?>
 --FILE--
 <?php
 $img = imagecreatetruecolor(10, 10);
@@ -26,10 +28,8 @@ var_dump(imagecrop($img, array("x" => 0x7fffff00, "y" => 0, "width" => 10, "heig
 var_dump(imagecrop($img, array("x" => 0, "y" => 0, "width" => 65535, "height" => 65535)));
 ?>
 --EXPECTF--
-object(GdImage)#2 (0) {
-}
-object(GdImage)#2 (0) {
-}
+resource(%d) of type (gd)
+resource(%d) of type (gd)
 Array
 (
     [x] => a
@@ -38,14 +38,12 @@ Array
     [height] => 10
 )
 
-Warning: imagecrop(): %cne parameter to a memory allocation multiplication is negative or zero, failing operation gracefully
- in %s on line %d
+Warning: imagecrop(): one parameter to a memory allocation multiplication is negative or zero, failing operation gracefully
+ in %sbug66356.php on line %d
 bool(false)
-object(GdImage)#2 (0) {
-}
-object(GdImage)#2 (0) {
-}
+resource(%d) of type (gd)
+resource(%d) of type (gd)
 
-Warning: imagecrop(): %croduct of memory allocation multiplication would exceed INT_MAX, failing operation gracefully
- in %s on line %d
+Warning: imagecrop(): product of memory allocation multiplication would exceed INT_MAX, failing operation gracefully
+ in %sbug66356.php on line %d
 bool(false)

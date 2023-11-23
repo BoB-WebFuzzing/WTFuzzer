@@ -32,7 +32,7 @@
 #include "file.h"
 
 #ifndef	lint
-FILE_RCSID("@(#)$File: fsmagic.c,v 1.82 2022/04/11 18:14:41 christos Exp $")
+FILE_RCSID("@(#)$File: fsmagic.c,v 1.80 2019/04/23 18:59:27 christos Exp $")
 #endif	/* lint */
 
 #include "magic.h"
@@ -246,11 +246,5 @@ file_fsmagic(struct magic_set *ms, const char *fn, zend_stat_t *sb)
 	    if (file_printf(ms, " ") == -1)
 		    return -1;
 	}
-	/*
-	 * If we were looking for extensions or apple (silent) it is not our
-	 * job to print here, so don't count this as a match.
-	 */
-	if (ret == 1 && silent)
-		return 0;
 	return ret;
 }

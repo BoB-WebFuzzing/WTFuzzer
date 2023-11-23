@@ -1,7 +1,5 @@
 --TEST--
 Overflow in float to int cast
---EXTENSIONS--
-exif
 --FILE--
 <?php
 
@@ -40,6 +38,6 @@ array(8) {
     ["ImageWidth"]=>
     int(1)
     ["ImageLength"]=>
-    float(-2.5961487387524236E+33)
+    float(-2.5961487387524E+33)
   }
 }

@@ -1,9 +1,11 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -23,6 +25,7 @@
 #include "intl_convert.h"
 #include "dateformat.h"
 #include "dateformat_class.h"
+#include "dateformat_parse.h"
 #include "dateformat_data.h"
 
 /* {{{
@@ -51,7 +54,7 @@ static void internal_parse_to_timestamp(IntlDateFormatter_object *dfo, char* tex
 
 	/* Since return is in  sec. */
 	result = (double)timestamp / U_MILLIS_PER_SECOND;
-	if (result > (double)LONG_MAX || result < (double)LONG_MIN) {
+	if(result > LONG_MAX || result < -LONG_MAX) {
 		ZVAL_DOUBLE(return_value, result<0?ceil(result):floor(result));
 	} else {
 		ZVAL_LONG(return_value, (zend_long)result);
@@ -75,7 +78,9 @@ static void add_to_localtime_arr( IntlDateFormatter_object *dfo, zval* return_va
 	}
 }
 
-/* {{{ Internal function which calls the udat_parseCalendar */
+/* {{{
+ * Internal function which calls the udat_parseCalendar
+*/
 static void internal_parse_to_localtime(IntlDateFormatter_object *dfo, char* text_to_parse, size_t text_len, int32_t *parse_pos, zval *return_value)
 {
 	UCalendar      *parsed_calendar = NULL;
@@ -116,7 +121,10 @@ static void internal_parse_to_localtime(IntlDateFormatter_object *dfo, char* tex
 /* }}} */
 
 
-/* {{{ Parse the string $value starting at parse_pos to a Unix timestamp -int */
+/* {{{ proto int IntlDateFormatter::parse( string $text_to_parse  [, int $parse_pos] )
+ * Parse the string $value starting at parse_pos to a Unix timestamp -int }}}*/
+/* {{{ proto int datefmt_parse( IntlDateFormatter $fmt, string $text_to_parse [, int $parse_pos] )
+ * Parse the string $value starting at parse_pos to a Unix timestamp -int }}}*/
 PHP_FUNCTION(datefmt_parse)
 {
 	char*           text_to_parse = NULL;
@@ -129,7 +137,8 @@ PHP_FUNCTION(datefmt_parse)
 	/* Parse parameters. */
 	if( zend_parse_method_parameters( ZEND_NUM_ARGS(), getThis(), "Os|z!",
 		&object, IntlDateFormatter_ce_ptr, &text_to_parse, &text_len, &z_parse_pos ) == FAILURE ){
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "datefmt_parse: unable to parse input params", 0 );
+		RETURN_FALSE;
 	}
 
 	/* Fetch the object. */
@@ -157,7 +166,10 @@ PHP_FUNCTION(datefmt_parse)
 }
 /* }}} */
 
-/* {{{ Parse the string $value to a localtime array */
+/* {{{ proto int IntlDateFormatter::localtime( string $text_to_parse[, int $parse_pos] )
+ * Parse the string $value to a localtime array  }}}*/
+/* {{{ proto int datefmt_localtime( IntlDateFormatter $fmt, string $text_to_parse[, int $parse_pos ])
+ * Parse the string $value to a localtime array  }}}*/
 PHP_FUNCTION(datefmt_localtime)
 {
 	char*           text_to_parse = NULL;
@@ -170,7 +182,8 @@ PHP_FUNCTION(datefmt_localtime)
 	/* Parse parameters. */
 	if( zend_parse_method_parameters( ZEND_NUM_ARGS(), getThis(), "Os|z!",
 		&object, IntlDateFormatter_ce_ptr, &text_to_parse, &text_len, &z_parse_pos ) == FAILURE ){
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR, "datefmt_parse_to_localtime: unable to parse input params", 0 );
+		RETURN_FALSE;
 	}
 
     /* Fetch the object. */

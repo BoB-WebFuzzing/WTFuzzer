@@ -3,20 +3,19 @@ Unsetting and recreating private properties.
 --FILE--
 <?php
 class C {
-    private $p = 'test';
-    function unsetPrivate() {
-        unset($this->p);
-    }
-    function setPrivate() {
-        $this->p = 'changed';
-    }
+	private $p = 'test';
+	function unsetPrivate() {
+		unset($this->p);
+	}
+	function setPrivate() {
+		$this->p = 'changed';
+	}
 }
 
-#[AllowDynamicProperties]
 class D extends C {
-    function setP() {
-        $this->p = 'changed in D';
-    }
+	function setP() {
+		$this->p = 'changed in D';
+	}
 }
 
 echo "Unset and recreate a superclass's private property:\n";
@@ -50,7 +49,7 @@ $c->unsetPrivate();
 $c->p = 'this will fail';
 var_dump($c);
 ?>
-===DONE===
+==Done==
 --EXPECTF--
 Unset and recreate a superclass's private property:
 object(D)#%d (1) {
@@ -79,7 +78,7 @@ object(C)#%d (1) {
 
 Unset a private property, and attempt to recreate at global scope (expecting failure):
 
-Fatal error: Uncaught Error: Cannot access private property C::$p in %s:%d
+Fatal error: Uncaught Error: Cannot access private property C::$p in %s:46
 Stack trace:
 #0 {main}
-  thrown in %s on line %d
+  thrown in %s on line 46

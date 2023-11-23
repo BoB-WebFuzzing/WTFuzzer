@@ -1,7 +1,7 @@
 --TEST--
 Bug #65997: Leak when using gc_collect_cycles with new GMP implementation
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 

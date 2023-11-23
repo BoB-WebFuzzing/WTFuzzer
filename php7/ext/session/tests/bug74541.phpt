@@ -1,7 +1,5 @@
 --TEST--
 Bug #74541 Wrong reflection on session_start()
---EXTENSIONS--
-session
 --SKIPIF--
 <?php
 include('skipif.inc');
@@ -12,6 +10,8 @@ $r = new ReflectionFunction('session_start');
 var_dump($r->getNumberOfParameters());
 var_dump($r->getNumberOfRequiredParameters());
 ?>
+===DONE===
 --EXPECT--
 int(1)
 int(0)
+===DONE===

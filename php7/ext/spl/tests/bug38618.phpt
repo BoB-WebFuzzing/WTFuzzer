@@ -84,6 +84,10 @@ test_array($array, 'Protected Property');
 test_array($array, 'Public Property New', RecursiveArrayIterator::CHILD_ARRAYS_ONLY);
 test_array($array, 'Protected Property New', RecursiveArrayIterator::CHILD_ARRAYS_ONLY);
 ?>
+===DONE===
+<?php exit(0); ?>
+?>
+===DONE===
 --EXPECT--
 ===Default with array===
 1 => apple
@@ -98,3 +102,4 @@ title => grape
 ===Protected Property New===
 1 => apple
 1 => grape
+===DONE===

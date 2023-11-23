@@ -1,17 +1,14 @@
 --TEST--
 Bug #42173 (TIMESTAMP and INTERVAL query and field functions)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 $stmts = array(
 
@@ -41,8 +38,8 @@ interval'1 2:20:20.123' day to second,
 interval'1 2:20:20.12345' day to second)");
 
 foreach ($stmts as $sql) {
-    $s = oci_parse($c, $sql);
-    $r = @oci_execute($s);
+	$s = oci_parse($c, $sql);
+	$r = @oci_execute($s);
 }
 
 $s = oci_parse($c, "select * from ts_test");
@@ -51,14 +48,14 @@ $row = oci_fetch_array($s, OCI_ASSOC);
 var_dump($row);
 
 foreach ($row as $name => $field) {
-    echo "\nColumn $name\n";
-    var_dump(oci_field_is_null($s, $name));
-    var_dump(oci_field_name($s, $name));
-    var_dump(oci_field_type($s, $name));
-    var_dump(oci_field_type_raw($s, $name));
-    var_dump(oci_field_scale($s, $name));
-    var_dump(oci_field_precision($s, $name));
-    var_dump(oci_field_size($s, $name));
+	echo "\nColumn $name\n";
+	var_dump(oci_field_is_null($s, $name));
+	var_dump(oci_field_name($s, $name));
+	var_dump(oci_field_type($s, $name));
+	var_dump(oci_field_type_raw($s, $name));
+	var_dump(oci_field_scale($s, $name));
+	var_dump(oci_field_precision($s, $name));
+	var_dump(oci_field_size($s, $name));
 }
 
 // Cleanup

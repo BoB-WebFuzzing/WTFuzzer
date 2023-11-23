@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -31,7 +33,7 @@
 #include "ext/standard/info.h"
 #include "php_ini.h"
 
-#ifdef HAVE_OCI8
+#if HAVE_OCI8
 
 #include "php_oci8.h"
 #include "php_oci8_int.h"
@@ -50,7 +52,11 @@ php_oci_collection *php_oci_collection_create(php_oci_connection *connection, ch
 
 	collection->connection = connection;
 	collection->collection = NULL;
+#if PHP_VERSION_ID < 70300
+	++GC_REFCOUNT(collection->connection->id);
+#else
 	GC_ADDREF(collection->connection->id);
+#endif
 
 	/* get type handle by name */
 	PHP_OCI_CALL_RETURN(errstatus, OCITypeByName,
@@ -191,7 +197,7 @@ php_oci_collection *php_oci_collection_create(php_oci_connection *connection, ch
 			break;
 			/* we only support VARRAYs and TABLEs */
 		default:
-			php_error_docref(NULL, E_WARNING, "Unknown collection type %d", collection->coll_typecode);
+			php_error_docref(NULL, E_WARNING, "unknown collection type %d", collection->coll_typecode);
 			break;
 	}
 

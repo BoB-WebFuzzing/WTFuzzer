@@ -1,12 +1,9 @@
 --TEST--
 oci_lob_write() and friends
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -35,5 +32,5 @@ echo "Done\n";
 
 ?>
 --EXPECTF--
-Warning: OCILob::write(): ORA-22990: %s in %s on line 19
+Warning: OCI-Lob::write(): ORA-22990: %s in %s on line 19
 Done

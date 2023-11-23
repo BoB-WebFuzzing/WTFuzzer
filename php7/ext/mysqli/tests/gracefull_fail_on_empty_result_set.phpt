@@ -1,19 +1,15 @@
 --TEST--
 Fail gracefully on empty result set
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
-    if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
-        printf("Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
-            $host, $user, $db, $port, $socket);
-        exit(1);
-    }
+    require_once("connect.inc");
+    require('table.inc');
 
     // Returns only one result set
     $link->multi_query("SELECT 1");
@@ -27,6 +23,11 @@ require_once 'skipifconnectfailure.inc';
     var_dump($link->use_result());
 
     $link->close();
+?>
+=== DONE ===
+--CLEAN--
+<?php
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 bool(false)
@@ -55,3 +56,4 @@ object(mysqli_result)#3 (5) {
   ["type"]=>
   int(1)
 }
+=== DONE ===

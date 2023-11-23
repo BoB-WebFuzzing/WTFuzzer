@@ -1,20 +1,25 @@
 --TEST--
 mysqli_stmt_execute() - OUT
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'connect.inc';
-if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
-    die(sprintf("skip Can't connect to MySQL Server - [%d] %s", mysqli_connect_errno(), mysqli_connect_error()));
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
+require_once('connect.inc');
+if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
+    die(sprintf('skip Cannot connect to MySQL, [%d] %s.', mysqli_connect_errno(), mysqli_connect_error()));
 }
 if (mysqli_get_server_version($link) < 50503) {
     die(sprintf('skip Needs MySQL 5.5.3+, found version %d.', mysqli_get_server_version($link)));
 }
+/*
+if ($IS_MYSQLND) {
+    die(sprintf("skip WHY ?!"));
+}
+*/
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once('connect.inc');
 
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
         printf("[001] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
@@ -39,12 +44,8 @@ if (mysqli_get_server_version($link) < 50503) {
         printf("[008] More results: %s\n", (mysqli_more_results($link) ? "yes" : "no"));
         printf("[009] Next results: %s\n", (mysqli_next_result($link) ? "yes" : "no"));
 
-        try {
-            if (!mysqli_stmt_bind_result($stmt, $ver_out) || !mysqli_stmt_fetch($stmt))
-                printf("[010] [%d] %s\n", mysqli_stmt_errno($stmt), mysqli_stmt_error($stmt));
-        } catch (\ArgumentCountError $e) {
-            echo $e->getMessage() . \PHP_EOL;
-        }
+        if (!mysqli_stmt_bind_result($stmt, $ver_out) || !mysqli_stmt_fetch($stmt))
+            printf("[010] [%d] %s\n", mysqli_stmt_errno($stmt), mysqli_stmt_error($stmt));
 
         if ("myversion" !== $ver_out)
             printf("[011] Results seem wrong got '%s'\n", $ver_out);
@@ -64,7 +65,7 @@ if (mysqli_get_server_version($link) < 50503) {
 ?>
 --CLEAN--
 <?php
-require_once 'connect.inc';
+require_once("connect.inc");
 if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
    printf("[c001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 

@@ -1,7 +1,7 @@
 --TEST--
 Phar object: unset file
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded('phar')) die('skip'); ?>
 --INI--
 phar.readonly=0
 phar.require_hash=0
@@ -23,6 +23,7 @@ unset($phar['f.php']);
 var_dump(isset($phar['f.php']));
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/files/phar_oo_012.phar.php');
@@ -32,3 +33,4 @@ __halt_compiler();
 bool(true)
 hi
 bool(false)
+===DONE===

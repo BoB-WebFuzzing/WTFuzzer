@@ -4,23 +4,9 @@ Redirection support in proc_open
 <?php
 
 $php = getenv('TEST_PHP_EXECUTABLE');
-try {
-    proc_open([$php], [['redirect']], $pipes);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
-try {
-    proc_open([$php], [['redirect', 'foo']], $pipes);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
-try {
-    proc_open([$php], [['redirect', 42]], $pipes);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(proc_open([$php], [['redirect']], $pipes));
+var_dump(proc_open([$php], [['redirect', 'foo']], $pipes));
+var_dump(proc_open([$php], [['redirect', 42]], $pipes));
 
 echo "\nWith pipe:\n";
 $cmd = [$php, '-r', 'echo "Test\n"; fprintf(STDERR, "Error");'];
@@ -52,10 +38,14 @@ proc_close($proc);
 
 ?>
 --EXPECTF--
-Missing redirection target
-Redirection target must be of type int, string given
+Warning: proc_open(): Missing redirection target in %s on line %d
+bool(false)
 
-Warning: proc_open(): Redirection target 42 not found in %s
+Warning: proc_open(): Redirection target must be an integer in %s on line %d
+bool(false)
+
+Warning: proc_open(): Redirection target 42 not found in %s on line %d
+bool(false)
 
 With pipe:
 array(1) {

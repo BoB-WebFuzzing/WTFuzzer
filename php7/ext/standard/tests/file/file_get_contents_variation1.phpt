@@ -4,6 +4,12 @@ Test file_get_contents() function : variation - include path testing
 Dave Kelsey <d_kelsey@uk.ibm.com>
 --FILE--
 <?php
+/* Prototype  : string file_get_contents(string filename [, bool use_include_path [, resource context [, long offset [, long maxlen]]]])
+ * Description: Read the entire file into a string
+ * Source code: ext/standard/file.c
+ * Alias to functions:
+ */
+
 echo "*** Testing file_get_contents() : variation ***\n";
 
 require_once('fopen_include_path.inc');
@@ -23,6 +29,7 @@ set_include_path($newpath);
 runtest();
 teardown_include_path();
 chdir("..");
+rmdir($thisTestDir);
 
 
 function runtest() {
@@ -36,12 +43,8 @@ function runtest() {
 }
 
 ?>
---CLEAN--
-<?php
-// TODO Clean up tmp files
-$thisTestDir = "fileGetContentsVar1.dir";
-rmdir($thisTestDir);
-?>
+===DONE===
 --EXPECT--
 *** Testing file_get_contents() : variation ***
 File in include path
+===DONE===

@@ -1,9 +1,17 @@
 --TEST--
 Test mb_substr_count() function : basic functionality
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_substr_count') or die("skip mb_substr_count() is not available in this build");
+?>
 --FILE--
 <?php
+/* Prototype  : int mb_substr_count(string $haystack, string $needle [, string $encoding])
+ * Description: Count the number of substring occurrences
+ * Source code: ext/mbstring/mbstring.c
+ */
+
 /*
  * Test Basic functionality of mb_substr_count
  */

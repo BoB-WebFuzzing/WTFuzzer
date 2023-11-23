@@ -11,6 +11,13 @@ if (substr(PHP_OS, 0, 3) != 'WIN') {
 ?>
 --FILE--
 <?php
+/* Prototype: string readlink ( string $path );
+   Description: Returns the target of a symbolic link
+
+   Prototype: string realpath ( string $path );
+   Description: Returns canonicalized absolute pathname
+*/
+
 echo "*** Testing readlink() and realpath() : usage variations ***\n";
 $name_prefix = __DIR__;
 // create temp dir
@@ -76,7 +83,7 @@ string(%d) "%s%ereadlink_realpath_variation2%ehome%etests%elink%ereadlink_realpa
 Warning: symlink(): No such file or directory in %s on line %d
 bool(false)
 
-Warning: readlink(): readlink failed to read the symbolic link (%s), error %d in %s on line %d
+Warning: readlink(): readlink failed to read the symbolic link (%s) in %s on line %d
 bool(false)
 bool(false)
 
@@ -90,7 +97,7 @@ string(%d) "%s%ereadlink_realpath_variation2%ehome%etests%elink%ereadlink_realpa
 Warning: link(): No such file or directory in %s on line %d
 bool(false)
 
-Warning: readlink(): readlink failed to read the symbolic link (%s), error %d in %s on line %d
+Warning: readlink(): readlink failed to read the symbolic link (%s) in %s on line %d
 bool(false)
 bool(false)
 

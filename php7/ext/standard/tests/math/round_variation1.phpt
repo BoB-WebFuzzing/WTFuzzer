@@ -4,6 +4,12 @@ Test round() function : usage variations - different data types as $val argument
 precision=14
 --FILE--
 <?php
+/* Prototype  : float round  ( float $val  [, int $precision  ] )
+ * Description: Returns the rounded value of val  to specified precision (number of digits
+ * after the decimal point)
+ * Source code: ext/standard/math.c
+ */
+
 echo "*** Testing round() : usage variations ***\n";
 
 //get an unset variable
@@ -75,16 +81,13 @@ $inputs = array(
 // loop through each element of $inputs to check the behaviour of round()
 $iterator = 1;
 foreach($inputs as $input) {
-    echo "\n-- Iteration $iterator --\n";
-    try {
-        var_dump(round($input, 14));
-    } catch (TypeError $e) {
-        echo $e->getMessage(), "\n";
-    }
-    $iterator++;
+	echo "\n-- Iteration $iterator --\n";
+	var_dump(round($input, 14));
+	$iterator++;
 };
 fclose($fp);
 ?>
+===Done===
 --EXPECTF--
 *** Testing round() : usage variations ***
 
@@ -119,13 +122,9 @@ float(1.23457E-9)
 float(0.5)
 
 -- Iteration 11 --
-
-Deprecated: round(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 float(0)
 
 -- Iteration 12 --
-
-Deprecated: round(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 float(0)
 
 -- Iteration 13 --
@@ -141,35 +140,34 @@ float(1)
 float(0)
 
 -- Iteration 17 --
-round(): Argument #1 ($num) must be of type int|float, string given
+float(0)
 
 -- Iteration 18 --
-round(): Argument #1 ($num) must be of type int|float, string given
+float(0)
 
 -- Iteration 19 --
-round(): Argument #1 ($num) must be of type int|float, array given
+bool(false)
 
 -- Iteration 20 --
-round(): Argument #1 ($num) must be of type int|float, string given
+float(0)
 
 -- Iteration 21 --
-round(): Argument #1 ($num) must be of type int|float, string given
+float(0)
 
 -- Iteration 22 --
-round(): Argument #1 ($num) must be of type int|float, string given
+float(0)
 
 -- Iteration 23 --
-round(): Argument #1 ($num) must be of type int|float, classA given
+
+Notice: Object of class classA could not be converted to number in %s on line %d
+float(1)
 
 -- Iteration 24 --
-
-Deprecated: round(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 float(0)
 
 -- Iteration 25 --
-
-Deprecated: round(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 float(0)
 
 -- Iteration 26 --
-round(): Argument #1 ($num) must be of type int|float, resource given
+float(%f)
+===Done===

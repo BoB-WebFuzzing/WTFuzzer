@@ -1,17 +1,15 @@
 --TEST--
 PostgreSQL pg_select()
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
-include("inc/skipif.inc");
+include("skipif.inc");
 skip_server_version('8.5dev', '>=');
 ?>
 --FILE--
 <?php
 error_reporting(E_ALL);
 
-include 'inc/config.inc';
+include 'config.inc';
 
 $db = pg_connect($conn_str);
 $fields = array('num'=>'1234', 'str'=>'ABC', 'bin'=>'XYZ');

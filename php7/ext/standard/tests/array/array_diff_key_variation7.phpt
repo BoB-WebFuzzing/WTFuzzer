@@ -2,6 +2,11 @@
 Test array_diff_key() function : usage variation - Passing null,unset and undefined variable indexed array
 --FILE--
 <?php
+/* Prototype  : array array_diff_key(array arr1, array arr2 [, array ...])
+ * Description: Returns the entries of arr1 that have keys which are not present in any of the others arguments.
+ * Source code: ext/standard/array.c
+ */
+
 echo "*** Testing array_diff_key() : usage variation ***\n";
 
 // Initialise function arguments not being substituted (if any)
@@ -24,6 +29,7 @@ foreach($input_arrays as $key =>$value) {
       var_dump( array_diff_key($value, $input_array) );
 }
 ?>
+===DONE===
 --EXPECT--
 *** Testing array_diff_key() : usage variation ***
 
@@ -50,3 +56,4 @@ array(1) {
 }
 array(0) {
 }
+===DONE===

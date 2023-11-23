@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -31,19 +33,17 @@
 #  include <utime.h>
 # endif
 #endif
-#include "userspace_arginfo.h"
 
 static int le_protocols;
 
 struct php_user_stream_wrapper {
-	php_stream_wrapper wrapper;
 	char * protoname;
+	char * classname;
 	zend_class_entry *ce;
-	zend_resource *resource;
+	php_stream_wrapper wrapper;
 };
 
 static php_stream *user_wrapper_opener(php_stream_wrapper *wrapper, const char *filename, const char *mode, int options, zend_string **opened_path, php_stream_context *context STREAMS_DC);
-static int user_wrapper_close(php_stream_wrapper *wrapper, php_stream *stream);
 static int user_wrapper_stat_url(php_stream_wrapper *wrapper, const char *url, int flags, php_stream_statbuf *ssb, php_stream_context *context);
 static int user_wrapper_unlink(php_stream_wrapper *wrapper, const char *url, int options, php_stream_context *context);
 static int user_wrapper_rename(php_stream_wrapper *wrapper, const char *url_from, const char *url_to, int options, php_stream_context *context);
@@ -55,7 +55,7 @@ static php_stream *user_wrapper_opendir(php_stream_wrapper *wrapper, const char 
 
 static const php_stream_wrapper_ops user_stream_wops = {
 	user_wrapper_opener,
-	user_wrapper_close,
+	NULL, /* close - the streams themselves know how */
 	NULL, /* stat - the streams themselves know how */
 	user_wrapper_stat_url,
 	user_wrapper_opendir,
@@ -73,6 +73,7 @@ static void stream_wrapper_dtor(zend_resource *rsrc)
 	struct php_user_stream_wrapper * uwrap = (struct php_user_stream_wrapper*)rsrc->ptr;
 
 	efree(uwrap->protoname);
+	efree(uwrap->classname);
 	efree(uwrap);
 }
 
@@ -83,8 +84,35 @@ PHP_MINIT_FUNCTION(user_streams)
 	if (le_protocols == FAILURE)
 		return FAILURE;
 
-	register_userspace_symbols(module_number);
+	REGISTER_LONG_CONSTANT("STREAM_USE_PATH", 			USE_PATH, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_IGNORE_URL", 		IGNORE_URL, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_REPORT_ERRORS", 		REPORT_ERRORS, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_MUST_SEEK", 			STREAM_MUST_SEEK, CONST_CS|CONST_PERSISTENT);
 
+	REGISTER_LONG_CONSTANT("STREAM_URL_STAT_LINK", 		PHP_STREAM_URL_STAT_LINK,		CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_URL_STAT_QUIET", 	PHP_STREAM_URL_STAT_QUIET,		CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_MKDIR_RECURSIVE",	PHP_STREAM_MKDIR_RECURSIVE,		CONST_CS|CONST_PERSISTENT);
+
+	REGISTER_LONG_CONSTANT("STREAM_IS_URL",	PHP_STREAM_IS_URL,		CONST_CS|CONST_PERSISTENT);
+
+	REGISTER_LONG_CONSTANT("STREAM_OPTION_BLOCKING",	PHP_STREAM_OPTION_BLOCKING,		CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_OPTION_READ_TIMEOUT",	PHP_STREAM_OPTION_READ_TIMEOUT,		CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_OPTION_READ_BUFFER",	PHP_STREAM_OPTION_READ_BUFFER,		CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_OPTION_WRITE_BUFFER",	PHP_STREAM_OPTION_WRITE_BUFFER,		CONST_CS|CONST_PERSISTENT);
+
+	REGISTER_LONG_CONSTANT("STREAM_BUFFER_NONE",		PHP_STREAM_BUFFER_NONE,			CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_BUFFER_LINE",		PHP_STREAM_BUFFER_LINE,			CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_BUFFER_FULL",		PHP_STREAM_BUFFER_FULL,			CONST_CS|CONST_PERSISTENT);
+
+	REGISTER_LONG_CONSTANT("STREAM_CAST_AS_STREAM",		PHP_STREAM_AS_STDIO,			CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_CAST_FOR_SELECT",	PHP_STREAM_AS_FD_FOR_SELECT,		CONST_CS|CONST_PERSISTENT);
+
+	REGISTER_LONG_CONSTANT("STREAM_META_TOUCH",			PHP_STREAM_META_TOUCH,			CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_META_OWNER",			PHP_STREAM_META_OWNER,			CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_META_OWNER_NAME",	PHP_STREAM_META_OWNER_NAME,		CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_META_GROUP",			PHP_STREAM_META_GROUP,			CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_META_GROUP_NAME",	PHP_STREAM_META_GROUP_NAME,		CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("STREAM_META_ACCESS",		PHP_STREAM_META_ACCESS,			CONST_CS|CONST_PERSISTENT);
 	return SUCCESS;
 }
 
@@ -251,13 +279,6 @@ typedef struct _php_userstream_data php_userstream_data_t;
 
 	}}} **/
 
-static zend_result call_method_if_exists(
-		zval *object, zval *method_name, zval *retval, uint32_t param_count, zval *params)
-{
-	return zend_call_method_if_exists(
-		Z_OBJ_P(object), Z_STR_P(method_name), retval, param_count, params);
-}
-
 static void user_stream_create_object(struct php_user_stream_wrapper *uwrap, php_stream_context *context, zval *object)
 {
 	if (uwrap->ce->ce_flags & (ZEND_ACC_INTERFACE|ZEND_ACC_TRAIT|ZEND_ACC_IMPLICIT_ABSTRACT_CLASS|ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)) {
@@ -272,15 +293,36 @@ static void user_stream_create_object(struct php_user_stream_wrapper *uwrap, php
 	}
 
 	if (context) {
-		GC_ADDREF(context->res);
 		add_property_resource(object, "context", context->res);
+		GC_ADDREF(context->res);
 	} else {
 		add_property_null(object, "context");
 	}
 
 	if (uwrap->ce->constructor) {
-		zend_call_known_instance_method_with_0_params(
-			uwrap->ce->constructor, Z_OBJ_P(object), NULL);
+		zend_fcall_info fci;
+		zend_fcall_info_cache fcc;
+		zval retval;
+
+		fci.size = sizeof(fci);
+		ZVAL_UNDEF(&fci.function_name);
+		fci.object = Z_OBJ_P(object);
+		fci.retval = &retval;
+		fci.param_count = 0;
+		fci.params = NULL;
+		fci.no_separation = 1;
+
+		fcc.function_handler = uwrap->ce->constructor;
+		fcc.called_scope = Z_OBJCE_P(object);
+		fcc.object = Z_OBJ_P(object);
+
+		if (zend_call_function(&fci, &fcc) == FAILURE) {
+			php_error_docref(NULL, E_WARNING, "Could not execute %s::%s()", ZSTR_VAL(uwrap->ce->name), ZSTR_VAL(uwrap->ce->constructor->common.function_name));
+			zval_ptr_dtor(object);
+			ZVAL_UNDEF(object);
+		} else {
+			zval_ptr_dtor(&retval);
+		}
 	}
 }
 
@@ -293,7 +335,7 @@ static php_stream *user_wrapper_opener(php_stream_wrapper *wrapper, const char *
 	zval args[4];
 	int call_result;
 	php_stream *stream = NULL;
-	bool old_in_user_include;
+	zend_bool old_in_user_include;
 
 	/* Try to catch bad usage without preventing flexibility */
 	if (FG(user_stream_current_filename) != NULL && strcmp(filename, FG(user_stream_current_filename)) == 0) {
@@ -315,8 +357,6 @@ static php_stream *user_wrapper_opener(php_stream_wrapper *wrapper, const char *
 
 	us = emalloc(sizeof(*us));
 	us->wrapper = uwrap;
-	/* call_method_if_exists() may unregister the stream wrapper. Hold on to it. */
-	GC_ADDREF(us->wrapper->resource);
 
 	user_stream_create_object(uwrap, context, &us->object);
 	if (Z_TYPE(us->object) == IS_UNDEF) {
@@ -335,7 +375,12 @@ static php_stream *user_wrapper_opener(php_stream_wrapper *wrapper, const char *
 	ZVAL_STRING(&zfuncname, USERSTREAM_OPEN);
 
 	zend_try {
-		call_result = call_method_if_exists(&us->object, &zfuncname, &zretval, 4, args);
+		call_result = call_user_function_ex(NULL,
+				Z_ISUNDEF(us->object)? NULL : &us->object,
+				&zfuncname,
+				&zretval,
+				4, args,
+				0, NULL	);
 	} zend_catch {
 		FG(user_stream_current_filename) = NULL;
 		zend_bailout();
@@ -354,14 +399,13 @@ static php_stream *user_wrapper_opener(php_stream_wrapper *wrapper, const char *
 		ZVAL_COPY(&stream->wrapperdata, &us->object);
 	} else {
 		php_stream_wrapper_log_error(wrapper, options, "\"%s::" USERSTREAM_OPEN "\" call failed",
-			ZSTR_VAL(us->wrapper->ce->name));
+			us->wrapper->classname);
 	}
 
 	/* destroy everything else */
 	if (stream == NULL) {
 		zval_ptr_dtor(&us->object);
 		ZVAL_UNDEF(&us->object);
-		zend_list_delete(us->wrapper->resource);
 		efree(us);
 	}
 	zval_ptr_dtor(&zretval);
@@ -375,14 +419,6 @@ static php_stream *user_wrapper_opener(php_stream_wrapper *wrapper, const char *
 
 	PG(in_user_include) = old_in_user_include;
 	return stream;
-}
-
-static int user_wrapper_close(php_stream_wrapper *wrapper, php_stream *stream)
-{
-	struct php_user_stream_wrapper *uwrap = (struct php_user_stream_wrapper*)wrapper->abstract;
-	zend_list_delete(uwrap->resource);
-	// FIXME: Unused?
-	return 0;
 }
 
 static php_stream *user_wrapper_opendir(php_stream_wrapper *wrapper, const char *filename, const char *mode,
@@ -404,8 +440,6 @@ static php_stream *user_wrapper_opendir(php_stream_wrapper *wrapper, const char 
 
 	us = emalloc(sizeof(*us));
 	us->wrapper = uwrap;
-	/* call_method_if_exists() may unregister the stream wrapper. Hold on to it. */
-	GC_ADDREF(us->wrapper->resource);
 
 	user_stream_create_object(uwrap, context, &us->object);
 	if (Z_TYPE(us->object) == IS_UNDEF) {
@@ -420,7 +454,12 @@ static php_stream *user_wrapper_opendir(php_stream_wrapper *wrapper, const char 
 
 	ZVAL_STRING(&zfuncname, USERSTREAM_DIR_OPEN);
 
-	call_result = call_method_if_exists(&us->object, &zfuncname, &zretval, 2, args);
+	call_result = call_user_function_ex(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&zfuncname,
+			&zretval,
+			2, args,
+			0, NULL	);
 
 	if (call_result == SUCCESS && Z_TYPE(zretval) != IS_UNDEF && zval_is_true(&zretval)) {
 		/* the stream is now open! */
@@ -430,14 +469,13 @@ static php_stream *user_wrapper_opendir(php_stream_wrapper *wrapper, const char 
 		ZVAL_COPY(&stream->wrapperdata, &us->object);
 	} else {
 		php_stream_wrapper_log_error(wrapper, options, "\"%s::" USERSTREAM_DIR_OPEN "\" call failed",
-			ZSTR_VAL(us->wrapper->ce->name));
+			us->wrapper->classname);
 	}
 
 	/* destroy everything else */
 	if (stream == NULL) {
 		zval_ptr_dtor(&us->object);
 		ZVAL_UNDEF(&us->object);
-		zend_list_delete(us->wrapper->resource);
 		efree(us);
 	}
 	zval_ptr_dtor(&zretval);
@@ -452,39 +490,42 @@ static php_stream *user_wrapper_opendir(php_stream_wrapper *wrapper, const char 
 }
 
 
-/* {{{ Registers a custom URL protocol handler class */
+/* {{{ proto bool stream_wrapper_register(string protocol, string classname[, int flags])
+   Registers a custom URL protocol handler class */
 PHP_FUNCTION(stream_wrapper_register)
 {
-	zend_string *protocol;
-	struct php_user_stream_wrapper *uwrap;
-	zend_class_entry *ce = NULL;
+	zend_string *protocol, *classname;
+	struct php_user_stream_wrapper * uwrap;
 	zend_resource *rsrc;
 	zend_long flags = 0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "SC|l", &protocol, &ce, &flags) == FAILURE) {
-		RETURN_THROWS();
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "SS|l", &protocol, &classname, &flags) == FAILURE) {
+		RETURN_FALSE;
 	}
 
 	uwrap = (struct php_user_stream_wrapper *)ecalloc(1, sizeof(*uwrap));
-	uwrap->ce = ce;
 	uwrap->protoname = estrndup(ZSTR_VAL(protocol), ZSTR_LEN(protocol));
+	uwrap->classname = estrndup(ZSTR_VAL(classname), ZSTR_LEN(classname));
 	uwrap->wrapper.wops = &user_stream_wops;
 	uwrap->wrapper.abstract = uwrap;
 	uwrap->wrapper.is_url = ((flags & PHP_STREAM_IS_URL) != 0);
 
 	rsrc = zend_register_resource(uwrap, le_protocols);
 
-	if (php_register_url_stream_wrapper_volatile(protocol, &uwrap->wrapper) == SUCCESS) {
-		uwrap->resource = rsrc;
-		RETURN_TRUE;
-	}
-
-	/* We failed.  But why? */
-	if (zend_hash_exists(php_stream_get_url_stream_wrappers_hash(), protocol)) {
-		php_error_docref(NULL, E_WARNING, "Protocol %s:// is already defined.", ZSTR_VAL(protocol));
+	if ((uwrap->ce = zend_lookup_class(classname)) != NULL) {
+		if (php_register_url_stream_wrapper_volatile(protocol, &uwrap->wrapper) == SUCCESS) {
+			RETURN_TRUE;
+		} else {
+			/* We failed.  But why? */
+			if (zend_hash_exists(php_stream_get_url_stream_wrappers_hash(), protocol)) {
+				php_error_docref(NULL, E_WARNING, "Protocol %s:// is already defined.", ZSTR_VAL(protocol));
+			} else {
+				/* Hash doesn't exist so it must have been an invalid protocol scheme */
+				php_error_docref(NULL, E_WARNING, "Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", ZSTR_VAL(classname), ZSTR_VAL(protocol));
+			}
+		}
 	} else {
-		/* Hash doesn't exist so it must have been an invalid protocol scheme */
-		php_error_docref(NULL, E_WARNING, "Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", ZSTR_VAL(uwrap->ce->name), ZSTR_VAL(protocol));
+		php_error_docref(NULL, E_WARNING, "class '%s' is undefined", ZSTR_VAL(classname));
 	}
 
 	zend_list_delete(rsrc);
@@ -492,34 +533,28 @@ PHP_FUNCTION(stream_wrapper_register)
 }
 /* }}} */
 
-/* {{{ Unregister a wrapper for the life of the current request. */
+/* {{{ proto bool stream_wrapper_unregister(string protocol)
+	Unregister a wrapper for the life of the current request. */
 PHP_FUNCTION(stream_wrapper_unregister)
 {
 	zend_string *protocol;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &protocol) == FAILURE) {
-		RETURN_THROWS();
+		RETURN_FALSE;
 	}
 
-	php_stream_wrapper *wrapper = zend_hash_find_ptr(php_stream_get_url_stream_wrappers_hash(), protocol);
 	if (php_unregister_url_stream_wrapper_volatile(protocol) == FAILURE) {
 		/* We failed */
 		php_error_docref(NULL, E_WARNING, "Unable to unregister protocol %s://", ZSTR_VAL(protocol));
 		RETURN_FALSE;
 	}
 
-	ZEND_ASSERT(wrapper != NULL);
-	if (wrapper->wops == &user_stream_wops) {
-		struct php_user_stream_wrapper *uwrap = (struct php_user_stream_wrapper *)wrapper;
-		// uwrap will be released by resource destructor
-		zend_list_delete(uwrap->resource);
-	}
-
 	RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ Restore the original protocol handler, overriding if necessary */
+/* {{{ proto bool stream_wrapper_restore(string protocol)
+	Restore the original protocol handler, overriding if necessary */
 PHP_FUNCTION(stream_wrapper_restore)
 {
 	zend_string *protocol;
@@ -527,7 +562,7 @@ PHP_FUNCTION(stream_wrapper_restore)
 	HashTable *global_wrapper_hash, *wrapper_hash;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &protocol) == FAILURE) {
-		RETURN_THROWS();
+		RETURN_FALSE;
 	}
 
 	global_wrapper_hash = php_stream_get_url_stream_wrappers_hash_global();
@@ -569,7 +604,12 @@ static ssize_t php_userstreamop_write(php_stream *stream, const char *buf, size_
 
 	ZVAL_STRINGL(&args[0], (char*)buf, count);
 
-	call_result = call_method_if_exists(&us->object, &func_name, &retval, 1, args);
+	call_result = call_user_function_ex(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			1, args,
+			0, NULL);
 	zval_ptr_dtor(&args[0]);
 	zval_ptr_dtor(&func_name);
 
@@ -586,14 +626,14 @@ static ssize_t php_userstreamop_write(php_stream *stream, const char *buf, size_
 		}
 	} else {
 		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_WRITE " is not implemented!",
-				ZSTR_VAL(us->wrapper->ce->name));
+				us->wrapper->classname);
 		didwrite = -1;
 	}
 
 	/* don't allow strange buffer overruns due to bogus return */
 	if (didwrite > 0 && didwrite > count) {
 		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_WRITE " wrote " ZEND_LONG_FMT " bytes more data than requested (" ZEND_LONG_FMT " written, " ZEND_LONG_FMT " max)",
-				ZSTR_VAL(us->wrapper->ce->name),
+				us->wrapper->classname,
 				(zend_long)(didwrite - count), (zend_long)didwrite, (zend_long)count);
 		didwrite = count;
 	}
@@ -618,7 +658,12 @@ static ssize_t php_userstreamop_read(php_stream *stream, char *buf, size_t count
 
 	ZVAL_LONG(&args[0], count);
 
-	call_result = call_method_if_exists(&us->object, &func_name, &retval, 1, args);
+	call_result = call_user_function_ex(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			1, args,
+			0, NULL);
 
 	zval_ptr_dtor(&args[0]);
 	zval_ptr_dtor(&func_name);
@@ -629,7 +674,7 @@ static ssize_t php_userstreamop_read(php_stream *stream, char *buf, size_t count
 
 	if (call_result == FAILURE) {
 		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_READ " is not implemented!",
-				ZSTR_VAL(us->wrapper->ce->name));
+				us->wrapper->classname);
 		return -1;
 	}
 
@@ -638,7 +683,6 @@ static ssize_t php_userstreamop_read(php_stream *stream, char *buf, size_t count
 	}
 
 	if (!try_convert_to_string(&retval)) {
-		zval_ptr_dtor(&retval);
 		return -1;
 	}
 
@@ -646,7 +690,7 @@ static ssize_t php_userstreamop_read(php_stream *stream, char *buf, size_t count
 	if (didread > 0) {
 		if (didread > count) {
 			php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_READ " - read " ZEND_LONG_FMT " bytes more data than requested (" ZEND_LONG_FMT " read, " ZEND_LONG_FMT " max) - excess data will be lost",
-					ZSTR_VAL(us->wrapper->ce->name), (zend_long)(didread - count), (zend_long)didread, (zend_long)count);
+					us->wrapper->classname, (zend_long)(didread - count), (zend_long)didread, (zend_long)count);
 			didread = count;
 		}
 		memcpy(buf, Z_STRVAL(retval), didread);
@@ -658,7 +702,11 @@ static ssize_t php_userstreamop_read(php_stream *stream, char *buf, size_t count
 	/* since the user stream has no way of setting the eof flag directly, we need to ask it if we hit eof */
 
 	ZVAL_STRINGL(&func_name, USERSTREAM_EOF, sizeof(USERSTREAM_EOF)-1);
-	call_result = call_method_if_exists(&us->object, &func_name, &retval, 0, NULL);
+	call_result = call_user_function(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			0, NULL);
 	zval_ptr_dtor(&func_name);
 
 	if (EG(exception)) {
@@ -671,7 +719,7 @@ static ssize_t php_userstreamop_read(php_stream *stream, char *buf, size_t count
 	} else if (call_result == FAILURE) {
 		php_error_docref(NULL, E_WARNING,
 				"%s::" USERSTREAM_EOF " is not implemented! Assuming EOF",
-				ZSTR_VAL(us->wrapper->ce->name));
+				us->wrapper->classname);
 
 		stream->eof = 1;
 	}
@@ -691,7 +739,11 @@ static int php_userstreamop_close(php_stream *stream, int close_handle)
 
 	ZVAL_STRINGL(&func_name, USERSTREAM_CLOSE, sizeof(USERSTREAM_CLOSE)-1);
 
-	call_method_if_exists(&us->object, &func_name, &retval, 0, NULL);
+	call_user_function(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			0, NULL);
 
 	zval_ptr_dtor(&retval);
 	zval_ptr_dtor(&func_name);
@@ -715,7 +767,11 @@ static int php_userstreamop_flush(php_stream *stream)
 
 	ZVAL_STRINGL(&func_name, USERSTREAM_FLUSH, sizeof(USERSTREAM_FLUSH)-1);
 
-	call_result = call_method_if_exists(&us->object, &func_name, &retval, 0, NULL);
+	call_result = call_user_function(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			0, NULL);
 
 	if (call_result == SUCCESS && Z_TYPE(retval) != IS_UNDEF && zval_is_true(&retval))
 		call_result = 0;
@@ -743,7 +799,12 @@ static int php_userstreamop_seek(php_stream *stream, zend_off_t offset, int when
 	ZVAL_LONG(&args[0], offset);
 	ZVAL_LONG(&args[1], whence);
 
-	call_result = call_method_if_exists(&us->object, &func_name, &retval, 2, args);
+	call_result = call_user_function_ex(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			2, args,
+			0, NULL);
 
 	zval_ptr_dtor(&args[0]);
 	zval_ptr_dtor(&args[1]);
@@ -773,13 +834,17 @@ static int php_userstreamop_seek(php_stream *stream, zend_off_t offset, int when
 	/* now determine where we are */
 	ZVAL_STRINGL(&func_name, USERSTREAM_TELL, sizeof(USERSTREAM_TELL)-1);
 
-	call_result = call_method_if_exists(&us->object, &func_name, &retval, 0, NULL);
+	call_result = call_user_function(NULL,
+		Z_ISUNDEF(us->object)? NULL : &us->object,
+		&func_name,
+		&retval,
+		0, NULL);
 
 	if (call_result == SUCCESS && Z_TYPE(retval) == IS_LONG) {
 		*newoffs = Z_LVAL(retval);
 		ret = 0;
 	} else if (call_result == FAILURE) {
-		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_TELL " is not implemented!", ZSTR_VAL(us->wrapper->ce->name));
+		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_TELL " is not implemented!", us->wrapper->classname);
 		ret = -1;
 	} else {
 		ret = -1;
@@ -839,7 +904,11 @@ static int php_userstreamop_stat(php_stream *stream, php_stream_statbuf *ssb)
 
 	ZVAL_STRINGL(&func_name, USERSTREAM_STAT, sizeof(USERSTREAM_STAT)-1);
 
-	call_result = call_method_if_exists(&us->object, &func_name, &retval, 0, NULL);
+	call_result = call_user_function(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			0, NULL);
 
 	if (call_result == SUCCESS && Z_TYPE(retval) == IS_ARRAY) {
 		if (SUCCESS == statbuf_from_array(&retval, ssb))
@@ -847,7 +916,7 @@ static int php_userstreamop_stat(php_stream *stream, php_stream_statbuf *ssb)
 	} else {
 		if (call_result == FAILURE) {
 			php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_STAT " is not implemented!",
-					ZSTR_VAL(us->wrapper->ce->name));
+					us->wrapper->classname);
 		}
 	}
 
@@ -869,14 +938,14 @@ static int php_userstreamop_set_option(php_stream *stream, int option, int value
 	switch (option) {
 	case PHP_STREAM_OPTION_CHECK_LIVENESS:
 		ZVAL_STRINGL(&func_name, USERSTREAM_EOF, sizeof(USERSTREAM_EOF)-1);
-		call_result = call_method_if_exists(&us->object, &func_name, &retval, 0, NULL);
+		call_result = call_user_function(NULL, Z_ISUNDEF(us->object)? NULL : &us->object, &func_name, &retval, 0, NULL);
 		if (call_result == SUCCESS && (Z_TYPE(retval) == IS_FALSE || Z_TYPE(retval) == IS_TRUE)) {
 			ret = zval_is_true(&retval) ? PHP_STREAM_OPTION_RETURN_ERR : PHP_STREAM_OPTION_RETURN_OK;
 		} else {
 			ret = PHP_STREAM_OPTION_RETURN_ERR;
 			php_error_docref(NULL, E_WARNING,
 					"%s::" USERSTREAM_EOF " is not implemented! Assuming EOF",
-					ZSTR_VAL(us->wrapper->ce->name));
+					us->wrapper->classname);
 		}
 		zval_ptr_dtor(&retval);
 		zval_ptr_dtor(&func_name);
@@ -903,7 +972,11 @@ static int php_userstreamop_set_option(php_stream *stream, int option, int value
 		/* TODO wouldblock */
 		ZVAL_STRINGL(&func_name, USERSTREAM_LOCK, sizeof(USERSTREAM_LOCK)-1);
 
-		call_result = call_method_if_exists(&us->object, &func_name, &retval, 1, args);
+		call_result = call_user_function_ex(NULL,
+						Z_ISUNDEF(us->object)? NULL : &us->object,
+						&func_name,
+						&retval,
+						1, args, 0, NULL);
 
 		if (call_result == SUCCESS && (Z_TYPE(retval) == IS_FALSE || Z_TYPE(retval) == IS_TRUE)) {
 			ret = (Z_TYPE(retval) == IS_FALSE);
@@ -913,7 +986,7 @@ static int php_userstreamop_set_option(php_stream *stream, int option, int value
 				ret = PHP_STREAM_OPTION_RETURN_OK;
 			} else {
 				php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_LOCK " is not implemented!",
-								 ZSTR_VAL(us->wrapper->ce->name));
+								 us->wrapper->classname);
 				ret = PHP_STREAM_OPTION_RETURN_ERR;
 			}
 		}
@@ -928,7 +1001,9 @@ static int php_userstreamop_set_option(php_stream *stream, int option, int value
 
 		switch (value) {
 		case PHP_STREAM_TRUNCATE_SUPPORTED:
-			if (zend_is_callable_ex(&func_name, Z_OBJ(us->object), IS_CALLABLE_SUPPRESS_DEPRECATIONS, NULL, NULL, NULL))
+			if (zend_is_callable_ex(&func_name,
+					Z_ISUNDEF(us->object)? NULL : Z_OBJ(us->object),
+					IS_CALLABLE_CHECK_SILENT, NULL, NULL, NULL))
 				ret = PHP_STREAM_OPTION_RETURN_OK;
 			else
 				ret = PHP_STREAM_OPTION_RETURN_ERR;
@@ -938,7 +1013,11 @@ static int php_userstreamop_set_option(php_stream *stream, int option, int value
 			ptrdiff_t new_size = *(ptrdiff_t*) ptrparam;
 			if (new_size >= 0 && new_size <= (ptrdiff_t)LONG_MAX) {
 				ZVAL_LONG(&args[0], (zend_long)new_size);
-				call_result = call_method_if_exists(&us->object, &func_name, &retval, 1, args);
+				call_result = call_user_function_ex(NULL,
+								Z_ISUNDEF(us->object)? NULL : &us->object,
+								&func_name,
+								&retval,
+								1, args, 0, NULL);
 				if (call_result == SUCCESS && Z_TYPE(retval) != IS_UNDEF) {
 					if (Z_TYPE(retval) == IS_FALSE || Z_TYPE(retval) == IS_TRUE) {
 						ret = (Z_TYPE(retval) == IS_TRUE) ? PHP_STREAM_OPTION_RETURN_OK :
@@ -946,12 +1025,12 @@ static int php_userstreamop_set_option(php_stream *stream, int option, int value
 					} else {
 						php_error_docref(NULL, E_WARNING,
 								"%s::" USERSTREAM_TRUNCATE " did not return a boolean!",
-								ZSTR_VAL(us->wrapper->ce->name));
+								us->wrapper->classname);
 					}
 				} else {
 					php_error_docref(NULL, E_WARNING,
 							"%s::" USERSTREAM_TRUNCATE " is not implemented!",
-							ZSTR_VAL(us->wrapper->ce->name));
+							us->wrapper->classname);
 				}
 				zval_ptr_dtor(&retval);
 				zval_ptr_dtor(&args[0]);
@@ -998,11 +1077,15 @@ static int php_userstreamop_set_option(php_stream *stream, int option, int value
 			break;
 		}
 
-		call_result = call_method_if_exists(&us->object, &func_name, &retval, 3, args);
+		call_result = call_user_function_ex(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			3, args, 0, NULL);
 
 		if (call_result == FAILURE) {
 			php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_SET_OPTION " is not implemented!",
-					ZSTR_VAL(us->wrapper->ce->name));
+					us->wrapper->classname);
 			ret = PHP_STREAM_OPTION_RETURN_ERR;
 		} else if (zend_is_true(&retval)) {
 			ret = PHP_STREAM_OPTION_RETURN_OK;
@@ -1044,13 +1127,18 @@ static int user_wrapper_unlink(php_stream_wrapper *wrapper, const char *url, int
 
 	ZVAL_STRING(&zfuncname, USERSTREAM_UNLINK);
 
-	call_result = call_method_if_exists(&object, &zfuncname, &zretval, 1, args);
+	call_result = call_user_function_ex(NULL,
+			&object,
+			&zfuncname,
+			&zretval,
+			1, args,
+			0, NULL	);
 
 	if (call_result == SUCCESS && (Z_TYPE(zretval) == IS_FALSE || Z_TYPE(zretval) == IS_TRUE)) {
 		ret = (Z_TYPE(zretval) == IS_TRUE);
 	} else if (call_result == FAILURE) {
-		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_UNLINK " is not implemented!", ZSTR_VAL(uwrap->ce->name));
-	}
+		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_UNLINK " is not implemented!", uwrap->classname);
+ 	}
 
 	/* clean up */
 	zval_ptr_dtor(&object);
@@ -1084,13 +1172,18 @@ static int user_wrapper_rename(php_stream_wrapper *wrapper, const char *url_from
 
 	ZVAL_STRING(&zfuncname, USERSTREAM_RENAME);
 
-	call_result = call_method_if_exists(&object, &zfuncname, &zretval, 2, args);
+	call_result = call_user_function_ex(NULL,
+			&object,
+			&zfuncname,
+			&zretval,
+			2, args,
+			0, NULL	);
 
 	if (call_result == SUCCESS && (Z_TYPE(zretval) == IS_FALSE || Z_TYPE(zretval) == IS_TRUE)) {
 		ret = (Z_TYPE(zretval) == IS_TRUE);
 	} else if (call_result == FAILURE) {
-		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_RENAME " is not implemented!", ZSTR_VAL(uwrap->ce->name));
-	}
+		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_RENAME " is not implemented!", uwrap->classname);
+ 	}
 
 	/* clean up */
 	zval_ptr_dtor(&object);
@@ -1126,13 +1219,18 @@ static int user_wrapper_mkdir(php_stream_wrapper *wrapper, const char *url, int 
 
 	ZVAL_STRING(&zfuncname, USERSTREAM_MKDIR);
 
-	call_result = call_method_if_exists(&object, &zfuncname, &zretval, 3, args);
+	call_result = call_user_function_ex(NULL,
+			&object,
+			&zfuncname,
+			&zretval,
+			3, args,
+			0, NULL	);
 
 	if (call_result == SUCCESS && (Z_TYPE(zretval) == IS_FALSE || Z_TYPE(zretval) == IS_TRUE)) {
 		ret = (Z_TYPE(zretval) == IS_TRUE);
 	} else if (call_result == FAILURE) {
-		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_MKDIR " is not implemented!", ZSTR_VAL(uwrap->ce->name));
-	}
+		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_MKDIR " is not implemented!", uwrap->classname);
+ 	}
 
 	/* clean up */
 	zval_ptr_dtor(&object);
@@ -1168,13 +1266,18 @@ static int user_wrapper_rmdir(php_stream_wrapper *wrapper, const char *url,
 
 	ZVAL_STRING(&zfuncname, USERSTREAM_RMDIR);
 
-	call_result = call_method_if_exists(&object, &zfuncname, &zretval, 2, args);
+	call_result = call_user_function_ex(NULL,
+			&object,
+			&zfuncname,
+			&zretval,
+			2, args,
+			0, NULL	);
 
 	if (call_result == SUCCESS && (Z_TYPE(zretval) == IS_FALSE || Z_TYPE(zretval) == IS_TRUE)) {
 		ret = (Z_TYPE(zretval) == IS_TRUE);
 	} else if (call_result == FAILURE) {
-		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_RMDIR " is not implemented!", ZSTR_VAL(uwrap->ce->name));
-	}
+		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_RMDIR " is not implemented!", uwrap->classname);
+ 	}
 
 	/* clean up */
 	zval_ptr_dtor(&object);
@@ -1234,13 +1337,18 @@ static int user_wrapper_metadata(php_stream_wrapper *wrapper, const char *url, i
 
 	ZVAL_STRING(&zfuncname, USERSTREAM_METADATA);
 
-	call_result = call_method_if_exists(&object, &zfuncname, &zretval, 3, args);
+	call_result = call_user_function_ex(NULL,
+			&object,
+			&zfuncname,
+			&zretval,
+			3, args,
+			0, NULL	);
 
 	if (call_result == SUCCESS && (Z_TYPE(zretval) == IS_FALSE || Z_TYPE(zretval) == IS_TRUE)) {
 		ret = Z_TYPE(zretval) == IS_TRUE;
 	} else if (call_result == FAILURE) {
-		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_METADATA " is not implemented!", ZSTR_VAL(uwrap->ce->name));
-	}
+		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_METADATA " is not implemented!", uwrap->classname);
+ 	}
 
 	/* clean up */
 	zval_ptr_dtor(&object);
@@ -1277,7 +1385,12 @@ static int user_wrapper_stat_url(php_stream_wrapper *wrapper, const char *url, i
 
 	ZVAL_STRING(&zfuncname, USERSTREAM_STATURL);
 
-	call_result = call_method_if_exists(&object, &zfuncname, &zretval, 2, args);
+	call_result = call_user_function_ex(NULL,
+			&object,
+			&zfuncname,
+			&zretval,
+			2, args,
+			0, NULL	);
 
 	if (call_result == SUCCESS && Z_TYPE(zretval) == IS_ARRAY) {
 		/* We got the info we needed */
@@ -1286,7 +1399,7 @@ static int user_wrapper_stat_url(php_stream_wrapper *wrapper, const char *url, i
 	} else {
 		if (call_result == FAILURE) {
 			php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_STATURL " is not implemented!",
-					ZSTR_VAL(uwrap->ce->name));
+					uwrap->classname);
 		}
 	}
 
@@ -1317,17 +1430,20 @@ static ssize_t php_userstreamop_readdir(php_stream *stream, char *buf, size_t co
 
 	ZVAL_STRINGL(&func_name, USERSTREAM_DIR_READ, sizeof(USERSTREAM_DIR_READ)-1);
 
-	call_result = call_method_if_exists(&us->object, &func_name, &retval, 0, NULL);
+	call_result = call_user_function(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			0, NULL);
 
 	if (call_result == SUCCESS && Z_TYPE(retval) != IS_FALSE && Z_TYPE(retval) != IS_TRUE) {
 		convert_to_string(&retval);
 		PHP_STRLCPY(ent->d_name, Z_STRVAL(retval), sizeof(ent->d_name), Z_STRLEN(retval));
-		ent->d_type = DT_UNKNOWN;
 
 		didread = sizeof(php_stream_dirent);
 	} else if (call_result == FAILURE) {
 		php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_DIR_READ " is not implemented!",
-				ZSTR_VAL(us->wrapper->ce->name));
+				us->wrapper->classname);
 	}
 
 	zval_ptr_dtor(&retval);
@@ -1346,7 +1462,11 @@ static int php_userstreamop_closedir(php_stream *stream, int close_handle)
 
 	ZVAL_STRINGL(&func_name, USERSTREAM_DIR_CLOSE, sizeof(USERSTREAM_DIR_CLOSE)-1);
 
-	call_method_if_exists(&us->object, &func_name, &retval, 0, NULL);
+	call_user_function(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			0, NULL);
 
 	zval_ptr_dtor(&retval);
 	zval_ptr_dtor(&func_name);
@@ -1366,7 +1486,11 @@ static int php_userstreamop_rewinddir(php_stream *stream, zend_off_t offset, int
 
 	ZVAL_STRINGL(&func_name, USERSTREAM_DIR_REWIND, sizeof(USERSTREAM_DIR_REWIND)-1);
 
-	call_method_if_exists(&us->object, &func_name, &retval, 0, NULL);
+	call_user_function(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			0, NULL);
 
 	zval_ptr_dtor(&retval);
 	zval_ptr_dtor(&func_name);
@@ -1384,8 +1508,6 @@ static int php_userstreamop_cast(php_stream *stream, int castas, void **retptr)
 	php_stream * intstream = NULL;
 	int call_result;
 	int ret = FAILURE;
-	/* If we are checking if the stream can cast, no return pointer is provided, so do not emit errors */
-	bool report_errors = retptr;
 
 	ZVAL_STRINGL(&func_name, USERSTREAM_CAST, sizeof(USERSTREAM_CAST)-1);
 
@@ -1398,14 +1520,16 @@ static int php_userstreamop_cast(php_stream *stream, int castas, void **retptr)
 		break;
 	}
 
-	call_result = call_method_if_exists(&us->object, &func_name, &retval, 1, args);
+	call_result = call_user_function_ex(NULL,
+			Z_ISUNDEF(us->object)? NULL : &us->object,
+			&func_name,
+			&retval,
+			1, args, 0, NULL);
 
 	do {
 		if (call_result == FAILURE) {
-			if (report_errors) {
-				php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_CAST " is not implemented!",
-						ZSTR_VAL(us->wrapper->ce->name));
-			}
+			php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_CAST " is not implemented!",
+					us->wrapper->classname);
 			break;
 		}
 		if (!zend_is_true(&retval)) {
@@ -1413,17 +1537,13 @@ static int php_userstreamop_cast(php_stream *stream, int castas, void **retptr)
 		}
 		php_stream_from_zval_no_verify(intstream, &retval);
 		if (!intstream) {
-			if (report_errors) {
-				php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_CAST " must return a stream resource",
-						ZSTR_VAL(us->wrapper->ce->name));
-			}
+			php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_CAST " must return a stream resource",
+					us->wrapper->classname);
 			break;
 		}
 		if (intstream == stream) {
-			if (report_errors) {
-				php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_CAST " must not return itself",
-						ZSTR_VAL(us->wrapper->ce->name));
-			}
+			php_error_docref(NULL, E_WARNING, "%s::" USERSTREAM_CAST " must not return itself",
+					us->wrapper->classname);
 			intstream = NULL;
 			break;
 		}

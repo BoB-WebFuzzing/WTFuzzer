@@ -1,7 +1,7 @@
 --TEST--
 Test 11: php:function Support
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php require_once __DIR__ .'/skipif.inc'; ?>
 --FILE--
 <?php
 print "Test 11: php:function Support\n";
@@ -45,7 +45,6 @@ $dom = new domDocument();
         return $id;
     }
   }
-?>
 --EXPECTF--
 Test 11: php:function Support
 

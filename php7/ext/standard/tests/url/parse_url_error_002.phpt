@@ -2,22 +2,24 @@
 Test parse_url() function: url component specifier out of range
 --FILE--
 <?php
+/* Prototype  : proto mixed parse_url(string url, [int url_component])
+ * Description: Parse a URL and return its components
+ * Source code: ext/standard/url.c
+ * Alias to functions:
+ */
+
 echo "*** Testing parse_url() : error conditions: url component specifier out of range ***\n";
 $url = 'http://secret:hideout@www.php.net:80/index.php?test=1&test2=char&test3=mixesCI#some_page_ref123';
 
 echo "--> Below range:";
 var_dump(parse_url($url, -1));
 
-echo "\n\n--> Above range:\n";
-try {
-    parse_url($url, 99);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+echo "\n\n--> Above range:";
+var_dump(parse_url($url, 99));
 
 echo "Done"
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing parse_url() : error conditions: url component specifier out of range ***
 --> Below range:array(8) {
   ["scheme"]=>
@@ -40,5 +42,6 @@ echo "Done"
 
 
 --> Above range:
-parse_url(): Argument #2 ($component) must be a valid URL component identifier, 99 given
+Warning: parse_url(): Invalid URL component identifier 99 in %s on line 15
+bool(false)
 Done

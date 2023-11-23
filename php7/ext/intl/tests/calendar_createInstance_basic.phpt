@@ -1,7 +1,9 @@
 --TEST--
 IntlCalendar::createInstance() basic test
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -22,6 +24,7 @@ $time = time();
 var_dump(abs($timeMillis - $time * 1000) < 2000);
 
 ?>
+==DONE==
 --EXPECTF--
 IntlTimeZone Object
 (
@@ -33,3 +36,4 @@ IntlTimeZone Object
 nl
 gregorian
 bool(true)
+==DONE==

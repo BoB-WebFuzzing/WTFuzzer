@@ -4,8 +4,8 @@ $this not in object context
 opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class Foo {
@@ -20,7 +20,10 @@ class Foo {
 Foo::test();
 ?>
 --EXPECTF--
-Fatal error: Uncaught Error: Non-static method Foo::test() cannot be called statically in %s:%d
+Deprecated: Non-static method Foo::test() should not be called statically in %swrong_inlining_002.php on line 11
+
+Fatal error: Uncaught Error: Using $this when not in object context in %swrong_inlining_002.php:7
 Stack trace:
-#0 {main}
-  thrown in %s on line %d
+#0 %swrong_inlining_002.php(11): Foo::test()
+#1 {main}
+  thrown in %swrong_inlining_002.php on line 7

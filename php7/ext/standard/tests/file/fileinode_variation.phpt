@@ -9,6 +9,11 @@ if (PHP_OS_FAMILY === 'Windows') {
 ?>
 --FILE--
 <?php
+/*
+Prototype: int fileinode ( string $filename );
+Description: Returns the inode number of the file, or FALSE in case of an error.
+*/
+
 echo "*** Testing fileinode() with files, links and directories ***\n";
 $file_path = __DIR__;
 $file1 = $file_path."/fileinode1_variation.tmp";
@@ -81,7 +86,6 @@ rmdir("$file_path/dir/subdir");
 rmdir("$file_path/dir");
 
 echo "\n*** Done ***";
-?>
 --EXPECTF--
 *** Testing fileinode() with files, links and directories ***
 -- Testing with files --

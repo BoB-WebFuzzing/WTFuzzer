@@ -1,17 +1,17 @@
 --TEST--
 mysqli_stmt_get_result() - seeking
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 
 if (!function_exists('mysqli_stmt_get_result'))
     die('skip mysqli_stmt_get_result not available');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require('table.inc');
 
     if (!$stmt = mysqli_stmt_init($link))
         printf("[001] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -61,32 +61,30 @@ if (!function_exists('mysqli_stmt_get_result'))
         }
     }
 
-    try {
-        $res->data_seek(-1);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (false !== ($tmp = $res->data_seek(-1)))
+        printf("[011] Expecting boolean/false got %s/%s\n", gettype($tmp), $tmp);
 
     if (false !== ($tmp = $res->data_seek($res->num_rows + 1)))
         printf("[012] Expecting boolean/false got %s/%s\n", gettype($tmp), $tmp);
 
+    if (NULL !== ($tmp = $res->data_seek(PHP_INT_MAX + 1)))
+        printf("[013] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
+
     for ($i = 0; $i < 100; $i++) {
         /* intentionally out of range! */
         $pos = mt_rand(-1, 4);
-        try {
-            $tmp = @mysqli_data_seek($res, $pos);
-            if (($pos >= 0 && $pos < 3)) {
-                if (true !== $tmp)
-                    printf("[015] Expecting boolan/true got %s/%s\n", gettype($tmp), $tmp);
-                $row = $res->fetch_array(MYSQLI_NUM);
-                if ($row[0] !== $pos + 1)
-                    printf("[016] Expecting id = %d for pos %d got %s/%s\n",
-                        $pos + 1, $pos, gettype($row[0]), $row[0]);
-            } else {
-                if (false !== $tmp)
-                    printf("[014] Expecting boolan/false got %s/%s\n", gettype($tmp), $tmp);
-            }
-        } catch (\ValueError $e) { /* Suppress because RANDOM */}
+        $tmp = mysqli_data_seek($res, $pos);
+        if (($pos >= 0 && $pos < 3)) {
+            if (true !== $tmp)
+                printf("[015] Expecting boolan/true got %s/%s\n", gettype($tmp), $tmp);
+            $row = $res->fetch_array(MYSQLI_NUM);
+            if ($row[0] !== $pos + 1)
+                printf("[016] Expecting id = %d for pos %d got %s/%s\n",
+                    $pos + 1, $pos, gettype($row[0]), $row[0]);
+        } else {
+            if (false !== $tmp)
+                printf("[014] Expecting boolan/false got %s/%s\n", gettype($tmp), $tmp);
+        }
     }
 
     mysqli_stmt_close($stmt);
@@ -99,42 +97,34 @@ if (!function_exists('mysqli_stmt_get_result'))
 
     mysqli_free_result($res);
 
-    try {
-        mysqli_data_seek($res, 0);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_data_seek($res, 0)))
+        printf("[017] Expecting false got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        $res->fetch_array(MYSQLI_NUM);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($row = $res->fetch_array(MYSQLI_NUM)))
+        printf("[018] Expecting false got %s/%s\n", gettype($tmp), $tmp);
 
     mysqli_close($link);
 
-    try {
-        mysqli_data_seek($res, 0);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_data_seek($res, 0)))
+        printf("[019] Expecting false got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        $res->fetch_array(MYSQLI_NUM);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($row = $res->fetch_array(MYSQLI_NUM)))
+        printf("[020] Expecting false got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
-mysqli_result::data_seek(): Argument #1 ($offset) must be greater than or equal to 0
-mysqli_result object is already closed
-mysqli_result object is already closed
-mysqli_result object is already closed
-mysqli_result object is already closed
+--EXPECTF--
+Warning: mysqli_result::data_seek() expects parameter 1 to be int, float given in %s on line %d
+
+Warning: mysqli_data_seek(): Couldn't fetch mysqli_result in %s on line %d
+
+Warning: mysqli_result::fetch_array(): Couldn't fetch mysqli_result in %s on line %d
+
+Warning: mysqli_data_seek(): Couldn't fetch mysqli_result in %s on line %d
+
+Warning: mysqli_result::fetch_array(): Couldn't fetch mysqli_result in %s on line %d
 done!

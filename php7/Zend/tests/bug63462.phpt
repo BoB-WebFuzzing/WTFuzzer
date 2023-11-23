@@ -4,34 +4,33 @@ Test script to verify that magic methods should be called only once when accessi
 Marco Pivetta <ocramius@gmail.com>
 --FILE--
 <?php
-#[AllowDynamicProperties]
 class Test {
-    public    $publicProperty;
-    protected $protectedProperty;
-    private   $privateProperty;
+	public    $publicProperty;
+	protected $protectedProperty;
+	private   $privateProperty;
 
-    public function __construct() {
-        unset(
-            $this->publicProperty,
-            $this->protectedProperty,
-            $this->privateProperty
-        );
-    }
+	public function __construct() {
+		unset(
+			$this->publicProperty,
+			$this->protectedProperty,
+			$this->privateProperty
+		);
+	}
 
-    function __get($name) {
-        echo '__get ' . $name . "\n";
-        return $this->$name;
-    }
+	function __get($name) {
+		echo '__get ' . $name . "\n";
+		return $this->$name;
+	}
 
-    function __set($name, $value) {
-        echo '__set ' . $name . "\n";
-        $this->$name = $value;
-    }
+	function __set($name, $value) {
+		echo '__set ' . $name . "\n";
+		$this->$name = $value;
+	}
 
-    function __isset($name) {
-        echo '__isset ' . $name . "\n";
-        return isset($this->$name);
-    }
+	function __isset($name) {
+		echo '__isset ' . $name . "\n";
+		return isset($this->$name);
+	}
 }
 
 $test = new Test();
@@ -53,16 +52,16 @@ $test->privateProperty   = 'value';
 --EXPECTF--
 __get nonExisting
 
-Warning: Undefined property: Test::$nonExisting in %s on line %d
+Notice: Undefined property: Test::$nonExisting in %s on line %d
 __get publicProperty
 
-Warning: Undefined property: Test::$publicProperty in %s on line %d
+Notice: Undefined property: Test::$publicProperty in %s on line %d
 __get protectedProperty
 
-Warning: Undefined property: Test::$protectedProperty in %s on line %d
+Notice: Undefined property: Test::$protectedProperty in %s on line %d
 __get privateProperty
 
-Warning: Undefined property: Test::$privateProperty in %s on line %d
+Notice: Undefined property: Test::$privateProperty in %s on line %d
 __isset nonExisting
 __isset publicProperty
 __isset protectedProperty

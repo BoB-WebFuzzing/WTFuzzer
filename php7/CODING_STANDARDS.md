@@ -1,22 +1,19 @@
 # PHP coding standards
 
-This file lists standards that any programmer adding or changing code in
-PHP should follow. The code base does not yet fully follow it, but new
-features are going in that general direction. Many sections have been
-rewritten to comply with these rules.
+This file lists several standards that any programmer adding or changing code in
+PHP should follow. Since this file was added at a very late stage of the
+development of PHP v3.0, the code base does not fully follow it, but new
+features are going in that general direction. Many sections have been recoded to
+use these rules.
 
 ## Code implementation
 
 1. Document your code in source files and the manual. (tm)
 
-1. PHP is implemented in C99.  The optional fixed-width integers from
-    stdint.h (int8_t, int16_t, int32_t, int64_t and their unsigned
-    counterparts) must be available.
+2. Functions that are given pointers to resources should not free them.
 
-1. Functions that are given pointers to resources should not free them.
-
-    For instance, `function int mail(char *to, char *from)` should NOT free `to`
-    and/or `from`.
+    For instance, `function int mail(char *to, char *from)` should NOT free to
+    and/or from.
 
     Exceptions:
 
@@ -24,22 +21,23 @@ rewritten to comply with these rules.
       `efree()`
 
     * The function is given a boolean argument, that controls whether or not the
-      function may free its arguments (if true, the function must free its
-      arguments; if false, it must not)
+      function may free its arguments (if true - the function must free its
+      arguments, if false - it must not)
 
     * Low-level parser routines, that are tightly integrated with the token
       cache and the bison code for minimum memory copying overhead.
 
-1. Functions that are tightly integrated with other functions within the same
-    module, and rely on each other's non-trivial behavior, should be documented as
+3. Functions that are tightly integrated with other functions within the same
+    module, and rely on each other non-trivial behavior, should be documented as
     such and declared `static`. They should be avoided if possible.
 
-1. Use definitions and macros whenever possible, so that constants have
-    meaningful names and can be easily manipulated. Any use of a numeric
-    constant to specify different behavior or actions should be done through
-    a `#define`.
+4. Use definitions and macros whenever possible, so that constants have
+    meaningful names and can be easily manipulated. The only exceptions to this
+    rule are 0 and 1, when used as `false` and `true` (respectively). Any other
+    use of a numeric constant to specify different behavior or actions should be
+    done through a `#define`.
 
-1. When writing functions that deal with strings, be sure to remember that PHP
+5. When writing functions that deal with strings, be sure to remember that PHP
     holds the length property of each string, and that it shouldn't be
     calculated with `strlen()`. Write your functions in such a way so that
     they'll take advantage of the length property, both for efficiency and in
@@ -47,25 +45,25 @@ rewritten to comply with these rules.
     their new lengths while doing so, should return that new length, so it
     doesn't have to be recalculated with `strlen()` (e.g. `php_addslashes()`).
 
-1. NEVER USE `strncat()`. If you're absolutely sure you know what you're doing,
+6. NEVER USE `strncat()`. If you're absolutely sure you know what you're doing,
     check its man page again, and only then, consider using it, and even then,
     try avoiding it.
 
-1. Use `PHP_*` macros in the PHP source, and `ZEND_*` macros in the Zend part of
+7. Use `PHP_*` macros in the PHP source, and `ZEND_*` macros in the Zend part of
     the source. Although the `PHP_*` macros are mostly aliased to the `ZEND_*`
     macros it gives a better understanding on what kind of macro you're calling.
 
-1. When commenting out code using a `#if` statement, do NOT use `0` only.
-    Instead, use `"<git username here>_0"`. For example, `#if FOO_0`,
-    where `FOO` is your git user `foo`. This allows easier tracking of why
-    code was commented out, especially in bundled libraries.
+8. When commenting out code using a `#if` statement, do NOT use `0` only.
+    Instead use `"<git username here>_0"`. For example, `#if FOO_0`, where `FOO`
+    is your git user `foo`. This allows easier tracking of why code was
+    commented out, especially in bundled libraries.
 
-1. Do not define functions that are not available. For instance, if a library is
+9. Do not define functions that are not available. For instance, if a library is
     missing a function, do not define the PHP version of the function, and do
     not raise a run-time error about the function not existing. End users should
     use `function_exists()` to test for the existence of a function.
 
-1. Prefer `emalloc()`, `efree()`, `estrdup()`, etc. to their standard C library
+10. Prefer `emalloc()`, `efree()`, `estrdup()`, etc. to their standard C library
     counterparts. These functions implement an internal "safety-net" mechanism
     that ensures the deallocation of any unfreed memory at the end of a request.
     They also provide useful allocation and overflow information while running
@@ -77,11 +75,6 @@ rewritten to comply with these rules.
     The use of `malloc()` should be limited to cases where a third-party library
     may need to control or free the memory, or when the memory in question needs
     to survive between multiple requests.
-
-1. The return type of "is" or "has" style functions should be `bool`,
-    which return a "yes"/"no" answer.  `zend_result` is an appropriate
-    return value for functions that perform some operation that may
-    succeed or fail.
 
 ## User functions/methods naming conventions
 
@@ -115,7 +108,7 @@ rewritten to comply with these rules.
     jf_n_s_i
     ```
 
-1. If they are part of a "parent set" of functions, that parent should be
+2. If they are part of a "parent set" of functions, that parent should be
     included in the user function name, and should be clearly related to the
     parent program or function family. This should be in the form of `parent_*`:
 
@@ -137,19 +130,19 @@ rewritten to comply with these rules.
     delete_foo_baz
     ```
 
-1. Function names used by user functions should be prefixed with `_php_`, and
+3. Function names used by user functions should be prefixed with `_php_`, and
     followed by a word or an underscore-delimited list of words, in lowercase
     letters, that describes the function. If applicable, they should be declared
     `static`.
 
-1. Variable names must be meaningful. One letter variable names must be avoided,
+4. Variable names must be meaningful. One letter variable names must be avoided,
     except for places where the variable has no real meaning or a trivial
     meaning (e.g. `for (i=0; i<100; i++) ...`).
 
-1. Variable names should be in lowercase. Use underscores to separate between
+5. Variable names should be in lowercase. Use underscores to separate between
     words.
 
-1. Method names follow the *studlyCaps* (also referred to as *bumpy case* or
+6. Method names follow the *studlyCaps* (also referred to as *bumpy case* or
     *camel caps*) naming convention, with care taken to minimize the letter
     count. The initial letter of the name is lowercase, and each letter that
     starts a new `word` is capitalized:
@@ -170,7 +163,7 @@ rewritten to comply with these rules.
     getI()
     ```
 
-1. Class names should be descriptive nouns in *PascalCase* and as short as
+7. Class names should be descriptive nouns in *PascalCase* and as short as
     possible. Each word in the class name should start with a capital letter,
     without underscore delimiters. The class name should be prefixed with the
     name of the "parent set" (e.g. the name of the extension) if no namespaces
@@ -228,20 +221,28 @@ rewritten to comply with these rules.
     static int php_session_destroy()
     ```
 
-1. Main module source file must be named `modulename.c`.
+2. Main module source file must be named `modulename.c`.
 
-1. Header file that is used by other sources must be named `php_modulename.h`.
+3. Header file that is used by other sources must be named `php_modulename.h`.
 
 ## Syntax and indentation
 
-1. Use K&R-style. Of course, we can't and don't want to force anybody to use a
+1. Never use C++ style comments (i.e. `//` comment). Always use C-style comments
+    instead. PHP is written in C, and is aimed at compiling under any ANSI-C
+    compliant compiler. Even though many compilers accept C++-style comments in
+    C code, you have to ensure that your code would compile with other compilers
+    as well. The only exception to this rule is code that is Win32-specific,
+    because the Win32 port is MS-Visual C++ specific, and this compiler is known
+    to accept C++-style comments in C code.
+
+2. Use K&R-style. Of course, we can't and don't want to force anybody to use a
     style he or she is not used to, but, at the very least, when you write code
     that goes into the core of PHP or one of its standard modules, please
     maintain the K&R style. This applies to just about everything, starting with
     indentation and comment styles and up to function declaration syntax. Also
     see [Indentstyle](http://www.catb.org/~esr/jargon/html/I/indent-style.html).
 
-1. Be generous with whitespace and braces. Keep one empty line between the
+3. Be generous with whitespace and braces. Keep one empty line between the
     variable declaration section and the statements in a block, as well as
     between logical statement groups in a block. Maintain at least one empty
     line between two functions, preferably two. Always prefer:
@@ -258,24 +259,56 @@ rewritten to comply with these rules.
     if(foo)bar;
     ```
 
-1. When indenting, use the tab character. A tab is expected to represent four
-    spaces. It is important to maintain consistency in indentation so that
+4. When indenting, use the tab character. A tab is expected to represent four
+    spaces. It is important to maintain consistency in indenture so that
     definitions, comments, and control structures line up correctly.
 
-1. Preprocessor statements (`#if` and such) MUST start at column one. To indent
+5. Preprocessor statements (`#if` and such) MUST start at column one. To indent
     preprocessor directives you should put the `#` at the beginning of a line,
-    followed by any number of spaces.
-
-1. The length of constant string literals should be calculated via ``strlen()``
-   instead of using ``sizeof()-1`` as it is clearer and any modern compiler
-   will optimize it away. Legacy usages of the latter style exists within the
-   codebase but should not be refactored, unless larger refactoring around that
-   code is taking place.
+    followed by any number of whitespace.
 
 ## Testing
 
-1. Extensions should be well tested using `*.phpt` tests. Read more at
+1. Extensions should be well tested using `*.phpt` tests. Read about that at
     [qa.php.net](https://qa.php.net/write-test.php) documentation.
+
+## Documentation and folding hooks
+
+In order to make sure that the online documentation stays in line with the code,
+each user-level function should have its user-level function prototype before it
+along with a brief one-line description of what the function does. It would look
+like this:
+
+```c
+/* {{{ proto int abs(int number)
+   Returns the absolute value of the number */
+PHP_FUNCTION(abs)
+{
+    ...
+}
+/* }}} */
+```
+
+The `{{{` symbols are the default folding symbols for the folding mode in Emacs
+and vim (`set fdm=marker`). Folding is very useful when dealing with large files
+because you can scroll through the file quickly and just unfold the function you
+wish to work on. The `}}}` at the end of each function marks the end of the
+fold, and should be on a separate line.
+
+The `proto` keyword there is just a helper for the `doc/genfuncsummary` script
+which generates a full function summary. Having this keyword in front of the
+function prototypes allows us to put folds elsewhere in the code without
+messing up the function summary.
+
+Optional arguments are written like this:
+
+```c
+/* {{{ proto object imap_header(int stream_id, int msg_no [, int from_length [, int subject_length [, string default_host]]])
+   Returns a header object with the defined parameters */
+```
+
+And yes, please keep the prototype on a single line, even if that line is
+massive.
 
 ## New and experimental functions
 
@@ -290,8 +323,8 @@ The file labelled `EXPERIMENTAL` should include the following information:
 * Any authoring information (known bugs, future directions of the module).
 * Ongoing status notes which may not be appropriate for Git comments.
 
-In general, new features should go to PECL or experimental branches until there
-are specific reasons for directly adding them to the core distribution.
+In general new features should go to PECL or experimental branches until there
+are specific reasons for directly adding it to the core distribution.
 
 ## Aliases & legacy documentation
 
@@ -301,7 +334,8 @@ purposes, these will only be documented by the most current name, with the
 aliases listed in the documentation for the parent function. For ease of
 reference, user-functions with completely different names, that alias to the
 same function (such as `highlight_file` and `show_source`), will be separately
-documented.
+documented. The proto should still be included, describing which function is
+aliased.
 
 Backwards compatible functions and names should be maintained as long as the
 code can be reasonably be kept as part of the codebase. See the `README` in the

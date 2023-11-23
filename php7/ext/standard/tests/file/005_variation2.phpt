@@ -10,7 +10,28 @@ if (substr(PHP_OS, 0, 3) == 'WIN') {
 ?>
 --FILE--
 <?php
+/*
+   Prototype: int fileatime ( string $filename );
+   Description: Returns the time the file was last accessed, or FALSE
+     in case of an error. The time is returned as a Unix timestamp.
 
+   Prototype: int filemtime ( string $filename );
+   Description: Returns the time the file was last modified, or FALSE
+     in case of an error.
+
+   Prototype: int filectime ( string $filename );
+   Description: Returns the time the file was last changed, or FALSE
+     in case of an error. The time is returned as a Unix timestamp.
+
+   Prototype: bool touch ( string $filename [, int $time [, int $atime]] );
+   Description: Attempts to set the access and modification times of the file
+     named in the filename parameter to the value given in time.
+*/
+
+/*
+   Prototype: void stat_fn(string $filename);
+   Description: Prints access, modification and change times of a file
+*/
 function stat_fn( $filename ) {
   echo "\n-- File '$filename' --\n";
   echo "-- File access time is => ";
@@ -28,11 +49,7 @@ function stat_fn( $filename ) {
 
 echo "*** Testing fileattime(), filemtime(), filectime() & touch() : usage variations ***\n";
 echo "\n*** testing touch ***\n";
-
-$dir = __DIR__ . '/005_variation2';
-mkdir($dir);
-chdir($dir);
-
+$a = touch(NULL);
 $b = touch(false);
 $c = touch('');
 $d = touch(' ');
@@ -45,6 +62,7 @@ var_dump($d);
 var_dump($e);
 
 echo "\n*** testing file info ***";
+stat_fn(NULL);
 stat_fn(false);
 stat_fn('');
 stat_fn(' ');
@@ -52,7 +70,6 @@ stat_fn('|');
 
 var_dump(unlink(' '));
 var_dump(unlink('|'));
-rmdir($dir);
 
 echo "Done";
 ?>
@@ -60,15 +77,18 @@ echo "Done";
 *** Testing fileattime(), filemtime(), filectime() & touch() : usage variations ***
 
 *** testing touch ***
-
-Warning: Undefined variable $a in %s on line %d
-NULL
+bool(false)
 bool(false)
 bool(false)
 bool(true)
 bool(true)
 
 *** testing file info ***
+-- File '' --
+-- File access time is => 
+-- File modification time is => 
+-- inode change time is => 
+
 -- File '' --
 -- File access time is => 
 -- File modification time is => 

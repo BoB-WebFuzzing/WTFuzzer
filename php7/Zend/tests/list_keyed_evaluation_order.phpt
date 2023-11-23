@@ -5,8 +5,8 @@ list() with keys, evaluation order
 
 require_once "list_keyed_evaluation_order.inc";
 
-$a = new StringCapable("A");
-$c = new StringCapable("C");
+$a = new Stringable("A");
+$c = new Stringable("C");
 
 $e = new IndexableRetrievable("E", new Indexable(["A" => "value for offset A", "C" => "value for offset C"]));
 

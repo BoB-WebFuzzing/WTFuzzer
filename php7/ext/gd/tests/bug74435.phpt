@@ -1,7 +1,9 @@
 --TEST--
 Bug #74435 (Buffer over-read into uninitialized memory)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $im = imagecreatefromgif(__DIR__ . DIRECTORY_SEPARATOR . 'bug74435.gif');
@@ -19,6 +21,7 @@ for ($i = 0; $i < $width; $i += 16) {
     }
 }
 ?>
---EXPECT--
-object(GdImage)#1 (0) {
-}
+===DONE===
+--EXPECTF--
+resource(%d) of type (gd)
+===DONE===

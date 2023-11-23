@@ -1,7 +1,7 @@
 --TEST--
 Bug #78015: Incorrect evaluation of expressions involving partials array in SCCP
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -103,7 +103,7 @@ array(1) {
 }
 bool(true)
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %s on line %d
 string(11) "Arrayfoobar"
 int(2)
 array(2) {

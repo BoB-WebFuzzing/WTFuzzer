@@ -1,7 +1,5 @@
 --TEST--
 Simple GET test
---EXTENSIONS--
-filter
 --GET--
 a=1
 --FILE--

@@ -1,9 +1,18 @@
 --TEST--
 Test mb_strrichr() function : basic functionality
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_strrichr') or die("skip mb_strrichr() is not available in this build");
+?>
 --FILE--
 <?php
+/* Prototype  : string mb_strrichr(string haystack, string needle[, bool part[, string encoding]])
+ * Description: Finds the last occurrence of a character in a string within another, case insensitive
+ * Source code: ext/mbstring/mbstring.c
+ * Alias to functions:
+ */
+
 echo "*** Testing mb_strrichr() : basic functionality ***\n";
 
 mb_internal_encoding('UTF-8');
@@ -39,6 +48,7 @@ $needle2 = base64_decode('zrzOvs6/');
 var_dump(mb_strrichr($string_mb, $needle2));
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing mb_strrichr() : basic functionality ***
 
@@ -57,3 +67,4 @@ string(44) "ceb1ceb2ceb3ceb4ceb5ceb6ceb7ceb8ceb9cebacebb"
 
 -- Multibyte string: needle doesn't exist --
 bool(false)
+===DONE===

@@ -1,17 +1,14 @@
 --TEST--
 Bug #71448 (Binding reference overwritten on php7)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => true);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Initialize
 
@@ -160,6 +157,8 @@ $stmtarray = array(
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Test 1: Bind input parameter in a local function
 array(2) {
@@ -189,3 +188,4 @@ Test 6: Bind IN OUT parameter within the same scope of execute
 string(4) "STR1"
 string(4) "STR2"
 string(9) "STR1 STR2"
+===DONE===

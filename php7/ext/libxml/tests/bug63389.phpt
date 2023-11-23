@@ -1,18 +1,14 @@
 --TEST--
 Bug #63389 (Missing context check on libxml_set_streams_context() causes memleak)
---EXTENSIONS--
-libxml
+--SKIPIF--
+<?php if (!extension_loaded('libxml')) die('skip'); ?>
 --FILE--
 <?php
 $fp = fopen("php://input", "r");
 libxml_set_streams_context($fp);
-try {
-    libxml_set_streams_context("a");
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+libxml_set_streams_context("a");
 echo "okey";
 ?>
---EXPECT--
-libxml_set_streams_context(): Argument #1 ($context) must be of type resource, string given
+--EXPECTF--
+Warning: libxml_set_streams_context() expects parameter 1 to be resource, string given in %sbug63389.php on line %d
 okey

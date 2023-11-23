@@ -1,9 +1,8 @@
 --TEST--
 Bug #68920: peer_fingerprint input checks should be strict
---EXTENSIONS--
-openssl
 --SKIPIF--
 <?php
+if (!extension_loaded("openssl")) die("skip openssl not loaded");
 if (!function_exists("proc_open")) die("skip no proc_open");
 ?>
 --FILE--
@@ -66,14 +65,14 @@ Warning: stream_socket_client(): Expected peer fingerprint must be a string or a
 
 Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
 
-Warning: stream_socket_client(): Unable to connect to %s (Unknown error) in %s on line %d
+Warning: stream_socket_client(): unable to connect to %s (Unknown error) in %s on line %d
 bool(false)
 
 Warning: stream_socket_client(): Expected peer fingerprint must be a string or an array in %s on line %d
 
 Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
 
-Warning: stream_socket_client(): Unable to connect to %s (Unknown error) in %s on line %d
+Warning: stream_socket_client(): unable to connect to %s (Unknown error) in %s on line %d
 bool(false)
 
 Warning: stream_socket_client(): Invalid peer_fingerprint array; [algo => fingerprint] form required in %s on line %d
@@ -82,7 +81,7 @@ Warning: stream_socket_client(): peer_fingerprint match failure in %s on line %d
 
 Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
 
-Warning: stream_socket_client(): Unable to connect to %s (Unknown error) in %s on line %d
+Warning: stream_socket_client(): unable to connect to %s (Unknown error) in %s on line %d
 bool(false)
 
 Warning: stream_socket_client(): Invalid peer_fingerprint array; [algo => fingerprint] form required in %s on line %d
@@ -91,5 +90,5 @@ Warning: stream_socket_client(): peer_fingerprint match failure in %s on line %d
 
 Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
 
-Warning: stream_socket_client(): Unable to connect to %s (Unknown error) in %s on line %d
+Warning: stream_socket_client(): unable to connect to %s (Unknown error) in %s on line %d
 bool(false)

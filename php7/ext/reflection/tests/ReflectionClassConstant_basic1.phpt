@@ -1,5 +1,5 @@
 --TEST--
-Test usage of ReflectionClassConstant methods __toString(), getName(), getValue(), isPublic(), isPrivate(), isProtected(), getModifiers(), getDeclaringClass() and getDocComment().
+Test usage of ReflectionClassConstant methods __toString(), export(), getName(), getValue(), isPublic(), isPrivate(), isProtected(), getModifiers(), getDeclaringClass() and getDocComment().
 --FILE--
 <?php
 
@@ -10,6 +10,10 @@ function reflectClassConstant($base, $constant) {
     echo "Reflecting on class constant $class::$constant\n\n";
     echo "__toString():\n";
     var_dump($constInfo->__toString());
+    echo "export():\n";
+    var_dump(ReflectionClassConstant::export($base, $constant, true));
+    echo "export():\n";
+    var_dump(ReflectionClassConstant::export($base, $constant, false));
     echo "getName():\n";
     var_dump($constInfo->getName());
     echo "getValue():\n";
@@ -20,34 +24,26 @@ function reflectClassConstant($base, $constant) {
     var_dump($constInfo->isPrivate());
     echo "isProtected():\n";
     var_dump($constInfo->isProtected());
-    echo "isFinal():\n";
-    var_dump($constInfo->isFinal());
     echo "getModifiers():\n";
     var_dump($constInfo->getModifiers());
     echo "getDeclaringClass():\n";
     var_dump($constInfo->getDeclaringClass());
     echo "getDocComment():\n";
     var_dump($constInfo->getDocComment());
-    echo "hasType():\n";
-    var_dump($constInfo->hasType());
-    echo "getType():\n";
-    echo $constInfo->getType() ?? "NULL";
     echo "\n**********************************\n";
 }
 
 class TestClass {
-    public const bool /** My Doc comment */ PUB = true;
+    public const /** My Doc comment */ PUB = true;
     /** Another doc comment */
     protected const PROT = 4;
     private const PRIV = "keepOut";
-    public final const FINAL = "foo";
 }
 $instance = new TestClass();
 
 reflectClassConstant("TestClass", "PUB");
 reflectClassConstant("TestClass", "PROT");
 reflectClassConstant("TestClass", "PRIV");
-reflectClassConstant("TestClass", "FINAL");
 reflectClassConstant($instance, "PRIV");
 reflectClassConstant($instance, "BAD_CONST");
 
@@ -59,6 +55,17 @@ Reflecting on class constant TestClass::PUB
 __toString():
 string(35) "Constant [ public bool PUB ] { 1 }
 "
+export():
+
+Deprecated: Function ReflectionClassConstant::export() is deprecated in %s on line %d
+string(35) "Constant [ public bool PUB ] { 1 }
+"
+export():
+
+Deprecated: Function ReflectionClassConstant::export() is deprecated in %s on line %d
+Constant [ public bool PUB ] { 1 }
+
+NULL
 getName():
 string(3) "PUB"
 getValue():
@@ -69,8 +76,6 @@ isPrivate():
 bool(false)
 isProtected():
 bool(false)
-isFinal():
-bool(false)
 getModifiers():
 int(1)
 getDeclaringClass():
@@ -80,10 +85,7 @@ object(ReflectionClass)#3 (1) {
 }
 getDocComment():
 string(21) "/** My Doc comment */"
-hasType():
-bool(true)
-getType():
-bool
+
 **********************************
 **********************************
 Reflecting on class constant TestClass::PROT
@@ -91,6 +93,17 @@ Reflecting on class constant TestClass::PROT
 __toString():
 string(38) "Constant [ protected int PROT ] { 4 }
 "
+export():
+
+Deprecated: Function ReflectionClassConstant::export() is deprecated in %s on line %d
+string(38) "Constant [ protected int PROT ] { 4 }
+"
+export():
+
+Deprecated: Function ReflectionClassConstant::export() is deprecated in %s on line %d
+Constant [ protected int PROT ] { 4 }
+
+NULL
 getName():
 string(4) "PROT"
 getValue():
@@ -101,8 +114,6 @@ isPrivate():
 bool(false)
 isProtected():
 bool(true)
-isFinal():
-bool(false)
 getModifiers():
 int(2)
 getDeclaringClass():
@@ -112,10 +123,7 @@ object(ReflectionClass)#3 (1) {
 }
 getDocComment():
 string(26) "/** Another doc comment */"
-hasType():
-bool(false)
-getType():
-NULL
+
 **********************************
 **********************************
 Reflecting on class constant TestClass::PRIV
@@ -123,6 +131,17 @@ Reflecting on class constant TestClass::PRIV
 __toString():
 string(45) "Constant [ private string PRIV ] { keepOut }
 "
+export():
+
+Deprecated: Function ReflectionClassConstant::export() is deprecated in %s on line %d
+string(45) "Constant [ private string PRIV ] { keepOut }
+"
+export():
+
+Deprecated: Function ReflectionClassConstant::export() is deprecated in %s on line %d
+Constant [ private string PRIV ] { keepOut }
+
+NULL
 getName():
 string(4) "PRIV"
 getValue():
@@ -133,8 +152,6 @@ isPrivate():
 bool(true)
 isProtected():
 bool(false)
-isFinal():
-bool(false)
 getModifiers():
 int(4)
 getDeclaringClass():
@@ -144,42 +161,7 @@ object(ReflectionClass)#3 (1) {
 }
 getDocComment():
 bool(false)
-hasType():
-bool(false)
-getType():
-NULL
-**********************************
-**********************************
-Reflecting on class constant TestClass::FINAL
 
-__toString():
-string(47) "Constant [ final public string FINAL ] { foo }
-"
-getName():
-string(5) "FINAL"
-getValue():
-string(3) "foo"
-isPublic():
-bool(true)
-isPrivate():
-bool(false)
-isProtected():
-bool(false)
-isFinal():
-bool(true)
-getModifiers():
-int(33)
-getDeclaringClass():
-object(ReflectionClass)#3 (1) {
-  ["name"]=>
-  string(9) "TestClass"
-}
-getDocComment():
-bool(false)
-hasType():
-bool(false)
-getType():
-NULL
 **********************************
 **********************************
 Reflecting on class constant TestClass::PRIV
@@ -187,6 +169,17 @@ Reflecting on class constant TestClass::PRIV
 __toString():
 string(45) "Constant [ private string PRIV ] { keepOut }
 "
+export():
+
+Deprecated: Function ReflectionClassConstant::export() is deprecated in %s on line %d
+string(45) "Constant [ private string PRIV ] { keepOut }
+"
+export():
+
+Deprecated: Function ReflectionClassConstant::export() is deprecated in %s on line %d
+Constant [ private string PRIV ] { keepOut }
+
+NULL
 getName():
 string(4) "PRIV"
 getValue():
@@ -197,8 +190,6 @@ isPrivate():
 bool(true)
 isProtected():
 bool(false)
-isFinal():
-bool(false)
 getModifiers():
 int(4)
 getDeclaringClass():
@@ -208,13 +199,10 @@ object(ReflectionClass)#3 (1) {
 }
 getDocComment():
 bool(false)
-hasType():
-bool(false)
-getType():
-NULL
+
 **********************************
 
-Fatal error: Uncaught ReflectionException: Constant TestClass::BAD_CONST does not exist in %s:%d
+Fatal error: Uncaught ReflectionException: Class Constant TestClass::BAD_CONST does not exist in %s:%d
 Stack trace:
 #0 %s(%d): ReflectionClassConstant->__construct(Object(TestClass), 'BAD_CONST')
 #1 %s(%d): reflectClassConstant(Object(TestClass), 'BAD_CONST')

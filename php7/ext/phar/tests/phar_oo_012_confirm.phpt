@@ -1,7 +1,7 @@
 --TEST--
 Phar object: unset file (confirm disk file is changed)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded('phar')) die('skip'); ?>
 --INI--
 phar.readonly=0
 phar.require_hash=0
@@ -26,6 +26,7 @@ if ($md5 == $md52) echo 'File on disk has not changed';
 var_dump(isset($phar['f.php']));
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/files/phar_oo_012_confirm.phar.php');
@@ -35,3 +36,4 @@ __halt_compiler();
 bool(true)
 hi
 bool(false)
+===DONE===

@@ -3,42 +3,43 @@ strrpos() offset integer overflow
 --FILE--
 <?php
 
-try {
-    var_dump(strrpos("t", "t", PHP_INT_MAX+1));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-
-try {
-    strrpos(1024, 1024, -PHP_INT_MAX);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
-try {
-    strrpos(1024, "te", -PHP_INT_MAX);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
-try {
-    strrpos(1024, 1024, -PHP_INT_MAX-1);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
-try {
-    strrpos(1024, "te", -PHP_INT_MAX-1);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(strrpos("t", "t", PHP_INT_MAX+1));
+var_dump(strrpos("tttt", "tt", PHP_INT_MAX+1));
+var_dump(strrpos(100, 101, PHP_INT_MAX+1));
+var_dump(strrpos(1024, 1024, PHP_INT_MAX+1));
+var_dump(strrpos(1024, 1024, -PHP_INT_MAX));
+var_dump(strrpos(1024, "te", -PHP_INT_MAX));
+var_dump(strrpos(1024, 1024, -PHP_INT_MAX-1));
+var_dump(strrpos(1024, "te", -PHP_INT_MAX-1));
 
 echo "Done\n";
 ?>
---EXPECT--
-strrpos(): Argument #3 ($offset) must be of type int, float given
-strrpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
-strrpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
-strrpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
-strrpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+--EXPECTF--
+Warning: strrpos() expects parameter 3 to be int, float given in %s on line %d
+bool(false)
+
+Warning: strrpos() expects parameter 3 to be int, float given in %s on line %d
+bool(false)
+
+Warning: strrpos() expects parameter 3 to be int, float given in %s on line %d
+bool(false)
+
+Warning: strrpos() expects parameter 3 to be int, float given in %s on line %d
+bool(false)
+
+Deprecated: strrpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+
+Warning: strrpos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
+
+Warning: strrpos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
+
+Deprecated: strrpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+
+Warning: strrpos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
+
+Warning: strrpos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
 Done

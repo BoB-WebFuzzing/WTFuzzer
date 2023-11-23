@@ -26,11 +26,7 @@ fclose($fp);
 
 $sock = stream_context_create();
 var_dump($sock);
-try {
-    var_dump(stream_supports_lock($sock));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(stream_supports_lock($sock));
 
 echo "Done\n";
 ?>
@@ -44,5 +40,7 @@ bool(false)
 resource(%d) of type (stream)
 bool(false)
 resource(%d) of type (stream-context)
-stream_supports_lock(): supplied resource is not a valid stream resource
+
+Warning: stream_supports_lock(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
 Done

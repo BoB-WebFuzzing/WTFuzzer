@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -17,7 +19,6 @@
 #include "php.h"
 #if defined(HAVE_LIBXML) && (defined(HAVE_XML) || defined(HAVE_XMLRPC)) && !defined(HAVE_LIBEXPAT)
 #include "expat_compat.h"
-#include "ext/libxml/php_libxml.h"
 
 typedef struct _php_xml_ns {
 	xmlNsPtr nsptr;
@@ -285,9 +286,9 @@ _pi_handler(void *user, const xmlChar *target, const xmlChar *data)
 static void
 _unparsed_entity_decl_handler(void *user,
                               const xmlChar *name,
-                              const xmlChar *pub_id,
-                              const xmlChar *sys_id,
-                              const xmlChar *notation)
+							  const xmlChar *pub_id,
+							  const xmlChar *sys_id,
+							  const xmlChar *notation)
 {
 	XML_Parser parser = (XML_Parser) user;
 
@@ -470,7 +471,6 @@ XML_ParserCreate_MM(const XML_Char *encoding, const XML_Memory_Handling_Suite *m
 		return NULL;
 	}
 
-	php_libxml_sanitize_parse_ctxt_options(parser->parser);
 	xmlCtxtUseOptions(parser->parser, XML_PARSE_OLDSAX);
 
 	parser->parser->replaceEntities = 1;

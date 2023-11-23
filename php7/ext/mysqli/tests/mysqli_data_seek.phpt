@@ -1,14 +1,28 @@
 --TEST--
 mysqli_data_seek()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (NULL !== ($tmp = @mysqli_data_seek()))
+        printf("[001] Expecting NULL/NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_data_seek($link)))
+        printf("[002] Expecting NULL/NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_data_seek($link, $link)))
+        printf("[003] Expecting NULL/NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
     if (!$res = mysqli_query($link, 'SELECT * FROM test ORDER BY id LIMIT 4', MYSQLI_STORE_RESULT))
         printf("[004] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 
@@ -29,30 +43,21 @@ require_once 'skipifconnectfailure.inc';
     if (false !== ($tmp = mysqli_data_seek($res, 4)))
         printf("[009] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        mysqli_data_seek($res, -1);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (false !== ($tmp = mysqli_data_seek($res, -1)))
+        printf("[010] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
     mysqli_free_result($res);
 
     if (!$res = mysqli_query($link, 'SELECT * FROM test ORDER BY id', MYSQLI_USE_RESULT))
         printf("[011] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 
-    try {
-        var_dump(mysqli_data_seek($res, 3));
-    } catch (\Error $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (false !== ($tmp = mysqli_data_seek($res, 3)))
+        printf("[012] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
     mysqli_free_result($res);
 
-    try {
-        mysqli_data_seek($res, 1);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_data_seek($res, 1)))
+        printf("[013] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     mysqli_close($link);
 
@@ -60,10 +65,10 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
-mysqli_data_seek(): Argument #2 ($offset) must be greater than or equal to 0
-mysqli_data_seek() cannot be used in MYSQLI_USE_RESULT mode
-mysqli_result object is already closed
+--EXPECTF--
+Warning: mysqli_data_seek(): Function cannot be used with MYSQL_USE_RESULT in %s on line %d
+
+Warning: mysqli_data_seek(): Couldn't fetch mysqli_result in %s on line %d
 done!

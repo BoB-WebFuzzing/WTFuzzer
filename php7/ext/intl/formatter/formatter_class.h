@@ -1,9 +1,11 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -44,8 +46,9 @@ extern zend_class_entry *NumberFormatter_ce_ptr;
 	FORMATTER_METHOD_FETCH_OBJECT_NO_CHECK; \
 	if (FORMATTER_OBJECT(nfo) == NULL) \
 	{ \
-		zend_throw_error(NULL, "Found unconstructed NumberFormatter"); \
-		RETURN_THROWS(); \
+		intl_errors_set(&nfo->nf_data.error, U_ILLEGAL_ARGUMENT_ERROR, \
+				"Found unconstructed NumberFormatter", 0); \
+		RETURN_FALSE; \
 	}
 
 

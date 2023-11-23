@@ -1,7 +1,7 @@
 --TEST--
 Phar::convertToZip()
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -36,6 +36,7 @@ $phar = new Phar($fname3);
 var_dump($phar->isFileFormat(Phar::ZIP));
 var_dump($phar->getStub());
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.zip');
@@ -52,3 +53,4 @@ __HALT_COMPILER();"
 bool(true)
 string(60) "<?php // zip-based phar archive stub file
 __HALT_COMPILER();"
+===DONE===

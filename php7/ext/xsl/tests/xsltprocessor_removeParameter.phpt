@@ -1,7 +1,11 @@
 --TEST--
 Check xsltprocessor::removeParameter functionality
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+        if (!extension_loaded('xsl')) {
+                die("skip\n");
+        }
+?>
 --FILE--
 <?php
 include __DIR__ .'/prepare.inc';
@@ -9,7 +13,6 @@ $proc->importStylesheet($xsl);
 $proc->setParameter('', 'key', 'value');
 $proc->removeParameter('', 'key');
 var_dump($proc->getParameter('', 'key'));
-?>
 --EXPECT--
 bool(false)
 --CREDITS--

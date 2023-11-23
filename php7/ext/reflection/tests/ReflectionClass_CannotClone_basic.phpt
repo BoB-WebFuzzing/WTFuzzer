@@ -1,5 +1,5 @@
 --TEST--
-Reflection class cannot be cloned
+Reflection class can not be cloned
 --CREDITS--
 Stefan Koopmanschap <stefan@phpgg.nl>
 TestFest PHP|Tek

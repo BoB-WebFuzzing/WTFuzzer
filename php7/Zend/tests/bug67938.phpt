@@ -20,10 +20,8 @@ class Test implements TestInterface {
 $obj = new Test;
 $obj->foo();
 $obj->bar([]);
-$obj->bar([], 1);
 
 ?>
 --EXPECT--
 Test::foo
-Test::bar
 Test::bar

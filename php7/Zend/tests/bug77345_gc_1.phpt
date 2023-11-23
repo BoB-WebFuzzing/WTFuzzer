@@ -36,7 +36,6 @@ for ($i = 0; $i < 200000; $i++) {
     $circularDoublyLinkedList = $nextNode;
 }
 var_dump('end');
-?>
 --EXPECT--
 bool(true)
 string(5) "start"

@@ -4,17 +4,17 @@ Bug #73792 (invalid foreach loop hangs script)
 <?php
 $a = 'aaa';
 
-foreach ($a['2bbb'] as &$value) {
-    echo 'loop';
+foreach ($a['bbb'] as &$value) {
+	echo 'loop';
 }
 
 unset($value);
 echo 'done';
 ?>
 --EXPECTF--
-Warning: Illegal string offset "2bbb" in %s on line %d
+Warning: Illegal string offset 'bbb' in %sbug73792.php on line 4
 
-Fatal error: Uncaught Error: Cannot create references to/from string offsets in %s:%d
+Fatal error: Uncaught Error: Cannot iterate on string offsets by reference in %sbug73792.php:4
 Stack trace:
 #0 {main}
   thrown in %sbug73792.php on line 4

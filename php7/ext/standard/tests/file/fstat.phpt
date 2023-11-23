@@ -8,11 +8,7 @@ $filename = __DIR__."/fstat.dat";
 $fp = fopen($filename, "w");
 var_dump(fstat($fp));
 fclose($fp);
-try {
-    var_dump(fstat($fp));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(fstat($fp));
 
 @unlink($filename);
 echo "Done\n";
@@ -72,5 +68,7 @@ array(26) {
   ["blocks"]=>
   int(%i)
 }
-fstat(): supplied resource is not a valid stream resource
+
+Warning: fstat(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
 Done

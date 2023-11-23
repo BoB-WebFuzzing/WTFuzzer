@@ -1,7 +1,7 @@
 --TEST--
 Encoding INI test
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php extension_loaded('iconv') or die('skip mbstring not available'); ?>
 --INI--
 error_reporting=E_ALL & ~E_DEPRECATED
 default_charset=ISO-8859-1
@@ -41,7 +41,6 @@ var_dump(ini_get('output_encoding'));
 var_dump(ini_get('iconv.internal_encoding'));
 var_dump(ini_get('iconv.input_encoding'));
 var_dump(ini_get('iconv.output_encoding'));
-?>
 --EXPECT--
 Getting INI
 string(10) "ISO-8859-1"

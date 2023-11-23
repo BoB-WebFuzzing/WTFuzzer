@@ -1,13 +1,13 @@
 --TEST--
 ldap_read() does not modify $attributes array
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php
+if (!extension_loaded('ldap')) die('skip ldap extension not available');
+?>
 --FILE--
 <?php
 $array = [123, 456, 789];
-try {
-  ldap_read(null, '', '', $array);
-} catch (TypeError $err) {}
+@ldap_read(null, null, null, $array);
 var_dump($array);
 ?>
 --EXPECT--

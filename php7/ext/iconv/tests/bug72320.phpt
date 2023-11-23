@@ -1,7 +1,9 @@
 --TEST--
 Bug #72320 (iconv_substr returns false for empty strings)
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+if (!extension_loaded('iconv')) die('skip ext/iconv required');
+?>
 --FILE--
 <?php
 var_dump(iconv_substr('', 0, 10, 'UTF-8'));

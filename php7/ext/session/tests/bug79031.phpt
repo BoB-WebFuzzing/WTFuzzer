@@ -1,9 +1,5 @@
 --TEST--
 Bug #79031: Session unserialization problem
---EXTENSIONS--
-session
---INI--
-error_reporting=E_ALL&~E_DEPRECATED
 --FILE--
 <?php
 

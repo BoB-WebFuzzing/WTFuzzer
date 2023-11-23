@@ -2,6 +2,12 @@
 Test new DateTime() : basic functionality
 --FILE--
 <?php
+/* Prototype  : DateTime::__construct  ([ string $time="now"  [, DateTimeZone $timezone=NULL  ]] )
+ * Description: Returns new DateTime object
+ * Source code: ext/date/php_date.c
+ * Alias to functions:
+ */
+
 //Set the default time zone
 date_default_timezone_set("Europe/London");
 
@@ -14,6 +20,7 @@ var_dump( new DateTime("2005-07-14 22:30:41") );
 var_dump( new DateTime("2005-07-14 22:30:41 GMT") );
 
 ?>
+===DONE===
 --EXPECTF--
 *** Testing new DateTime() : basic functionality ***
 object(DateTime)#%d (3) {
@@ -48,3 +55,4 @@ object(DateTime)#%d (3) {
   ["timezone"]=>
   string(3) "GMT"
 }
+===DONE===

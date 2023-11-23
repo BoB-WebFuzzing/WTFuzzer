@@ -21,6 +21,5 @@ class Y extends X implements InterfaceY {
 }
 
 echo "ok";
-?>
 --EXPECT--
 ok

@@ -1,9 +1,15 @@
 --TEST--
 Test finfo_open() function : variations in opening
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
+/* Prototype  : resource finfo_open([int options [, string arg]])
+ * Description: Create a new fileinfo resource.
+ * Source code: ext/fileinfo/fileinfo.c
+ * Alias to functions:
+ */
+
 $magicFile = __DIR__ . DIRECTORY_SEPARATOR . 'magic';
 
 echo "*** Testing finfo_open() : variations in opening ***\n";
@@ -14,9 +20,9 @@ var_dump( finfo_open( FILEINFO_MIME | FILEINFO_SYMLINK, $magicFile ) );
 var_dump( finfo_open( FILEINFO_DEVICES | FILEINFO_RAW, $magicFile ) );
 
 ?>
+===DONE===
 --EXPECTF--
 *** Testing finfo_open() : variations in opening ***
-object(finfo)#%d (0) {
-}
-object(finfo)#%d (0) {
-}
+resource(%d) of type (file_info)
+resource(%d) of type (file_info)
+===DONE===

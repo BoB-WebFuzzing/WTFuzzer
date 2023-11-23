@@ -3,8 +3,10 @@ Testing imagefontwidth() of GD library
 --CREDITS--
 Rafael Dohms <rdohms [at] gmail [dot] com>
 #testfest PHPSP on 2009-06-20
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+	if (!extension_loaded("gd")) die("skip GD not present");
+?>
 --FILE--
 <?php
 var_dump(imagefontwidth(1),imagefontwidth(2),imagefontwidth(3),imagefontwidth(4),imagefontwidth(5));

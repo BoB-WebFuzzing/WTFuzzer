@@ -1,8 +1,11 @@
 --TEST--
 Bug #80901 (Info leak in ftp extension)
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php
+require 'skipif.inc';
+?>
+--INI--
+log_errors_max_len=0
 --FILE--
 <?php
 $bug80901 = true;

@@ -1,18 +1,17 @@
 --TEST--
 SOAP XML Schema 32: Structure (choice)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";
 $schema = <<<EOF
-    <complexType name="testType">
-        <choice>
-            <element name="int" type="int"/>
-            <element name="str" type="string"/>
-        </choice>
-    </complexType>
+	<complexType name="testType">
+		<choice>
+			<element name="int" type="int"/>
+			<element name="str" type="string"/>
+		</choice>
+	</complexType>
 EOF;
 test_schema($schema,'type="tns:testType"',(object)array("int"=>123.5));
 echo "ok";

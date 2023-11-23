@@ -1,5 +1,5 @@
 --TEST--
-Bug #60477: Segfault after two multipart/form-data POST requests
+Bug #60477: Segfault after two multipart/form-data POST requestes
 --SKIPIF--
 <?php
 include "skipif.inc";
@@ -24,9 +24,9 @@ Content-Type: application/x-www-form-urlencoded
 a=b
 HEADER
 )) {
-    while (!feof($fp)) {
-        $output .= fgets($fp);
-    }
+	while (!feof($fp)) {
+		$output .= fgets($fp);
+	}
 }
 
 fclose($fp);
@@ -43,9 +43,9 @@ Content-Type: application/x-www-form-urlencoded
 a=b
 HEADER
 )) {
-    while (!feof($fp)) {
-        $output .= fgets($fp);
-    }
+	while (!feof($fp)) {
+		$output .= fgets($fp);
+	}
 }
 
 echo preg_replace("/<style>(.*?)<\/style>/s", "<style>AAA</style>", $output), "\n";

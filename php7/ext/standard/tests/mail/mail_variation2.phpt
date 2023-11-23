@@ -11,6 +11,12 @@ if(substr(PHP_OS, 0, 3) == "WIN")
 ?>
 --FILE--
 <?php
+/* Prototype  : int mail(string to, string subject, string message [, string additional_headers [, string additional_parameters]])
+ * Description: Send an email message
+ * Source code: ext/standard/mail.c
+ * Alias to functions:
+ */
+
 echo "*** Testing mail() : basic functionality ***\n";
 
 
@@ -26,6 +32,7 @@ echo file_get_contents($outFile);
 unlink($outFile);
 
 ?>
+===DONE===
 --EXPECTF--
 *** Testing mail() : basic functionality ***
 bool(true)
@@ -33,3 +40,4 @@ bool(true)
 %w2%wSubject: Test Subject
 %w3%w
 %w4%wA Message
+===DONE===

@@ -2,19 +2,15 @@
 cal_info()
 --INI--
 date.timezone=UTC
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
   print_r(cal_info());
   print_r(cal_info(1));
-  try {
-      cal_info(99999);
-  } catch (ValueError $ex) {
-      echo "{$ex->getMessage()}\n";
-  }
+  print_r(cal_info(99999));
 ?>
---EXPECT--
+--EXPECTF--
 Array
 (
     [0] => Array
@@ -216,4 +212,5 @@ Array
     [calname] => Julian
     [calsymbol] => CAL_JULIAN
 )
-cal_info(): Argument #1 ($calendar) must be a valid calendar ID
+
+Warning: cal_info(): invalid calendar ID 99999 in %s on line %d

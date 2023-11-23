@@ -8,6 +8,15 @@ if( substr(PHP_OS, 0, 3) != 'WIN' ) {
 ?>
 --FILE--
 <?php
+/*
+ Prototype: int fwrite ( resource $handle,string string, [, int $length] );
+ Description: fwrite() writes the contents of string to the file stream pointed to by handle.
+              If the length arquement is given,writing will stop after length bytes have been
+              written or the end of string reached, whichever comes first.
+              fwrite() returns the number of bytes written or FALSE on error
+*/
+
+
 echo "*** Testing fwrite() various  operations ***\n";
 
 // include the file.inc for Function: function delete_file($filename)
@@ -76,13 +85,13 @@ echo "Done\n";
 -- Opening file in r --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -92,13 +101,13 @@ string(32) "950b7457d1deb6332f2fc5d42f3129d6"
 -- Opening file in rb --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -108,13 +117,13 @@ string(32) "950b7457d1deb6332f2fc5d42f3129d6"
 -- Opening file in rt --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -126,13 +135,13 @@ string(32) "950b7457d1deb6332f2fc5d42f3129d6"
 -- Opening file in r --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -142,13 +151,13 @@ string(32) "e486000c4c8452774f746a27658d87fa"
 -- Opening file in rb --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -158,13 +167,13 @@ string(32) "e486000c4c8452774f746a27658d87fa"
 -- Opening file in rt --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -176,13 +185,13 @@ string(32) "e486000c4c8452774f746a27658d87fa"
 -- Opening file in r --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -192,13 +201,13 @@ string(32) "b09c8026a64a88d36d4c2f17983964bb"
 -- Opening file in rb --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -208,13 +217,13 @@ string(32) "b09c8026a64a88d36d4c2f17983964bb"
 -- Opening file in rt --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -226,13 +235,13 @@ string(32) "b09c8026a64a88d36d4c2f17983964bb"
 -- Opening file in r --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -242,13 +251,13 @@ string(32) "3fabd48d8eaa65c14e0d93d6880c560c"
 -- Opening file in rb --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)
@@ -258,13 +267,13 @@ string(32) "3fabd48d8eaa65c14e0d93d6880c560c"
 -- Opening file in rt --
 int(0)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(0)
 bool(false)
 int(2)
 
-Notice: fwrite(): Write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
+Notice: fwrite(): write of 1024 bytes failed with errno=9 Bad file descriptor in %s on line %d
 bool(false)
 int(2)
 bool(false)

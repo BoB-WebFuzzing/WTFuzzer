@@ -1,15 +1,11 @@
 --TEST--
 PECL Bug #6109 (Error messages not kept)
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Run Test
 
@@ -19,12 +15,12 @@ $s = oci_parse($c, 'delete from table_does_not_exist');
 $r = @oci_execute($s);
 
 if ($r) {
-    echo "whoops - table does exist\n";
+	echo "whoops - table does exist\n";
 } else {
-    for ($i = 0; $i < 5; $i++) {
-        $err = oci_error($s);
-        echo ($i) .' -> '.$err['message'] ."\n";
-    }
+	for ($i = 0; $i < 5; $i++) {
+		$err = oci_error($s);
+		echo ($i) .' -> '.$err['message'] ."\n";
+	}
 }
 
 // Cleanup

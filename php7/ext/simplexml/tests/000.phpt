@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: var_dump()
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -9,12 +9,12 @@ $sxe = simplexml_load_file(__DIR__.'/000.xml');
 
 function test($what)
 {
-    global $sxe;
-    echo "===$what\n";
-    eval("var_dump(isset(\$$what));");
-    eval("var_dump((bool)\$$what);");
-    eval("if (isset(\$$what)) var_dump(count(\$$what));");
-    eval("var_dump(\$$what);");
+	global $sxe;
+	echo "===$what\n";
+	eval("var_dump(isset(\$$what));");
+	eval("var_dump((bool)\$$what);");
+	eval("if (isset(\$$what)) var_dump(count(\$$what));");
+	eval("var_dump(\$$what);");
 }
 
 test('sxe');
@@ -35,6 +35,8 @@ test('sxe->elem22->attr22');
 test('sxe->elem22["attr22"]');
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 ===sxe
 bool(true)
@@ -242,3 +244,4 @@ NULL
 bool(false)
 bool(false)
 NULL
+===DONE===

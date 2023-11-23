@@ -1,7 +1,7 @@
 --TEST--
 Bug #74428 (exif_read_data(): "Illegal IFD size" warning occurs with correct exif format)
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
 --INI--
 output_handler=
 zlib.output_compression=0
@@ -10,6 +10,7 @@ zlib.output_compression=0
 $infile = __DIR__.'/bug74428.jpg';
 var_dump(exif_read_data($infile));
 ?>
+===DONE===
 --EXPECTF--
 array(11) {
   ["FileName"]=>
@@ -46,3 +47,4 @@ array(11) {
   ["ExifImageLength"]=>
   int(28)
 }
+===DONE===

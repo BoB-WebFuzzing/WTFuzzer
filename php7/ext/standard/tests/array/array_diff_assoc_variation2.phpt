@@ -1,9 +1,15 @@
 --TEST--
-Test array_diff_assoc() function : usage variations  - unexpected values for 'array1' argument
+Test array_diff_assoc() function : usage variations  - unexpected values for 'arr1' argument
 --FILE--
 <?php
+/* Prototype  : array array_diff_assoc(array $arr1, array $arr2 [, array ...])
+ * Description: Returns the entries of arr1 that have values which are not present
+ * in any of the others arguments but do additional checks whether the keys are equal
+ * Source code: ext/standard/array.c
+ */
+
 /*
- * pass array_diff_assoc arguments which are not arrays in place of $array2
+ * pass array_diff_assoc arguments which are not arrays in place of $arr2
  */
 
 echo "\n*** Testing array_diff_assoc() : usage variations ***\n";
@@ -30,7 +36,7 @@ EOT;
 // get a resource variable
 $fp = fopen(__FILE__, "r");
 
-//array of unexpected values to be passed to $array1 argument
+//array of unexpected values to be passed to $arr1 argument
 $inputs = array(
 
        // int data
@@ -67,7 +73,7 @@ $inputs = array(
 
        // binary data
 /*21*/ b"binary",
-       (binary)"binary",
+	   (binary)"binary",
 
        // object data
 /*23*/ new classA(),
@@ -85,95 +91,143 @@ $inputs = array(
 // loop through each element of $inputs to check the behavior of array_diff_assoc
 $iterator = 1;
 foreach($inputs as $input) {
-    echo "\n-- Iteration $iterator --\n";
-    try {
-        var_dump(array_diff_assoc($array, $input));
-    } catch (TypeError $e) {
-        echo $e->getMessage(), "\n";
-    }
-    $iterator++;
+  echo "\n-- Iteration $iterator --\n";
+  var_dump( array_diff_assoc($array, $input));
+  $iterator++;
 };
 fclose($fp);
 echo "Done";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing array_diff_assoc() : usage variations ***
 
 -- Iteration 1 --
-array_diff_assoc(): Argument #2 must be of type array, int given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 -- Iteration 2 --
-array_diff_assoc(): Argument #2 must be of type array, int given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 -- Iteration 3 --
-array_diff_assoc(): Argument #2 must be of type array, int given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 -- Iteration 4 --
-array_diff_assoc(): Argument #2 must be of type array, int given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 -- Iteration 5 --
-array_diff_assoc(): Argument #2 must be of type array, float given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 6 --
-array_diff_assoc(): Argument #2 must be of type array, float given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 7 --
-array_diff_assoc(): Argument #2 must be of type array, float given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 8 --
-array_diff_assoc(): Argument #2 must be of type array, float given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 9 --
-array_diff_assoc(): Argument #2 must be of type array, float given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 -- Iteration 10 --
-array_diff_assoc(): Argument #2 must be of type array, null given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 -- Iteration 11 --
-array_diff_assoc(): Argument #2 must be of type array, null given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 -- Iteration 12 --
-array_diff_assoc(): Argument #2 must be of type array, true given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 -- Iteration 13 --
-array_diff_assoc(): Argument #2 must be of type array, false given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 -- Iteration 14 --
-array_diff_assoc(): Argument #2 must be of type array, true given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 -- Iteration 15 --
-array_diff_assoc(): Argument #2 must be of type array, false given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 -- Iteration 16 --
-array_diff_assoc(): Argument #2 must be of type array, string given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 17 --
-array_diff_assoc(): Argument #2 must be of type array, string given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 18 --
-array_diff_assoc(): Argument #2 must be of type array, string given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 19 --
-array_diff_assoc(): Argument #2 must be of type array, string given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 20 --
-array_diff_assoc(): Argument #2 must be of type array, string given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 21 --
-array_diff_assoc(): Argument #2 must be of type array, string given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 22 --
-array_diff_assoc(): Argument #2 must be of type array, string given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 -- Iteration 23 --
-array_diff_assoc(): Argument #2 must be of type array, classA given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, object given in %s on line %d
+NULL
 
 -- Iteration 24 --
-array_diff_assoc(): Argument #2 must be of type array, null given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 -- Iteration 25 --
-array_diff_assoc(): Argument #2 must be of type array, null given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 -- Iteration 26 --
-array_diff_assoc(): Argument #2 must be of type array, resource given
+
+Warning: array_diff_assoc(): Expected parameter 2 to be an array, resource given in %s on line %d
+NULL
 Done

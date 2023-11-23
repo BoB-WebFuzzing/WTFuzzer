@@ -4,8 +4,10 @@ Test DOMDocument::loadHTMLFile when a not-well formed document is loaded
 Verifies the behavior if a not-well formed document is loaded
 --CREDITS--
 Antonio Diaz Ruiz <dejalatele@gmail.com>
---EXTENSIONS--
-dom
+--INI--
+assert.bail=true
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --FILE--
 <?php
 $doc = new DOMDocument();

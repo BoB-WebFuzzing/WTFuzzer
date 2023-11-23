@@ -1,8 +1,7 @@
 --TEST--
 normalizer_get_raw_decomposition()
---EXTENSIONS--
-intl
 --SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip intl extension not loaded'; ?>
 <?php if( !function_exists( 'normalizer_get_raw_decomposition' ) ) print 'skip normalizer_get_raw_decomposition function does not exist'; ?>
 --FILE--
 <?php
@@ -14,15 +13,15 @@ intl
 
 function ut_main()
 {
-    $result = '';
-    $strings = [
-        "a",
+	$result = '';
+	$strings = [
+		"a",
         "\u{FFDA}",
         "\u{FDFA}",
         "",
         "aa",
         "\xF5",
-    ];
+	];
 
     foreach ($strings as $string) {
         $decomposition = ut_norm_get_raw_decomposition($string, Normalizer::FORM_KC);
@@ -40,7 +39,7 @@ function ut_main()
         $result .= "error info: '$error_message' ($error_code)\n";
     }
 
-    return $result;
+	return $result;
 }
 
 include_once( 'ut_common.inc' );

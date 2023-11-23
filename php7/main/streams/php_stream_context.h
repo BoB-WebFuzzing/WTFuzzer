@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -57,7 +59,7 @@ PHPAPI void php_stream_context_free(php_stream_context *context);
 PHPAPI php_stream_context *php_stream_context_alloc(void);
 PHPAPI zval *php_stream_context_get_option(php_stream_context *context,
 		const char *wrappername, const char *optionname);
-PHPAPI void php_stream_context_set_option(php_stream_context *context,
+PHPAPI int php_stream_context_set_option(php_stream_context *context,
 		const char *wrappername, const char *optionname, zval *optionvalue);
 
 PHPAPI php_stream_notifier *php_stream_notification_alloc(void);
@@ -94,17 +96,13 @@ END_EXTERN_C()
 	php_stream_notification_notify((context), PHP_STREAM_NOTIFY_PROGRESS, PHP_STREAM_NOTIFY_SEVERITY_INFO, \
 			NULL, 0, (bsofar), (bmax), NULL); } } while(0)
 
-#define php_stream_notify_completed(context) do { if ((context) && (context)->notifier) { \
-	php_stream_notification_notify((context), PHP_STREAM_NOTIFY_COMPLETED, PHP_STREAM_NOTIFY_SEVERITY_INFO, \
-			NULL, 0, (context)->notifier->progress, (context)->notifier->progress_max, NULL); } } while(0)
-
 #define php_stream_notify_progress_init(context, sofar, bmax) do { if ((context) && (context)->notifier) { \
 	(context)->notifier->progress = (sofar); \
 	(context)->notifier->progress_max = (bmax); \
 	(context)->notifier->mask |= PHP_STREAM_NOTIFIER_PROGRESS; \
 	php_stream_notify_progress((context), (sofar), (bmax)); } } while (0)
 
-#define php_stream_notify_progress_increment(context, dsofar, dmax) do { if ((context) && (context)->notifier && ((context)->notifier->mask & PHP_STREAM_NOTIFIER_PROGRESS)) { \
+#define php_stream_notify_progress_increment(context, dsofar, dmax) do { if ((context) && (context)->notifier && (context)->notifier->mask & PHP_STREAM_NOTIFIER_PROGRESS) { \
 	(context)->notifier->progress += (dsofar); \
 	(context)->notifier->progress_max += (dmax); \
 	php_stream_notify_progress((context), (context)->notifier->progress, (context)->notifier->progress_max); } } while (0)

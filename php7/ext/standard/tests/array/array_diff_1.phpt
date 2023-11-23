@@ -6,14 +6,10 @@ Test array_diff when non-array is passed
 $a = array();
 $b = 3;
 $c = array(5);
-try {
-    array_diff($a, $b, $c);
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+array_diff($a, $b, $c);
 //-=-=-=-=-=-
 echo "OK!";
 ?>
---EXPECT--
-array_diff(): Argument #2 must be of type array, int given
+--EXPECTF--
+Warning: array_diff(): Expected parameter 2 to be an array, int given in %s
 OK!

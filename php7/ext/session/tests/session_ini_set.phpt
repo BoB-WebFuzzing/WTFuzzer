@@ -1,7 +1,5 @@
 --TEST--
 Test ini_set() for session : basic functionality
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -118,67 +116,67 @@ string(1) "4"
 string(1) "1"
 string(15) "session started"
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 38
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 39
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 40
 bool(false)
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 42
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 43
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 44
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 45
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 46
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 47
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 48
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 49
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 50
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 51
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 52
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 53
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 54
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 55
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 56
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 57
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 58
 bool(false)
 
-Warning: ini_set(): Session ini settings cannot be changed when a session is active in %s on line %d
+Warning: ini_set(): A session is active. You cannot change the session module's ini settings at this time in %s on line 59
 bool(false)
 Done

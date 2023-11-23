@@ -1,15 +1,7 @@
 --TEST--
 Bug #44618 (Fetching may rely on uninitialized data)
---EXTENSIONS--
-odbc
 --SKIPIF--
-<?php
-include 'skipif.inc';
-
-if (ODBC_TYPE === "unixODBC") {
-    die("skip Fails with unixODBC");
-}
-?>
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 include __DIR__ . "/config.inc";
@@ -65,8 +57,6 @@ array(3) {
 
 Warning: odbc_result(): Cannot get data of column #3 (retcode 100) in %s on line %d
 bool(false)
-
-Deprecated: Function odbc_result_all() is deprecated in %s on line %d
 <table><tr><th>ID</th><th>real1</th><th>text1</th></tr>
 <tr><td>1</td><td>10.02</td><td></td></tr></table>
 Warning: odbc_result_all(): Cannot get data of column #3 (retcode 100) in %s on line %d

@@ -2,6 +2,11 @@
 Test array_map() function : usage variations - unexpected values for 'callback' argument
 --FILE--
 <?php
+/* Prototype  : array array_map  ( callback $callback  , array $arr1  [, array $...  ] )
+ * Description: Applies the callback to the elements of the given arrays
+ * Source code: ext/standard/array.c
+ */
+
 /*
  * Test array_map() by passing different scalar/nonscalar values in place of $callback
  */
@@ -61,77 +66,93 @@ $unexpected_callbacks = array(
 
 // loop through each element of $inputs to check the behavior of array_map
 for($count = 0; $count < count($unexpected_callbacks); $count++) {
-    echo "\n-- Iteration ".($count + 1)." --\n";
-    try {
-        var_dump( array_map($unexpected_callbacks[$count], $arr1));
-    } catch (TypeError $e) {
-        echo $e->getMessage(), "\n";
-    }
+  echo "\n-- Iteration ".($count + 1)." --";
+  var_dump( array_map($unexpected_callbacks[$count], $arr1));
 };
 
 fclose($fp);
 echo "Done";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing array_map() : unexpected values for 'callback' argument ***
 
 -- Iteration 1 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 2 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 3 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 4 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 5 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 6 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 7 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 8 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 9 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 10 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 11 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 12 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 13 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 14 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, function "" not found or invalid function name
+Warning: array_map() expects parameter 1 to be a valid callback, function '' not found or invalid function name in %s on line %d
+NULL
 
 -- Iteration 15 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, function "" not found or invalid function name
+Warning: array_map() expects parameter 1 to be a valid callback, function '' not found or invalid function name in %s on line %d
+NULL
 
 -- Iteration 16 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, array callback must have exactly two members
+Warning: array_map() expects parameter 1 to be a valid callback, array must have exactly two members in %s on line %d
+NULL
 
 -- Iteration 17 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, first array member is not a valid class name or object
+Warning: array_map() expects parameter 1 to be a valid callback, first array member is not a valid class name or object in %s on line %d
+NULL
 
 -- Iteration 18 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, first array member is not a valid class name or object
+Warning: array_map() expects parameter 1 to be a valid callback, first array member is not a valid class name or object in %s on line %d
+NULL
 
 -- Iteration 19 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 
 -- Iteration 20 --
-array_map(): Argument #1 ($callback) must be a valid callback or null, no array or string given
+Warning: array_map() expects parameter 1 to be a valid callback, no array or string given in %s on line %d
+NULL
 Done

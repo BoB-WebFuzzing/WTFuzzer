@@ -3,12 +3,9 @@ func_num_args() outside of a function declaration
 --FILE--
 <?php
 
-try {
-    func_num_args();
-} catch (Error $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(func_num_args());
 
 ?>
---EXPECT--
-func_num_args() must be called from a function context
+--EXPECTF--
+Warning: func_num_args():  Called from the global scope - no function context in %s on line %d
+int(-1)

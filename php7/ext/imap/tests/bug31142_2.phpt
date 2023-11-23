@@ -1,7 +1,11 @@
 --TEST--
 Bug #31142 test #2 (imap_mail_compose() generates incorrect output)
---EXTENSIONS--
-imap
+--SKIPIF--
+<?php
+        if (!extension_loaded("imap")) {
+                die("skip imap extension not available");
+        }
+?>
 --FILE--
 <?php
 $envelope["from"]= 'host@domain.com';

@@ -1,12 +1,9 @@
 --TEST--
 Array fetch CLOB and BLOB
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -128,7 +125,7 @@ Test 1b
 bool(true)
 array(1) {
   ["CLOB"]=>
-  object(OCILob)#2 (1) {
+  object(OCI-Lob)#2 (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
@@ -136,7 +133,7 @@ array(1) {
 string(11) "clob test 1"
 array(1) {
   ["CLOB"]=>
-  object(OCILob)#3 (1) {
+  object(OCI-Lob)#3 (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
@@ -144,7 +141,7 @@ array(1) {
 string(11) "clob test 2"
 array(1) {
   ["CLOB"]=>
-  object(OCILob)#2 (1) {
+  object(OCI-Lob)#2 (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
@@ -170,7 +167,7 @@ Test 2b
 bool(true)
 array(1) {
   ["BLOB"]=>
-  object(OCILob)#3 (1) {
+  object(OCI-Lob)#3 (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
@@ -178,7 +175,7 @@ array(1) {
 string(11) "blob test 1"
 array(1) {
   ["BLOB"]=>
-  object(OCILob)#4 (1) {
+  object(OCI-Lob)#4 (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
@@ -186,7 +183,7 @@ array(1) {
 string(11) "blob test 2"
 array(1) {
   ["BLOB"]=>
-  object(OCILob)#3 (1) {
+  object(OCI-Lob)#3 (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }

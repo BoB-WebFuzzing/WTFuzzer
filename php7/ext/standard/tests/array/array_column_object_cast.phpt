@@ -10,15 +10,20 @@ class IndexKeyClass {
     function __toString() { return 'id'; }
 }
 
+class ValueClass {
+    function __toString() { return '2135'; }
+}
+
 
 $column_key = new ColumnKeyClass();
 $index_key = new IndexKeyClass();
+$value = new ValueClass();
 
 
 // Array representing a possible record set returned from a database
 $records = array(
     array(
-        'id' => 2135,
+        'id' => $value,
         'first_name' => 'John',
         'last_name' => 'XXX'
     ),
@@ -32,15 +37,16 @@ $firstNames = array_column($records, $column_key, $index_key);
 print_r($firstNames);
 var_dump($column_key);
 var_dump($index_key);
-
-?>
---EXPECT--
+var_dump($value);
+--EXPECTF--
 Array
 (
     [2135] => John
     [3245] => Sally
 )
-object(ColumnKeyClass)#1 (0) {
+object(ColumnKeyClass)#%d (0) {
 }
-object(IndexKeyClass)#2 (0) {
+object(IndexKeyClass)#%d (0) {
+}
+object(ValueClass)#%d (0) {
 }

@@ -28,6 +28,8 @@ $longVals = array(
    var_dump(max($longVals));
 
 ?>
+===DONE===
 --EXPECT--
 int(9223372036854775807)
 int(9223372036854775807)
+===DONE===

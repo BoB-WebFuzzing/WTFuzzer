@@ -2,6 +2,12 @@
 Test dir() function : basic functionality
 --FILE--
 <?php
+/*
+ * Prototype  : object dir(string $directory[, resource $context])
+ * Description: Directory class with properties, handle and class and methods read, rewind and close
+ * Source code: ext/standard/dir.c
+ */
+
 echo "*** Testing dir() : basic functionality ***\n";
 
 // include the file.inc for Function: function create_files()
@@ -32,12 +38,8 @@ echo "\nClose directory:\n";
 var_dump( $d->close() );
 var_dump( $d );
 
-echo "\nTest read after closing the dir:\n";
-try {
-    var_dump( $d->read() );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+echo "\nTest read after closing the dir:";
+var_dump( $d->read() );
 
 // delete temp files
 delete_files($dir_path, 3, "dir_basic", 1, ".tmp");
@@ -79,5 +81,6 @@ object(Directory)#%d (2) {
 }
 
 Test read after closing the dir:
-Directory::read(): supplied resource is not a valid Directory resource
+Warning: Directory::read(): supplied resource is not a valid Directory resource in %s on line %d
+bool(false)
 Done

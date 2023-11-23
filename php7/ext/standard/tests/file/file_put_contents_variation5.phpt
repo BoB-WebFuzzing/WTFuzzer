@@ -6,7 +6,7 @@ Dave Kelsey <d_kelsey@uk.ibm.com>
 <?php
 
 
-$thisTestDir = __DIR__ . '/' .basename(__FILE__, ".php") . ".dir";
+$thisTestDir = __DIR__ . '/' .basename(__FILE__, ".php") . ".directory";
 mkdir($thisTestDir);
 chdir($thisTestDir);
 
@@ -19,12 +19,13 @@ runtest();
 $newpath = "";
 set_include_path($newpath);
 runtest();
-set_include_path("");
+set_include_path(null);
 runtest();
 set_include_path(";;  ; ;c:\\rubbish");
 runtest();
 
 chdir(__DIR__);
+rmdir($thisTestDir);
 
 
 function runtest() {
@@ -40,17 +41,10 @@ function runtest() {
    }
 }
 ?>
---CLEAN--
-<?php
-$thisTestDir = __DIR__ . '/' . basename(__FILE__, ".clean.php") . ".dir";
-$filename = basename(__FILE__, ".clean.php") . ".tmp";
-$scriptLocFile = __DIR__."/".$filename;
-@unlink($filename);
-@unlink($scriptLocFile);
-rmdir($thisTestDir);
-?>
+===DONE===
 --EXPECT--
 File written in working directory
 File written in working directory
 File written in working directory
 File written in working directory
+===DONE===

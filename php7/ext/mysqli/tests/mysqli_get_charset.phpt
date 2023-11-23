@@ -1,19 +1,41 @@
 --TEST--
 mysqli_get_charset()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
+if (!function_exists('mysqli_get_charset'))
+    die("skip: function not available");
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
-    if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
-        printf("Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
-            $host, $user, $db, $port, $socket);
-        exit(1);
-    }
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_get_charset()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_get_charset($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_set_charset($link, $link)))
+        printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
+
+    if (!$res = mysqli_query($link, 'SELECT version() AS server_version'))
+        printf("[004] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+    $tmp = mysqli_fetch_assoc($res);
+    mysqli_free_result($res);
+    $version = explode('.', $tmp['server_version']);
+    if (empty($version))
+        printf("[005] Cannot determine server version, need MySQL Server 4.1+ for the test!\n");
+
+    if ($version[0] <= 4 && $version[1] < 1)
+        printf("[006] Need MySQL Server 4.1+ for the test!\n");
 
     if (!$res = mysqli_query($link, 'SELECT @@character_set_connection AS charset, @@collation_connection AS collation'))
         printf("[007] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -79,14 +101,15 @@ require_once 'skipifconnectfailure.inc';
 
     mysqli_close($link);
 
-    try {
-        mysqli_get_charset($link);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_get_charset($link)))
+        printf("[023] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
---EXPECT--
-mysqli object is already closed
+--CLEAN--
+<?php
+    require_once("clean_table.inc");
+?>
+--EXPECTF--
+Warning: mysqli_get_charset(): Couldn't fetch mysqli in %s on line %d
 done!

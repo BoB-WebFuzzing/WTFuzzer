@@ -2,7 +2,9 @@
 SPL: Test ArrayObject::asort() function : basic functionality with array based store
 --FILE--
 <?php
-/* Sort the entries by values.
+/* Prototype  : int ArrayObject::asort()
+ * Description: proto int ArrayIterator::asort()
+ * Sort the entries by values.
  * Source code: ext/spl/spl_array.c
  * Alias to functions:
  */
@@ -13,15 +15,12 @@ $ao1 = new ArrayObject(array(4,2,3));
 $ao2 = new ArrayObject(array('a'=>4,'b'=>2,'c'=>3));
 var_dump($ao1->asort());
 var_dump($ao1);
-try {
-    var_dump($ao2->asort('blah'));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump($ao2->asort('blah'));
 var_dump($ao2);
 var_dump($ao2->asort(SORT_NUMERIC));
 var_dump($ao2);
 ?>
+===DONE===
 --EXPECTF--
 *** Testing ArrayObject::asort() : basic functionality ***
 bool(true)
@@ -36,7 +35,9 @@ object(ArrayObject)#%d (1) {
     int(4)
   }
 }
-ArrayObject::asort(): Argument #1 ($flags) must be of type int, string given
+
+Warning: asort() expects parameter 2 to be int, string given in %sarrayObject_asort_basic1.php on line %d
+bool(false)
 object(ArrayObject)#%d (1) {
   ["storage":"ArrayObject":private]=>
   array(3) {
@@ -60,3 +61,4 @@ object(ArrayObject)#%d (1) {
     int(4)
   }
 }
+===DONE===

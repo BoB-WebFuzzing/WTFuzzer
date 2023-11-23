@@ -3,8 +3,10 @@ Test preg_match_all() function : error conditions - bad regular expressions
 --FILE--
 <?php
 /*
+* proto int preg_match_all(string pattern, string subject, array subpatterns [, int flags [, int offset]])
 * Function is implemented in ext/pcre/php_pcre.c
 */
+error_reporting(E_ALL&~E_NOTICE);
 /*
 * Testing how preg_match_all reacts to being passed the wrong type of regex argument
 */
@@ -17,20 +19,12 @@ $regex_array = array('abcdef', //Regex without delimiter
 );
 $subject = 'test';
 foreach($regex_array as $regex_value) {
-    @print "\nArg value is $regex_value\n";
-    try {
-        var_dump(preg_match_all($regex_value, $subject, $matches1));
-    } catch (TypeError $e) {
-        echo $e->getMessage(), "\n";
-    }
+    print "\nArg value is $regex_value\n";
+    var_dump(preg_match_all($regex_value, $subject, $matches1));
     var_dump($matches1);
 }
 $regex_value = new stdclass(); //Object
-try {
-    var_dump(preg_match_all($regex_value, $subject, $matches));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(preg_match_all($regex_value, $subject, $matches));
 var_dump($matches);
 ?>
 --EXPECTF--
@@ -38,7 +32,7 @@ var_dump($matches);
 
 Arg value is abcdef
 
-Warning: preg_match_all(): Delimiter must not be alphanumeric, backslash, or NUL in %spreg_match_all_error1.php on line %d
+Warning: preg_match_all(): Delimiter must not be alphanumeric or backslash in %spreg_match_all_error1.php on line %d
 bool(false)
 NULL
 
@@ -61,7 +55,9 @@ bool(false)
 NULL
 
 Arg value is Array
-preg_match_all(): Argument #1 ($pattern) must be of type string, array given
+
+Warning: preg_match_all() expects parameter 1 to be string, array given in %spreg_match_all_error1.php on line %d
+bool(false)
 NULL
 
 Arg value is /[a-zA-Z]/
@@ -79,5 +75,7 @@ array(1) {
     string(1) "t"
   }
 }
-preg_match_all(): Argument #1 ($pattern) must be of type string, stdClass given
+
+Warning: preg_match_all() expects parameter 1 to be string, object given in %spreg_match_all_error1.php on line %d
+bool(false)
 NULL

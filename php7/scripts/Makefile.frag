@@ -15,7 +15,6 @@ BUILD_FILES = \
 	build/pkg.m4 \
 	build/Makefile.global \
 	build/php.m4 \
-	build/gen_stub.php \
 	run-tests.php
 
 BUILD_FILES_EXEC = \

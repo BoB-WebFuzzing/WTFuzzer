@@ -6,6 +6,11 @@ if (PHP_INT_SIZE != 4) die("skip this test is for 32bit platform only");
 ?>
 --FILE--
 <?php
+/* Prototype  : string vprintf(string format, array args)
+ * Description: Output a formatted string
+ * Source code: ext/standard/formatted_print.c
+*/
+
 /*
  * Test vprintf() when different hexa formats and hexa values are passed to
  * the '$format' and '$args' arguments of the function
@@ -17,11 +22,11 @@ echo "*** Testing vprintf() : hexa formats with hexa values ***\n";
 $formats = array(
   "%x",
   "%+x %-x %X",
-  "%lx %4x %-4x",
+  "%lx %Lx, %4x %-4x",
   "%10.4x %-10.4x %04x %04.4x",
   "%'#2x %'2x %'$2x %'_2x",
   "%x %x %x %x",
-  "% %%x",
+  "% %%x x%",
   '%3$x %4$x %1$x %2$x'
 );
 
@@ -30,7 +35,7 @@ $formats = array(
 $args_array = array(
   array(0x0),
   array(-0x1, 0x1, +0x22),
-  array(0x7FFFFFFF, +0x7000000, -0x80000000),
+  array(0x7FFFFFFF, -0x7fffffff, +0x7000000, -0x80000000),
   array(123456, 12345678, -1234567, 1234567),
   array(1, 0x2222, 0333333, -0x44444444),
   array(0x123b, 0xfAb, "0xaxz", 012),
@@ -51,6 +56,7 @@ foreach($formats as $format) {
 }
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing vprintf() : hexa formats with hexa values ***
 
@@ -63,8 +69,8 @@ ffffffff 1 22
 int(13)
 
 -- Iteration 3 --
-7fffffff 7000000 80000000
-int(25)
+7fffffff x, 7000000 80000000
+int(28)
 
 -- Iteration 4 --
                       ffed2979 0000
@@ -79,9 +85,10 @@ int(22)
 int(12)
 
 -- Iteration 7 --
-%34
-int(3)
+%34 x
+int(5)
 
 -- Iteration 8 --
 1 2 3 4
 int(7)
+===DONE===

@@ -1,7 +1,7 @@
 --TEST--
 Request #69086 (enhancement for mb_convert_encoding)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 mb_substitute_character(0xfffd);

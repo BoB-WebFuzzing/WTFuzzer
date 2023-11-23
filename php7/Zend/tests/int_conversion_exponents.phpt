@@ -39,14 +39,14 @@ int(-1234500000)
 int(1234500000)
 int(-1234500000)
 
-Warning: A non-numeric value encountered in %s on line %d
+Notice: A non well formed numeric value encountered in %s on line %d
 int(1234500000)
 
-Warning: A non-numeric value encountered in %s on line %d
+Notice: A non well formed numeric value encountered in %s on line %d
 int(-1234500000)
 
-Warning: A non-numeric value encountered in %s on line %d
+Notice: A non well formed numeric value encountered in %s on line %d
 int(1234500000)
 
-Warning: A non-numeric value encountered in %s on line %d
+Notice: A non well formed numeric value encountered in %s on line %d
 int(-1234500000)

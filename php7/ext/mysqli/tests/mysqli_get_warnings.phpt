@@ -1,16 +1,17 @@
 --TEST--
 mysqli_get_warnings() - TODO
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
+require_once('connect.inc');
 if (!$TEST_EXPERIMENTAL)
     die("skip - experimental (= unsupported) feature");
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     $tmp    = NULL;
     $link   = NULL;
@@ -83,7 +84,8 @@ if (!$TEST_EXPERIMENTAL)
     mysqli_close($link);
 
 
-    $mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket))
+        printf("[021] Cannot create mysqli object: [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
     if (!$mysqli->query("DROP TABLE IF EXISTS t1"))
         printf("[022] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -91,7 +93,8 @@ if (!$TEST_EXPERIMENTAL)
     if (!$mysqli->query("CREATE TABLE t1 (a smallint)"))
         printf("[023] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 
-    $warning = new mysqli_warning($mysqli);
+    if (!is_object($warning = new mysqli_warning($mysqli)))
+        printf("[024] Expecting object/mysqli_warning, got %s/%s", gettype($warning), $warning);
 
     if (!is_string($warning->message) || ('' == $warning->message))
         printf("[025] Expecting string, got %s/%s", gettype($warning->message), $warning->message);
@@ -100,7 +103,8 @@ if (!$TEST_EXPERIMENTAL)
         printf("[026] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 
     /* Yes, I really want to check if the object property is empty */
-    $mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket))
+        printf("[027] Cannot create mysqli object: [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
     $warning = new mysqli_warning($mysqli);
     if (false !== ($tmp = $warning->next()))
@@ -109,7 +113,8 @@ if (!$TEST_EXPERIMENTAL)
     if ('' != ($tmp = $warning->message))
         printf("[029] Expecting string/empty, got %s/%s\n", gettype($tmp), $tmp);
 
-    $mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket))
+        printf("[030] Cannot create mysqli object: [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
     if (!$mysqli->query("DROP TABLE IF EXISTS t1"))
         printf("[031] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -137,7 +142,7 @@ if (!$TEST_EXPERIMENTAL)
     print "done!";
 ?>
 <?php
-require_once 'connect.inc';
+require_once("connect.inc");
 if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
    printf("[c001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 

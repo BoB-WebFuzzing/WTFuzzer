@@ -2,6 +2,11 @@
 Test array_unique() function : usage variations - two dimensional arrays
 --FILE--
 <?php
+/* Prototype  : array array_unique(array $input)
+ * Description: Removes duplicate values from array
+ * Source code: ext/standard/array.c
+*/
+
 /*
  * Testing the functionality of array_unique() by passing
  * two dimensional arrays for $input argument.
@@ -24,13 +29,13 @@ echo "Done";
 --EXPECTF--
 *** Testing array_unique() : two dimensional array for $input argument ***
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_unique_variation8.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_unique_variation8.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_unique_variation8.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_unique_variation8.php on line %d
 array(1) {
   [0]=>
   array(4) {

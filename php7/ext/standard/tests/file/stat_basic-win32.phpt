@@ -8,6 +8,11 @@ if (substr(PHP_OS, 0, 3) != 'WIN') {
 ?>
 --FILE--
 <?php
+/*
+   Prototype: array stat ( string $filename );
+   Description: Gives information about a file
+*/
+
 $file_path = __DIR__;
 require("$file_path/file.inc");
 
@@ -29,7 +34,7 @@ $file_handle = fopen($filename, "w");
 fclose($file_handle);
 // stat of the file created
 $file_stat = stat($filename);
-sleep(1);
+sleep(2);
 
 // now new stat of the dir after file is created
 $new_dir_stat = stat($dirname);

@@ -5,12 +5,12 @@ opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
 opcache.preload=
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
-class Test {
+class Test { 
     public string $x = "x";
 }
 function test() {

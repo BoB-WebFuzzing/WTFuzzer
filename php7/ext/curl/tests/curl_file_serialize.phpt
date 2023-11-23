@@ -1,7 +1,11 @@
 --TEST--
 CURL file uploading
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+if (!extension_loaded("curl")) {
+	exit("skip curl extension not loaded");
+}
+?>
 --FILE--
 <?php
 $file = new CURLFile(__DIR__ . '/curl_testdata1.txt');

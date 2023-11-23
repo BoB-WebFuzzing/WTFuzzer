@@ -1,10 +1,8 @@
 --TEST--
 PDO PgSQL Bug #69752 (memory leak with closeCursor)
---EXTENSIONS--
-pdo
-pdo_pgsql
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo') || !extension_loaded('pdo_pgsql')) die('skip not loaded');
 require __DIR__ . '/config.inc';
 require __DIR__ . '/../../../ext/pdo/tests/pdo_test.inc';
 PDOTest::skip();
@@ -19,7 +17,7 @@ $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 $pdo->beginTransaction();
 
 $pdo->exec("
-    create table test69752 (
+    create table foo (
         id bigserial not null primary key,
         field1 text not null,
         field2 text not null,
@@ -27,7 +25,7 @@ $pdo->exec("
         field4 int4 not null
     )
 ");
-$stmt = $pdo->prepare("insert into test69752 (field1, field2, field3, field4) values (:field1, :field2, :field3, :field4)");
+$stmt = $pdo->prepare("insert into foo (field1, field2, field3, field4) values (:field1, :field2, :field3, :field4)");
 $max = 1000;
 $first_time_usage = null;
 

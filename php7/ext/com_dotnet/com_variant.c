@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -92,10 +94,10 @@ bogus:
 	}
 }
 
-static void php_com_variant_from_zval_ex(VARIANT *v, zval *z, int codepage, VARTYPE vt)
+PHP_COM_DOTNET_API void php_com_variant_from_zval(VARIANT *v, zval *z, int codepage)
 {
 	php_com_dotnet_object *obj;
-	uint8_t ztype = IS_NULL;
+	zend_uchar ztype = IS_NULL;
 
 	if (z) {
 		ZVAL_DEREF(z);
@@ -145,11 +147,6 @@ static void php_com_variant_from_zval_ex(VARIANT *v, zval *z, int codepage, VART
 			break;
 
 		case IS_LONG:
-			if (vt == VT_ERROR) {
-				V_VT(v) = VT_ERROR;
-				V_ERROR(v) = Z_LVAL_P(z);
-				break;
-			}
 #if SIZEOF_ZEND_LONG == 4
 			V_VT(v) = VT_I4;
 			V_I4(v) = Z_LVAL_P(z);
@@ -177,15 +174,10 @@ static void php_com_variant_from_zval_ex(VARIANT *v, zval *z, int codepage, VART
 	}
 }
 
-PHP_COM_DOTNET_API void php_com_variant_from_zval(VARIANT *v, zval *z, int codepage)
-{
-	php_com_variant_from_zval_ex(v, z, codepage, VT_EMPTY);
-}
-
-PHP_COM_DOTNET_API zend_result php_com_zval_from_variant(zval *z, VARIANT *v, int codepage)
+PHP_COM_DOTNET_API int php_com_zval_from_variant(zval *z, VARIANT *v, int codepage)
 {
 	OLECHAR *olestring = NULL;
-	zend_result ret = SUCCESS;
+	int ret = SUCCESS;
 
 	switch (V_VT(v)) {
 		case VT_EMPTY:
@@ -281,9 +273,9 @@ PHP_COM_DOTNET_API zend_result php_com_zval_from_variant(zval *z, VARIANT *v, in
 }
 
 
-PHP_COM_DOTNET_API zend_result php_com_copy_variant(VARIANT *dstvar, VARIANT *srcvar)
+PHP_COM_DOTNET_API int php_com_copy_variant(VARIANT *dstvar, VARIANT *srcvar)
 {
-	zend_result ret = SUCCESS;
+	int ret = SUCCESS;
 
 	switch (V_VT(dstvar) & ~VT_BYREF) {
 	case VT_EMPTY:
@@ -394,14 +386,14 @@ PHP_COM_DOTNET_API zend_result php_com_copy_variant(VARIANT *dstvar, VARIANT *sr
 		} else {
 			V_BOOL(dstvar) = V_BOOL(srcvar);
 		}
-		break;
+        break;
 
 	case VT_BSTR:
 		if (V_VT(dstvar) & VT_BYREF) {
 			*V_BSTRREF(dstvar) = V_BSTR(srcvar);
 		} else {
 			V_BSTR(dstvar) = V_BSTR(srcvar);
-		}
+        }
 		break;
 
 	case VT_UNKNOWN:
@@ -424,14 +416,14 @@ PHP_COM_DOTNET_API zend_result php_com_copy_variant(VARIANT *dstvar, VARIANT *sr
 		return php_com_copy_variant(V_VARIANTREF(dstvar), srcvar);
 
 	default:
-		php_error_docref(NULL, E_WARNING, "variant->__construct: failed to copy from 0x%x to 0x%x", V_VT(dstvar), V_VT(srcvar));
+		php_error_docref(NULL, E_WARNING, "variant->variant: failed to copy from 0x%x to 0x%x", V_VT(dstvar), V_VT(srcvar));
 		ret = FAILURE;
 	}
 	return ret;
 }
 
 /* {{{ com_variant_create_instance - ctor for new VARIANT() */
-PHP_METHOD(variant, __construct)
+PHP_FUNCTION(com_variant_create_instance)
 {
 	/* VARTYPE == unsigned short */ zend_long vt = VT_EMPTY;
 	zend_long codepage = CP_ACP;
@@ -445,20 +437,21 @@ PHP_METHOD(variant, __construct)
 		return;
 	}
 
+	obj = CDNO_FETCH(object);
+
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
 		"z!|ll", &zvalue, &vt, &codepage)) {
-			RETURN_THROWS();
+			php_com_throw_exception(E_INVALIDARG, "Invalid arguments");
+			return;
 	}
 
 	php_com_initialize();
-	obj = CDNO_FETCH(object);
-
 	if (ZEND_NUM_ARGS() == 3) {
 		obj->code_page = (int)codepage;
 	}
 
 	if (zvalue) {
-		php_com_variant_from_zval_ex(&obj->v, zvalue, obj->code_page, vt);
+		php_com_variant_from_zval(&obj->v, zvalue, obj->code_page);
 	}
 
 	/* Only perform conversion if variant not already of type passed */
@@ -501,7 +494,8 @@ PHP_METHOD(variant, __construct)
 }
 /* }}} */
 
-/* {{{ Assigns a new value for a variant object */
+/* {{{ proto void variant_set(object variant, mixed value)
+   Assigns a new value for a variant object */
 PHP_FUNCTION(variant_set)
 {
 	zval *zobj, *zvalue = NULL;
@@ -509,7 +503,7 @@ PHP_FUNCTION(variant_set)
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
 			"Oz!", &zobj, php_com_variant_class_entry, &zvalue)) {
-		RETURN_THROWS();
+		return;
 	}
 
 	obj = CDNO_FETCH(zobj);
@@ -520,7 +514,7 @@ PHP_FUNCTION(variant_set)
 		obj->typeinfo = NULL;
 	}
 	if (obj->sink_dispatch) {
-		php_com_object_enable_event_sink(obj, /* enable */ false);
+		php_com_object_enable_event_sink(obj, FALSE);
 		IDispatch_Release(obj->sink_dispatch);
 		obj->sink_dispatch = NULL;
 	}
@@ -587,7 +581,7 @@ static void variant_binary_operation(enum variant_binary_opcode op, INTERNAL_FUN
 		php_com_variant_from_zval(vright, zright, codepage);
 
 	} else {
-		RETURN_THROWS();
+		return;
 	}
 
 	switch (op) {
@@ -647,91 +641,104 @@ static void variant_binary_operation(enum variant_binary_opcode op, INTERNAL_FUN
 }
 /* }}} */
 
-/* {{{ "Adds" two variant values together and returns the result */
+/* {{{ proto mixed variant_add(mixed left, mixed right)
+   "Adds" two variant values together and returns the result */
 PHP_FUNCTION(variant_add)
 {
 	variant_binary_operation(VOP_ADD, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ concatenates two variant values together and returns the result */
+/* {{{ proto mixed variant_cat(mixed left, mixed right)
+   concatenates two variant values together and returns the result */
 PHP_FUNCTION(variant_cat)
 {
 	variant_binary_operation(VOP_CAT, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ subtracts the value of the right variant from the left variant value and returns the result */
+/* {{{ proto mixed variant_sub(mixed left, mixed right)
+   subtracts the value of the right variant from the left variant value and returns the result */
 PHP_FUNCTION(variant_sub)
 {
 	variant_binary_operation(VOP_SUB, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ multiplies the values of the two variants and returns the result */
+/* {{{ proto mixed variant_mul(mixed left, mixed right)
+   multiplies the values of the two variants and returns the result */
 PHP_FUNCTION(variant_mul)
 {
 	variant_binary_operation(VOP_MUL, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ performs a bitwise AND operation between two variants and returns the result */
+/* {{{ proto mixed variant_and(mixed left, mixed right)
+   performs a bitwise AND operation between two variants and returns the result */
 PHP_FUNCTION(variant_and)
 {
 	variant_binary_operation(VOP_AND, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Returns the result from dividing two variants */
+/* {{{ proto mixed variant_div(mixed left, mixed right)
+   Returns the result from dividing two variants */
 PHP_FUNCTION(variant_div)
 {
 	variant_binary_operation(VOP_DIV, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Performs a bitwise equivalence on two variants */
+/* {{{ proto mixed variant_eqv(mixed left, mixed right)
+   Performs a bitwise equivalence on two variants */
 PHP_FUNCTION(variant_eqv)
 {
 	variant_binary_operation(VOP_EQV, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Converts variants to integers and then returns the result from dividing them */
+/* {{{ proto mixed variant_idiv(mixed left, mixed right)
+   Converts variants to integers and then returns the result from dividing them */
 PHP_FUNCTION(variant_idiv)
 {
 	variant_binary_operation(VOP_IDIV, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Performs a bitwise implication on two variants */
+/* {{{ proto mixed variant_imp(mixed left, mixed right)
+   Performs a bitwise implication on two variants */
 PHP_FUNCTION(variant_imp)
 {
 	variant_binary_operation(VOP_IMP, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Divides two variants and returns only the remainder */
+/* {{{ proto mixed variant_mod(mixed left, mixed right)
+   Divides two variants and returns only the remainder */
 PHP_FUNCTION(variant_mod)
 {
 	variant_binary_operation(VOP_MOD, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Performs a logical disjunction on two variants */
+/* {{{ proto mixed variant_or(mixed left, mixed right)
+   Performs a logical disjunction on two variants */
 PHP_FUNCTION(variant_or)
 {
 	variant_binary_operation(VOP_OR, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Returns the result of performing the power function with two variants */
+/* {{{ proto mixed variant_pow(mixed left, mixed right)
+   Returns the result of performing the power function with two variants */
 PHP_FUNCTION(variant_pow)
 {
 	variant_binary_operation(VOP_POW, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Performs a logical exclusion on two variants */
+/* {{{ proto mixed variant_xor(mixed left, mixed right)
+   Performs a logical exclusion on two variants */
 PHP_FUNCTION(variant_xor)
 {
 	variant_binary_operation(VOP_XOR, INTERNAL_FUNCTION_PARAM_PASSTHRU);
@@ -760,7 +767,7 @@ static void variant_unary_operation(enum variant_unary_opcode op, INTERNAL_FUNCT
 		vleft = &left_val;
 		php_com_variant_from_zval(vleft, zleft, codepage);
 	} else {
-		RETURN_THROWS();
+		return;
 	}
 
 	switch (op) {
@@ -794,42 +801,48 @@ static void variant_unary_operation(enum variant_unary_opcode op, INTERNAL_FUNCT
 }
 /* }}} */
 
-/* {{{ Returns the absolute value of a variant */
+/* {{{ proto mixed variant_abs(mixed left)
+   Returns the absolute value of a variant */
 PHP_FUNCTION(variant_abs)
 {
 	variant_unary_operation(VOP_ABS, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Returns the integer part ? of a variant */
+/* {{{ proto mixed variant_fix(mixed left)
+   Returns the integer part ? of a variant */
 PHP_FUNCTION(variant_fix)
 {
 	variant_unary_operation(VOP_FIX, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Returns the integer portion of a variant */
+/* {{{ proto mixed variant_int(mixed left)
+   Returns the integer portion of a variant */
 PHP_FUNCTION(variant_int)
 {
 	variant_unary_operation(VOP_INT, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Performs logical negation on a variant */
+/* {{{ proto mixed variant_neg(mixed left)
+   Performs logical negation on a variant */
 PHP_FUNCTION(variant_neg)
 {
 	variant_unary_operation(VOP_NEG, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Performs bitwise not negation on a variant */
+/* {{{ proto mixed variant_not(mixed left)
+   Performs bitwise not negation on a variant */
 PHP_FUNCTION(variant_not)
 {
 	variant_unary_operation(VOP_NOT, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 /* }}} */
 
-/* {{{ Rounds a variant to the specified number of decimal places */
+/* {{{ proto mixed variant_round(mixed left, int decimals)
+   Rounds a variant to the specified number of decimal places */
 PHP_FUNCTION(variant_round)
 {
 	VARIANT vres;
@@ -852,7 +865,7 @@ PHP_FUNCTION(variant_round)
 		vleft = &left_val;
 		php_com_variant_from_zval(vleft, zleft, codepage);
 	} else {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (SUCCEEDED(VarRound(vleft, (int)decimals, &vres))) {
@@ -864,7 +877,8 @@ PHP_FUNCTION(variant_round)
 }
 /* }}} */
 
-/* {{{ Compares two variants */
+/* {{{ proto int variant_cmp(mixed left, mixed right [, int lcid [, int flags]])
+   Compares two variants */
 PHP_FUNCTION(variant_cmp)
 {
 	VARIANT left_val, right_val;
@@ -911,7 +925,7 @@ PHP_FUNCTION(variant_cmp)
 		php_com_variant_from_zval(vright, zright, codepage);
 
 	} else {
-		RETURN_THROWS();
+		return;
 	}
 
 	ZVAL_LONG(return_value, VarCmp(vleft, vright, (LCID)lcid, (ULONG)flags));
@@ -921,7 +935,8 @@ PHP_FUNCTION(variant_cmp)
 }
 /* }}} */
 
-/* {{{ Converts a variant date/time value to unix timestamp */
+/* {{{ proto int variant_date_to_timestamp(object variant)
+   Converts a variant date/time value to unix timestamp */
 PHP_FUNCTION(variant_date_to_timestamp)
 {
 	VARIANT vres;
@@ -932,7 +947,7 @@ PHP_FUNCTION(variant_date_to_timestamp)
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
 		"O", &zleft, php_com_variant_class_entry)) {
-		RETURN_THROWS();
+		return;
 	}
 	obj = CDNO_FETCH(zleft);
 
@@ -959,7 +974,8 @@ PHP_FUNCTION(variant_date_to_timestamp)
 }
 /* }}} */
 
-/* {{{ Returns a variant date representation of a unix timestamp */
+/* {{{ proto object variant_date_from_timestamp(int timestamp)
+   Returns a variant date representation of a unix timestamp */
 PHP_FUNCTION(variant_date_from_timestamp)
 {
 	zend_long timestamp;
@@ -970,12 +986,12 @@ PHP_FUNCTION(variant_date_from_timestamp)
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "l",
 			&timestamp)) {
-		RETURN_THROWS();
+		return;
 	}
 
 	if (timestamp < 0) {
-		zend_argument_value_error(1, "must be greater than or equal to 0");
-		RETURN_THROWS();
+		php_error_docref(NULL, E_WARNING, "Timestamp value must be a positive value.");
+		RETURN_FALSE;
 	}
 
 	VariantInit(&res);
@@ -985,8 +1001,8 @@ PHP_FUNCTION(variant_date_from_timestamp)
 
 	/* Invalid after 23:59:59, December 31, 3000, UTC */
 	if (!tmv) {
-		zend_argument_value_error(1, "must not go past 23:59:59, December 31, 3000, UTC");
-		RETURN_THROWS();
+		php_error_docref(NULL, E_WARNING, "Invalid timestamp " ZEND_LONG_FMT, timestamp);
+		RETURN_FALSE;
 	}
 
 	memset(&systime, 0, sizeof(systime));
@@ -1007,7 +1023,8 @@ PHP_FUNCTION(variant_date_from_timestamp)
 }
 /* }}} */
 
-/* {{{ Returns the VT_XXX type code for a variant */
+/* {{{ proto int variant_get_type(object variant)
+   Returns the VT_XXX type code for a variant */
 PHP_FUNCTION(variant_get_type)
 {
 	zval *zobj;
@@ -1015,7 +1032,7 @@ PHP_FUNCTION(variant_get_type)
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
 		"O", &zobj, php_com_variant_class_entry)) {
-		RETURN_THROWS();
+		return;
 	}
 	obj = CDNO_FETCH(zobj);
 
@@ -1023,27 +1040,22 @@ PHP_FUNCTION(variant_get_type)
 }
 /* }}} */
 
-/* {{{ Convert a variant into another type.  Variant is modified "in-place" */
+/* {{{ proto void variant_set_type(object variant, int type)
+   Convert a variant into another type.  Variant is modified "in-place" */
 PHP_FUNCTION(variant_set_type)
 {
 	zval *zobj;
 	php_com_dotnet_object *obj;
 	/* VARTYPE == unsigned short */ zend_long vt;
-	VARIANT vtmp;
 	HRESULT res;
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
 		"Ol", &zobj, php_com_variant_class_entry, &vt)) {
-		RETURN_THROWS();
+		return;
 	}
 	obj = CDNO_FETCH(zobj);
 
-	if (V_VT(&obj->v) == VT_ERROR) {
-		VariantInit(&vtmp);
-		V_VT(&vtmp) = VT_I4;
-		V_I4(&vtmp) = V_ERROR(&obj->v);
-	}
-	res = VariantChangeType(&obj->v, V_VT(&obj->v) != VT_ERROR ? &obj->v : &vtmp, 0, (VARTYPE)vt);
+	res = VariantChangeType(&obj->v, &obj->v, 0, (VARTYPE)vt);
 
 	if (SUCCEEDED(res)) {
 		if (vt != VT_DISPATCH && obj->typeinfo) {
@@ -1063,7 +1075,8 @@ PHP_FUNCTION(variant_set_type)
 }
 /* }}} */
 
-/* {{{ Convert a variant into a new variant object of another type */
+/* {{{ proto object variant_cast(object variant, int type)
+   Convert a variant into a new variant object of another type */
 PHP_FUNCTION(variant_cast)
 {
 	zval *zobj;
@@ -1074,16 +1087,12 @@ PHP_FUNCTION(variant_cast)
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
 		"Ol", &zobj, php_com_variant_class_entry, &vt)) {
-		RETURN_THROWS();
+		return;
 	}
 	obj = CDNO_FETCH(zobj);
 
 	VariantInit(&vres);
-	if (V_VT(&obj->v) == VT_ERROR) {
-		V_VT(&vres) = VT_I4;
-		V_I4(&vres) = V_ERROR(&obj->v);
-	}
-	res = VariantChangeType(&vres, V_VT(&vres) == VT_EMPTY ? &obj->v : &vres, 0, (VARTYPE)vt);
+	res = VariantChangeType(&vres, &obj->v, 0, (VARTYPE)vt);
 
 	if (SUCCEEDED(res)) {
 		php_com_wrap_variant(return_value, &vres, obj->code_page);

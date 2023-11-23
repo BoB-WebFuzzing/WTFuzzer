@@ -1,20 +1,31 @@
 --TEST--
 mysqli_query()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
 
-    try {
-        mysqli_query($link, '');
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_query()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_query($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
+
+    if (false !== ($tmp = @mysqli_query($link, '')))
+        printf("[002a] Expecting boolean/false got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_query($link, "SELECT 1 AS a", MYSQLI_USE_RESULT, "foo")))
+        printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     if (false !== ($tmp = mysqli_query($link, 'THIS IS NOT SQL')))
         printf("[004] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
@@ -83,25 +94,22 @@ require_once 'skipifconnectfailure.inc';
         printf("[012] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
     mysqli_free_result($res);
 
-    try {
-        mysqli_query($link, "SELECT id FROM test ORDER BY id", 1234);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (false !== ($res = @mysqli_query($link, "SELECT id FROM test ORDER BY id", 1234)))
+        printf("[013] Invalid mode should return false got %s/%s, [%d] %s\n",
+            gettype($res), (is_object($res)) ? 'object' : $res,
+            mysqli_errno($link), mysqli_error($link));
+
 
     mysqli_close($link);
 
-    try {
-        mysqli_query($link, "SELECT id FROM test");
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_query($link, "SELECT id FROM test")))
+        printf("[011] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
 --CLEAN--
 <?php
-require_once 'connect.inc';
+require_once("connect.inc");
 if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
    printf("[c001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
@@ -114,7 +122,6 @@ if (!mysqli_query($link, "DROP TABLE IF EXISTS test"))
 mysqli_close($link);
 ?>
 --EXPECTF--
-mysqli_query(): Argument #2 ($query) cannot be empty
 array(1) {
   ["valid"]=>
   string(30) "this is sql but with semicolon"
@@ -124,6 +131,6 @@ array(1) {
   string(1) "a"
 }
 string(1) "a"
-mysqli_query(): Argument #3 ($result_mode) must be either MYSQLI_USE_RESULT or MYSQLI_STORE_RESULT%S
-mysqli object is already closed
+
+Warning: mysqli_query(): Couldn't fetch mysqli in %s on line %d
 done!

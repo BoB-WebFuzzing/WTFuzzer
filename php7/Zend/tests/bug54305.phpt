@@ -9,11 +9,14 @@ class TestClass {
 abstract class AbstractClass {
 }
 $methodWithArgs = new ReflectionMethod('TestClass', 'methodWithArgs');
-try {
-    echo $methodWithArgs++;
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+echo $methodWithArgs++;
 ?>
---EXPECT--
-Cannot increment ReflectionMethod
+--EXPECTF--
+Method [ <user> public method methodWithArgs ] {
+  @@ %sbug54305.php %d - %d
+
+  - Parameters [2] {
+    Parameter #0 [ <required> $a ]
+    Parameter #1 [ <required> $b ]
+  }
+}

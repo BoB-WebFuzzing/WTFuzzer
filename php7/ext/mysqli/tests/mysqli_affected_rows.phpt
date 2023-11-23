@@ -1,14 +1,26 @@
 --TEST--
 mysqli_affected_rows()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-    require_once 'skipifconnectfailure.inc';
+    require_once('skipif.inc');
+    require_once('skipifemb.inc');
+    require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_affected_rows()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_affected_rows($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_affected_rows($link, $link)))
+        printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
         printf("[004] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
@@ -110,18 +122,14 @@ mysqli
 
     mysqli_close($link);
 
-    try {
-        mysqli_affected_rows($link);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = @mysqli_affected_rows($link)))
+        printf("[033] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
-mysqli object is already closed
 done!

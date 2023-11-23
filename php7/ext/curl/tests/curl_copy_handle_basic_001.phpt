@@ -3,8 +3,8 @@ Test curl_copy_handle() with simple get
 --CREDITS--
 Rick Buitenman <rick@meritos.nl>
 #testfest Utrecht 2009
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 
@@ -28,6 +28,7 @@ curl
 
   var_dump( $curl_content );
 ?>
+===DONE===
 --EXPECT--
 *** Testing curl copy handle with simple GET ***
 string(106) "array(2) {
@@ -39,3 +40,4 @@ string(106) "array(2) {
 array(0) {
 }
 "
+===DONE=== 

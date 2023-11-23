@@ -1,11 +1,7 @@
 --TEST--
 oci_bind_array_by_name() and invalid values 2
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
@@ -54,11 +50,7 @@ $statement = oci_parse($c, "BEGIN array_bind_002_pkg.iobind(:c1); END;");
 
 $array = Array("06-DEC-05","10-DEC-80","21-AUG-91","26-OCT-17","05-NOV-05");
 
-try {
-    oci_bind_array_by_name($statement, ":c1", $array, 0, 0, SQLT_ODT);
-} catch (ValueError $e) {
-    echo $e->getMessage(), "\n";
-}
+oci_bind_array_by_name($statement, ":c1", $array, 0, 0, SQLT_ODT);
 
 oci_execute($statement);
 
@@ -67,7 +59,7 @@ var_dump($array);
 echo "Done\n";
 ?>
 --EXPECTF--
-oci_bind_array_by_name(): Argument #4 ($max_array_length) must be greater than 0
+Warning: oci_bind_array_by_name(): Maximum array length must be greater than zero in %s on line %d
 
 Warning: oci_execute(): ORA-%r(01008|57000)%r: %s in %s on line %d
 array(5) {

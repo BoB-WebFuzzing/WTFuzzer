@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: casting instances
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -35,6 +35,7 @@ var_dump((object)$foo);
 var_dump((object)$people);
 
 ?>
+===DONE===
 --EXPECTF--
 bool(false)
 bool(true)
@@ -133,3 +134,4 @@ object(SimpleXMLElement)#%d (1) {
     }
   }
 }
+===DONE===

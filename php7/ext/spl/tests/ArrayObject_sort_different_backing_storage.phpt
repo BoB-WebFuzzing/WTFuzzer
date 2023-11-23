@@ -28,7 +28,7 @@ $ao5->uasort(function($a, $b) { return $a <=> $b; });
 var_dump($ao5);
 
 ?>
---EXPECTF--
+--EXPECT--
 object(ArrayObject)#2 (1) {
   ["storage":"ArrayObject":private]=>
   object(stdClass)#1 (2) {
@@ -50,10 +50,6 @@ object(ArrayObject)#3 (1) {
     }
   }
 }
-
-Deprecated: Creation of dynamic property ArrayObject::$a is deprecated in %s on line %d
-
-Deprecated: Creation of dynamic property ArrayObject::$b is deprecated in %s on line %d
 object(ArrayObject)#4 (2) {
   ["b"]=>
   int(1)

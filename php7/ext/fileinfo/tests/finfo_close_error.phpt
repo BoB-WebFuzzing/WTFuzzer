@@ -1,22 +1,47 @@
 --TEST--
 Test finfo_close() function : error conditions
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
+/* Prototype  : resource finfo_close(resource finfo)
+ * Description: Close fileinfo resource.
+ * Source code: ext/fileinfo/fileinfo.c
+ * Alias to functions:
+ */
+
 echo "*** Testing finfo_close() : error conditions ***\n";
 
-echo "\n-- Testing finfo_close() function with wrong resource type --\n";
+$magicFile = __DIR__ . DIRECTORY_SEPARATOR . 'magic';
+$finfo = finfo_open( FILEINFO_MIME, $magicFile );
 $fp = fopen( __FILE__, 'r' );
-try {
-    var_dump( finfo_close( $fp ) );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+
+echo "\n-- Testing finfo_close() function with Zero arguments --\n";
+var_dump( finfo_close() );
+
+echo "\n-- Testing finfo_close() function with more than expected no. of arguments --\n";
+var_dump( finfo_close( $finfo, '10') );
+
+echo "\n-- Testing finfo_close() function with wrong resource type --\n";
+var_dump( finfo_close( $fp ) );
 
 ?>
---EXPECT--
+===DONE===
+--EXPECTF--
 *** Testing finfo_close() : error conditions ***
 
+-- Testing finfo_close() function with Zero arguments --
+
+Warning: finfo_close() expects exactly 1 parameter, 0 given in %s on line %d
+bool(false)
+
+-- Testing finfo_close() function with more than expected no. of arguments --
+
+Warning: finfo_close() expects exactly 1 parameter, 2 given in %s on line %d
+bool(false)
+
 -- Testing finfo_close() function with wrong resource type --
-finfo_close(): Argument #1 ($finfo) must be of type finfo, resource given
+
+Warning: finfo_close(): supplied resource is not a valid file_info resource in %s on line %d
+bool(false)
+===DONE===

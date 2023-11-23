@@ -1,8 +1,10 @@
 --TEST--
 Bug #70535 (XSLT: free(): invalid pointer)
---EXTENSIONS--
-xsl
-simplexml
+--SKIPIF--
+<?php
+if (!extension_loaded('xsl')) die("skip Extension XSL is required");
+if (!extension_loaded("simplexml")) die("skip simplexml extension is not loaded");
+?>
 --FILE--
 <?php
 

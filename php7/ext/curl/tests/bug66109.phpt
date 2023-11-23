@@ -1,7 +1,7 @@
 --TEST--
 Bug #66109 (Option CURLOPT_CUSTOMREQUEST can't be reset to default.)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 include 'server.inc';

@@ -1,7 +1,11 @@
 --TEST--
 OSS-Fuzz #17474: Memory leak on duplicate Copyright tags
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php
+if (!extension_loaded('exif')) {
+    die('skip exif extension not available');
+}
+?>
 --FILE--
 <?php
 
@@ -10,5 +14,5 @@ exif
 
 ?>
 ===DONE===
---EXPECT--
+--EXPECTF--
 ===DONE===

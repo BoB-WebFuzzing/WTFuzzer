@@ -1,7 +1,7 @@
 --TEST--
 Bug #75608 ("Narrowing occurred during type inference" error)
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class ReactionRatingService

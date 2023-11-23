@@ -18,6 +18,7 @@ $ref = 'changed.one';
 D::$p =& $ref;
 var_dump(C::$p, D::$p, E::$p);
 ?>
+==Done==
 --EXPECT--
 Inherited static properties refer to the same value across classes:
 string(8) "original"
@@ -33,3 +34,4 @@ References cannot be used to split the properties:
 string(11) "changed.one"
 string(11) "changed.one"
 string(11) "changed.one"
+==Done==

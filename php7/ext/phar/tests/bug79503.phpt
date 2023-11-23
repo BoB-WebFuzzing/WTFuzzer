@@ -1,7 +1,9 @@
 --TEST--
 Bug #79503 (Memory leak on duplicate metadata)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded('phar')) die('skip phar extension not available');
+?>
 --FILE--
 <?php
 try {

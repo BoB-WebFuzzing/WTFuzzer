@@ -4,8 +4,10 @@ Test DOMDocument::loadHTMLFile when an empty document is loaded
 Verifies that an warning message is showed if an empty document is loaded
 --CREDITS--
 Antonio Diaz Ruiz <dejalatele@gmail.com>
---EXTENSIONS--
-dom
+--INI--
+assert.bail=true
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --FILE--
 <?php
 $doc = new DOMDocument();

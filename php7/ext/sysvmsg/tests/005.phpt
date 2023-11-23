@@ -1,23 +1,24 @@
 --TEST--
 sysvmsg functions on non-existing queue
---EXTENSIONS--
-sysvmsg
+--SKIPIF--
+<?php if (!extension_loaded("sysvmsg")) die("skip sysvmsg extension is not available")?>
 --FILE--
 <?php
 
 $tests = array(null, 'foo');
 
-foreach ($tests as $i => $q) {
+foreach ($tests as $q) {
 
     if ($q === null) {
-        do {
-            $id = ftok(__FILE__, chr(mt_rand(0, 255))); } while (msg_queue_exists($id));
+	do {
+	    $id = ftok(__FILE__, chr(mt_rand(0, 255)));
+	} while (msg_queue_exists($id));
+
+	$q = msg_get_queue($id) or die("Failed to create queue");
+	msg_remove_queue($q) or die("Failed to close queue");
     }
 
-    $q = msg_get_queue($id) or die("Failed to create queue");
-    msg_remove_queue($q) or die("Failed to close queue");
-
-    echo "Iteration " . ($i + 1) . ":\n";
+    echo "Using '$q' as queue resource:\n";
 
     $errno = 0;
 
@@ -27,12 +28,8 @@ foreach ($tests as $i => $q) {
 
     var_dump(msg_receive($q, 0, $null, 1, $msg, true, 0, $errno));
     var_dump($errno != 0);
-    // again, but triggering an exception
-    try {
-        msg_receive($q, 0, $null, 0, $msg);
-    } catch (ValueError $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    // again, but triggering an E_WARNING
+    var_dump(msg_receive($q, 0, $null, 0, $msg));
 
     var_dump(msg_send($q, 1, 'foo', true, true, $errno));
     var_dump($errno != 0);
@@ -41,24 +38,34 @@ foreach ($tests as $i => $q) {
 echo "Done\n";
 ?>
 --EXPECTF--
-Iteration 1:
+Using 'Resource id #4' as queue resource:
 bool(false)
 bool(false)
 bool(false)
 bool(true)
-msg_receive(): Argument #4 ($max_message_size) must be greater than 0
+
+Warning: msg_receive(): maximum size of the message has to be greater than zero in %s on line %d
+bool(false)
 
 Warning: msg_send(): msgsnd failed: Invalid argument in %s on line %d
 bool(false)
 bool(true)
-Iteration 2:
-bool(false)
-bool(false)
-bool(false)
-bool(true)
-msg_receive(): Argument #4 ($max_message_size) must be greater than 0
+Using 'foo' as queue resource:
 
-Warning: msg_send(): msgsnd failed: Invalid argument in %s on line %d
+Warning: msg_set_queue() expects parameter 1 to be resource, string given in %s on line %d
 bool(false)
-bool(true)
+
+Warning: msg_stat_queue() expects parameter 1 to be resource, string given in %s on line %d
+bool(false)
+
+Warning: msg_receive() expects parameter 1 to be resource, string given in %s on line %d
+bool(false)
+bool(false)
+
+Warning: msg_receive() expects parameter 1 to be resource, string given in %s on line %d
+bool(false)
+
+Warning: msg_send() expects parameter 1 to be resource, string given in %s on line %d
+bool(false)
+bool(false)
 Done

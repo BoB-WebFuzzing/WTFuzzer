@@ -1,7 +1,9 @@
 --TEST--
 Set and get image resolution of PNG images
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $filename = __DIR__ . DIRECTORY_SEPARATOR . 'imageresolution_png.png';
@@ -19,6 +21,7 @@ imagepng($exp, $filename);
 $act = imagecreatefrompng($filename);
 var_dump(imageresolution($act));
 ?>
+===DONE===
 --EXPECT--
 array(2) {
   [0]=>
@@ -32,6 +35,7 @@ array(2) {
   [1]=>
   int(299)
 }
+===DONE===
 --CLEAN--
 <?php
 @unlink(__DIR__ . DIRECTORY_SEPARATOR . 'imageresolution_png.png');

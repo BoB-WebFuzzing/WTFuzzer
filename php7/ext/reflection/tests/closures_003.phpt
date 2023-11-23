@@ -18,6 +18,8 @@ unset ($parameter);
 echo $method->getName ()."\n";
 
 ?>
+===DONE===
 --EXPECT--
 __invoke
 __invoke
+===DONE===

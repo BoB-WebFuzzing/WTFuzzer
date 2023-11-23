@@ -1,7 +1,9 @@
 --TEST--
 Bug #79664 (PDOStatement::getColumnMeta fails on empty result set)
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo_sqlite')) print 'skip not loaded';
+?>
 --FILE--
 <?php
 $pdo = new PDO('sqlite::memory:', null, null, [
@@ -16,8 +18,6 @@ if ($stmt->columnCount()) {
 array(6) {
   ["native_type"]=>
   string(4) "null"
-  ["pdo_type"]=>
-  int(0)
   ["flags"]=>
   array(0) {
   }
@@ -27,4 +27,6 @@ array(6) {
   int(-1)
   ["precision"]=>
   int(0)
+  ["pdo_type"]=>
+  int(2)
 }

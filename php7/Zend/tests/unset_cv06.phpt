@@ -1,7 +1,7 @@
 --TEST--
 unset() CV 6 (indirect unset() of global variable in session_unset())
---EXTENSIONS--
-session
+--SKIPIF--
+<?php include(__DIR__.'/../../ext/session/tests/skipif.inc'); ?>
 --INI--
 session.auto_start=0
 session.save_handler=files
@@ -18,5 +18,5 @@ echo "ok\n";
 --EXPECTF--
 1
 
-Warning: Undefined array key "x" in %s on line %d
+Notice: Undefined index: x in %sunset_cv06.php on line %d
 ok

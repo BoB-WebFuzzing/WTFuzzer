@@ -1,12 +1,10 @@
 --TEST--
 Phar::setSupportedSignatures() with hash, tar-based
---EXTENSIONS--
-phar
 --SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 <?php
 $arr = Phar::getSupportedSignatures();
 if (!in_array("OpenSSL", $arr)) die("skip openssl support required");
-?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -40,14 +38,11 @@ $pkey = '';
 openssl_pkey_export($private, $pkey, NULL, $config_arg);
 $p->setSignatureAlgorithm(Phar::OPENSSL, $pkey);
 var_dump($p->getSignature());
-$p->setSignatureAlgorithm(Phar::OPENSSL_SHA512, $pkey);
-var_dump($p->getSignature());
-$p->setSignatureAlgorithm(Phar::OPENSSL_SHA256, $pkey);
-var_dump($p->getSignature());
 } catch (Exception $e) {
 echo $e->getMessage();
 }
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.tar');
@@ -57,7 +52,7 @@ array(2) {
   ["hash"]=>
   string(%d) "%s"
   ["hash_type"]=>
-  string(7) "SHA-256"
+  string(5) "SHA-1"
 }
 array(2) {
   ["hash"]=>
@@ -89,15 +84,4 @@ array(2) {
   ["hash_type"]=>
   string(7) "OpenSSL"
 }
-array(2) {
-  ["hash"]=>
-  string(%d) "%s"
-  ["hash_type"]=>
-  string(14) "OpenSSL_SHA512"
-}
-array(2) {
-  ["hash"]=>
-  string(%d) "%s"
-  ["hash_type"]=>
-  string(14) "OpenSSL_SHA256"
-}
+===DONE===

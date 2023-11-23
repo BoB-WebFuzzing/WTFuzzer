@@ -2,6 +2,11 @@
 Test strip_tags() function : usage variations - unexpected values for 'allowable_tags'
 --FILE--
 <?php
+/* Prototype  : string strip_tags(string $str [, string $allowable_tags])
+ * Description: Strips HTML and PHP tags from a string
+ * Source code: ext/standard/string.c
+*/
+
 /*
  * testing functionality of strip_tags() by giving unexpected values for $allowable_tags argument
 */
@@ -72,11 +77,7 @@ $values = array(
 $iterator = 1;
 foreach($values as $value) {
       echo "-- Iteration $iterator --\n";
-      try {
-        var_dump(strip_tags($string, $value));
-      } catch (TypeError $exception) {
-        echo $exception->getMessage() . "\n";
-      }
+      var_dump( strip_tags($string, $value) );
       $iterator++;
 };
 
@@ -125,5 +126,5 @@ string(10) "helloworld"
 -- Iteration 20 --
 string(10) "helloworld"
 -- Iteration 21 --
-strip_tags(): Argument #2 ($allowed_tags) must be of type array|string|null, resource given
+string(10) "helloworld"
 Done

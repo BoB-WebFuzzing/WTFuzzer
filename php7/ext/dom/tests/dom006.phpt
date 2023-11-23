@@ -1,7 +1,7 @@
 --TEST--
 Test 6: Extends Test
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php  require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -26,7 +26,6 @@ $dom = new books;
 $dom->load(__DIR__."/book.xml");
 $dom->addBook("PHP de Luxe", "Richard Samar, Christian Stocker");
 print $dom->saveXML();
-?>
 --EXPECT--
 <?xml version="1.0"?>
 <books>

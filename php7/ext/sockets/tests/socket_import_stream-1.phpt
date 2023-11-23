@@ -1,7 +1,10 @@
 --TEST--
 socket_import_stream: Basic test
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+if (!extension_loaded('sockets')) {
+	die('SKIP sockets extension not available.');
+}
 --FILE--
 <?php
 
@@ -17,8 +20,6 @@ socket_write($sock, "test message");
 socket_close($sock);
 
 var_dump(stream_get_contents($s1));
-?>
 --EXPECTF--
-object(Socket)#%d (0) {
-}
+resource(%d) of type (Socket)
 string(12) "test message"

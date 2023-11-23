@@ -1,12 +1,10 @@
 --TEST--
 Oracle Database 12c Implicit Result Sets: oci_get_implicit_resultset: basic test 3
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+if (!extension_loaded('oci8')) die ("skip no oci8 extension");
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 preg_match('/.*Release ([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)*/', oci_server_version($c), $matches);
 if (!(isset($matches[0]) && $matches[1] >= 12)) {
     die("skip expected output only valid when using Oracle Database 12c or greater");
@@ -21,7 +19,7 @@ oci8.statement_cache_size = 0
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Initialization
 
@@ -82,6 +80,8 @@ $stmtarray = array(
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Test 1
   1  abcde
@@ -264,3 +264,4 @@ Test 1
   t
   u
   X
+===DONE===

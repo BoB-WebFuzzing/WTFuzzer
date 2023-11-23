@@ -1,21 +1,21 @@
 --TEST--
-SCCP 018: Object assignment
+SCCP 018: Object assignemnt
 --INI--
 opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
 ;opcache.opt_debug_level=0x20000
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function foo() {
-    $a = new stdClass;
-    $b = $a;
-    $a->x = 5;
-    $b->x = 42;
-    echo $a->x;
-    echo "\n";
+	$a = new stdClass;
+	$b = $a;
+	$a->x = 5;
+	$b->x = 42;
+	echo $a->x;
+	echo "\n";
 }
 foo();
 ?>

@@ -1,7 +1,7 @@
 --TEST--
 Phar: alias edge cases
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly=0
 --FILE--
@@ -32,6 +32,7 @@ $b = new Phar($fname, 0, 'another');
 echo $e->getMessage(),"\n";
 }
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.zip');
@@ -42,3 +43,4 @@ alias "foo" is already used for archive "%salias_acrobatics.phar.zip" cannot be 
 2
 phar error: Unable to add zip-based phar "%salias_acrobatics.2.phar.zip" with implicit alias, alias is already in use
 alias "another" is already used for archive "%salias_acrobatics.phar.zip" cannot be overloaded with "%salias_acrobatics.phar.zip"
+===DONE===

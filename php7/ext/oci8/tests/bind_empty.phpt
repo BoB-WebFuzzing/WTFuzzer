@@ -1,11 +1,7 @@
 --TEST--
 binding empty values
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
@@ -93,6 +89,8 @@ $statement = oci_parse($c, $drop);
 @oci_execute($statement);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Test 1
 bool(true)
@@ -126,3 +124,4 @@ NULL
 Test 6
 NULL
 NULL
+===DONE===

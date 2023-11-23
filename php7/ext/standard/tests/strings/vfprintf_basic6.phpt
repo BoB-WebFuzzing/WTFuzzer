@@ -2,6 +2,12 @@
 Test vfprintf() function : basic functionality - exponential format
 --FILE--
 <?php
+/* Prototype  : int vfprintf  ( resource $handle  , string $format , array $args  )
+ * Description: Write a formatted string to a stream
+ * Source code: ext/standard/formatted_print.c
+*/
+
+
 echo "*** Testing vfprintf() : basic functionality - using exponential format ***\n";
 
 // Initialise all required variables
@@ -33,8 +39,10 @@ print_r(file_get_contents($data_file));
 unlink($data_file);
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing vfprintf() : basic functionality - using exponential format ***
 1.000000e+3
 1.000000e+3 2.000000e+3
 1.000000e+3 2.000000e+3 3.000000e+3
+===DONE===

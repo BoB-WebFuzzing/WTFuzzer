@@ -1,7 +1,9 @@
 --TEST--
 Phar: opendir test, recurse into
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.require_hash=0
 --FILE--
@@ -22,21 +24,21 @@ include $fname;
 
 function dump($phar, $base)
 {
-    var_dump($phar . $base);
-    $dir = opendir($phar . $base);
-    if ($base == '/')
-    {
-        $base = '';
-    }
-    while (false !== ($entry = readdir($dir))) {
-        $entry = $base . '/' . $entry;
-        var_dump($entry);
-        var_dump(is_dir($phar . $entry));
-        if (is_dir($phar . $entry))
-        {
-            dump($phar, $entry);
-        }
-    }
+	var_dump($phar . $base);
+	$dir = opendir($phar . $base);
+	if ($base == '/')
+	{
+		$base = '';
+	}
+	while (false !== ($entry = readdir($dir))) {
+		$entry = $base . '/' . $entry;
+		var_dump($entry);
+		var_dump(is_dir($phar . $entry));
+		if (is_dir($phar . $entry))
+		{
+			dump($phar, $entry);
+		}
+	}
 }
 
 dump('phar://hio', '/');

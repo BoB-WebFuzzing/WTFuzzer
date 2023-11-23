@@ -1,7 +1,11 @@
 --TEST--
 Check xsltprocessor::registerPHPFunctions
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+        if (!extension_loaded('xsl')) {
+                die("skip\n");
+        }
+?>
 --FILE--
 <?php
 include __DIR__ .'/prepare.inc';
@@ -17,7 +21,6 @@ var_dump($proc->transformToXml($dom));
 
 //var_dump($proc->registerPHPFunctions(array()));
 //var_dump($proc->transformToXml($dom));
-?>
 --EXPECT--
 NULL
 string(18) "This Is An Example"

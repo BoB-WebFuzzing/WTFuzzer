@@ -1,7 +1,7 @@
 --TEST--
 Phar::buildFromIterator() iterator, 1 file passed in zip-based
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -14,35 +14,42 @@ class myIterator implements Iterator
     {
         $this->a = $a;
     }
-    function next(): void {
+    function next() {
         echo "next\n";
-        next($this->a);
+        return next($this->a);
     }
-    function current(): mixed {
+    function current() {
         echo "current\n";
         return current($this->a);
     }
-    function key(): mixed {
+    function key() {
         echo "key\n";
         return key($this->a);
     }
-    function valid(): bool {
+    function valid() {
         echo "valid\n";
         return current($this->a);
     }
-    function rewind(): void {
+    function rewind() {
         echo "rewind\n";
-        reset($this->a);
+        return reset($this->a);
     }
 }
-chdir(__DIR__);
-$phar = new Phar(__DIR__ . '/buildfromiterator4.phar.zip');
-var_dump($phar->buildFromIterator(new myIterator(array('a' => basename(__FILE__, 'php') . 'phpt'))));
-var_dump($phar->isFileFormat(Phar::ZIP));
+try {
+	chdir(__DIR__);
+	$phar = new Phar(__DIR__ . '/buildfromiterator.phar.zip');
+	var_dump($phar->buildFromIterator(new myIterator(array('a' => basename(__FILE__, 'php') . 'phpt'))));
+	var_dump($phar->isFileFormat(Phar::ZIP));
+} catch (Exception $e) {
+	var_dump(get_class($e));
+	echo $e->getMessage() . "\n";
+}
 ?>
+===DONE===
 --CLEAN--
 <?php
-unlink(__DIR__ . '/buildfromiterator4.phar.zip');
+unlink(__DIR__ . '/buildfromiterator.phar.zip');
+__HALT_COMPILER();
 ?>
 --EXPECTF--
 rewind
@@ -56,3 +63,4 @@ array(1) {
   string(%d) "%sphar_buildfromiterator4.phpt"
 }
 bool(true)
+===DONE===

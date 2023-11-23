@@ -1,7 +1,9 @@
 --TEST--
 Bug #79676 (imagescale adds black border with IMG_BICUBIC)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 function test($image, $desc)

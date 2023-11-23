@@ -2,6 +2,11 @@
 Test array_diff_ukey() function : usage variation - Passing unexpected values to second argument
 --FILE--
 <?php
+/* Prototype  : array array_diff_ukey(array arr1, array arr2 [, array ...], callback key_comp_func)
+ * Description: Returns the entries of arr1 that have keys which are not present in any of the others arguments.
+ * Source code: ext/standard/array.c
+ */
+
 echo "*** Testing array_diff_ukey() : usage variation ***\n";
 
 // Initialize function arguments not being substituted (if any)
@@ -28,9 +33,9 @@ $fp = fopen(__FILE__, "r");
 // define some classes
 class classWithToString
 {
-    public function __toString() {
-        return "Class A object";
-    }
+	public function __toString() {
+		return "Class A object";
+	}
 }
 
 class classWithoutToString
@@ -93,127 +98,225 @@ $inputs = array(
 
 );
 
-// loop through each element of the array for array2
+// loop through each element of the array for arr2
 
 foreach($inputs as $key =>$value) {
-    echo "\n--$key--\n";
-    try {
-        var_dump( array_diff_ukey($array1, $value, 'key_compare_func') );
-    } catch (TypeError $e) {
-        echo $e->getMessage(), "\n";
-    }
-    try {
-        var_dump( array_diff_ukey($array1, $value, $array3, 'key_compare_func') );
-    } catch (TypeError $e) {
-        echo $e->getMessage(), "\n";
-    }
+      echo "\n--$key--\n";
+      var_dump( array_diff_ukey($array1, $value, 'key_compare_func') );
+      var_dump( array_diff_ukey($array1, $value, $array3, 'key_compare_func') );
 };
 
 fclose($fp);
 ?>
---EXPECT--
+===DONE===
+--EXPECTF--
 *** Testing array_diff_ukey() : usage variation ***
 
 --int 0--
-array_diff_ukey(): Argument #2 must be of type array, int given
-array_diff_ukey(): Argument #2 must be of type array, int given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 --int 1--
-array_diff_ukey(): Argument #2 must be of type array, int given
-array_diff_ukey(): Argument #2 must be of type array, int given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 --int 12345--
-array_diff_ukey(): Argument #2 must be of type array, int given
-array_diff_ukey(): Argument #2 must be of type array, int given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 --int -12345--
-array_diff_ukey(): Argument #2 must be of type array, int given
-array_diff_ukey(): Argument #2 must be of type array, int given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, int given in %s on line %d
+NULL
 
 --float 10.5--
-array_diff_ukey(): Argument #2 must be of type array, float given
-array_diff_ukey(): Argument #2 must be of type array, float given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 --float -10.5--
-array_diff_ukey(): Argument #2 must be of type array, float given
-array_diff_ukey(): Argument #2 must be of type array, float given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 --float 12.3456789000e10--
-array_diff_ukey(): Argument #2 must be of type array, float given
-array_diff_ukey(): Argument #2 must be of type array, float given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 --float -12.3456789000e10--
-array_diff_ukey(): Argument #2 must be of type array, float given
-array_diff_ukey(): Argument #2 must be of type array, float given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 --float .5--
-array_diff_ukey(): Argument #2 must be of type array, float given
-array_diff_ukey(): Argument #2 must be of type array, float given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, float given in %s on line %d
+NULL
 
 --uppercase NULL--
-array_diff_ukey(): Argument #2 must be of type array, null given
-array_diff_ukey(): Argument #2 must be of type array, null given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 --lowercase null--
-array_diff_ukey(): Argument #2 must be of type array, null given
-array_diff_ukey(): Argument #2 must be of type array, null given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 --lowercase true--
-array_diff_ukey(): Argument #2 must be of type array, true given
-array_diff_ukey(): Argument #2 must be of type array, true given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 --lowercase false--
-array_diff_ukey(): Argument #2 must be of type array, false given
-array_diff_ukey(): Argument #2 must be of type array, false given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 --uppercase TRUE--
-array_diff_ukey(): Argument #2 must be of type array, true given
-array_diff_ukey(): Argument #2 must be of type array, true given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 --uppercase FALSE--
-array_diff_ukey(): Argument #2 must be of type array, false given
-array_diff_ukey(): Argument #2 must be of type array, false given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, bool given in %s on line %d
+NULL
 
 --empty string DQ--
-array_diff_ukey(): Argument #2 must be of type array, string given
-array_diff_ukey(): Argument #2 must be of type array, string given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 --empty string SQ--
-array_diff_ukey(): Argument #2 must be of type array, string given
-array_diff_ukey(): Argument #2 must be of type array, string given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 --string DQ--
-array_diff_ukey(): Argument #2 must be of type array, string given
-array_diff_ukey(): Argument #2 must be of type array, string given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 --string SQ--
-array_diff_ukey(): Argument #2 must be of type array, string given
-array_diff_ukey(): Argument #2 must be of type array, string given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 --mixed case string--
-array_diff_ukey(): Argument #2 must be of type array, string given
-array_diff_ukey(): Argument #2 must be of type array, string given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 --heredoc--
-array_diff_ukey(): Argument #2 must be of type array, string given
-array_diff_ukey(): Argument #2 must be of type array, string given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, string given in %s on line %d
+NULL
 
 --instance of classWithToString--
-array_diff_ukey(): Argument #2 must be of type array, classWithToString given
-array_diff_ukey(): Argument #2 must be of type array, classWithToString given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, object given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, object given in %s on line %d
+NULL
 
 --instance of classWithoutToString--
-array_diff_ukey(): Argument #2 must be of type array, classWithoutToString given
-array_diff_ukey(): Argument #2 must be of type array, classWithoutToString given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, object given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, object given in %s on line %d
+NULL
 
 --undefined var--
-array_diff_ukey(): Argument #2 must be of type array, null given
-array_diff_ukey(): Argument #2 must be of type array, null given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 --unset var--
-array_diff_ukey(): Argument #2 must be of type array, null given
-array_diff_ukey(): Argument #2 must be of type array, null given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, null given in %s on line %d
+NULL
 
 --resource--
-array_diff_ukey(): Argument #2 must be of type array, resource given
-array_diff_ukey(): Argument #2 must be of type array, resource given
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, resource given in %s on line %d
+NULL
+
+Warning: array_diff_ukey(): Expected parameter 2 to be an array, resource given in %s on line %d
+NULL
+===DONE===

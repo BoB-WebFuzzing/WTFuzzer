@@ -2,6 +2,10 @@
 Test strnatcmp() function : basic functionality
 --FILE--
 <?php
+/* Prototype  : int strnatcmp  ( string $str1  , string $str2  )
+ * Description: String comparisons using a "natural order" algorithm
+ * Source code: ext/standard/string.c
+*/
 echo "*** Testing strnatcmp() : basic functionality ***\n";
 
 $a1 = "abc1";
@@ -45,6 +49,7 @@ var_dump(strnatcmp($d1, $a2));
 var_dump(strnatcmp($c1, $b2));
 var_dump(strnatcmp($c1, $d2));
 ?>
+===DONE===
 --EXPECT--
 *** Testing strnatcmp() : basic functionality ***
 Less than tests
@@ -72,3 +77,4 @@ int(1)
 int(1)
 int(1)
 int(1)
+===DONE===

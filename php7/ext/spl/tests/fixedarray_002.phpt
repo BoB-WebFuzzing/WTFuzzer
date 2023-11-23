@@ -3,26 +3,26 @@ SPL: FixedArray: overloading
 --FILE--
 <?php
 class A extends SplFixedArray {
-    public $prop1 = NULL;
-    public $prop2 = NULL;
+	public $prop1 = NULL;
+	public $prop2 = NULL;
 
-    public function count(): int {
+    public function count() {
         return 2;
     }
 
-    public function offsetGet($n): mixed {
+    public function offsetGet($n) {
         echo "A::offsetGet\n";
         return parent::offsetGet($n);
     }
-    public function offsetSet($n, $v): void {
+    public function offsetSet($n, $v) {
         echo "A::offsetSet\n";
-        parent::offsetSet($n, $v);
+        return parent::offsetSet($n, $v);
     }
-    public function offsetUnset($n): void {
+    public function offsetUnset($n) {
         echo "A::offsetUnset\n";
-        parent::offsetUnset($n);
+        return parent::offsetUnset($n);
     }
-    public function offsetExists($n): bool {
+    public function offsetExists($n) {
         echo "A::offsetExists\n";
         return parent::offsetExists($n);
     }
@@ -34,17 +34,17 @@ $a = new A;
 try {
     $a[0] = "value1";
 } catch (RuntimeException $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo "Exception: ".$e->getMessage()."\n";
 }
 try {
     var_dump($a["asdf"]);
-} catch (\TypeError $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+} catch (RuntimeException $e) {
+    echo "Exception: ".$e->getMessage()."\n";
 }
 try {
     unset($a[-1]);
 } catch (RuntimeException $e) {
-    echo $e::class, ': ', $e->getMessage(), "\n";
+    echo "Exception: ".$e->getMessage()."\n";
 }
 $a->setSize(10);
 
@@ -67,13 +67,14 @@ var_dump($a[0], $a[2], $a[3], $a[4]);
 
 var_dump(count($a), $a->getSize(), count($a) == $a->getSize());
 ?>
+===DONE===
 --EXPECT--
 A::offsetSet
-OutOfBoundsException: Index invalid or out of range
+Exception: Index invalid or out of range
 A::offsetGet
-TypeError: Cannot access offset of type string on SplFixedArray
+Exception: Index invalid or out of range
 A::offsetUnset
-OutOfBoundsException: Index invalid or out of range
+Exception: Index invalid or out of range
 A::offsetSet
 A::offsetSet
 A::offsetSet
@@ -99,3 +100,4 @@ string(6) "value4"
 int(2)
 int(10)
 bool(false)
+===DONE===

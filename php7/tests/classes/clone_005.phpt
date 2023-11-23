@@ -6,7 +6,7 @@ abstract class base {
   public $a = 'base';
 
   // disallow cloning once forever
-  final protected function __clone() {}
+  final private function __clone() {}
 }
 
 class test extends base {

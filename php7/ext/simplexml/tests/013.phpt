@@ -1,7 +1,9 @@
 --TEST--
 SimpleXML: Split text content
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php
+	if (!extension_loaded('simplexml')) print 'skip';
+?>
 --FILE--
 <?php
 
@@ -15,5 +17,7 @@ $sxe = simplexml_load_string($xml);
 var_dump((string)$sxe);
 
 ?>
+===DONE===
 --EXPECT--
 string(6) "barbar"
+===DONE===

@@ -1,16 +1,16 @@
 --TEST--
 Playing with SELECT FORMAT(...) AS _format - see also bugs.php.net/42378
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --INI--
 memory_limit=83886080
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     function create_table($link, $column, $min, $max, $engine, $offset) {
 
@@ -154,7 +154,7 @@ memory_limit=83886080
     test_format($link, 'FORMAT(1234.567, 4)', 'DUAL', null, '1,234.5670', 50);
 
     mysqli_close($link);
-    require_once 'table.inc';
+    require_once('table.inc');
 
     /* select from existing table */
     test_format($link, 'FORMAT(id, 0)', 'test', null, '1', 60);
@@ -228,7 +228,7 @@ memory_limit=83886080
                 $current_targets = mt_rand(-100000, 100000) / 10;
                 do {
                     $trend = (mt_rand(0, 3) > 1) ? (mt_rand(-10000, 10000) / 100) : 'NULL';
-                } while (isset($values[(string)$trend]));
+                } while (isset($values[$trend]));
 
                 $sql = sprintf('INSERT INTO test(targetport, current_targets, maxreports, trend) VALUES (%d, %f, %s, %s)',
                     $i,
@@ -240,7 +240,7 @@ memory_limit=83886080
                     break 2;
                 }
                 if ($current_targets > 0 && $trend !== 'NULL')
-                    $values[(string)$trend] = $i;
+                    $values[$trend] = $i;
             }
             krsort($values);
 
@@ -335,7 +335,7 @@ memory_limit=83886080
 ?>
 --CLEAN--
 <?php
-	require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 done!

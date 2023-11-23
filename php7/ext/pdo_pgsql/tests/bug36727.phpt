@@ -1,10 +1,8 @@
 --TEST--
 Bug #36727 (segfault in bindValue() when no parameters are defined)
---EXTENSIONS--
-pdo
-pdo_pgsql
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo') || !extension_loaded('pdo_pgsql')) die('skip not loaded');
 require __DIR__ . '/../../../ext/pdo/tests/pdo_test.inc';
 require __DIR__ . '/config.inc';
 PDOTest::skip();
@@ -15,18 +13,12 @@ require __DIR__ . '/../../../ext/pdo/tests/pdo_test.inc';
 require __DIR__ . '/config.inc';
 $db = PDOTest::test_factory(__DIR__ . '/common.phpt');
 
-$stmt = $db->prepare('SELECT * FROM test36727');
+$stmt = $db->prepare('SELECT * FROM child');
 var_dump($stmt->bindValue(':test', 1, PDO::PARAM_INT));
 
 echo "Done\n";
 ?>
---CLEAN--
-<?php
-require __DIR__ . '/../../../ext/pdo/tests/pdo_test.inc';
-$db = PDOTest::test_factory(__DIR__ . '/common.phpt');
-$db->exec("DROP TABLE IF EXISTS test36727");
-?>
 --EXPECTF--
-Warning: PDOStatement::bindValue(): SQLSTATE[HY093]: Invalid parameter number: :test in %s on line %d
+Warning: PDOStatement::bindValue(): SQLSTATE[HY093]: Invalid parameter number: :test in %sbug36727.php on line %d
 bool(false)
 Done

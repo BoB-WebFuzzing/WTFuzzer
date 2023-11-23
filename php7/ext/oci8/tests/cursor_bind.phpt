@@ -1,17 +1,14 @@
 --TEST--
 bind and fetch cursor from a statement
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__."/connect.inc");
 
 // Initialization
 
@@ -57,6 +54,8 @@ $stmtarray = array(
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 array(2) {
   [0]=>
@@ -77,3 +76,4 @@ array(2) {
   string(1) "1"
 }
 bool(false)
+===DONE===

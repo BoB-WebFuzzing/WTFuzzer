@@ -1,9 +1,14 @@
 --TEST--
 Test pow() function : usage variations - different data types as $exp argument
 --INI--
-serialize_precision = 14
+precision = 14
 --FILE--
 <?php
+/* Prototype  : number pow  ( number $base  , number $exp  )
+ * Description: Exponential expression.
+ * Source code: ext/standard/math.c
+ */
+
 echo "*** Testing pow() : usage variations ***\n";
 
 //get an unset variable
@@ -75,17 +80,14 @@ $inputs = array(
 // loop through each element of $inputs to check the behaviour of pow()
 $iterator = 1;
 foreach($inputs as $input) {
-    echo "\n-- Iteration $iterator --\n";
-    try {
-        var_dump(pow(20.3, $input));
-    } catch (Error $e) {
-        echo $e->getMessage(), "\n";
-    }
-    $iterator++;
+	echo "\n-- Iteration $iterator --\n";
+	var_dump(pow(20.3, $input));
+	$iterator++;
 };
 fclose($fp);
 ?>
---EXPECT--
+===Done===
+--EXPECTF--
 *** Testing pow() : usage variations ***
 
 -- Iteration 1 --
@@ -137,25 +139,37 @@ float(20.3)
 float(1)
 
 -- Iteration 17 --
-Unsupported operand types: float ** string
+
+Warning: A non-numeric value encountered in %s on line %d
+float(1)
 
 -- Iteration 18 --
-Unsupported operand types: float ** string
+
+Warning: A non-numeric value encountered in %s on line %d
+float(1)
 
 -- Iteration 19 --
-Unsupported operand types: float ** array
+int(1)
 
 -- Iteration 20 --
-Unsupported operand types: float ** string
+
+Warning: A non-numeric value encountered in %s on line %d
+float(1)
 
 -- Iteration 21 --
-Unsupported operand types: float ** string
+
+Warning: A non-numeric value encountered in %s on line %d
+float(1)
 
 -- Iteration 22 --
-Unsupported operand types: float ** string
+
+Warning: A non-numeric value encountered in %s on line %d
+float(1)
 
 -- Iteration 23 --
-Unsupported operand types: float ** classA
+
+Notice: Object of class classA could not be converted to number in %s on line %d
+float(20.3)
 
 -- Iteration 24 --
 float(1)
@@ -164,4 +178,5 @@ float(1)
 float(1)
 
 -- Iteration 26 --
-Unsupported operand types: float ** resource
+%s
+===Done===

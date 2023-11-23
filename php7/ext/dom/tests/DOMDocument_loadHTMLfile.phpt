@@ -4,8 +4,10 @@ Test DOMDocument::loadHTMLFile
 Verifies the basic behaviour of the method
 --CREDITS--
 Antonio Diaz Ruiz <dejalatele@gmail.com>
---EXTENSIONS--
-dom
+--INI--
+assert.bail=true
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --FILE--
 <?php
 $doc = new DOMDocument();

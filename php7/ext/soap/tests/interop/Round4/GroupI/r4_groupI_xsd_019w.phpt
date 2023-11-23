@@ -1,14 +1,18 @@
 --TEST--
 SOAP Interop Round4 GroupI XSD 019 (php/wsdl): echoComplexTypeAsSimpleTypes
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 soap.wsdl_cache_enabled=0
 --FILE--
 <?php
 class SOAPComplexType {
-    function __construct(public $varString, public $varInt, public $varFloat) {}
+    function __construct($s, $i, $f) {
+        $this->varString = $s;
+        $this->varInt = $i;
+        $this->varFloat = $f;
+    }
 }
 $struct = new SOAPComplexType('arg',34,325.325);
 $client = new SoapClient(__DIR__."/round4_groupI_xsd.wsdl",array("trace"=>1,"exceptions"=>0));

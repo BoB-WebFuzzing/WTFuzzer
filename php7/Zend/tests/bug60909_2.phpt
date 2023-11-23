@@ -12,7 +12,6 @@ class Bad {
 
 $bad = new Bad();
 echo "$bad";
-?>
 --EXPECTF--
 Fatal error: Uncaught Exception: I CAN DO THIS in %s:%d
 Stack trace:

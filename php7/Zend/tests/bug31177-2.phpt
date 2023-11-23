@@ -13,7 +13,6 @@ try {
 } catch (Exception $e) {
   var_dump($x);
 }
-?>
 --EXPECT--
 object(foo)#1 (0) {
 }

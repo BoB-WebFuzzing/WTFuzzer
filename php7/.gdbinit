@@ -250,13 +250,16 @@ define ____printzv_contents
 		____printzv &$zvalue->value.ref->val $arg1
 	end
 	if $type == 11
-		printf "CONSTANT_AST"
+		printf "const: %s", $zvalue->value.str->val
 	end
 	if $type == 12
+		printf "CONSTANT_AST"
+	end
+	if $type == 13
 		printf "indirect: "
 		____printzv $zvalue->value.zv $arg1
 	end
-	if $type == 13
+	if $type == 14
 		printf "pointer: %p", $zvalue->value.ptr
 	end
 	if $type == 15
@@ -266,9 +269,18 @@ define ____printzv_contents
 		printf "_BOOL"
 	end
 	if $type == 17
+		printf "CALLABLE"
+	end
+	if $type == 18
+		printf "ITERABLE"
+	end
+	if $type == 19
+		printf "VOID"
+	end
+	if $type == 20
 		printf "_NUMBER"
 	end
-	if $type > 17
+	if $type > 20
 		printf "unknown type %d", $type
 	end
 	printf "\n"
@@ -318,8 +330,7 @@ define ____print_ht
 		set $n = $n - 1
 	end
 
-	set $packed = $ht->u.v.flags & 4
-	if $packed
+	if $ht->u.v.flags & 4
 		printf "Packed"
 	else
 		printf "Hash"
@@ -330,45 +341,36 @@ define ____print_ht
 	set $i = 0
 	set $ind = $ind + 1
 	while $i < $num
-		if $packed
-			set $val = (zval*)($ht->arPacked + $i)
-			set $key = (zend_string*)0
-			set $h = $i
-		else
-			set $bucket = (Bucket*)($ht->arData + $i)
-			set $val = &$bucket->val
-			set $key = $bucket->key
-			set $h = $bucket->h
-		end
+		set $p = (Bucket*)($ht->arData + $i)
 		set $n = $ind
-		if $val->u1.v.type > 0
+		if $p->val.u1.v.type > 0
 			while $n > 0
 				printf "  "
 				set $n = $n - 1
 			end
 			printf "[%d] ", $i
-			if $key
-				____print_str $key->val $key->len
+			if $p->key
+				____print_str $p->key->val $p->key->len
 				printf " => "
 			else
-				printf "%d => ", $h
+				printf "%d => ", $p->h
 			end
 			if $arg1 == 0
-				printf "%p\n", $val
+				printf "%p\n", (zval *)&$p->val
 			end
 			if $arg1 == 1
-				set $zval = $val
+				set $zval = (zval *)&$p->val
 				____printzv $zval 1
 			end
 			if $arg1 == 2
-				printf "%s\n", (char*)$val->value.ptr
+				printf "%s\n", (char*)$p->val.value.ptr
 			end
 			if $arg1 == 3
-				set $func = (zend_function*)$val->value.ptr
+				set $func = (zend_function*)$p->val.value.ptr
 				printf "\"%s\"\n", $func->common.function_name->val
 			end
 			if $arg1 == 4
-				set $const = (zend_constant *)$val->value.ptr
+				set $const = (zend_constant *)$p->val.value.ptr
 				____printzv $const 1
 			end
 		end
@@ -482,7 +484,7 @@ end
 
 define print_pi
 	set $pi = (zend_property_info *)$arg0
-	set $initial_offset = ((uint32_t)(uintptr_t)(&((zend_object*)0)->properties_table[(0)]))
+	set $initial_offset = ((uint32_t)(zend_uintptr_t)(&((zend_object*)0)->properties_table[(0)]))
 	set $ptr_to_val = (zval*)((char*)$pi->ce->default_properties_table + $pi->offset - $initial_offset)
 	printf "[%p] {\n", $pi
 	printf "    offset = %p\n", $pi->offset

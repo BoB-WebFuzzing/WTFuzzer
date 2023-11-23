@@ -21,6 +21,8 @@ echo stream_get_contents($tmp, 1, 0);
 echo "\n";
 echo stream_get_contents($tmp, -1);
 
+@unlink($tmp);
+
 ?>
 --EXPECT--
 23

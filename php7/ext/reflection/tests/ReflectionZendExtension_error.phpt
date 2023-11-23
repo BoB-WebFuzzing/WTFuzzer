@@ -1,9 +1,9 @@
 --TEST--
-Test ReflectionZendExtension class errors
+Test ReflectionZendExtension class erros
 --CREDITS--
 Gabriel Caruso (carusogabriel34@gmail.com)
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php if(!extension_loaded('Zend OPcache')) die('skip Zend OPcache extension not loaded'); ?>
 --FILE--
 <?php
 try {
@@ -14,4 +14,4 @@ try {
 
 ?>
 --EXPECT--
-Zend Extension "zend_opcache" does not exist
+Zend Extension zend_opcache does not exist

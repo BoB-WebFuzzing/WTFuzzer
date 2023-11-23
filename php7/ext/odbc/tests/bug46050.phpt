@@ -1,7 +1,5 @@
 --TEST--
 Bug #46050 (odbc_next_result corrupts prepared resource)
---EXTENSIONS--
-odbc
 --SKIPIF--
 <?php include 'skipif.inc'; ?>
 --FILE--

@@ -4,8 +4,7 @@ public bool ReflectionParameter::isArray ( void );
 marcosptf - <marcosptf@yahoo.com.br> - @phpsp - sao paulo - br
 --FILE--
 <?php
-
-function testReflectionIsArray(array $a, ?array $b, iterable $c, array|string $d) {}
+function testReflectionIsArray($a = null, $b = 0, array $c, $d=true, array $e, $f=1.5, $g="", array $h, $i="#F989898") {}
 
 $reflection = new ReflectionFunction('testReflectionIsArray');
 
@@ -13,15 +12,13 @@ foreach ($reflection->getParameters() as $parameter) {
     var_dump($parameter->isArray());
 }
 ?>
---EXPECTF--
-Deprecated: Method ReflectionParameter::isArray() is deprecated in %s on line %d
-bool(true)
-
-Deprecated: Method ReflectionParameter::isArray() is deprecated in %s on line %d
-bool(true)
-
-Deprecated: Method ReflectionParameter::isArray() is deprecated in %s on line %d
+--EXPECT--
 bool(false)
-
-Deprecated: Method ReflectionParameter::isArray() is deprecated in %s on line %d
+bool(false)
+bool(true)
+bool(false)
+bool(true)
+bool(false)
+bool(false)
+bool(true)
 bool(false)

@@ -9,13 +9,17 @@ require __DIR__ . '/../skipif_root.inc';
 ?>
 --FILE--
 <?php
+/* Prototype: bool is_readable ( string $filename );
+   Description: Tells whether the filename is readable
+*/
+
 // include common file test functions
 require __DIR__.'/file.inc';
 
 echo "*** Testing is_readable(): basic functionality ***\n";
 
 // create a file
-$filename = __DIR__."/is_readable_basic.tmp";
+$filename = __DIR__."/is_readable.tmp";
 create_file($filename);
 
 $counter = 1;

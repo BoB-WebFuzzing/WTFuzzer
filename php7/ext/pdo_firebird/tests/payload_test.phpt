@@ -1,11 +1,12 @@
 --TEST--
 FB payload server satisfies connection attempt
---EXTENSIONS--
-pdo_firebird
-sockets
---XLEAK--
-A bug in firebird causes a memory leak when calling `isc_attach_database()`.
-See https://github.com/FirebirdSQL/firebird/issues/7849
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo_firebird')) die("skip pdo_firebird extension not available");
+if (!extension_loaded('sockets')) die("skip sockets extension not available");
+?>
+--ENV--
+LSAN_OPTIONS=detect_leaks=0
 --FILE--
 <?php
 require_once "payload_server.inc";

@@ -2,8 +2,8 @@
 Bug #50590 (IntlDateFormatter::parse result is limited to the integer range)
 --INI--
 date.timezone=Atlantic/Azores
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

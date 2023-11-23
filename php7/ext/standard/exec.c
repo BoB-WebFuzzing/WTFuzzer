@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -26,23 +28,23 @@
 #include "php_globals.h"
 #include "SAPI.h"
 
-#ifdef HAVE_SYS_WAIT_H
+#if HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif
 
 #include <signal.h>
 
-#ifdef HAVE_SYS_TYPES_H
+#if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
-#ifdef HAVE_SYS_STAT_H
+#if HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
-#ifdef HAVE_FCNTL_H
+#if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 
-#ifdef HAVE_UNISTD_H
+#if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -81,29 +83,6 @@ PHP_MINIT_FUNCTION(exec)
 }
 /* }}} */
 
-static size_t strip_trailing_whitespace(char *buf, size_t bufl) {
-	size_t l = bufl;
-	while (l-- > 0 && isspace(((unsigned char *)buf)[l]));
-	if (l != (bufl - 1)) {
-		bufl = l + 1;
-		buf[bufl] = '\0';
-	}
-	return bufl;
-}
-
-static size_t handle_line(int type, zval *array, char *buf, size_t bufl) {
-	if (type == 1) {
-		PHPWRITE(buf, bufl);
-		if (php_output_get_level() < 1) {
-			sapi_flush();
-		}
-	} else if (type == 2) {
-		bufl = strip_trailing_whitespace(buf, bufl);
-		add_next_index_stringl(array, buf, bufl);
-	}
-	return bufl;
-}
-
 /* {{{ php_exec
  * If type==0, only last line of output is returned (exec)
  * If type==1, all lines will be printed and last lined returned (system)
@@ -111,10 +90,11 @@ static size_t handle_line(int type, zval *array, char *buf, size_t bufl) {
  * If type==3, output will be printed binary, no lines will be saved or returned (passthru)
  *
  */
-PHPAPI int php_exec(int type, const char *cmd, zval *array, zval *return_value)
+PHPAPI int php_exec(int type, char *cmd, zval *array, zval *return_value)
 {
 	FILE *fp;
 	char *buf;
+	size_t l = 0;
 	int pclose_return;
 	char *b, *d=NULL;
 	php_stream *stream;
@@ -161,17 +141,45 @@ PHPAPI int php_exec(int type, const char *cmd, zval *array, zval *return_value)
 				bufl += b - buf;
 			}
 
-			bufl = handle_line(type, array, buf, bufl);
+			if (type == 1) {
+				PHPWRITE(buf, bufl);
+				if (php_output_get_level() < 1) {
+					sapi_flush();
+				}
+			} else if (type == 2) {
+				/* strip trailing whitespaces */
+				l = bufl;
+				while (l-- > 0 && isspace(((unsigned char *)buf)[l]));
+				if (l != (bufl - 1)) {
+					bufl = l + 1;
+					buf[bufl] = '\0';
+				}
+				add_next_index_stringl(array, buf, bufl);
+			}
 			b = buf;
 		}
 		if (bufl) {
-			if (buf != b) {
-				/* Process remaining output */
-				bufl = handle_line(type, array, buf, bufl);
+			/* output remaining data in buffer */
+			if (type == 1 && buf != b) {
+				PHPWRITE(buf, bufl);
+				if (php_output_get_level() < 1) {
+					sapi_flush();
+				}
+			}
+			/* strip trailing whitespaces if we have not done so already */
+			if ((type == 2 && buf != b) || type != 2) {
+				l = bufl;
+				while (l-- > 0 && isspace(((unsigned char *)buf)[l]));
+				if (l != (bufl - 1)) {
+					bufl = l + 1;
+					buf[bufl] = '\0';
+				}
+				if (type == 2) {
+					add_next_index_stringl(array, buf, bufl);
+				}
 			}
 
 			/* Return last line from the shell command */
-			bufl = strip_trailing_whitespace(buf, bufl);
 			RETVAL_STRINGL(buf, bufl);
 		} else { /* should return NULL, but for BC we return "" */
 			RETVAL_EMPTY_STRING();
@@ -198,7 +206,6 @@ done:
 	return pclose_return;
 err:
 	pclose_return = -1;
-	RETVAL_FALSE;
 	goto done;
 }
 /* }}} */
@@ -217,15 +224,15 @@ static void php_exec_ex(INTERNAL_FUNCTION_PARAMETERS, int mode) /* {{{ */
 			Z_PARAM_ZVAL(ret_array)
 		}
 		Z_PARAM_ZVAL(ret_code)
-	ZEND_PARSE_PARAMETERS_END();
+	ZEND_PARSE_PARAMETERS_END_EX(RETURN_FALSE);
 
 	if (!cmd_len) {
-		zend_argument_value_error(1, "cannot be empty");
-		RETURN_THROWS();
+		php_error_docref(NULL, E_WARNING, "Cannot execute a blank command");
+		RETURN_FALSE;
 	}
 	if (strlen(cmd) != cmd_len) {
-		zend_argument_value_error(1, "must not contain any null bytes");
-		RETURN_THROWS();
+		php_error_docref(NULL, E_WARNING, "NULL byte detected. Possible attack");
+		RETURN_FALSE;
 	}
 
 	if (!ret_array) {
@@ -237,7 +244,7 @@ static void php_exec_ex(INTERNAL_FUNCTION_PARAMETERS, int mode) /* {{{ */
 		} else {
 			ret_array = zend_try_array_init(ret_array);
 			if (!ret_array) {
-				RETURN_THROWS();
+				return;
 			}
 		}
 
@@ -249,21 +256,24 @@ static void php_exec_ex(INTERNAL_FUNCTION_PARAMETERS, int mode) /* {{{ */
 }
 /* }}} */
 
-/* {{{ Execute an external program */
+/* {{{ proto string exec(string command [, array &output [, int &return_value]])
+   Execute an external program */
 PHP_FUNCTION(exec)
 {
 	php_exec_ex(INTERNAL_FUNCTION_PARAM_PASSTHRU, 0);
 }
 /* }}} */
 
-/* {{{ Execute an external program and display output */
+/* {{{ proto int system(string command [, int &return_value])
+   Execute an external program and display output */
 PHP_FUNCTION(system)
 {
 	php_exec_ex(INTERNAL_FUNCTION_PARAM_PASSTHRU, 1);
 }
 /* }}} */
 
-/* {{{ Execute an external program and display raw output */
+/* {{{ proto void passthru(string command [, int &return_value])
+   Execute an external program and display raw output */
 PHP_FUNCTION(passthru)
 {
 	php_exec_ex(INTERNAL_FUNCTION_PARAM_PASSTHRU, 3);
@@ -279,9 +289,9 @@ PHP_FUNCTION(passthru)
 
    *NOT* safe for binary strings
 */
-PHPAPI zend_string *php_escape_shell_cmd(const char *str)
+PHPAPI zend_string *php_escape_shell_cmd(char *str)
 {
-	size_t x, y;
+	register size_t x, y;
 	size_t l = strlen(str);
 	uint64_t estimate = (2 * (uint64_t)l) + 1;
 	zend_string *cmd;
@@ -358,7 +368,7 @@ PHPAPI zend_string *php_escape_shell_cmd(const char *str)
 #else
 				ZSTR_VAL(cmd)[y++] = '\\';
 #endif
-				ZEND_FALLTHROUGH;
+				/* fall-through */
 			default:
 				ZSTR_VAL(cmd)[y++] = str[x];
 
@@ -384,8 +394,9 @@ PHPAPI zend_string *php_escape_shell_cmd(const char *str)
 }
 /* }}} */
 
-/* {{{ php_escape_shell_arg */
-PHPAPI zend_string *php_escape_shell_arg(const char *str)
+/* {{{ php_escape_shell_arg
+ */
+PHPAPI zend_string *php_escape_shell_arg(char *str)
 {
 	size_t x, y = 0;
 	size_t l = strlen(str);
@@ -432,7 +443,7 @@ PHPAPI zend_string *php_escape_shell_arg(const char *str)
 			ZSTR_VAL(cmd)[y++] = '\\';
 			ZSTR_VAL(cmd)[y++] = '\'';
 #endif
-			ZEND_FALLTHROUGH;
+			/* fall-through */
 		default:
 			ZSTR_VAL(cmd)[y++] = str[x];
 		}
@@ -468,7 +479,8 @@ PHPAPI zend_string *php_escape_shell_arg(const char *str)
 }
 /* }}} */
 
-/* {{{ Escape shell metacharacters */
+/* {{{ proto string escapeshellcmd(string command)
+   Escape shell metacharacters */
 PHP_FUNCTION(escapeshellcmd)
 {
 	char *command;
@@ -480,8 +492,8 @@ PHP_FUNCTION(escapeshellcmd)
 
 	if (command_len) {
 		if (command_len != strlen(command)) {
-			zend_argument_value_error(1, "must not contain any null bytes");
-			RETURN_THROWS();
+			php_error_docref(NULL, E_ERROR, "Input string contains NULL bytes");
+			return;
 		}
 		RETVAL_STR(php_escape_shell_cmd(command));
 	} else {
@@ -490,7 +502,8 @@ PHP_FUNCTION(escapeshellcmd)
 }
 /* }}} */
 
-/* {{{ Quote and escape an argument for use in a shell command */
+/* {{{ proto string escapeshellarg(string arg)
+   Quote and escape an argument for use in a shell command */
 PHP_FUNCTION(escapeshellarg)
 {
 	char *argument;
@@ -500,16 +513,18 @@ PHP_FUNCTION(escapeshellarg)
 		Z_PARAM_STRING(argument, argument_len)
 	ZEND_PARSE_PARAMETERS_END();
 
-	if (argument_len != strlen(argument)) {
-		zend_argument_value_error(1, "must not contain any null bytes");
-		RETURN_THROWS();
+	if (argument) {
+		if (argument_len != strlen(argument)) {
+			php_error_docref(NULL, E_ERROR, "Input string contains NULL bytes");
+			return;
+		}
+		RETVAL_STR(php_escape_shell_arg(argument));
 	}
-
-	RETVAL_STR(php_escape_shell_arg(argument));
 }
 /* }}} */
 
-/* {{{ Execute command via shell and return complete output as string */
+/* {{{ proto string shell_exec(string cmd)
+   Execute command via shell and return complete output as string */
 PHP_FUNCTION(shell_exec)
 {
 	FILE *in;
@@ -523,12 +538,12 @@ PHP_FUNCTION(shell_exec)
 	ZEND_PARSE_PARAMETERS_END();
 
 	if (!command_len) {
-		zend_argument_value_error(1, "cannot be empty");
-		RETURN_THROWS();
+		php_error_docref(NULL, E_WARNING, "Cannot execute a blank command");
+		RETURN_FALSE;
 	}
 	if (strlen(command) != command_len) {
-		zend_argument_value_error(1, "must not contain any null bytes");
-		RETURN_THROWS();
+		php_error_docref(NULL, E_WARNING, "NULL byte detected. Possible attack");
+		RETURN_FALSE;
 	}
 
 #ifdef PHP_WIN32
@@ -551,14 +566,15 @@ PHP_FUNCTION(shell_exec)
 /* }}} */
 
 #ifdef HAVE_NICE
-/* {{{ Change the priority of the current process */
+/* {{{ proto bool proc_nice(int priority)
+   Change the priority of the current process */
 PHP_FUNCTION(proc_nice)
 {
 	zend_long pri;
 
 	ZEND_PARSE_PARAMETERS_START(1, 1)
 		Z_PARAM_LONG(pri)
-	ZEND_PARSE_PARAMETERS_END();
+	ZEND_PARSE_PARAMETERS_END_EX(RETURN_FALSE);
 
 	errno = 0;
 	php_ignore_value(nice(pri));

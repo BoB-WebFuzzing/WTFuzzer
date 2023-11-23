@@ -67,6 +67,7 @@ A::myCatch();
 echo "via B:\n";
 B::myCatch();
 ?>
+==DONE==
 --EXPECT--
 via A:
 A
@@ -88,3 +89,4 @@ B
 B
 B
 B
+==DONE==

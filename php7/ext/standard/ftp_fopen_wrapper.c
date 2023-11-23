@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -40,7 +42,7 @@
 #include "php_standard.h"
 
 #include <sys/types.h>
-#ifdef HAVE_SYS_SOCKET_H
+#if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
 
@@ -49,7 +51,7 @@
 #else
 #include <netinet/in.h>
 #include <netdb.h>
-#ifdef HAVE_ARPA_INET_H
+#if HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 #endif
@@ -73,7 +75,8 @@ typedef struct _php_ftp_dirstream_data {
 	php_stream *dirstream;
 } php_ftp_dirstream_data;
 
-/* {{{ get_ftp_result */
+/* {{{ get_ftp_result
+ */
 static inline int get_ftp_result(php_stream *stream, char *buffer, size_t buffer_size)
 {
 	buffer[0] = '\0'; /* in case read fails to read anything */
@@ -84,7 +87,8 @@ static inline int get_ftp_result(php_stream *stream, char *buffer, size_t buffer
 }
 /* }}} */
 
-/* {{{ php_stream_ftp_stream_stat */
+/* {{{ php_stream_ftp_stream_stat
+ */
 static int php_stream_ftp_stream_stat(php_stream_wrapper *wrapper, php_stream *stream, php_stream_statbuf *ssb)
 {
 	/* For now, we return with a failure code to prevent the underlying
@@ -93,7 +97,8 @@ static int php_stream_ftp_stream_stat(php_stream_wrapper *wrapper, php_stream *s
 }
 /* }}} */
 
-/* {{{ php_stream_ftp_stream_close */
+/* {{{ php_stream_ftp_stream_close
+ */
 static int php_stream_ftp_stream_close(php_stream_wrapper *wrapper, php_stream *stream)
 {
 	php_stream *controlstream = stream->wrapperthis;
@@ -121,7 +126,8 @@ static int php_stream_ftp_stream_close(php_stream_wrapper *wrapper, php_stream *
 }
 /* }}} */
 
-/* {{{ php_ftp_fopen_connect */
+/* {{{ php_ftp_fopen_connect
+ */
 static php_stream *php_ftp_fopen_connect(php_stream_wrapper *wrapper, const char *path, const char *mode, int options,
 										 zend_string **opened_path, php_stream_context *context, php_stream **preuseid,
 										 php_url **presource, int *puse_ssl, int *puse_ssl_on_data)
@@ -299,7 +305,9 @@ static php_stream *php_ftp_fopen_connect(php_stream_wrapper *wrapper, const char
 	return stream;
 
 connect_errexit:
-	php_url_free(resource);
+	if (resource) {
+		php_url_free(resource);
+	}
 
 	if (stream) {
 		php_stream_close(stream);
@@ -309,7 +317,8 @@ connect_errexit:
 }
 /* }}} */
 
-/* {{{ php_fopen_do_pasv */
+/* {{{ php_fopen_do_pasv
+ */
 static unsigned short php_fopen_do_pasv(php_stream *stream, char *ip, size_t ip_size, char **phoststart)
 {
 	char tmp_line[512];
@@ -399,7 +408,8 @@ static unsigned short php_fopen_do_pasv(php_stream *stream, char *ip, size_t ip_
 }
 /* }}} */
 
-/* {{{ php_fopen_url_wrap_ftp */
+/* {{{ php_fopen_url_wrap_ftp
+ */
 php_stream * php_stream_url_wrap_ftp(php_stream_wrapper *wrapper, const char *path, const char *mode,
 									 int options, zend_string **opened_path, php_stream_context *context STREAMS_DC)
 {
@@ -413,7 +423,7 @@ php_stream * php_stream_url_wrap_ftp(php_stream_wrapper *wrapper, const char *pa
 	php_stream *reuseid=NULL;
 	size_t file_size = 0;
 	zval *tmpzval;
-	bool allow_overwrite = 0;
+	zend_bool allow_overwrite = 0;
 	int8_t read_write = 0;
 	char *transport;
 	int transport_len;
@@ -488,7 +498,7 @@ php_stream * php_stream_url_wrap_ftp(php_stream_wrapper *wrapper, const char *pa
 	} else if (read_write == 2) {
 		/* when writing file (but not appending), it must NOT exist, unless a context option exists which allows it */
 		if (context && (tmpzval = php_stream_context_get_option(context, "ftp", "overwrite")) != NULL) {
-			allow_overwrite = zend_is_true(tmpzval);
+			allow_overwrite = Z_LVAL_P(tmpzval) ? 1 : 0;
 		}
 		if (result <= 299 && result >= 200) {
 			if (allow_overwrite) {
@@ -601,7 +611,8 @@ errexit:
 }
 /* }}} */
 
-/* {{{ php_ftp_dirsteam_read */
+/* {{{ php_ftp_dirsteam_read
+ */
 static ssize_t php_ftp_dirstream_read(php_stream *stream, char *buf, size_t count)
 {
 	php_stream_dirent *ent = (php_stream_dirent *)buf;
@@ -629,7 +640,6 @@ static ssize_t php_ftp_dirstream_read(php_stream *stream, char *buf, size_t coun
 	memcpy(ent->d_name, ZSTR_VAL(basename), tmp_len);
 	ent->d_name[tmp_len - 1] = '\0';
 	zend_string_release_ex(basename, 0);
-	ent->d_type = DT_UNKNOWN;
 
 	/* Trim off trailing whitespace characters */
 	while (tmp_len > 0 &&
@@ -642,7 +652,8 @@ static ssize_t php_ftp_dirstream_read(php_stream *stream, char *buf, size_t coun
 }
 /* }}} */
 
-/* {{{ php_ftp_dirstream_close */
+/* {{{ php_ftp_dirstream_close
+ */
 static int php_ftp_dirstream_close(php_stream *stream, int close_handle)
 {
 	php_ftp_dirstream_data *data = stream->abstract;
@@ -677,7 +688,8 @@ static const php_stream_ops php_ftp_dirstream_ops = {
 	NULL  /* set option */
 };
 
-/* {{{ php_stream_ftp_opendir */
+/* {{{ php_stream_ftp_opendir
+ */
 php_stream * php_stream_ftp_opendir(php_stream_wrapper *wrapper, const char *path, const char *mode, int options,
 									zend_string **opened_path, php_stream_context *context STREAMS_DC)
 {
@@ -769,7 +781,8 @@ opendir_errexit:
 }
 /* }}} */
 
-/* {{{ php_stream_ftp_url_stat */
+/* {{{ php_stream_ftp_url_stat
+ */
 static int php_stream_ftp_url_stat(php_stream_wrapper *wrapper, const char *url, int flags, php_stream_statbuf *ssb, php_stream_context *context)
 {
 	php_stream *stream = NULL;
@@ -833,7 +846,7 @@ static int php_stream_ftp_url_stat(php_stream_wrapper *wrapper, const char *url,
 			goto mdtm_error;
 		}
 
-		n = sscanf(p, "%4d%2d%2d%2d%2d%2d", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
+		n = sscanf(p, "%4u%2u%2u%2u%2u%2u", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
 		if (n != 6) {
 			goto mdtm_error;
 		}
@@ -891,7 +904,8 @@ stat_errexit:
 }
 /* }}} */
 
-/* {{{ php_stream_ftp_unlink */
+/* {{{ php_stream_ftp_unlink
+ */
 static int php_stream_ftp_unlink(php_stream_wrapper *wrapper, const char *url, int options, php_stream_context *context)
 {
 	php_stream *stream = NULL;
@@ -915,7 +929,7 @@ static int php_stream_ftp_unlink(php_stream_wrapper *wrapper, const char *url, i
 	}
 
 	/* Attempt to delete the file */
-	php_stream_printf(stream, "DELE %s\r\n", ZSTR_VAL(resource->path));
+	php_stream_printf(stream, "DELE %s\r\n", (resource->path != NULL ? ZSTR_VAL(resource->path) : "/"));
 
 	result = GET_FTP_RESULT(stream);
 	if (result < 200 || result > 299) {
@@ -940,7 +954,8 @@ unlink_errexit:
 }
 /* }}} */
 
-/* {{{ php_stream_ftp_rename */
+/* {{{ php_stream_ftp_rename
+ */
 static int php_stream_ftp_rename(php_stream_wrapper *wrapper, const char *url_from, const char *url_to, int options, php_stream_context *context)
 {
 	php_stream *stream = NULL;
@@ -978,7 +993,7 @@ static int php_stream_ftp_rename(php_stream_wrapper *wrapper, const char *url_fr
 	}
 
 	/* Rename FROM */
-	php_stream_printf(stream, "RNFR %s\r\n", ZSTR_VAL(resource_from->path));
+	php_stream_printf(stream, "RNFR %s\r\n", (resource_from->path != NULL ? ZSTR_VAL(resource_from->path) : "/"));
 
 	result = GET_FTP_RESULT(stream);
 	if (result < 300 || result > 399) {
@@ -989,7 +1004,7 @@ static int php_stream_ftp_rename(php_stream_wrapper *wrapper, const char *url_fr
 	}
 
 	/* Rename TO */
-	php_stream_printf(stream, "RNTO %s\r\n", ZSTR_VAL(resource_to->path));
+	php_stream_printf(stream, "RNTO %s\r\n", (resource_to->path != NULL ? ZSTR_VAL(resource_to->path) : "/"));
 
 	result = GET_FTP_RESULT(stream);
 	if (result < 200 || result > 299) {
@@ -1018,7 +1033,8 @@ rename_errexit:
 }
 /* }}} */
 
-/* {{{ php_stream_ftp_mkdir */
+/* {{{ php_stream_ftp_mkdir
+ */
 static int php_stream_ftp_mkdir(php_stream_wrapper *wrapper, const char *url, int mode, int options, php_stream_context *context)
 {
 	php_stream *stream = NULL;
@@ -1044,15 +1060,15 @@ static int php_stream_ftp_mkdir(php_stream_wrapper *wrapper, const char *url, in
 	if (!recursive) {
 		php_stream_printf(stream, "MKD %s\r\n", ZSTR_VAL(resource->path));
 		result = GET_FTP_RESULT(stream);
-	} else {
-		/* we look for directory separator from the end of string, thus hopefully reducing our work load */
-		char *p, *e, *buf;
+    } else {
+        /* we look for directory separator from the end of string, thus hopefully reducing our work load */
+        char *p, *e, *buf;
 
-		buf = estrndup(ZSTR_VAL(resource->path), ZSTR_LEN(resource->path));
-		e = buf + ZSTR_LEN(resource->path);
+        buf = estrndup(ZSTR_VAL(resource->path), ZSTR_LEN(resource->path));
+        e = buf + ZSTR_LEN(resource->path);
 
-		/* find a top level directory we need to create */
-		while ((p = strrchr(buf, '/'))) {
+        /* find a top level directory we need to create */
+        while ((p = strrchr(buf, '/'))) {
 			*p = '\0';
 			php_stream_printf(stream, "CWD %s\r\n", strlen(buf) ? buf : "/");
 			result = GET_FTP_RESULT(stream);
@@ -1087,7 +1103,7 @@ static int php_stream_ftp_mkdir(php_stream_wrapper *wrapper, const char *url, in
 		}
 
 		efree(buf);
-	}
+    }
 
 	php_url_free(resource);
 	php_stream_close(stream);
@@ -1110,7 +1126,8 @@ mkdir_errexit:
 }
 /* }}} */
 
-/* {{{ php_stream_ftp_rmdir */
+/* {{{ php_stream_ftp_rmdir
+ */
 static int php_stream_ftp_rmdir(php_stream_wrapper *wrapper, const char *url, int options, php_stream_context *context)
 {
 	php_stream *stream = NULL;

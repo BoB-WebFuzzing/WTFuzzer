@@ -1,12 +1,9 @@
 --TEST--
 Bug #42841 (REF CURSOR and oci_new_cursor PHP crash)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --INI--
 oci8.statement_cache_size=20
@@ -102,7 +99,7 @@ function bug43449_getCur($c)
 
     $ret = array();
 
-    while ($row = oci_fetch_assoc($cur)) {
+    while (ocifetchinto($cur, $row, OCI_ASSOC)) {
         $ret[] = $row;
     }
 

@@ -7,7 +7,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -24,7 +24,6 @@
 #include "zend_shared_alloc.h"
 #include "zend_accelerator_util_funcs.h"
 #include "zend_execute.h"
-#include "zend_system_id.h"
 #include "SAPI.h"
 #include "tsrm_win32.h"
 #include "win32/winutil.h"
@@ -54,14 +53,14 @@ static void zend_win_error_message(int type, char *msg, int err)
 	ev_msgs[0] = msg;
 	ev_msgs[1] = buf;
 	ReportEvent(h,				  // event log handle
-	        EVENTLOG_ERROR_TYPE,  // event type
-	        0,                    // category zero
-	        err,				  // event identifier
-	        NULL,                 // no user security identifier
-	        2,                    // one substitution string
-	        0,                    // no data
-	        ev_msgs,              // pointer to string array
-	        NULL);                // pointer to data
+            EVENTLOG_ERROR_TYPE,  // event type
+            0,                    // category zero
+            err,				  // event identifier
+            NULL,                 // no user security identifier
+            2,                    // one substitution string
+            0,                    // no data
+            ev_msgs,              // pointer to string array
+            NULL);                // pointer to data
 	DeregisterEventSource(h);
 
 	zend_accel_error(type, "%s", msg);
@@ -80,7 +79,7 @@ static char *create_name_with_username(char *name)
 	*(p++) = '@';
 	p += strlcpy(p, sapi_module.name, 21);
 	*(p++) = '@';
-	memcpy(p, zend_system_id, 32);
+	memcpy(p, accel_system_id, 32);
 	p += 32;
 	*(p++) = '\0';
 	ZEND_ASSERT(p - newname <= sizeof(newname));
@@ -112,7 +111,7 @@ void zend_shared_alloc_unlock_win32(void)
 	ReleaseMutex(memory_mutex);
 }
 
-static int zend_shared_alloc_reattach(size_t requested_size, const char **error_in)
+static int zend_shared_alloc_reattach(size_t requested_size, char **error_in)
 {
 	int err;
 	void *wanted_mapping_base;
@@ -153,7 +152,7 @@ static int zend_shared_alloc_reattach(size_t requested_size, const char **error_
 			}
 
 			pre_size = ZEND_ALIGNED_SIZE(sizeof(zend_smm_shared_globals)) + ZEND_ALIGNED_SIZE(sizeof(zend_shared_segment)) + ZEND_ALIGNED_SIZE(sizeof(void *)) + ZEND_ALIGNED_SIZE(sizeof(int));
-			/* Map only part of SHM to have access to opcache shared globals */
+			/* Map only part of SHM to have access opcache shared globals */
 			mapping_base = MapViewOfFileEx(memfile, FILE_MAP_ALL_ACCESS, 0, 0, pre_size + ZEND_ALIGNED_SIZE(sizeof(zend_accel_shared_globals)), NULL);
 			if (mapping_base == NULL) {
 				err = GetLastError();
@@ -175,7 +174,7 @@ static int zend_shared_alloc_reattach(size_t requested_size, const char **error_
 		return ALLOC_FAILURE;
 	}
 
-	mapping_base = MapViewOfFileEx(memfile, FILE_MAP_ALL_ACCESS|FILE_MAP_EXECUTE, 0, 0, 0, wanted_mapping_base);
+	mapping_base = MapViewOfFileEx(memfile, FILE_MAP_ALL_ACCESS, 0, 0, 0, wanted_mapping_base);
 
 	if (mapping_base == NULL) {
 		err = GetLastError();
@@ -184,22 +183,13 @@ static int zend_shared_alloc_reattach(size_t requested_size, const char **error_
 			return ALLOC_FAILURE;
 		}
 		return ALLOC_FAIL_MAPPING;
-	} else {
-		DWORD old;
-
-		if (!VirtualProtect(mapping_base, requested_size, PAGE_READWRITE, &old)) {
-			err = GetLastError();
-			zend_win_error_message(ACCEL_LOG_FATAL, "VirtualProtect() failed", err);
-			return ALLOC_FAIL_MAPPING;
-		}
 	}
-
 	smm_shared_globals = (zend_smm_shared_globals *) ((char*)mapping_base + ACCEL_BASE_POINTER_SIZE);
 
 	return SUCCESSFULLY_REATTACHED;
 }
 
-static int create_segments(size_t requested_size, zend_shared_segment ***shared_segments_p, int *shared_segments_count, const char **error_in)
+static int create_segments(size_t requested_size, zend_shared_segment ***shared_segments_p, int *shared_segments_count, char **error_in)
 {
 	int err = 0, ret;
 	zend_shared_segment *shared_segment;
@@ -221,10 +211,10 @@ static int create_segments(size_t requested_size, zend_shared_segment ***shared_
 
 	zend_shared_alloc_lock_win32();
 	/* Mapping retries: When Apache2 restarts, the parent process startup routine
-	   can be called before the child process is killed. In this case, the mapping will fail
+	   can be called before the child process is killed. In this case, the map will fail
 	   and we have to sleep some time (until the child releases the mapping object) and retry.*/
 	do {
-		memfile = OpenFileMapping(FILE_MAP_READ|FILE_MAP_WRITE|FILE_MAP_EXECUTE, 0, create_name_with_username(ACCEL_FILEMAP_NAME));
+		memfile = OpenFileMapping(FILE_MAP_WRITE, 0, create_name_with_username(ACCEL_FILEMAP_NAME));
 		if (memfile == NULL) {
 			err = GetLastError();
 			break;
@@ -268,7 +258,7 @@ static int create_segments(size_t requested_size, zend_shared_segment ***shared_
 	shared_segment = (zend_shared_segment *)((char *)(*shared_segments_p) + sizeof(void *));
 	(*shared_segments_p)[0] = shared_segment;
 
-	memfile	= CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_EXECUTE_READWRITE | SEC_COMMIT, size_high, size_low,
+	memfile	= CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, size_high, size_low,
 								create_name_with_username(ACCEL_FILEMAP_NAME));
 	if (memfile == NULL) {
 		err = GetLastError();
@@ -278,15 +268,15 @@ static int create_segments(size_t requested_size, zend_shared_segment ***shared_
 		return ALLOC_FAILURE;
 	}
 
-	/* Starting from Windows Vista, heap randomization occurs which might cause our mapping base to
-	   be taken (fail to map). So we try to map into one of the hard coded predefined addresses
+	/* Starting from windows Vista, heap randomization occurs which might cause our mapping base to
+	   be taken (fail to map). So under Vista, we try to map into a hard coded predefined addresses
 	   in high memory. */
 	if (!ZCG(accel_directives).mmap_base || !*ZCG(accel_directives).mmap_base) {
 		wanted_mapping_base = vista_mapping_base_set;
 	} else {
 		char *s = ZCG(accel_directives).mmap_base;
 
-		/* skip leading 0x, %p assumes hexdecimal format anyway */
+		/* skip leading 0x, %p assumes hexdeciaml format anyway */
 		if (*s == '0' && *(s + 1) == 'x') {
 			s += 2;
 		}
@@ -298,7 +288,7 @@ static int create_segments(size_t requested_size, zend_shared_segment ***shared_
 	}
 
 	do {
-		shared_segment->p = mapping_base = MapViewOfFileEx(memfile, FILE_MAP_ALL_ACCESS|FILE_MAP_EXECUTE, 0, 0, 0, *wanted_mapping_base);
+		shared_segment->p = mapping_base = MapViewOfFileEx(memfile, FILE_MAP_ALL_ACCESS, 0, 0, 0, *wanted_mapping_base);
 		if (*wanted_mapping_base == NULL) { /* Auto address (NULL) is the last option on the array */
 			break;
 		}
@@ -312,14 +302,6 @@ static int create_segments(size_t requested_size, zend_shared_segment ***shared_
 		*error_in = "MapViewOfFile";
 		return ALLOC_FAILURE;
 	} else {
-		DWORD old;
-
-		if (!VirtualProtect(mapping_base, requested_size, PAGE_READWRITE, &old)) {
-			err = GetLastError();
-			zend_win_error_message(ACCEL_LOG_FATAL, "VirtualProtect() failed", err);
-			return ALLOC_FAILURE;
-		}
-
 		((void**)mapping_base)[0] = mapping_base;
 		((void**)mapping_base)[1] = (void*)execute_ex;
 	}
@@ -352,7 +334,7 @@ static size_t segment_type_size(void)
 	return sizeof(zend_shared_segment);
 }
 
-const zend_shared_memory_handlers zend_alloc_win32_handlers = {
+zend_shared_memory_handlers zend_alloc_win32_handlers = {
 	create_segments,
 	detach_segment,
 	segment_type_size

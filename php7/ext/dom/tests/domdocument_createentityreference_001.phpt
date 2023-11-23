@@ -2,14 +2,17 @@
 DomDocument::CreateEntityReference() - Creates an entity reference with the appropriate name
 --CREDITS--
 Clint Priest @ PhpTek09
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
-    $objDoc = new DomDocument();
+	$objDoc = new DomDocument();
 
-    $objRef = $objDoc->createEntityReference('Test');
-    echo $objRef->nodeName . "\n";
+	$objRef = $objDoc->createEntityReference('Test');
+	echo $objRef->nodeName . "\n";
 ?>
+===DONE===
 --EXPECT--
 Test
+===DONE===
+	

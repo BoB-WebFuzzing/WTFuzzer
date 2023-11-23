@@ -18,6 +18,5 @@ while (!feof($fh)) {
 fclose($fh);
 
 echo strlen($out) . "\n";
-?>
 --EXPECT--
 3

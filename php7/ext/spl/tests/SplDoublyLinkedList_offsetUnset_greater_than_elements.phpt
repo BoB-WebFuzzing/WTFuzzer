@@ -22,4 +22,4 @@ echo $e->getMessage();
 
 ?>
 --EXPECT--
-SplDoublyLinkedList::offsetUnset(): Argument #1 ($index) is out of range
+Offset out of range

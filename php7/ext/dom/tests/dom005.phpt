@@ -1,7 +1,7 @@
 --TEST--
 Test 5: HTML Test
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php  require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $dom = new domdocument;
@@ -16,7 +16,6 @@ print adjustDoctype($dom->saveHTML());
 function adjustDoctype($xml) {
     return str_replace(array("DOCTYPE HTML",'<p>','</p>'),array("DOCTYPE html",'',''),$xml);
 }
-?>
 --EXPECT--
 --- save as XML
 <?xml version="1.0" standalone="yes"?>

@@ -1,7 +1,7 @@
 --TEST--
 bug 8315, NULL values halt the validation
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 

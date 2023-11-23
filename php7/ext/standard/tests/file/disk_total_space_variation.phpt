@@ -4,6 +4,13 @@ Testing disk_total_space() functions : Usage Variations.
 disk_total_space
 --FILE--
 <?php
+/*
+ *  Prototype: float disk_total_space( string directory )
+ *  Description: given a string containing a directory, this function
+ *               will return the total number of bytes on the corresponding
+ *               filesystem or disk partition.
+ */
+
 $file_path = __DIR__;
 
 echo "*** Testing with a directory ***\n";
@@ -44,11 +51,7 @@ $count = 1;
 /* loop through to test each element the above array */
 foreach($dirs_arr as $dir1) {
   echo "\n-- Iteration $count --\n";
-  try {
-    var_dump( disk_total_space( $dir1 ) );
-  } catch (Error $e) {
-    echo $e->getMessage(), "\n";
-  }
+  var_dump( disk_total_space( $dir1 ) );
   $count++;
 }
 
@@ -64,48 +67,56 @@ rmdir($file_path."/disk_total_space");
 ?>
 --EXPECTF--
 *** Testing with a directory ***
-float(%f)
+float(%d)
 
 Testing for the return type ***
 bool(true)
 
 *** Testing with different directory combinations ***
 -- Iteration 1 --
-float(%f)
+float(%d)
 
 -- Iteration 2 --
-float(%f)
+float(%d)
 
 -- Iteration 3 --
-float(%f)
+float(%d)
 
 -- Iteration 4 --
-float(%f)
+float(%d)
 
 -- Iteration 5 --
-float(%f)
+float(%d)
 
 -- Iteration 6 --
-float(%f)
+float(%d)
 
 -- Iteration 7 --
-float(%f)
+float(%d)
 
 -- Iteration 8 --
-float(%f)
+float(%d)
 
 -- Iteration 9 --
-disk_total_space(): Argument #1 ($directory) must not contain any null bytes
+
+Warning: disk_total_space() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 
 -- Iteration 10 --
-disk_total_space(): Argument #1 ($directory) must not contain any null bytes
+
+Warning: disk_total_space() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 
 -- Iteration 11 --
-disk_total_space(): Argument #1 ($directory) must not contain any null bytes
+
+Warning: disk_total_space() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 
 -- Iteration 12 --
-disk_total_space(): Argument #1 ($directory) must not contain any null bytes
+
+Warning: disk_total_space() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 *** Testing with Binary Input ***
-float(%s)
+float(%d)
 
 --- Done ---

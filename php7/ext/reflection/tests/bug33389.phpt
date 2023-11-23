@@ -20,7 +20,6 @@ class Test {
     }
 }
 echo new ReflectionClass('Test');
-?>
 --EXPECTF--
 Class [ <user> class Test ] {
   @@ %sbug33389.php 3-18
@@ -42,7 +41,7 @@ Class [ <user> class Test ] {
       @@ %sbug33389.php 4 - 5
 
       - Parameters [1] {
-        Parameter #0 [ <optional> $arg = foobar ]
+        Parameter #0 [ <optional> $arg = 1 ]
       }
     }
 

@@ -6,6 +6,11 @@ require __DIR__ . '/../skipif_root.inc';
 ?>
 --FILE--
 <?php
+/* Prototype: bool is_writable ( string $filename );
+   Description: Tells whether the filename is writable.
+
+   is_writeable() is an alias of is_writable()
+*/
 /* test is_writable() & is_writeable() with file having different filepath notation */
 require __DIR__.'/file.inc';
 echo "*** Testing is_writable(): usage variations ***\n";
@@ -45,16 +50,8 @@ $counter = 1;
    is a writable file */
 foreach($files_arr as $file) {
   echo "-- Iteration $counter --\n";
-  try {
-    var_dump( is_writable($file) );
-  } catch (Error $e) {
-    echo $e->getMessage(), "\n";
-  }
-  try {
-    var_dump( is_writeable($file) );
-  } catch (Error $e) {
-    echo $e->getMessage(), "\n";
-  }
+  var_dump( is_writable($file) );
+  var_dump( is_writeable($file) );
   $counter++;
   clearstatcache();
 }
@@ -87,14 +84,26 @@ bool(false)
 bool(false)
 bool(false)
 -- Iteration 7 --
-bool(false)
-bool(false)
+
+Warning: is_writable() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: is_writeable() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 -- Iteration 8 --
-bool(false)
-bool(false)
+
+Warning: is_writable() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: is_writeable() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 -- Iteration 9 --
-bool(false)
-bool(false)
+
+Warning: is_writable() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
+
+Warning: is_writeable() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 -- Iteration 10 --
 bool(true)
 bool(true)

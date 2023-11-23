@@ -1,8 +1,8 @@
 --TEST--
 Phar: context/compress=GZ
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
+<?php if (!extension_loaded("zlib")) die("skip zlib not present"); ?>
 --INI--
 phar.readonly=0
 phar.require_hash=0
@@ -48,6 +48,7 @@ var_dump(file_get_contents($pname . '/e'));
 var_dump($phar['e']->isCompressed());
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.php');
@@ -69,3 +70,4 @@ string(5) "new d"
 bool(false)
 string(5) "new e"
 bool(true)
+===DONE===

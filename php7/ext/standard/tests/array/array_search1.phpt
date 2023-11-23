@@ -5,6 +5,8 @@ array_search() tests
 
 $a = array(1=>0, 2=>1, 4=>3, "a"=>"b", "c"=>"d");
 
+var_dump(array_search(1));
+var_dump(array_search(1,1));
 var_dump(array_search("a",$a));
 var_dump(array_search("0",$a, true));
 var_dump(array_search("0",$a));
@@ -16,13 +18,18 @@ var_dump(array_search(-1,$a, true));
 
 echo "Done\n";
 ?>
---EXPECT--
-bool(false)
+--EXPECTF--
+Warning: array_search() expects at least 2 parameters, 1 given in %s on line %d
+NULL
+
+Warning: array_search() expects parameter 2 to be array, int given in %s on line %d
+NULL
+int(1)
 bool(false)
 int(1)
 int(1)
 int(2)
 string(1) "c"
-string(1) "c"
+int(1)
 bool(false)
 Done

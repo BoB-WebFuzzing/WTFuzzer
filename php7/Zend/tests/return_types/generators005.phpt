@@ -16,7 +16,6 @@ class SomeCollection implements Collection {
 
 $some = new SomeCollection();
 var_dump($some->getIterator());
-?>
 --EXPECTF--
 object(Generator)#%d (%d) {
 }

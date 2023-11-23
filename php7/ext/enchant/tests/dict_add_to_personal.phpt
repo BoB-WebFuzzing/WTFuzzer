@@ -1,13 +1,12 @@
 --TEST--
-enchant_dict_add() function
+enchant_dict_add_to_personal() function
 --CREDITS--
 marcosptf - <marcosptf@yahoo.com.br>
---EXTENSIONS--
-enchant
 --SKIPIF--
 <?php
-if (!is_object(enchant_broker_init())) {die("skip, resource dont load\n");}
-if (!is_array(enchant_broker_list_dicts(enchant_broker_init()))) {die("skip, no dictionary installed on this machine! \n");}
+if(!extension_loaded('enchant')) die('skip, enchant not loader');
+if (!is_resource(enchant_broker_init())) {die("skip, resource dont load\n");}
+if (!is_array(enchant_broker_list_dicts(enchant_broker_init()))) {die("skip, dont has dictionary install in this machine! \n");}
 ?>
 --FILE--
 <?php
@@ -15,13 +14,13 @@ $broker = enchant_broker_init();
 $dicts = enchant_broker_list_dicts($broker);
 $newWord = "iLoveJava";
 
-if (is_object($broker)) {
+if (is_resource($broker)) {
     echo("OK\n");
     $requestDict = enchant_broker_request_dict($broker, $dicts[0]['lang_tag']);
 
     if ($requestDict) {
         echo("OK\n");
-        $AddtoPersonalDict = enchant_dict_add($requestDict,$newWord);
+        $AddtoPersonalDict = enchant_dict_add_to_personal($requestDict,$newWord);
 
         if (NULL === $AddtoPersonalDict) {
             var_dump($AddtoPersonalDict);
@@ -31,7 +30,7 @@ if (is_object($broker)) {
         }
 
     } else {
-    echo("broker request dict failed\n");
+	echo("broker request dict failed\n");
 
     }
 

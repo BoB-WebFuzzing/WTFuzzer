@@ -1,14 +1,18 @@
 --TEST--
 int mysqli_poll() simple
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('connect.inc');
+require_once('skipifconnectfailure.inc');
+
+if (!$IS_MYSQLND)
+    die("skip mysqlnd only feature, compile PHP using --with-mysqli=mysqlnd");
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once('connect.inc');
 
     function get_connection() {
         global $host, $user, $passwd, $db, $port, $socket;
@@ -21,29 +25,40 @@ require_once 'skipifconnectfailure.inc';
     if (!$link = get_connection())
         printf("[001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
+    if (NULL !== ($tmp = @mysqli_poll()))
+        printf("[002] Expecting NULL got %s\n", var_export($tmp, true));
+
+    $l = array($link);
+    if (NULL !== ($tmp = @mysqli_poll($l)))
+        printf("[003] Expecting NULL got %s\n", var_export($tmp, true));
+
+    $l = array($link); $n = NULL;
+    if (NULL !== ($tmp = @mysqli_poll($l, $n)))
+        printf("[004] Expecting NULL got %s\n", var_export($tmp, true));
+
+    $l = array($link); $n = NULL;
+    if (NULL !== ($tmp = @mysqli_poll($l, $n, $n)))
+        printf("[005] Expecting NULL got %s\n", var_export($tmp, true));
+
+    $l = array($link); $e = NULL; $r = NULL;
+    if (NULL !== ($tmp = @mysqli_poll($l, $e, $r, -1)))
+        printf("[007] Expecting boolean/false got %s/%s\n", gettype($tmp), var_export($tmp, true));
+
+    $l = array($link); $e = NULL; $r = NULL;
+    if (NULL !== ($tmp = @mysqli_poll($l, $e, $r, 0, -1)))
+        printf("[008] Expecting boolean/false got %s/%s\n", gettype($tmp), var_export($tmp, true));
+
     $read = $error = $reject = array($link);
     if (0 !== ($tmp = (mysqli_poll($read, $error, $reject, 0, 1))))
         printf("[009] Expecting int/0 got %s/%s\n", gettype($tmp), var_export($tmp, true));
 
     $read = $error = $reject = array($link);
-    try {
-        mysqli_poll($read, $error, $reject, -1, 1);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
-    try {
-        mysqli_poll($read, $error, $reject, 0, -1);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (false !== ($tmp = (mysqli_poll($read, $error, $reject, -1, 1))))
+        printf("[010] Expecting false got %s/%s\n", gettype($tmp), var_export($tmp, true));
 
-    $link->close();
-    $read[0] = get_connection();
-    try {
-        mysqli_poll($read, $error, $reject, 0, 1);
-    } catch (\Error $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    $read = $error = $reject = array($link);
+    if (false !== ($tmp = (mysqli_poll($read, $error, $reject, 0, -1))))
+        printf("[011] Expecting false got %s/%s\n", gettype($tmp), var_export($tmp, true));
 
     function poll_async($offset, $link, $links, $errors, $reject, $exp_ready, $use_oo_syntax) {
 
@@ -77,7 +92,7 @@ require_once 'skipifconnectfailure.inc';
 
     }
 
-    // Connections on which no query has been sent - 1
+    // Connections on which no query has been send - 1
     $link = get_connection();
     $links = array($link);
     $errors = array($link);
@@ -92,7 +107,7 @@ require_once 'skipifconnectfailure.inc';
     poll_async(13, $link, $links, $errors, $reject, 0, true);
     mysqli_close($link);
 
-    // Connections on which no query has been sent - 2
+    // Connections on which no query has been send - 2
     // Difference: pass $links twice
     $link = get_connection();
     $links = array($link, $link);
@@ -100,7 +115,7 @@ require_once 'skipifconnectfailure.inc';
     $reject = array();
     poll_async(14, $link, $links, $errors, $reject, 0, false);
 
-    // Connections on which no query has been sent - 3
+    // Connections on which no query has been send - 3
     // Difference: pass two connections
     $link = get_connection();
     $links = array($link, get_connection());
@@ -119,9 +134,9 @@ require_once 'skipifconnectfailure.inc';
     print "done!";
 ?>
 --EXPECTF--
-mysqli_poll(): Argument #4 ($seconds) must be greater than or equal to 0
-mysqli_poll(): Argument #5 ($microseconds) must be greater than or equal to 0
-mysqli object is already closed
+Warning: mysqli_poll(): Negative values passed for sec and/or usec in %s on line %d
+
+Warning: mysqli_poll(): Negative values passed for sec and/or usec in %s on line %d
 [012 + 6] Rejecting thread %d: 0/
 [013 + 6] Rejecting thread %d: 0/
 [014 + 6] Rejecting thread %d: 0/

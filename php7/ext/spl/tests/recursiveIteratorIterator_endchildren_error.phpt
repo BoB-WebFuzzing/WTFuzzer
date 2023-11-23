@@ -10,8 +10,8 @@ $recArrIt = new RecursiveArrayIterator($arrOb->getIterator());
 
 class MyRecursiveIteratorIterator extends RecursiveIteratorIterator {
 
-    function endchildren(): void {
-        throw new Exception;
+    function endchildren() {
+    	throw new Exception;
     }
 }
 
@@ -36,6 +36,7 @@ foreach ($recItIt2 as $val) echo "$val\n";
 
 Fatal error: Uncaught Exception in %s
 Stack trace:
-#0 %s(%d): MyRecursiveIteratorIterator->endchildren()
-#1 {main}
+#0 [internal function]: MyRecursiveIteratorIterator->endchildren()
+#1 %s: RecursiveIteratorIterator->next()
+#2 {main}
   thrown in %s on line %d

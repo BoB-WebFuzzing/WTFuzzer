@@ -1,12 +1,9 @@
 --TEST--
 oci_lob_free()/close()
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -30,18 +27,10 @@ var_dump($blob->write("test"));
 var_dump($blob->close());
 var_dump($blob->write("test"));
 var_dump(oci_free_descriptor($blob));
+var_dump($blob->write("test"));
 
-try {
-    var_dump($blob->write("test"));
-} catch(\TypeError $exception) {
-    var_dump($exception->getMessage());
-}
-
-try {
-    var_dump(oci_free_descriptor($blob));
-} catch(\TypeError $exception) {
-    var_dump($exception->getMessage());
-}
+var_dump(oci_free_descriptor($blob));
+var_dump(oci_free_descriptor(new stdclass));
 
 $blob = oci_new_descriptor($c,OCI_D_LOB);
 unset($blob->descriptor);
@@ -65,8 +54,15 @@ int(4)
 bool(true)
 int(4)
 bool(true)
-string(%d) "OCILob::write(): %s is not a valid oci8 descriptor resource"
-string(%d) "oci_free_descriptor(): %s is not a valid oci8 descriptor resource"
+
+Warning: OCI-Lob::write(): %s is not a valid oci8 descriptor resource in %s on line %d
+bool(false)
+
+Warning: oci_free_descriptor(): %s is not a valid oci8 descriptor resource in %s on line %d
+bool(false)
+
+Warning: oci_free_descriptor() expects parameter 1 to be OCI-Lob, object given in %s on line %d
+NULL
 
 Warning: oci_free_descriptor(): Unable to find descriptor property in %s on line %d
 bool(false)

@@ -1,5 +1,5 @@
 --TEST--
-Overwritten methods do not cause a conflict.
+Overwridden methods do not cause a conflict.
 --FILE--
 <?php
 error_reporting(E_ALL);

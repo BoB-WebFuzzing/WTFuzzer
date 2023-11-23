@@ -1,7 +1,8 @@
 --TEST--
 gzopen(), gzread(), gzwrite()
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) print "skip"; ?>
 --FILE--
 <?php
 $original = str_repeat("hallo php",4096);
@@ -17,14 +18,14 @@ $fp = gzopen($filename, "rb");
 
 $data = '';
 while ($buf = gzread($fp, 8092)) {
-    $data .= $buf;
+	$data .= $buf;
 }
 
 if ($data == $original) {
-    echo "Strings are equal\n";
+	echo "Strings are equal\n";
 } else {
-    echo "Strings are not equal\n";
-    var_dump($data);
+	echo "Strings are not equal\n";
+	var_dump($data);
 }
 gzclose($fp);
 unlink($filename);

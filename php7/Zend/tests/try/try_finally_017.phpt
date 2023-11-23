@@ -34,7 +34,9 @@ function foo() {
 
 foo();
 ?>
+===DONE===
 --EXPECT--
 finally1
 catch2
 finally2
+===DONE===

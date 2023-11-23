@@ -1,7 +1,9 @@
 --TEST--
 IntlTimeZone clone handler: basic test
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -16,6 +18,7 @@ print_r($gmt);
 print_r(clone $gmt);
 
 ?>
+==DONE==
 --EXPECTF--
 IntlTimeZone Object
 (
@@ -44,4 +47,5 @@ IntlTimeZone Object
     [id] => GMT
     [rawOffset] => 0
     [currentOffset] => 0
-)
+)
+==DONE==

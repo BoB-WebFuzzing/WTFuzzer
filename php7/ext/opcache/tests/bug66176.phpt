@@ -5,16 +5,15 @@ opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
 opcache.file_update_protection=0
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function foo($v) {
-    global $a;
-    return $a[$v];
+	global $a;
+	return $a[$v];
 }
 $a = array(PHP_VERSION => 1);
 var_dump(foo(PHP_VERSION));
-?>
 --EXPECT--
 int(1)

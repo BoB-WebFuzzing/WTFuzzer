@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -22,14 +24,10 @@
 #include "php_hash_ripemd.h"
 
 const php_hash_ops php_hash_ripemd128_ops = {
-	"ripemd128",
 	(php_hash_init_func_t) PHP_RIPEMD128Init,
 	(php_hash_update_func_t) PHP_RIPEMD128Update,
 	(php_hash_final_func_t) PHP_RIPEMD128Final,
-	php_hash_copy,
-	php_hash_serialize,
-	php_hash_unserialize,
-	PHP_RIPEMD128_SPEC,
+	(php_hash_copy_func_t) php_hash_copy,
 	16,
 	64,
 	sizeof(PHP_RIPEMD128_CTX),
@@ -37,14 +35,10 @@ const php_hash_ops php_hash_ripemd128_ops = {
 };
 
 const php_hash_ops php_hash_ripemd160_ops = {
-	"ripemd160",
 	(php_hash_init_func_t) PHP_RIPEMD160Init,
 	(php_hash_update_func_t) PHP_RIPEMD160Update,
 	(php_hash_final_func_t) PHP_RIPEMD160Final,
-	php_hash_copy,
-	php_hash_serialize,
-	php_hash_unserialize,
-	PHP_RIPEMD160_SPEC,
+	(php_hash_copy_func_t) php_hash_copy,
 	20,
 	64,
 	sizeof(PHP_RIPEMD160_CTX),
@@ -52,14 +46,10 @@ const php_hash_ops php_hash_ripemd160_ops = {
 };
 
 const php_hash_ops php_hash_ripemd256_ops = {
-	"ripemd256",
 	(php_hash_init_func_t) PHP_RIPEMD256Init,
 	(php_hash_update_func_t) PHP_RIPEMD256Update,
 	(php_hash_final_func_t) PHP_RIPEMD256Final,
-	php_hash_copy,
-	php_hash_serialize,
-	php_hash_unserialize,
-	PHP_RIPEMD256_SPEC,
+	(php_hash_copy_func_t) php_hash_copy,
 	32,
 	64,
 	sizeof(PHP_RIPEMD256_CTX),
@@ -67,14 +57,10 @@ const php_hash_ops php_hash_ripemd256_ops = {
 };
 
 const php_hash_ops php_hash_ripemd320_ops = {
-	"ripemd320",
 	(php_hash_init_func_t) PHP_RIPEMD320Init,
 	(php_hash_update_func_t) PHP_RIPEMD320Update,
 	(php_hash_final_func_t) PHP_RIPEMD320Final,
-	php_hash_copy,
-	php_hash_serialize,
-	php_hash_unserialize,
-	PHP_RIPEMD320_SPEC,
+	(php_hash_copy_func_t) php_hash_copy,
 	40,
 	64,
 	sizeof(PHP_RIPEMD320_CTX),
@@ -84,7 +70,7 @@ const php_hash_ops php_hash_ripemd320_ops = {
 /* {{{ PHP_RIPEMD128Init
  * ripemd128 initialization. Begins a ripemd128 operation, writing a new context.
  */
-PHP_HASH_API void PHP_RIPEMD128Init(PHP_RIPEMD128_CTX * context, ZEND_ATTRIBUTE_UNUSED HashTable *args)
+PHP_HASH_API void PHP_RIPEMD128Init(PHP_RIPEMD128_CTX * context)
 {
 	context->count[0] = context->count[1] = 0;
 	/* Load magic initialization constants.
@@ -99,7 +85,7 @@ PHP_HASH_API void PHP_RIPEMD128Init(PHP_RIPEMD128_CTX * context, ZEND_ATTRIBUTE_
 /* {{{ PHP_RIPEMD256Init
  * ripemd256 initialization. Begins a ripemd256 operation, writing a new context.
  */
-PHP_HASH_API void PHP_RIPEMD256Init(PHP_RIPEMD256_CTX * context, ZEND_ATTRIBUTE_UNUSED HashTable *args)
+PHP_HASH_API void PHP_RIPEMD256Init(PHP_RIPEMD256_CTX * context)
 {
 	context->count[0] = context->count[1] = 0;
 	/* Load magic initialization constants.
@@ -118,7 +104,7 @@ PHP_HASH_API void PHP_RIPEMD256Init(PHP_RIPEMD256_CTX * context, ZEND_ATTRIBUTE_
 /* {{{ PHP_RIPEMD160Init
  * ripemd160 initialization. Begins a ripemd160 operation, writing a new context.
  */
-PHP_HASH_API void PHP_RIPEMD160Init(PHP_RIPEMD160_CTX * context, ZEND_ATTRIBUTE_UNUSED HashTable *args)
+PHP_HASH_API void PHP_RIPEMD160Init(PHP_RIPEMD160_CTX * context)
 {
 	context->count[0] = context->count[1] = 0;
 	/* Load magic initialization constants.
@@ -134,7 +120,7 @@ PHP_HASH_API void PHP_RIPEMD160Init(PHP_RIPEMD160_CTX * context, ZEND_ATTRIBUTE_
 /* {{{ PHP_RIPEMD320Init
  * ripemd320 initialization. Begins a ripemd320 operation, writing a new context.
  */
-PHP_HASH_API void PHP_RIPEMD320Init(PHP_RIPEMD320_CTX * context, ZEND_ATTRIBUTE_UNUSED HashTable *args)
+PHP_HASH_API void PHP_RIPEMD320Init(PHP_RIPEMD320_CTX * context)
 {
 	context->count[0] = context->count[1] = 0;
 	/* Load magic initialization constants.

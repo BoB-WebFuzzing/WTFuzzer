@@ -1,12 +1,10 @@
 --TEST--
 oci_set_db_operation: basic test for end-to-end tracing
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+if (!extension_loaded('oci8')) die ("skip no oci8 extension");
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 if (strcasecmp($user, "system") && strcasecmp($user, "sys")) {
     die("skip needs to be run as a DBA user");
 }
@@ -22,7 +20,7 @@ if (!(isset($matches[0]) && $matches[0] >= 12)) {
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Run Test
 
@@ -43,6 +41,8 @@ dq($c, 'select /*+ MONITOR */ * from dual');
 dq($c, 'select dbop_name from v$sql_monitor where dbop_name is not null order by dbop_exec_id desc');
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Test 1
 array(1) {
@@ -53,3 +53,4 @@ array(1) {
   ["DBOP_NAME"]=>
   string(7) "db_op_1"
 }
+===DONE===

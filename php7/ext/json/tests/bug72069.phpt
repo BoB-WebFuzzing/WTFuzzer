@@ -1,17 +1,19 @@
 --TEST--
 Bug #72069 (Behavior \JsonSerializable different from json_encode)
+--SKIPIF--
+<?php if (!extension_loaded("json")) print "skip"; ?>
 --FILE--
 <?php
 
-$result = json_encode(['end' => json_decode('', true)]);
+$result = json_encode(['end' => json_decode(null, true)]);
 var_dump($result);
 
 class A implements \JsonSerializable
 {
-    function jsonSerialize(): mixed
-    {
-        return ['end' => json_decode('', true)];
-    }
+	function jsonSerialize()
+	{
+		return ['end' => json_decode(null, true)];
+	}
 }
 $a = new A();
 $toJsonData = $a->jsonSerialize();

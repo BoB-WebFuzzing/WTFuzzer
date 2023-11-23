@@ -1,12 +1,12 @@
 --TEST--
 FFI 010: string()
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--
 <?php
-$a = FFI::cdef()->new("int[3]");
+$a = FFI::new("int[3]");
 FFI::memset($a, ord("a"), FFI::sizeof($a));
 var_dump(FFI::string($a, FFI::sizeof($a)));
 ?>

@@ -14,7 +14,7 @@ foreach ($iterator as $element) {
 }
 
 class SkipsFirstElementRecursiveIteratorIterator extends RecursiveIteratorIterator {
-  public function beginIteration(): void {
+  public function beginIteration() {
     echo "::beginIteration() was invoked\n";
     $this->next();
   }

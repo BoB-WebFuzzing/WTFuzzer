@@ -12,8 +12,11 @@ var_dump($a == $b);
 $a[$b] = 3;
 var_dump($a == $b);
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 bool(true)
 bool(false)
 bool(true)
 bool(false)
+===DONE===

@@ -94,19 +94,6 @@
 		(dval) = (double)(a) * (double)(b); \
 	} \
 } while (0)
-# elif defined(_M_ARM64)
-#  pragma intrinsic(__mulh)
-#  define ZEND_SIGNED_MULTIPLY_LONG(a, b, lval, dval, usedval) do {       \
-	__int64 __high = __mulh((a), (b)); \
-	__int64 __low  = (a) * (b); \
-	if ((__low >> 63I64) == __high) { \
-		(usedval) = 0; \
-		(lval) = __low; \
-	} else { \
-		(usedval) = 1; \
-		(dval) = (double)(a) * (double)(b); \
-	} \
-} while (0)
 # else
 #  define ZEND_SIGNED_MULTIPLY_LONG(a, b, lval, dval, usedval) do {	\
 	zend_long   __lres  = (a) * (b);										\
@@ -167,7 +154,7 @@
 
 #if defined(__GNUC__) && (defined(__native_client__) || defined(i386))
 
-static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, bool *overflow)
+static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, int *overflow)
 {
 	size_t res = nmemb;
 	size_t m_overflow = 0;
@@ -195,7 +182,7 @@ static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, si
 
 #elif defined(__GNUC__) && defined(__x86_64__)
 
-static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, bool *overflow)
+static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, int *overflow)
 {
 	size_t res = nmemb;
 	zend_ulong m_overflow = 0;
@@ -232,7 +219,7 @@ static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, si
 
 #elif defined(__GNUC__) && defined(__arm__)
 
-static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, bool *overflow)
+static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, int *overflow)
 {
 	size_t res;
 	zend_ulong m_overflow;
@@ -254,7 +241,7 @@ static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, si
 
 #elif defined(__GNUC__) && defined(__aarch64__)
 
-static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, bool *overflow)
+static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, int *overflow)
 {
 	size_t res;
 	zend_ulong m_overflow;
@@ -275,7 +262,7 @@ static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, si
 
 #elif defined(__GNUC__) && defined(__powerpc64__)
 
-static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, bool *overflow)
+static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, int *overflow)
 {
         size_t res;
         unsigned long m_overflow;
@@ -299,7 +286,7 @@ static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, si
 
 #elif SIZEOF_SIZE_T == 4
 
-static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, bool *overflow)
+static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, int *overflow)
 {
 	uint64_t res = (uint64_t) nmemb * (uint64_t) size + (uint64_t) offset;
 
@@ -313,7 +300,7 @@ static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, si
 
 #else
 
-static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, bool *overflow)
+static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, size_t offset, int *overflow)
 {
 	size_t res = nmemb * size + offset;
 	double _d  = (double)nmemb * (double)size + (double)offset;
@@ -330,7 +317,7 @@ static zend_always_inline size_t zend_safe_address(size_t nmemb, size_t size, si
 
 static zend_always_inline size_t zend_safe_address_guarded(size_t nmemb, size_t size, size_t offset)
 {
-	bool overflow;
+	int overflow;
 	size_t ret = zend_safe_address(nmemb, size, offset, &overflow);
 
 	if (UNEXPECTED(overflow)) {
@@ -343,7 +330,7 @@ static zend_always_inline size_t zend_safe_address_guarded(size_t nmemb, size_t 
 /* A bit more generic version of the same */
 static zend_always_inline size_t zend_safe_addmult(size_t nmemb, size_t size, size_t offset, const char *message)
 {
-	bool overflow;
+	int overflow;
 	size_t ret = zend_safe_address(nmemb, size, offset, &overflow);
 
 	if (UNEXPECTED(overflow)) {

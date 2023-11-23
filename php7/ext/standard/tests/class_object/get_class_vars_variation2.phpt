@@ -2,6 +2,12 @@
 Test get_class_vars() function : testing visibility
 --FILE--
 <?php
+/* Prototype  : array get_class_vars(string class_name)
+ * Description: Returns an array of default properties of the class.
+ * Source code: Zend/zend_builtin_functions.c
+ * Alias to functions:
+ */
+
 class Ancestor {
   function test() {
     var_dump(get_class_vars("Tester"));
@@ -68,6 +74,7 @@ $child->test();
 echo "\n-- From a child's static context --\n";
 Child::testStatic();
 ?>
+===DONE===
 --EXPECT--
 *** Testing get_class_vars() : testing visibility
 
@@ -158,3 +165,4 @@ array(4) {
   ["prots"]=>
   string(20) "protected static var"
 }
+===DONE===

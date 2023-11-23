@@ -2,6 +2,12 @@
 Test array_search() function : usage variations - different haystack values
 --FILE--
 <?php
+/*
+ * Prototype  : mixed array_search ( mixed $needle, array $haystack [, bool $strict] )
+ * Description: Searches haystack for needle and returns the key if it is found in the array, FALSE otherwise
+ * Source Code: ext/standard/array.c
+*/
+
 /* Test array_search() with different possible haystack values */
 
 echo "*** Testing array_search() with different haystack values ***\n";
@@ -12,7 +18,7 @@ $misc_array = array (
   3,
   ".001" =>-67,
   "-.051" =>"k",
-  0 =>"-.08",
+  0.091 =>"-.08",
   "e" =>"5",
   "y" =>NULL,
   NULL =>"",
@@ -58,9 +64,9 @@ int(3)
 bool(false)
 int(3)
 -- Iteration 4 --
-string(1) "y"
+string(3) "key"
 int(2)
-string(1) "y"
+string(3) "key"
 -- Iteration 5 --
 int(3)
 bool(false)
@@ -86,9 +92,9 @@ string(1) "y"
 bool(false)
 string(1) "y"
 -- Iteration 11 --
-int(3)
+int(2)
 bool(false)
-int(3)
+int(2)
 -- Iteration 12 --
 string(1) "y"
 string(0) ""

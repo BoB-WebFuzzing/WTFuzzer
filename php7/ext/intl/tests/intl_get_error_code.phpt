@@ -1,7 +1,7 @@
 --TEST--
 intl_get_error_code()
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 /*
@@ -11,7 +11,7 @@ intl
 // Suppress warning messages.
 error_reporting( E_ERROR );
 
-if( collator_get_locale(new Collator('en_US'), -1) !== false )
+if( collator_get_locale() !== false )
     echo "failed\n";
 else
 {

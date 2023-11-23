@@ -1,5 +1,5 @@
 --TEST--
-Type group use declarations should not allow override on inner items
+Type group use declarations should not allow override on inner itens
 --FILE--
 <?php
 
@@ -10,6 +10,5 @@ use const Foo\Bar\{
     const B,
     function C
 };
-?>
 --EXPECTF--
-Parse error: syntax error, unexpected token "const", expecting "}" in %s on line %d
+Parse error: syntax error, unexpected 'const' (T_CONST), expecting '}' in %s on line 7

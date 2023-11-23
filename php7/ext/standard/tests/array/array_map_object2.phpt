@@ -2,6 +2,11 @@
 Test array_map() function : object functionality - with non-existent class and method
 --FILE--
 <?php
+/* Prototype  : array array_map  ( callback $callback  , array $arr1  [, array $...  ] )
+ * Description: Applies the callback to the elements of the given arrays
+ * Source code: ext/standard/array.c
+ */
+
 /*
  * Testing array_map() for following object functionalities:
  *   1) non-existent class
@@ -21,25 +26,21 @@ class SimpleClass
 }
 
 echo "-- with non-existent class --\n";
-try {
-    var_dump( array_map(array('non-existent', 'square'), array(1, 2)) );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump( array_map(array('non-existent', 'square'), array(1, 2)) );
 
 echo "-- with existent class and non-existent method --\n";
-try {
-    var_dump( array_map(array('SimpleClass', 'non-existent'), array(1, 2)) );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump( array_map(array('SimpleClass', 'non-existent'), array(1, 2)) );
 
 echo "Done";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing array_map() :  with non-existent class and method ***
 -- with non-existent class --
-array_map(): Argument #1 ($callback) must be a valid callback or null, class "non-existent" not found
+
+Warning: array_map() expects parameter 1 to be a valid callback, class 'non-existent' not found in %s on line %d
+NULL
 -- with existent class and non-existent method --
-array_map(): Argument #1 ($callback) must be a valid callback or null, class SimpleClass does not have a method "non-existent"
+
+Warning: array_map() expects parameter 1 to be a valid callback, class 'SimpleClass' does not have a method 'non-existent' in %s on line %d
+NULL
 Done

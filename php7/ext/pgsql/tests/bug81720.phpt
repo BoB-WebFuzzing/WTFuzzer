@@ -1,12 +1,10 @@
 --TEST--
 Bug #81720 (Uninitialized array in pg_query_params() leading to RCE)
---EXTENSIONS--
-pgsql
 --SKIPIF--
-<?php include("inc/skipif.inc"); ?>
+<?php include("skipif.inc"); ?>
 --FILE--
 <?php
-include('inc/config.inc');
+include('config.inc');
 
 $conn = pg_connect($conn_str);
 

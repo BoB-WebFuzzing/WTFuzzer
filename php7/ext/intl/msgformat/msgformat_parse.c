@@ -1,9 +1,11 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -20,6 +22,7 @@
 
 #include "php_intl.h"
 #include "msgformat_class.h"
+#include "msgformat_parse.h"
 #include "msgformat_data.h"
 #include "msgformat_helpers.h"
 #include "intl_convert.h"
@@ -50,7 +53,11 @@ static void msgfmt_do_parse(MessageFormatter_object *mfo, char *source, size_t s
 }
 /* }}} */
 
-/* {{{ Parse a message */
+/* {{{ proto array MessageFormatter::parse( string $source )
+ * Parse a message }}} */
+/* {{{ proto array msgfmt_parse( MessageFormatter $nf, string $source )
+ * Parse a message.
+ */
 PHP_FUNCTION( msgfmt_parse )
 {
 	char *source;
@@ -62,7 +69,10 @@ PHP_FUNCTION( msgfmt_parse )
 	if( zend_parse_method_parameters( ZEND_NUM_ARGS(), getThis(), "Os",
 		&object, MessageFormatter_ce_ptr,  &source, &source_len ) == FAILURE )
 	{
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			"msgfmt_parse: unable to parse input params", 0 );
+
+		RETURN_FALSE;
 	}
 
 	/* Fetch the object. */
@@ -72,7 +82,11 @@ PHP_FUNCTION( msgfmt_parse )
 }
 /* }}} */
 
-/* {{{ Parse a message. */
+/* {{{ proto array MessageFormatter::formatMessage( string $locale, string $pattern, string $source )
+ * Parse a message. }}} */
+/* {{{ proto array numfmt_parse_message( string $locale, string $pattern, string $source )
+ * Parse a message.
+ */
 PHP_FUNCTION( msgfmt_parse_message )
 {
 	UChar      *spattern = NULL;
@@ -90,7 +104,10 @@ PHP_FUNCTION( msgfmt_parse_message )
 	if( zend_parse_parameters( ZEND_NUM_ARGS(), "sss",
 		  &slocale, &slocale_len, &pattern, &pattern_len, &source, &src_len ) == FAILURE )
 	{
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+			"msgfmt_parse_message: unable to parse input params", 0 );
+
+		RETURN_FALSE;
 	}
 
 	INTL_CHECK_LOCALE_LEN(slocale_len);

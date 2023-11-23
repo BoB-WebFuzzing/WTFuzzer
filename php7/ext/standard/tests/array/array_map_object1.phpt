@@ -2,6 +2,11 @@
 Test array_map() function : usage variations - object functionality
 --FILE--
 <?php
+/* Prototype  : array array_map  ( callback $callback  , array $arr1  [, array $...  ] )
+ * Description: Applies the callback to the elements of the given arrays
+ * Source code: ext/standard/array.c
+ */
+
 /*
  * Testing array_map() for object functionalities:
  *   1) simple class with variable and method
@@ -17,17 +22,13 @@ echo "-- simple class with public variable and method --\n";
 class SimpleClass
 {
   public $var1 = 1;
-  public static function square($n) {
+  public function square($n) {
     return $n * $n;
   }
 }
 function test($cb, $args) {
   echo join('::', $cb) . "\n";
-  try {
-    var_dump(array_map($cb, $args));
-  } catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-  }
+  var_dump(array_map($cb, $args));
 }
 test(array('SimpleClass', 'square'), array(1, 2));
 
@@ -35,7 +36,7 @@ echo "\n-- simple class with private variable and method --\n";
 class SimpleClassPri
 {
   private $var1 = 10;
-  private static function add($n) {
+  private function add($n) {
     return $var + $n;
   }
 }
@@ -45,7 +46,7 @@ echo "\n-- simple class with protected variable and method --\n";
 class SimpleClassPro
 {
   protected $var1 = 5;
-  protected static function mul($n) {
+  protected function mul($n) {
     return $var1 * $n;
   }
 }
@@ -61,14 +62,14 @@ echo "\n-- abstract class --\n";
 abstract class AbstractClass
 {
   protected $var2 = 5;
-  abstract static function emptyFunction();
+  abstract function emptyFunction();
 }
 
 // class deriving the above abstract class
 class ChildClass extends AbstractClass
 {
   private $var3;
-  public static function emptyFunction() {
+  public function emptyFunction() {
     echo "defined in child\n";
   }
 }
@@ -78,7 +79,7 @@ echo "\n-- class with final method --\n";
 class FinalClass
 {
   private $var4;
-  final static function finalMethod() {
+  final function finalMethod() {
     echo "This function can't be overloaded\n";
   }
 }
@@ -119,10 +120,14 @@ class InterClass implements myInterface
 test(array('InterClass', 'square'), array(1, 2));
 
 ?>
---EXPECT--
+===DONE===
+<?php exit(0); ?>
+--EXPECTF--
 *** Testing array_map() : object functionality ***
 -- simple class with public variable and method --
 SimpleClass::square
+
+Deprecated: array_map() expects parameter 1 to be a valid callback, non-static method SimpleClass::square() should not be called statically in %sarray_map_object1.php on line %d
 array(2) {
   [0]=>
   int(1)
@@ -132,18 +137,26 @@ array(2) {
 
 -- simple class with private variable and method --
 SimpleClassPri::add
-array_map(): Argument #1 ($callback) must be a valid callback or null, cannot access private method SimpleClassPri::add()
+
+Warning: array_map() expects parameter 1 to be a valid callback, cannot access private method SimpleClassPri::add() in %sarray_map_object1.php on line %d
+NULL
 
 -- simple class with protected variable and method --
 SimpleClassPro::mul
-array_map(): Argument #1 ($callback) must be a valid callback or null, cannot access protected method SimpleClassPro::mul()
+
+Warning: array_map() expects parameter 1 to be a valid callback, cannot access protected method SimpleClassPro::mul() in %sarray_map_object1.php on line %d
+NULL
 
 -- class without members --
 EmptyClass
-array_map(): Argument #1 ($callback) must be a valid callback or null, array callback must have exactly two members
+
+Warning: array_map() expects parameter 1 to be a valid callback, array must have exactly two members in %sarray_map_object1.php on line %d
+NULL
 
 -- abstract class --
 ChildClass::emptyFunction
+
+Deprecated: array_map() expects parameter 1 to be a valid callback, non-static method ChildClass::emptyFunction() should not be called statically in %sarray_map_object1.php on line %d
 defined in child
 defined in child
 array(2) {
@@ -155,6 +168,8 @@ array(2) {
 
 -- class with final method --
 FinalClass::finalMethod
+
+Deprecated: array_map() expects parameter 1 to be a valid callback, non-static method FinalClass::finalMethod() should not be called statically in %sarray_map_object1.php on line %d
 This function can't be overloaded
 This function can't be overloaded
 array(2) {
@@ -173,9 +188,13 @@ array(2) {
   int(4)
 }
 StaticClass::cube
-array_map(): Argument #1 ($callback) must be a valid callback or null, cannot access private method StaticClass::cube()
+
+Warning: array_map() expects parameter 1 to be a valid callback, cannot access private method StaticClass::cube() in %sarray_map_object1.php on line %d
+NULL
 StaticClass::retVal
-array_map(): Argument #1 ($callback) must be a valid callback or null, cannot access protected method StaticClass::retVal()
+
+Warning: array_map() expects parameter 1 to be a valid callback, cannot access protected method StaticClass::retVal() in %sarray_map_object1.php on line %d
+NULL
 -- class implementing an interface --
 InterClass::square
 array(2) {
@@ -184,3 +203,4 @@ array(2) {
   [1]=>
   int(4)
 }
+===DONE===

@@ -40,7 +40,6 @@ foreach ($arr as $ent) {
     echo html_entity_decode($ent, ENT_QUOTES, 'UTF-8'), "\n";
 }
 echo "Done.\n";
-?>
 --EXPECT--
 &
 &&

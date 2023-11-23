@@ -33,6 +33,7 @@ $after = unserialize($ser);
 var_dump($before, $after);
 
 ?>
+===DONE===
 --EXPECTF--
 object(TestY)#%d (2) {
   ["A"]=>
@@ -84,3 +85,4 @@ object(TestY)#%d (2) {
     int(1)
   }
 }
+===DONE===

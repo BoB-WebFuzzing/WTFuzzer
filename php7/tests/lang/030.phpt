@@ -3,20 +3,19 @@ $this in constructor test
 --FILE--
 <?php
 class foo {
-    public $Name;
-    function __construct($name) {
-        $GLOBALS['List']= &$this;
-        $this->Name = $name;
-        $GLOBALS['List']->echoName();
-    }
+	function __construct($name) {
+     	$GLOBALS['List']= &$this;
+     	$this->Name = $name;
+		$GLOBALS['List']->echoName();
+	}
 
-    function echoName() {
-        $GLOBALS['names'][]=$this->Name;
-    }
+	function echoName() {
+     	$GLOBALS['names'][]=$this->Name;
+	}
 }
 
 function &foo2(&$foo) {
-    return $foo;
+	return $foo;
 }
 
 

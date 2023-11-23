@@ -1,8 +1,10 @@
 --TEST--
 SPL: SimpleXMLIterator and recursion
---EXTENSIONS--
-simplexml
-libxml
+--SKIPIF--
+<?php
+if (!extension_loaded('simplexml')) print 'skip';
+if (!extension_loaded("libxml")) print "skip LibXML not present";
+?>
 --FILE--
 <?php
 
@@ -36,9 +38,9 @@ EOF;
 $sxe = simplexml_load_string($xml, 'SimpleXMLIterator');
 
 foreach(new RecursiveIteratorIterator($sxe, 1) as $name => $data) {
-    var_dump($name);
-    var_dump(get_class($data));
-    var_dump(trim($data));
+	var_dump($name);
+	var_dump(get_class($data));
+	var_dump(trim($data));
 }
 
 echo "===DUMP===\n";
@@ -47,6 +49,7 @@ var_dump(get_class($sxe));
 var_dump(trim($sxe->elem1));
 
 ?>
+===DONE===
 --EXPECT--
 string(5) "elem1"
 string(17) "SimpleXMLIterator"
@@ -69,3 +72,4 @@ string(7) "Foo Bar"
 ===DUMP===
 string(17) "SimpleXMLIterator"
 string(10) "Bla bla 1."
+===DONE===

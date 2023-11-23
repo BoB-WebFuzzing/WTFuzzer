@@ -1,29 +1,44 @@
 --TEST--
 mysqli_release_savepoint()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'connect.inc';
-if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
-    die(sprintf("skip Can't connect to MySQL Server - [%d] %s", mysqli_connect_errno(), mysqli_connect_error()));
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
+
+require_once('connect.inc');
+if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
+    die(sprintf("skip Cannot connect, [%d] %s", mysqli_connect_errno(), mysqli_connect_error()));
 
 if (!have_innodb($link))
     die(sprintf("skip Needs InnoDB support, [%d] %s", $link->errno, $link->error));
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
+     /* {{{ proto bool mysqli_release_savepoint(object link, string name) */
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_release_savepoint()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_release_savepoint($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
         printf("[003] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
             $host, $user, $db, $port, $socket);
 
-    try {
-        mysqli_release_savepoint($link, '');
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    $name = array();
+    if (!is_null($tmp = @mysqli_release_savepoint($link, $name)))
+        printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_release_savepoint($link, 'foo', $link)))
+        printf("[005] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (false !== ($tmp = mysqli_release_savepoint($link, '')))
+        printf("[006] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!mysqli_query($link, 'DROP TABLE IF EXISTS test'))
         printf("[007] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -58,10 +73,10 @@ if (!have_innodb($link))
 ?>
 --CLEAN--
 <?php
-require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
-mysqli_release_savepoint(): Argument #2 ($name) cannot be empty
+--EXPECTF--
+Warning: mysqli_release_savepoint(): Savepoint name cannot be empty in %s on line %d
 array(1) {
   ["id"]=>
   string(1) "1"

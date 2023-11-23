@@ -3,6 +3,11 @@ Test fscanf() function: usage variations - unsigned formats with strings
 --FILE--
 <?php
 
+/*
+  Prototype: mixed fscanf ( resource $handle, string $format [, mixed &$...] );
+  Description: Parses input from a file according to a format
+*/
+
 /* Test fscanf() to scan strings using different unsigned format types */
 
 $file_path = __DIR__;
@@ -62,11 +67,7 @@ foreach($unsigned_formats as $unsigned_format) {
   rewind($file_handle);
   echo "\n-- iteration $counter --\n";
   while( !feof($file_handle) ) {
-    try {
-      var_dump(fscanf($file_handle,$unsigned_format));
-    } catch (ValueError $exception) {
-      echo $exception->getMessage() . "\n";
-    }
+    var_dump( fscanf($file_handle,$unsigned_format) );
   }
   $counter++;
 }
@@ -79,7 +80,7 @@ $file_path = __DIR__;
 $filename = "$file_path/fscanf_variation43.tmp";
 unlink($filename);
 ?>
---EXPECT--
+--EXPECTF--
 *** Test fscanf(): different unsigned format types with strings ***
 
 -- iteration 1 --
@@ -497,24 +498,60 @@ array(1) {
 bool(false)
 
 -- iteration 7 --
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
 bool(false)
 
 -- iteration 8 --

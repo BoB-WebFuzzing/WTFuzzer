@@ -2,7 +2,7 @@
 
 #include "fpm_config.h"
 
-#ifdef HAVE_CLOCK_GETTIME
+#if defined(HAVE_CLOCK_GETTIME)
 #include <time.h> /* for CLOCK_MONOTONIC */
 #endif
 
@@ -15,7 +15,7 @@
 
 static int monotonic_works;
 
-int fpm_clock_init(void)
+int fpm_clock_init() /* {{{ */
 {
 	struct timespec ts;
 
@@ -27,6 +27,7 @@ int fpm_clock_init(void)
 
 	return 0;
 }
+/* }}} */
 
 int fpm_clock_get(struct timeval *tv) /* {{{ */
 {
@@ -47,7 +48,7 @@ int fpm_clock_get(struct timeval *tv) /* {{{ */
 }
 /* }}} */
 
-/* macOS clock */
+/* macosx clock */
 #elif defined(HAVE_CLOCK_GET_TIME)
 
 #include <mach/mach.h>
@@ -58,7 +59,7 @@ static clock_serv_t mach_clock;
 
 /* this code borrowed from here: http://lists.apple.com/archives/Darwin-development/2002/Mar/msg00746.html */
 /* mach_clock also should be re-initialized in child process after fork */
-int fpm_clock_init(void)
+int fpm_clock_init() /* {{{ */
 {
 	kern_return_t ret;
 	mach_timespec_t aTime;
@@ -80,6 +81,7 @@ int fpm_clock_init(void)
 
 	return 0;
 }
+/* }}} */
 
 int fpm_clock_get(struct timeval *tv) /* {{{ */
 {
@@ -102,10 +104,11 @@ int fpm_clock_get(struct timeval *tv) /* {{{ */
 
 #else /* no clock */
 
-int fpm_clock_init(void)
+int fpm_clock_init() /* {{{ */
 {
 	return 0;
 }
+/* }}} */
 
 int fpm_clock_get(struct timeval *tv) /* {{{ */
 {

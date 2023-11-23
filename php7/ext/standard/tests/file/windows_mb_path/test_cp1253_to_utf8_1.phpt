@@ -21,10 +21,10 @@ dir_cp1253
 include __DIR__ . DIRECTORY_SEPARATOR . "util.inc";
 
 $item = "διαδρομή δοκιμής";
-$prefix = create_data("dir_cp1253", "{$item}42");
-$path = $prefix . DIRECTORY_SEPARATOR . "{$item}42";
+$prefix = create_data("dir_cp1253", "${item}42");
+$path = $prefix . DIRECTORY_SEPARATOR . "${item}42";
 
-$subpath = $path . DIRECTORY_SEPARATOR . "{$item}4";
+$subpath = $path . DIRECTORY_SEPARATOR . "${item}4";
 
 /* The mb dirname exists*/
 var_dump(file_exists($path));
@@ -38,6 +38,7 @@ var_dump(rmdir($subpath));
 remove_data("dir_cp1253");
 
 ?>
+===DONE===
 --EXPECTF--
 bool(true)
 bool(true)
@@ -49,3 +50,4 @@ bool(true)
 string(%d) "%s\διαδρομή δοκιμής42\διαδρομή δοκιμής4"
 Active code page: %d
 bool(true)
+===DONE===

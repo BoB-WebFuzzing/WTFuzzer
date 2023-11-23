@@ -1,7 +1,5 @@
 --TEST--
 Null Pointer Dereference in PHP Session Upload Progress
---EXTENSIONS--
-session
 --INI--
 error_reporting=0
 file_uploads=1
@@ -42,7 +40,6 @@ session_start();
 var_dump($_SESSION);
 session_destroy();
 
-?>
---EXPECT--
+--EXPECTF--
 array(0) {
 }

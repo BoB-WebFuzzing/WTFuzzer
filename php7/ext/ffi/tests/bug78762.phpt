@@ -1,11 +1,11 @@
 --TEST--
 Bug #78762 (Failing FFI::cast() may leak memory)
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 try {
-    FFI::cdef()->cast('char[10]', FFI::cdef()->new('char[1]'));
+    FFI::cast('char[10]', FFI::new('char[1]'));
 } catch (FFI\Exception $ex) {
     echo $ex->getMessage(), PHP_EOL;
 }

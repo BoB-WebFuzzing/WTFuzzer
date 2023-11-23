@@ -11,7 +11,7 @@
 #include "fpm_systemd.h"
 
 
-static void fpm_systemd(void)
+static void fpm_systemd() /* {{{ */
 {
 	static unsigned long int last=0;
 	struct fpm_worker_pool_s *wp;
@@ -43,6 +43,7 @@ static void fpm_systemd(void)
 
 	last = requests;
 }
+/* }}} */
 
 void fpm_systemd_heartbeat(struct fpm_event_s *ev, short which, void *arg) /* {{{ */
 {
@@ -78,7 +79,7 @@ void fpm_systemd_heartbeat(struct fpm_event_s *ev, short which, void *arg) /* {{
 }
 /* }}} */
 
-int fpm_systemd_conf(void)
+int fpm_systemd_conf() /* {{{ */
 {
 	char *watchdog;
 	int  interval = 0;
@@ -108,3 +109,4 @@ int fpm_systemd_conf(void)
 	}
 	return 0;
 }
+/* }}} */

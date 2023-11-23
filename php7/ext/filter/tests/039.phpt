@@ -1,66 +1,39 @@
 --TEST--
 filter_var_array() and different arguments
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) print "skip"; ?>
 --FILE--
 <?php
 
 echo "-- (1)\n";
+var_dump(filter_var_array(NULL));
 var_dump(filter_var_array(array()));
 var_dump(filter_var_array(array(1,"blah"=>"hoho")));
 var_dump(filter_var_array(array(), -1));
 var_dump(filter_var_array(array(), 1000000));
-
-try {
-    filter_var_array(array(), "");
-} catch (TypeError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(filter_var_array(array(), ""));
 
 echo "-- (2)\n";
 var_dump(filter_var_array(array(""=>""), -1));
 var_dump(filter_var_array(array(""=>""), 1000000));
-
-try {
-    filter_var_array(array(""=>""), "");
-} catch (TypeError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(filter_var_array(array(""=>""), ""));
 
 echo "-- (3)\n";
 var_dump(filter_var_array(array("aaa"=>"bbb"), -1));
 var_dump(filter_var_array(array("aaa"=>"bbb"), 1000000));
-
-try {
-    filter_var_array(array("aaa"=>"bbb"), "");
-} catch (TypeError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(filter_var_array(array("aaa"=>"bbb"), ""));
 
 echo "-- (4)\n";
-
-try {
-    filter_var_array(array(), new stdclass);
-} catch (TypeError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
+var_dump(filter_var_array(array(), new stdclass));
 var_dump(filter_var_array(array(), array()));
 var_dump(filter_var_array(array(), array("var_name"=>1)));
 var_dump(filter_var_array(array(), array("var_name"=>-1)));
 var_dump(filter_var_array(array("var_name"=>""), array("var_name"=>-1)));
 
 echo "-- (5)\n";
-try {
-    filter_var_array(array("var_name"=>""), array("var_name"=>-1, "asdas"=>"asdasd", "qwe"=>"rty", ""=>""));
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-try {
-    filter_var_array(array("asdas"=>"text"), array("var_name"=>-1, "asdas"=>"asdasd", "qwe"=>"rty", ""=>""));
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(filter_var_array(array("var_name"=>""), array("var_name"=>-1, "asdas"=>"asdasd", "qwe"=>"rty", ""=>"")));
+var_dump(filter_var_array(array("asdas"=>"text"), array("var_name"=>-1, "asdas"=>"asdasd", "qwe"=>"rty", ""=>"")));
+
 
 $a = array(""=>""); $b = -1;
 var_dump(filter_var_array($a, $b));
@@ -71,17 +44,16 @@ var_dump(filter_var_array($a, $b));
 var_dump($a, $b);
 
 $a = array(""=>""); $b = "";
-try {
-    filter_var_array($a, $b);
-} catch (TypeError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(filter_var_array($a, $b));
 var_dump($a, $b);
 
 echo "Done\n";
 ?>
 --EXPECTF--
 -- (1)
+
+Warning: filter_var_array() expects parameter 1 to be array, null given in %s on line %d
+NULL
 array(0) {
 }
 array(2) {
@@ -90,31 +62,19 @@ array(2) {
   ["blah"]=>
   string(4) "hoho"
 }
-
-Warning: filter_var_array(): Unknown filter with ID -1 in %s on line %d
 bool(false)
-
-Warning: filter_var_array(): Unknown filter with ID 1000000 in %s on line %d
 bool(false)
-filter_var_array(): Argument #2 ($options) must be of type array|int, string given
+bool(false)
 -- (2)
-
-Warning: filter_var_array(): Unknown filter with ID -1 in %s on line %d
 bool(false)
-
-Warning: filter_var_array(): Unknown filter with ID 1000000 in %s on line %d
 bool(false)
-filter_var_array(): Argument #2 ($options) must be of type array|int, string given
+bool(false)
 -- (3)
-
-Warning: filter_var_array(): Unknown filter with ID -1 in %s on line %d
 bool(false)
-
-Warning: filter_var_array(): Unknown filter with ID 1000000 in %s on line %d
 bool(false)
-filter_var_array(): Argument #2 ($options) must be of type array|int, string given
+bool(false)
 -- (4)
-filter_var_array(): Argument #2 ($options) must be of type array|int, stdClass given
+bool(false)
 array(0) {
 }
 array(1) {
@@ -130,25 +90,25 @@ array(1) {
   string(0) ""
 }
 -- (5)
-filter_var_array(): Argument #2 ($options) cannot contain empty keys
-filter_var_array(): Argument #2 ($options) cannot contain empty keys
 
-Warning: filter_var_array(): Unknown filter with ID -1 in %s on line %d
+Warning: filter_var_array(): Empty keys are not allowed in the definition array in %s on line %d
+bool(false)
+
+Warning: filter_var_array(): Empty keys are not allowed in the definition array in %s on line %d
+bool(false)
 bool(false)
 array(1) {
   [""]=>
   string(0) ""
 }
 int(-1)
-
-Warning: filter_var_array(): Unknown filter with ID 100000 in %s on line %d
 bool(false)
 array(1) {
   [""]=>
   string(0) ""
 }
 int(100000)
-filter_var_array(): Argument #2 ($options) must be of type array|int, string given
+bool(false)
 array(1) {
   [""]=>
   string(0) ""

@@ -1,14 +1,15 @@
 --TEST--
 Interface of the class mysqli_result
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require('connect.inc');
+    require('table.inc');
 
     $mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
     $mysqli_result = $mysqli->query('SELECT * FROM test');
@@ -27,7 +28,6 @@ require_once 'skipifconnectfailure.inc';
         '__construct'           => true,
         'close'                 => true,
         'data_seek'             => true,
-        'fetch_all'             => true,
         'fetch_array'           => true,
         'fetch_assoc'           => true,
         'fetch_field'           => true,
@@ -35,12 +35,12 @@ require_once 'skipifconnectfailure.inc';
         'fetch_fields'          => true,
         'fetch_object'          => true,
         'fetch_row'             => true,
-        'fetch_column'          => true,
         'field_seek'            => true,
         'free'                  => true,
         'free_result'           => true,
-        'getIterator'           => true,
     );
+    if ($IS_MYSQLND)
+        $expected_methods['fetch_all'] = true;
 
     foreach ($methods as $k => $method) {
         if (isset($expected_methods[$method])) {
@@ -110,20 +110,26 @@ require_once 'skipifconnectfailure.inc';
     printf("mysqli_result->unknown = '%s'\n", @$mysqli_result->unknown);
 
     printf("\nConstructor:\n");
-    $res = new mysqli_result($link);
+    if (!is_object($res = new mysqli_result($link)))
+        printf("[001] Expecting object/mysqli_result got %s/%s\n", gettye($res), $res);
 
-    try {
-        $res->num_rows;
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (null !== ($tmp = @$res->num_rows))
+        printf("[002] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
 
     if (!mysqli_query($link, "SELECT id FROM test ORDER BY id"))
         printf("[003] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 
-    $res = new mysqli_result($link);
-    $res = new mysqli_result($link, MYSQLI_STORE_RESULT);
-    $res = new mysqli_result($link, MYSQLI_USE_RESULT);
+    if (!is_object($res = new mysqli_result($link)))
+        printf("[004] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+
+    if (!is_object($res = new mysqli_result($link, MYSQLI_STORE_RESULT)))
+        printf("[005] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+
+    if (!is_object($res = new mysqli_result($link, MYSQLI_USE_RESULT)))
+        printf("[006] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+
+    if (!is_object($res = new mysqli_result($link, 'invalid')))
+        printf("[007] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 
     $valid = array(MYSQLI_STORE_RESULT, MYSQLI_USE_RESULT);
     do {
@@ -132,16 +138,23 @@ require_once 'skipifconnectfailure.inc';
 
     if ($TEST_EXPERIMENTAL) {
         ob_start();
-        $res = new mysqli_result($link, $mode);
+        if (!is_object($res = new mysqli_result($link, $mode)))
+            printf("[008] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
         $content = ob_get_contents();
         ob_end_clean();
         if (!stristr($content, 'Invalid value for resultmode'))
             printf("[009] Expecting warning because of invalid resultmode\n");
     }
 
+    if (!is_object($res = new mysqli_result('foo')))
+        printf("[010] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+
+    if (!is_object($res = @new mysqli_result($link, MYSQLI_STORE_RESULT, 1)))
+        printf("[011] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+
     print "done!";
 ?>
---EXPECT--
+--EXPECTF--
 Parent class:
 bool(false)
 
@@ -156,6 +169,11 @@ num_rows
 type
 
 Object variables:
+current_field
+field_count
+lengths
+num_rows
+type
 
 Magic, magic properties:
 mysqli_result->current_field = '0'/integer ('0'/integer)
@@ -168,5 +186,8 @@ Access to undefined properties:
 mysqli_result->unknown = ''
 
 Constructor:
-mysqli_result object is already closed
+
+Warning: mysqli_result::__construct() expects parameter 2 to be int, string given in %s on line %d
+
+Warning: mysqli_result::__construct() expects parameter 1 to be mysqli, string given in %s on line %d
 done!

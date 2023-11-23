@@ -24,4 +24,4 @@ $c = new C;
 
 ?>
 --EXPECTF--
-Fatal error: Declaration of B::method(C $x) must be compatible with A::method(B $x) in %s on line %d
+Warning: Declaration of B::method(C $x) should be compatible with A::method(B $x) in %s on line %d

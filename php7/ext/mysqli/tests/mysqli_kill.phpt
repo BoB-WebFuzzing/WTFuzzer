@@ -1,20 +1,29 @@
 --TEST--
 mysqli_kill()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
 
-    try {
-        mysqli_kill($link, 0);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_kill()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_kill($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
+
+    // Zend will cast the NULL to 0
+    if (!is_bool($tmp = mysqli_kill($link, null)))
+        printf("[003] Expecting boolean/any, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!$thread_id = mysqli_thread_id($link))
         printf("[004] Cannot determine thread id, [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -31,8 +40,14 @@ require_once 'skipifconnectfailure.inc';
         printf("[007] Expecting string/any non empty, got %s/%s\n", gettype($error), $error);
     var_dump($res);
     var_dump($link);
-    if ($link->info != 'Records: 6  Duplicates: 0  Warnings: 0') {
-        printf("[008] mysqlnd used to be more verbose and used to support SELECT\n");
+    if ($IS_MYSQLND) {
+        if ($link->info != 'Records: 6  Duplicates: 0  Warnings: 0') {
+            printf("[008] mysqlnd used to be more verbose and used to support SELECT\n");
+        }
+    } else {
+        if ($link->info != NULL) {
+            printf("[008] Time for wonders - libmysql has started to support SELECT, change test\n");
+        }
     }
 
     mysqli_close($link);
@@ -40,11 +55,7 @@ require_once 'skipifconnectfailure.inc';
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
         printf("[010] Cannot connect, [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
-    try {
-        mysqli_kill($link, -1);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    mysqli_kill($link, -1);
     if ((!$res = mysqli_query($link, "SELECT id FROM test LIMIT 1")) ||
         (!$tmp = mysqli_fetch_assoc($res))) {
         printf("[011] Connection should not be gone, [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -56,12 +67,7 @@ require_once 'skipifconnectfailure.inc';
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
         printf("[012] Cannot connect, [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
-    mysqli_change_user($link, "This might work if you accept anonymous users in your setup", "password", $db);
-    try {
-        mysqli_kill($link, -1);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    mysqli_change_user($link, "This might work if you accept anonymous users in your setup", "password", $db);      mysqli_kill($link, -1);
 
     mysqli_close($link);
 
@@ -69,10 +75,10 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
-mysqli_kill(): Argument #2 ($process_id) must be greater than 0
+Warning: mysqli_kill(): processid should have positive value in %s on line %d
 string(%d) "%s"
 bool(false)
 object(mysqli)#%d (%d) {
@@ -87,7 +93,7 @@ object(mysqli)#%d (%d) {
   ["connect_error"]=>
   NULL
   ["errno"]=>
-  int(%d)
+  int(2006)
   ["error"]=>
   string(%d) "%s"
   ["error_list"]=>
@@ -95,7 +101,7 @@ object(mysqli)#%d (%d) {
     [0]=>
     array(3) {
       ["errno"]=>
-      int(%d)
+      int(2006)
       ["sqlstate"]=>
       string(5) "%s"
       ["error"]=>
@@ -123,10 +129,12 @@ object(mysqli)#%d (%d) {
   ["warning_count"]=>
   int(0)
 }
-mysqli_kill(): Argument #2 ($process_id) must be greater than 0
+
+Warning: mysqli_kill(): processid should have positive value in %s on line %d
 array(1) {
   ["id"]=>
   string(1) "1"
 }
-mysqli_kill(): Argument #2 ($process_id) must be greater than 0
+
+Warning: mysqli_kill(): processid should have positive value in %s on line %d
 done!

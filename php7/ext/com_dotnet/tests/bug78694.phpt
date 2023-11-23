@@ -1,7 +1,9 @@
 --TEST--
 Bug #78694 (Appending to a variant array causes segfault)
---EXTENSIONS--
-com_dotnet
+--SKIPIF--
+<?php
+if (!extension_loaded('com_dotnet')) die('skip com_dotnet extension not available');
+?>
 --FILE--
 <?php
 foreach ([new com('WScript.Shell'), new variant([])] as $var) {

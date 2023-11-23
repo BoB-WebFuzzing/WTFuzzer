@@ -3,8 +3,10 @@ cURL option CURLOPT_READFUNCTION
 --CREDITS--
 WHITE new media architects - Jeroen Vermeulen
 #testfest Utrecht 2009
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+if (!extension_loaded("curl")) print "skip cURL extension not loaded";
+?>
 --FILE--
 <?php
 function custom_readfunction($oCurl, $hReadHandle, $iMaxOut)
@@ -38,6 +40,7 @@ fclose ($hReadHandle);
 $sOutput = file_get_contents($sWriteFile);
 var_dump($sOutput);
 ?>
+===DONE===
 --CLEAN--
 <?php
 $sFileBase  = __DIR__.DIRECTORY_SEPARATOR.'curl_opt_CURLOPT_READFUNCTION';
@@ -48,3 +51,4 @@ unlink($sWriteFile);
 ?>
 --EXPECT--
 string(27) "custom:contents of tempfile"
+===DONE===

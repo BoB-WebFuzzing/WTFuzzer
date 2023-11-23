@@ -6,16 +6,16 @@ Various pow() tests
 $x = 2;
 $x **= 3;
 
-var_dump( -3 ** 2 === -9);
-var_dump( (-3) **2 === 9);
-var_dump( 2 ** 3 ** 2 === 512);
-var_dump( (2 ** 3) ** 2 === 64);
-var_dump( $x === 8);
+$tests = <<<TESTS
+ -3 ** 2 === -9
+ (-3) **2 === 9
+ 2 ** 3 ** 2 === 512
+ (2 ** 3) ** 2 === 64
+ $x === 8
+TESTS;
 
-?>
+ echo "On failure, please mail result to php-dev@lists.php.net\n";
+ include(__DIR__ . '/../../../../tests/quicktester.inc');
 --EXPECT--
-bool(true)
-bool(true)
-bool(true)
-bool(true)
-bool(true)
+On failure, please mail result to php-dev@lists.php.net
+OK

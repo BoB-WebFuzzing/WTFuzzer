@@ -24,30 +24,29 @@ $fp = fopen(__FILE__, 'r');
 var_dump($a[$fp]);
 
 fclose($fp);
-?>
 --EXPECTF--
-Warning: Undefined array key "epic_magic" in %s on line %d
+Notice: Undefined index: epic_magic in %sbug62978.php on line %d
 NULL
 
-Warning: Undefined array key "epic_magic" in %s on line %d
+Notice: Undefined index: epic_magic in %sbug62978.php on line %d
 NULL
 
-Warning: Undefined variable $c in %s on line %d
+Notice: Undefined variable: c in %sbug62978.php on line %d
 
-Warning: Trying to access array offset on null in %s on line %d
+Notice: Trying to access array offset on value of type null in %s on line %d
 NULL
 
-Warning: Undefined array key "epic_magic" in %s on line %d
+Notice: Undefined index: epic_magic in %sbug62978.php on line %d
 NULL
 
-Warning: Undefined array key "epic_magic" in %s on line %d
+Notice: Undefined index: epic_magic in %sbug62978.php on line %d
 NULL
 
-Warning: Undefined array key "epic_magic" in %s on line %d
+Notice: Undefined index: epic_magic in %sbug62978.php on line %d
 NULL
 bool(false)
 
-Warning: Resource ID#%d used as offset, casting to integer (%d) in %sbug62978.php on line %d
+Notice: Resource ID#%d used as offset, casting to integer (%d) in %sbug62978.php on line %d
 
-Warning: Undefined array key %d in %s on line %d
+Notice: Undefined offset: %d in %sbug62978.php on line %d
 NULL

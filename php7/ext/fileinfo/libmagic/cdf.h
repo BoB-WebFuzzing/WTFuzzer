@@ -35,8 +35,10 @@
 #ifndef _H_CDF_
 #define _H_CDF_
 
-#ifdef WIN32
+#ifdef PHP_WIN32
 #include <winsock2.h>
+#define asctime_r php_asctime_r
+#define ctime_r php_ctime_r
 #endif
 #ifdef __DJGPP__
 #define timespec timeval
@@ -277,7 +279,7 @@ typedef struct {
 
 typedef struct {
 	size_t cat_num;
-	cdf_catalog_entry_t cat_e[1] ZEND_ELEMENT_COUNT(cat_num);
+	cdf_catalog_entry_t cat_e[1];
 } cdf_catalog_t;
 
 struct timespec;

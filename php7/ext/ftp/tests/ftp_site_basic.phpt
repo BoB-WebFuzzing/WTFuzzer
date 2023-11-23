@@ -2,9 +2,8 @@
 ftp_site function basic functionality
 --CREDITS--
 Gabriel Caruso (carusogabriel34@gmail.com)
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --FILE--
 <?php
 require 'server.inc';

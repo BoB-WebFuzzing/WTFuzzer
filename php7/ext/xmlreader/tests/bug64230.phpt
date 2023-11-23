@@ -1,16 +1,18 @@
 --TEST--
 Bug #64230 (XMLReader does not suppress errors)
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php
+extension_loaded("xmlreader") or die("skip requires xmlreader");
+?>
 --FILE--
 <?php
 echo "Test\n";
 
 function show_internal_errors() {
-    foreach (libxml_get_errors() as $error) {
-        printf("Internal: %s\n", $error->message);
-    }
-    libxml_clear_errors();
+	foreach (libxml_get_errors() as $error) {
+		printf("Internal: %s\n", $error->message);
+	}
+	libxml_clear_errors();
 }
 
 echo "Internal errors TRUE\n";

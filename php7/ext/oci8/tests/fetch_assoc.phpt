@@ -1,22 +1,18 @@
 --TEST--
 oci_fetch_assoc()
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
 require __DIR__."/connect.inc";
 
 $stmtarray = array(
-    "drop table fetch_assoc_tab",
-    "create table fetch_assoc_tab (id number, value number, dummy varchar2(20))",
-    "insert into fetch_assoc_tab values (1,1,null)",
-    "insert into fetch_assoc_tab values (1,1,null)",
-    "insert into fetch_assoc_tab values (1,1,null)"
+	"drop table fetch_assoc_tab",
+	"create table fetch_assoc_tab (id number, value number, dummy varchar2(20))",
+	"insert into fetch_assoc_tab values (1,1,null)",
+	"insert into fetch_assoc_tab values (1,1,null)",
+	"insert into fetch_assoc_tab values (1,1,null)"
 );
 
 oci8_test_sql_execute($c, $stmtarray);
@@ -24,20 +20,20 @@ oci8_test_sql_execute($c, $stmtarray);
 $select_sql = "select * from fetch_assoc_tab";
 
 if (!($s = oci_parse($c, $select_sql))) {
-    die("oci_parse(select) failed!\n");
+	die("oci_parse(select) failed!\n");
 }
 
 if (!oci_execute($s)) {
-    die("oci_execute(select) failed!\n");
+	die("oci_execute(select) failed!\n");
 }
 while ($row = oci_fetch_assoc($s)) {
-    var_dump($row);
+	var_dump($row);
 }
 
 // Clean up
 
 $stmtarray = array(
-    "drop table fetch_assoc_tab"
+	"drop table fetch_assoc_tab"
 );
 
 oci8_test_sql_execute($c, $stmtarray);

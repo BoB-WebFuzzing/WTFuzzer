@@ -1,14 +1,14 @@
 --TEST--
 Bug #77535 (Invalid callback, h2 server push)
---EXTENSIONS--
-curl
 --SKIPIF--
 <?php
-include 'skipif-nocaddy.inc';
-
+include 'skipif.inc';
+if (getenv("SKIP_ONLINE_TESTS")) {
+	die("skip online test");
+}
 $curl_version = curl_version();
-if ($curl_version['version_number'] < 0x080100) {
-    exit("skip: test may crash with curl < 8.1.0");
+if ($curl_version['version_number'] < 0x073d00) {
+	exit("skip: test may crash with curl < 7.61.0");
 }
 ?>
 --FILE--
@@ -32,7 +32,7 @@ class MyHttpClient
         curl_setopt($this->curl, CURLOPT_HEADER, false);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, false);
         curl_setopt($this->curl, CURLOPT_FAILONERROR, false);
-        curl_setopt($this->curl, CURLOPT_URL, 'https://localhost/serverpush');
+        curl_setopt($this->curl, CURLOPT_URL, 'https://http2.golang.org/serverpush');
         curl_setopt($this->curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
         curl_setopt($this->curl, CURLOPT_HEADERFUNCTION, function ($ch, $data) {
             return \strlen($data);
@@ -41,7 +41,7 @@ class MyHttpClient
             return \strlen($data);
         });
         curl_multi_add_handle($this->mh, $this->curl);
-
+        
         $stillRunning = null;
         while (true) {
             do {
@@ -53,8 +53,7 @@ class MyHttpClient
                 if (CURLMSG_DONE !== $info['msg']) {
                     continue;
                 }
-                echo "Start handle request.\n";
-                return;
+                die("Start handle request.");
             }
         }
     }
@@ -73,7 +72,6 @@ class MyHttpClient
 
 $buzz = new MyHttpClient();
 $buzz->sendRequest();
-?>
 --EXPECT--
 Start handle request.
 

@@ -1,13 +1,13 @@
 --TEST--
 Phar: bug #71498: Out-of-Bound Read in phar_parse_zipfile()
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 try {
 $p = new PharData(__DIR__."/bug71498.zip");
 } catch(UnexpectedValueException $e) {
-    echo $e->getMessage();
+	echo $e->getMessage();
 }
 ?>
 

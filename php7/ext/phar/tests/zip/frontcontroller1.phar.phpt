@@ -1,10 +1,8 @@
 --TEST--
 Phar front controller other zip-based
---INI--
-phar.require_hash=0
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
+<?php if (!extension_loaded("zlib")) die("skip zlib not available"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller1.phar.php
 REQUEST_URI=/frontcontroller1.phar.php/a.jpg

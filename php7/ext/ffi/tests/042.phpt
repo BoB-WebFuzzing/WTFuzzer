@@ -1,12 +1,12 @@
 --TEST--
 FFI 042: Next array element
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--
 <?php
-$a = FFI::cdef()->new("uint8_t[8]");
+$a = FFI::new("uint8_t[8]");
 $a[] = 0;
 ?>
 --EXPECTF--

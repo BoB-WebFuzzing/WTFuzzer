@@ -2,8 +2,8 @@
 Bison weirdness
 --FILE--
 <?php
+error_reporting(E_ALL & ~E_NOTICE);
 echo "blah-$foo\n";
 ?>
---EXPECTF--
-Warning: Undefined variable $foo in %s on line %d
+--EXPECT--
 blah-

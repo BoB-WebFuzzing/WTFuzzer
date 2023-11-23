@@ -2,10 +2,15 @@
 Test ksort() function : usage variations - sort array with diff. sub arrays
 --FILE--
 <?php
+/* Prototype  : bool ksort ( array &$array [, int $sort_flags] )
+ * Description: Sort an array by key, maintaining key to data correlation
+ * Source code: ext/standard/array.c
+*/
+
 /*
  * testing ksort() by providing arrays containing sub arrays for $array argument
  * with flowing flag values:
- *  1. flag value as default
+ *  1. flag value as defualt
  *  2. SORT_REGULAR - compare items normally
 */
 
@@ -35,7 +40,7 @@ echo "\n-- Testing ksort() by supplying various arrays containing sub arrays --\
 foreach ($various_arrays as $array) {
 
   echo "\n-- Iteration $count --\n";
-  echo "- With default sort flag -\n";
+  echo "- With defualt sort flag -\n";
   $temp_array = $array;
   var_dump( ksort($temp_array) );
   var_dump($temp_array);
@@ -55,7 +60,7 @@ echo "Done\n";
 -- Testing ksort() by supplying various arrays containing sub arrays --
 
 -- Iteration 1 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(0) {
 }
@@ -65,7 +70,7 @@ array(0) {
 }
 
 -- Iteration 2 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(1) {
   [1]=>
@@ -81,7 +86,7 @@ array(1) {
 }
 
 -- Iteration 3 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(3) {
   [1]=>
@@ -113,7 +118,7 @@ array(3) {
 }
 
 -- Iteration 4 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(4) {
   [0]=>

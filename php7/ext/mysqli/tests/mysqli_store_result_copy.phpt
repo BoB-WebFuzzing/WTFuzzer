@@ -1,10 +1,13 @@
 --TEST--
 mysqli_store_result()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
+if (!$IS_MYSQLND) {
+    die("SKIP mysqlnd only test");
+}
 ?>
 --INI--
 mysqlnd.debug="d:t:O,{TMP}/mysqlnd.trace"
@@ -13,7 +16,12 @@ mysqlnd.mempool_default_size=1
 mysqlnd.fetch_data_copy=0
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    require('table.inc');
 
     if (!$res = mysqli_real_query($link, "SELECT id, label FROM test ORDER BY id"))
         printf("[003] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -55,16 +63,12 @@ mysqlnd.fetch_data_copy=0
     $no_result = 0;
     for ($i = 0; $i < 1000; $i++) {
         $idx = mt_rand(-100, 100);
-        try {
-            if (true === @mysqli_data_seek($res, $idx)) {
-                $row = $res->fetch_assoc();
-                if (!isset($row['id']) || !isset($row['label'])) {
-                    printf("[010] Brute force seek %d returned %d\n", $idx, var_export($row, true));
-                }
-            } else {
-                $no_result++;
+        if (true === @mysqli_data_seek($res, $idx)) {
+            $row = $res->fetch_assoc();
+            if (!isset($row['id']) || !isset($row['label'])) {
+                printf("[010] Brute force seek %d returned %d\n", $idx, var_export($row, true));
             }
-        } catch (\ValueError $e) {
+        } else {
             $no_result++;
         }
     }
@@ -192,7 +196,7 @@ END;')) {
 ?>
 --CLEAN--
 <?php
-	require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
 array(2) {

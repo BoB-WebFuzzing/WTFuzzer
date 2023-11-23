@@ -1,7 +1,11 @@
 --TEST--
 Check if %EXTNAME% is loaded
---EXTENSIONS--
-%EXTNAME%
+--SKIPIF--
+<?php
+if (!extension_loaded('%EXTNAME%')) {
+	echo 'skip';
+}
+?>
 --FILE--
 <?php
 echo 'The extension "%EXTNAME%" is available';

@@ -1,7 +1,9 @@
 --TEST--
 Bug #37013 (server hangs when returning circular object references)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php
+  if (!extension_loaded('soap')) die('skip soap extension not available');
+?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--

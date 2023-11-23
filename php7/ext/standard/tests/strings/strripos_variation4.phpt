@@ -2,8 +2,13 @@
 Test strripos() function : usage variations - heredoc string containing special chars for 'haystack' argument
 --FILE--
 <?php
+/* Prototype  : int strripos ( string $haystack, string $needle [, int $offset] );
+ * Description: Find position of last occurrence of a case-insensitive 'needle' in a 'haystack'
+ * Source code: ext/standard/string.c
+*/
+
 /* Test strripos() function by passing heredoc string containing special chars for haystack
- *  and with various needles & offsets
+ *  and with various needles & offets
 */
 
 echo "*** Testing strripos() function: with heredoc strings ***\n";
@@ -22,6 +27,7 @@ var_dump( strripos($special_chars_str, "$*", 10) );
 var_dump( strripos($special_chars_str, "(speCIal)") );
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing strripos() function: with heredoc strings ***
 -- With heredoc string containing special chars --
@@ -32,3 +38,4 @@ int(39)
 int(55)
 int(55)
 int(57)
+===DONE===

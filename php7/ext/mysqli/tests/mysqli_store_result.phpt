@@ -1,14 +1,25 @@
 --TEST--
 mysqli_store_result()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_store_result()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_store_result($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
 
     if (!$res = mysqli_real_query($link, "SELECT id, label FROM test ORDER BY id"))
         printf("[003] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -39,18 +50,15 @@ require_once 'skipifconnectfailure.inc';
 
     mysqli_close($link);
 
-    try {
-        mysqli_store_result($link);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_store_result($link)))
+        printf("[010] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
-mysqli object is already closed
+--EXPECTF--
+Warning: mysqli_store_result(): Couldn't fetch mysqli in %s on line %d
 done!

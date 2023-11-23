@@ -12,8 +12,7 @@ $s = serialize($x);
 $s = str_replace("Foo", "Bar", $s);
 $y = unserialize($s);
 var_dump($y);
-?>
---EXPECT--
+--EXPECTF--
 array(2) {
   [0]=>
   object(__PHP_Incomplete_Class)#3 (5) {

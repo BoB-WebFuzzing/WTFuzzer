@@ -1,12 +1,13 @@
 --TEST--
 mysqli_autocommit()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-    require_once 'connect.inc';
+    require_once('skipif.inc');
+    require_once('skipifemb.inc');
+    require_once('connect.inc');
+    require_once('skipifconnectfailure.inc');
 
-    if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
+    if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
         die(sprintf("skip Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
             $host, $user, $db, $port, $socket));
     }
@@ -16,7 +17,19 @@ mysqli
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_autocommit()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_autocommit($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_autocommit($link, $link, $link)))
+        printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
         printf("[004] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
@@ -121,18 +134,14 @@ mysqli
 
     mysqli_close($link);
 
-    try {
-        mysqli_autocommit($link, false);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = @mysqli_autocommit($link, false)))
+        printf("[033] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
 --CLEAN--
 <?php
-require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
-mysqli object is already closed
 done!

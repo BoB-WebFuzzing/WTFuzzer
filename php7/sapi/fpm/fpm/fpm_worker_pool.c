@@ -34,16 +34,13 @@ void fpm_worker_pool_free(struct fpm_worker_pool_s *wp) /* {{{ */
 	if (wp->user) {
 		free(wp->user);
 	}
-	if (wp->set_user) {
-		free(wp->set_user);
-	}
 	if (wp->home) {
 		free(wp->home);
 	}
 	if (wp->limit_extensions) {
 		fpm_worker_pool_free_limit_extensions(wp->limit_extensions);
 	}
-	fpm_unix_free_socket_permissions(wp);
+	fpm_unix_free_socket_premissions(wp);
 	free(wp);
 }
 /* }}} */
@@ -65,7 +62,7 @@ static void fpm_worker_pool_cleanup(int which, void *arg) /* {{{ */
 }
 /* }}} */
 
-struct fpm_worker_pool_s *fpm_worker_pool_alloc(void)
+struct fpm_worker_pool_s *fpm_worker_pool_alloc() /* {{{ */
 {
 	struct fpm_worker_pool_s *ret;
 
@@ -80,11 +77,13 @@ struct fpm_worker_pool_s *fpm_worker_pool_alloc(void)
 	ret->log_fd = -1;
 	return ret;
 }
+/* }}} */
 
-int fpm_worker_pool_init_main(void)
+int fpm_worker_pool_init_main() /* {{{ */
 {
 	if (0 > fpm_cleanup_add(FPM_CLEANUP_ALL, fpm_worker_pool_cleanup, 0)) {
 		return -1;
 	}
 	return 0;
 }
+/* }}} */

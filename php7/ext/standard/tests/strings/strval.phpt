@@ -22,5 +22,5 @@ string(3) "1.1"
 string(1) "1"
 string(0) ""
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sstrval.php on line %d
 string(5) "Array"

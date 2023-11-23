@@ -1,9 +1,8 @@
 --TEST--
 Oniguruma retry limit
---EXTENSIONS--
-mbstring
 --SKIPIF--
 <?php
+extension_loaded('mbstring') or die('skip mbstring not available');
 if (!function_exists('mb_ereg')) die('skip mb_ereg not available');
 if (version_compare(MB_ONIGURUMA_VERSION, '6.9.3') < 0) {
     die('skip requires Oniguruma >= 6.9.3');
@@ -20,5 +19,5 @@ var_dump(mb_ereg($regex, $str));
 
 ?>
 --EXPECT--
-bool(true)
+int(1)
 bool(false)

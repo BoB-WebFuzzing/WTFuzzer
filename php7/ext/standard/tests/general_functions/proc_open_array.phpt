@@ -10,33 +10,14 @@ $ds = [
     2 => ['pipe', 'w'],
 ];
 
-echo "Empty command array:\n";
-try {
-    proc_open([], $ds, $pipes);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+echo "Empty command array:";
+var_dump(proc_open([], $ds, $pipes));
 
-echo "\nNul byte in program name:\n";
-try {
-    proc_open(["php\0oops"], $ds, $pipes);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+echo "\nNul byte in program name:";
+var_dump(proc_open(["php\0oops"], $ds, $pipes));
 
-echo "\nNul byte in argument:\n";
-try {
-    proc_open(["php", "array\0oops"], $ds, $pipes);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
-echo "\nEmpty program name:\n";
-try {
-     proc_open([""], $ds, $pipes);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+echo "\nNul byte in argument:";
+var_dump(proc_open(["php", "arg\0oops"], $ds, $pipes));
 
 echo "\nBasic usage:\n";
 $proc = proc_open([$php, '-r', 'echo "Hello World!\n";'], $ds, $pipes);
@@ -73,18 +54,18 @@ fpassthru($pipes[1]);
 proc_close($proc);
 
 ?>
---EXPECT--
+--EXPECTF--
 Empty command array:
-proc_open(): Argument #1 ($command) must have at least one element
+Warning: proc_open(): Command array must have at least one element in %s on line %d
+bool(false)
 
 Nul byte in program name:
-Command array element 1 contains a null byte
+Warning: proc_open(): Command array element 1 contains a null byte in %s on line %d
+bool(false)
 
 Nul byte in argument:
-Command array element 2 contains a null byte
-
-Empty program name:
-First element must contain a non-empty program name
+Warning: proc_open(): Command array element 2 contains a null byte in %s on line %d
+bool(false)
 
 Basic usage:
 Hello World!

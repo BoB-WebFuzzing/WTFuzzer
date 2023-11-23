@@ -2,8 +2,10 @@
 MessageFormatter::format() invalid date/time argument
 --INI--
 date.timezone=Atlantic/Azores
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -14,7 +16,6 @@ EOD;
 
 $mf = new MessageFormatter('en_US', $fmt);
 var_dump($mf->format(array("foo" => new stdclass())));
-?>
 --EXPECTF--
 Warning: MessageFormatter::format(): msgfmt_format: invalid object type for date/time (only IntlCalendar and DateTimeInterface permitted) in %s on line %d
 

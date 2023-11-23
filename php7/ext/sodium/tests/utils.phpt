@@ -1,13 +1,13 @@
 --TEST--
 Check for libsodium utils
---EXTENSIONS--
-sodium
+--SKIPIF--
+<?php if (!extension_loaded("sodium")) print "skip"; ?>
 --FILE--
 <?php
 $a = 'test';
 sodium_memzero($a);
 if ($a !== 'test') {
-  var_dump($a);
+  echo strlen($a);
 } else {
   echo $a;
 }
@@ -93,7 +93,7 @@ if (defined('SODIUM_BASE64_VARIANT_ORIGINAL')) {
     var_dump('base64("O") case passed');
     var_dump('abcd');
 }
-
+    
 function sodium_foo()
 {
     throw new SodiumException('test');
@@ -107,8 +107,7 @@ try {
 
 ?>
 --EXPECT--
-NULL
-
+0
 bool(true)
 bool(false)
 string(22) "0000810102030405060708"

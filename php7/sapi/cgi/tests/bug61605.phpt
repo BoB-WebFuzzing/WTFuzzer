@@ -18,7 +18,6 @@ $headers3 = headers_list();
 print_r($headers1);
 print_r($headers2);
 print_r($headers3);
-?>
 --EXPECTF--
 Array
 (

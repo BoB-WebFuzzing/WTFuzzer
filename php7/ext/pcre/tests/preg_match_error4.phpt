@@ -926,8 +926,10 @@ if($count === false) {
             throw new \RuntimeException('Failed to execute regex: Unknown error');
     }
 } else {
-    var_dump("Done, $count matches.");
+	var_dump("Done, $count matches.");
 }
 ?>
+==DONE==
 --EXPECT--
 string(16) "Done, 1 matches."
+==DONE==

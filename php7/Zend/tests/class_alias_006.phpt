@@ -4,10 +4,7 @@ Testing creation of alias to an internal class
 <?php
 
 class_alias('stdclass', 'foo');
-$foo = new foo();
-var_dump($foo);
 
 ?>
---EXPECT--
-object(stdClass)#1 (0) {
-}
+--EXPECTF--
+Warning: First argument of class_alias() must be a name of user defined class in %s on line %d

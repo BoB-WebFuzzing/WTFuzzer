@@ -1,15 +1,12 @@
 --TEST--
 Bug #51647 (Certificate file without private key (pk in another file) doesn't work)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'connect.inc';
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
+require_once("connect.inc");
 
-if (!defined('MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT'))
-    die("skip Requires MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT");
-
-if (!extension_loaded("openssl"))
+if ($IS_MYSQLND && !extension_loaded("openssl"))
     die("skip PHP streams lack support for SSL. mysqli is compiled to use mysqlnd which uses PHP streams in turn.");
 
 if (!($link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)))
@@ -42,7 +39,7 @@ $link->close();
 ?>
 --FILE--
 <?php
-    include 'connect.inc';
+    include ("connect.inc");
 
     if (!is_object($link = mysqli_init()))
         printf("[001] Cannot create link\n");
@@ -68,7 +65,7 @@ $link->close();
         if (!$row = $res->fetch_assoc())
             printf("[006] [%d] %s\n", $link->errno, $link->error);
         if (!strlen($row["Value"]))
-            printf("[007] Empty cipher. No encryption!");
+            printf("[007] Empty cipher. No encrytion!");
         var_dump($row);
     }
 
@@ -98,7 +95,7 @@ $link->close();
         if (!$row = $res->fetch_assoc())
             printf("[012] [%d] %s\n", $link->errno, $link->error);
         if (!strlen($row["Value"]))
-            printf("[013] Empty cipher. No encryption!");
+            printf("[013] Empty cipher. No encrytion!");
         var_dump($row);
     }
 

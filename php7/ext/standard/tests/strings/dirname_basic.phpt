@@ -2,6 +2,9 @@
 Test dirname() function : basic functionality
 --FILE--
 <?php
+/* Prototype: string dirname ( string $path );
+   Description: Returns directory name component of path.
+*/
 $file_paths = array (
   /* simple paths */
   "bar",

@@ -1,9 +1,11 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -36,14 +38,14 @@ using icu::UCharCharacterIterator;
 UOBJECT_DEFINE_RTTI_IMPLEMENTATION(CodePointBreakIterator)
 
 CodePointBreakIterator::CodePointBreakIterator()
-: BreakIterator(), lastCodePoint(U_SENTINEL), fCharIter(NULL)
+: BreakIterator(), fCharIter(NULL), lastCodePoint(U_SENTINEL)
 {
 	UErrorCode uec = UErrorCode();
 	this->fText = utext_openUChars(NULL, NULL, 0, &uec);
 }
 
 CodePointBreakIterator::CodePointBreakIterator(const PHP::CodePointBreakIterator &other)
-: BreakIterator(other), fText(NULL), lastCodePoint(U_SENTINEL), fCharIter(NULL)
+: BreakIterator(other), fText(NULL), fCharIter(NULL), lastCodePoint(U_SENTINEL)
 {
 	*this = other;
 }
@@ -56,7 +58,7 @@ CodePointBreakIterator& CodePointBreakIterator::operator=(const CodePointBreakIt
 		return *this;
 	}
 
-	this->fText = utext_clone(this->fText, that.fText, false, true, &uec);
+	this->fText = utext_clone(this->fText, that.fText, FALSE, TRUE, &uec);
 
 	//don't bother copying the character iterator, getText() is deprecated
 	clearCurrentCharIter();
@@ -80,17 +82,17 @@ UBool CodePointBreakIterator::operator==(const BreakIterator& that) const
 #endif
 {
 	if (typeid(*this) != typeid(that)) {
-		return false;
+		return FALSE;
 	}
 
 	const CodePointBreakIterator& that2 =
 		static_cast<const CodePointBreakIterator&>(that);
 
 	if (!utext_equals(this->fText, that2.fText)) {
-		return false;
+		return FALSE;
 	}
 
-	return true;
+	return TRUE;
 }
 
 CodePointBreakIterator* CodePointBreakIterator::clone(void) const
@@ -111,7 +113,7 @@ CharacterIterator& CodePointBreakIterator::getText(void) const
 
 UText *CodePointBreakIterator::getUText(UText *fillIn, UErrorCode &status) const
 {
-	return utext_clone(fillIn, this->fText, false, true, &status);
+	return utext_clone(fillIn, this->fText, FALSE, TRUE, &status);
 }
 
 void CodePointBreakIterator::setText(const UnicodeString &text)
@@ -130,7 +132,7 @@ void CodePointBreakIterator::setText(UText *text, UErrorCode &status)
 		return;
 	}
 
-	this->fText = utext_clone(this->fText, text, false, true, &status);
+	this->fText = utext_clone(this->fText, text, FALSE, TRUE, &status);
 
 	clearCurrentCharIter();
 }
@@ -282,7 +284,7 @@ CodePointBreakIterator &CodePointBreakIterator::refreshInputText(UText *input, U
 	}
 
 	int64_t pos = utext_getNativeIndex(this->fText);
-	this->fText = utext_clone(this->fText, input, false, true, &status);
+	this->fText = utext_clone(this->fText, input, FALSE, TRUE, &status);
 	if (U_FAILURE(status)) {
 		return *this;
 	}

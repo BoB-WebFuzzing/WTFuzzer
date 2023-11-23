@@ -20,8 +20,6 @@
 #ifndef ZEND_GENERATORS_H
 #define ZEND_GENERATORS_H
 
-#include <stdint.h>
-
 BEGIN_EXTERN_C()
 
 extern ZEND_API zend_class_entry *zend_ce_generator;
@@ -43,18 +41,21 @@ struct _zend_generator_node {
 	uint32_t children;
 	union {
 		HashTable *ht; /* if multiple children */
-		zend_generator *single; /* if one child */
+		struct { /* if one child */
+			zend_generator *leaf;
+			zend_generator *child;
+		} single;
 	} child;
-	/* One generator can cache a direct pointer to the current root.
-	 * The leaf member points back to the generator using the root cache. */
 	union {
-		zend_generator *leaf; /* if parent != NULL */
-		zend_generator *root; /* if parent == NULL */
+		zend_generator *leaf; /* if > 0 children */
+		zend_generator *root; /* if 0 children */
 	} ptr;
 };
 
 struct _zend_generator {
 	zend_object std;
+
+	zend_object_iterator *iterator;
 
 	/* The suspended execution context. */
 	zend_execute_data *execute_data;
@@ -87,17 +88,19 @@ struct _zend_generator {
 	zend_execute_data execute_fake;
 
 	/* ZEND_GENERATOR_* flags */
-	uint8_t flags;
+	zend_uchar flags;
+
+	zval *gc_buffer;
+	uint32_t gc_buffer_size;
 };
 
-static const uint8_t ZEND_GENERATOR_CURRENTLY_RUNNING = 0x1;
-static const uint8_t ZEND_GENERATOR_FORCED_CLOSE      = 0x2;
-static const uint8_t ZEND_GENERATOR_AT_FIRST_YIELD    = 0x4;
-static const uint8_t ZEND_GENERATOR_DO_INIT           = 0x8;
-static const uint8_t ZEND_GENERATOR_IN_FIBER          = 0x10;
+static const zend_uchar ZEND_GENERATOR_CURRENTLY_RUNNING = 0x1;
+static const zend_uchar ZEND_GENERATOR_FORCED_CLOSE      = 0x2;
+static const zend_uchar ZEND_GENERATOR_AT_FIRST_YIELD    = 0x4;
+static const zend_uchar ZEND_GENERATOR_DO_INIT           = 0x8;
 
 void zend_register_generator_ce(void);
-ZEND_API void zend_generator_close(zend_generator *generator, bool finished_execution);
+ZEND_API void zend_generator_close(zend_generator *generator, zend_bool finished_execution);
 ZEND_API void zend_generator_resume(zend_generator *generator);
 
 ZEND_API void zend_generator_restore_call_stack(zend_generator *generator);
@@ -106,26 +109,26 @@ ZEND_API zend_execute_data* zend_generator_freeze_call_stack(zend_execute_data *
 void zend_generator_yield_from(zend_generator *generator, zend_generator *from);
 ZEND_API zend_execute_data *zend_generator_check_placeholder_frame(zend_execute_data *ptr);
 
-ZEND_API zend_generator *zend_generator_update_current(zend_generator *generator);
-ZEND_API zend_generator *zend_generator_update_root(zend_generator *generator);
+ZEND_API zend_generator *zend_generator_update_current(zend_generator *generator, zend_generator *leaf);
 static zend_always_inline zend_generator *zend_generator_get_current(zend_generator *generator)
 {
+	zend_generator *leaf;
+	zend_generator *root;
+
 	if (EXPECTED(generator->node.parent == NULL)) {
 		/* we're not in yield from mode */
 		return generator;
 	}
 
-	zend_generator *root = generator->node.ptr.root;
-	if (!root) {
-		root = zend_generator_update_root(generator);
-	}
+	leaf = generator->node.children ? generator->node.ptr.leaf : generator;
+	root = leaf->node.ptr.root;
 
-	if (EXPECTED(root->execute_data)) {
+	if (EXPECTED(root->execute_data && root->node.parent == NULL)) {
 		/* generator still running */
 		return root;
 	}
 
-	return zend_generator_update_current(generator);
+	return zend_generator_update_current(generator, leaf);
 }
 
 END_EXTERN_C()

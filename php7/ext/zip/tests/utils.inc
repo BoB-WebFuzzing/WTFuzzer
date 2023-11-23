@@ -1,11 +1,4 @@
 <?php
-function dump_entries_name($z) {
-    for($i=0; $i<$z->numFiles; $i++) {
-        $sb = $z->statIndex($i);
-        echo $i . ' ' . $sb['name'] . "\n";
-    }
-}
-
 function verify_entries($zip, $entries = []) {
     $verified = true;
     $found    = [];
@@ -16,7 +9,7 @@ function verify_entries($zip, $entries = []) {
         if (!in_array($stat["name"], $entries)) {
             $verified = false;
         }
-
+        
         $found[] = $stat["name"];
     }
 
@@ -27,19 +20,19 @@ function verify_entries($zip, $entries = []) {
     return $verified;
 }
 
-/* recursively remove a directory */
+/* recursively remove a directoryy */
 function rmdir_rf($dir) {
-    if ($handle = opendir($dir)) {
-        while (false !== ($item = readdir($handle))) {
-            if ($item != "." && $item != "..") {
-                if (is_dir($dir . '/' . $item)) {
-                    rmdir_rf($dir . '/' . $item);
-                } else {
-                    unlink($dir . '/' . $item);
-                }
-            }
-        }
-        closedir($handle);
-        rmdir($dir);
-    }
+	if ($handle = opendir($dir)) {
+		while (false !== ($item = readdir($handle))) {
+			if ($item != "." && $item != "..") {
+				if (is_dir($dir . '/' . $item)) {
+					rmdir_rf($dir . '/' . $item);
+				} else {
+					unlink($dir . '/' . $item);
+				}
+			}
+		}
+		closedir($handle);
+		rmdir($dir);
+	}
 }

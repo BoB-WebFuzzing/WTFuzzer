@@ -4,8 +4,8 @@ ISSUE #79 (Optimization Problem/Bug)
 opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class Test {
@@ -29,7 +29,6 @@ class Test {
 
 $t = new Test();
 var_dump ($t->run());
-?>
 --EXPECT--
 bool(true)
 bool(true)

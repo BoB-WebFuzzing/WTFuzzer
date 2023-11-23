@@ -3,6 +3,7 @@ strcasecmp() tests
 --FILE--
 <?php
 
+var_dump(strcasecmp(""));
 var_dump(strcasecmp("", ""));
 var_dump(strcasecmp("aef", "dfsgbdf"));
 var_dump(strcasecmp("qwe", "qwer"));
@@ -13,7 +14,9 @@ var_dump(strcasecmp("01", "01"));
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
+Warning: strcasecmp() expects exactly 2 parameters, 1 given in %s on line %d
+NULL
 int(0)
 int(-3)
 int(-1)

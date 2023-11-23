@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -91,7 +93,7 @@ static int php_json_ucs2_to_int(php_json_scanner *s, int size)
 	return php_json_ucs2_to_int_ex(s, size, 1);
 }
 
-void php_json_scanner_init(php_json_scanner *s, const char *str, size_t str_len, int options)
+void php_json_scanner_init(php_json_scanner *s, char *str, size_t str_len, int options)
 {
 	s->cursor = (php_json_ctype *) str;
 	s->limit = (php_json_ctype *) str + str_len;
@@ -168,7 +170,7 @@ std:
 		return PHP_JSON_T_FALSE;
 	}
 	<JS>INT                  {
-		bool bigint = 0, negative = s->token[0] == '-';
+		zend_bool bigint = 0, negative = s->token[0] == '-';
 		size_t digits = (size_t) (s->cursor - s->token - negative);
 		if (digits >= PHP_JSON_INT_MAX_LENGTH) {
 			if (digits == PHP_JSON_INT_MAX_LENGTH) {

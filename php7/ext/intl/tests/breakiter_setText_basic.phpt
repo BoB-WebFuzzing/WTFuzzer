@@ -1,7 +1,9 @@
 --TEST--
 IntlBreakIterator::setText(): basic test
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -22,7 +24,6 @@ var_dump($bi->getText());
 var_dump($bi->next());
 var_dump($bi->setText('foo bar'));
 var_dump($bi->current());
-?>
 --EXPECT--
 bool(true)
 string(7) "foo bar"

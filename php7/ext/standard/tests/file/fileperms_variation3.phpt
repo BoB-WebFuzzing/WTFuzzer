@@ -4,6 +4,10 @@ Test fileperms() function: usage variations - diff. path notations
 Dave Kelsey <d_kelsey@uk.ibm.com>
 --FILE--
 <?php
+/* Prototype: int fileperms ( string $filename )
+ * Description: Returns the group ID of the file, or FALSE in case of an error.
+ */
+
 /* Passing file names with different notations, using slashes, wild-card chars */
 
 $file_path = __DIR__;
@@ -35,11 +39,7 @@ $count = 1;
 /* loop through to test each element in the above array */
 foreach($files_arr as $file) {
   echo "- Iteration $count -\n";
-  try {
-    var_dump( fileperms( $file_path."/".$file ) );
-  } catch (Error $e) {
-    echo $e->getMessage(), "\n";
-  }
+  var_dump( fileperms( $file_path."/".$file ) );
   clearstatcache();
   $count++;
 }
@@ -75,11 +75,11 @@ Warning: fileperms(): stat failed for %s/fileperms_variation3/fileperms*.tmp in 
 bool(false)
 - Iteration 7 -
 
-Warning: fileperms(): Filename contains null byte in %s on line %d
-bool(false)
+Warning: fileperms() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 - Iteration 8 -
 
-Warning: fileperms(): Filename contains null byte in %s on line %d
-bool(false)
+Warning: fileperms() expects parameter 1 to be a valid path, string given in %s on line %d
+NULL
 
 *** Done ***

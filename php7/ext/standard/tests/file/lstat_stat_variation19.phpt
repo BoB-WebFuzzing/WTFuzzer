@@ -2,6 +2,13 @@
 Test lstat() and stat() functions: usage variations - dir/file names in array
 --FILE--
 <?php
+/* Prototype: array lstat ( string $filename );
+   Description: Gives information about a file or symbolic link
+
+   Prototype: array stat ( string $filename );
+   Description: Gives information about a file
+*/
+
 /* test for stats of dir/file when their names are stored in an array */
 
 $file_path = __DIR__;
@@ -89,7 +96,7 @@ array(26) {
   ["gid"]=>
   int(%d)
   ["rdev"]=>
-  int(%i)
+  int(%d)
   ["size"]=>
   int(%d)
   ["atime"]=>
@@ -143,7 +150,7 @@ array(26) {
   ["gid"]=>
   int(%d)
   ["rdev"]=>
-  int(%i)
+  int(%d)
   ["size"]=>
   int(%d)
   ["atime"]=>
@@ -199,7 +206,7 @@ array(26) {
   ["gid"]=>
   int(%d)
   ["rdev"]=>
-  int(%i)
+  int(%d)
   ["size"]=>
   int(%d)
   ["atime"]=>
@@ -253,7 +260,7 @@ array(26) {
   ["gid"]=>
   int(%d)
   ["rdev"]=>
-  int(%i)
+  int(%d)
   ["size"]=>
   int(%d)
   ["atime"]=>

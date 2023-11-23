@@ -2,27 +2,28 @@
 ldap_set_option() - Basic test for TLS protocol min ldap option
 --CREDITS--
 Chad Sikorra <Chad.Sikorra@gmail.com>
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require "connect.inc";
-$link = ldap_connect($uri);
+$link = ldap_connect($host, $port);
 
 foreach([
-    LDAP_OPT_X_TLS_PROTOCOL_SSL2,
-    LDAP_OPT_X_TLS_PROTOCOL_SSL3,
-    LDAP_OPT_X_TLS_PROTOCOL_TLS1_0,
-    LDAP_OPT_X_TLS_PROTOCOL_TLS1_1,
-    LDAP_OPT_X_TLS_PROTOCOL_TLS1_2,
+	LDAP_OPT_X_TLS_PROTOCOL_SSL2,
+	LDAP_OPT_X_TLS_PROTOCOL_SSL3,
+	LDAP_OPT_X_TLS_PROTOCOL_TLS1_0,
+	LDAP_OPT_X_TLS_PROTOCOL_TLS1_1,
+	LDAP_OPT_X_TLS_PROTOCOL_TLS1_2,
 ] as $option) {
-    $result = ldap_set_option($link, LDAP_OPT_X_TLS_PROTOCOL_MIN, $option);
-    var_dump($result);
+	$result = ldap_set_option($link, LDAP_OPT_X_TLS_PROTOCOL_MIN, $option);
+	var_dump($result);
 
-    ldap_get_option($link, LDAP_OPT_X_TLS_PROTOCOL_MIN, $optionval);
-    var_dump($optionval);
+	ldap_get_option($link, LDAP_OPT_X_TLS_PROTOCOL_MIN, $optionval);
+	var_dump($optionval);
 }
 ?>
+===DONE===
 --EXPECT--
 bool(true)
 int(512)
@@ -34,3 +35,4 @@ bool(true)
 int(770)
 bool(true)
 int(771)
+===DONE===

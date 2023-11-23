@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -22,38 +24,52 @@
 
 #include "php.h"
 
-#include "curl_private.h"
+#if HAVE_CURL
+
+#include "php_curl.h"
 
 #include <curl/curl.h>
 
 #define SAVE_CURLSH_ERROR(__handle, __err) (__handle)->err.no = (int) __err;
 
-/* {{{ Initialize a share curl handle */
+/* {{{ proto void curl_share_init()
+   Initialize a share curl handle */
 PHP_FUNCTION(curl_share_init)
 {
 	php_curlsh *sh;
 
-	ZEND_PARSE_PARAMETERS_NONE();
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
 
-	object_init_ex(return_value, curl_share_ce);
-	sh = Z_CURL_SHARE_P(return_value);
+	sh = ecalloc(1, sizeof(php_curlsh));
 
 	sh->share = curl_share_init();
+
+	RETURN_RES(zend_register_resource(sh, le_curl_share_handle));
 }
 /* }}} */
 
-/* {{{ Close a set of cURL handles */
+/* {{{ proto void curl_share_close(resource sh)
+   Close a set of cURL handles */
 PHP_FUNCTION(curl_share_close)
 {
 	zval *z_sh;
+	php_curlsh *sh;
 
 	ZEND_PARSE_PARAMETERS_START(1,1)
-		Z_PARAM_OBJECT_OF_CLASS(z_sh, curl_share_ce)
+		Z_PARAM_RESOURCE(z_sh)
 	ZEND_PARSE_PARAMETERS_END();
+
+	if ((sh = (php_curlsh *)zend_fetch_resource(Z_RES_P(z_sh), le_curl_share_handle_name, le_curl_share_handle)) == NULL) {
+		RETURN_FALSE;
+	}
+
+	zend_list_close(Z_RES_P(z_sh));
 }
 /* }}} */
 
-static bool _php_curl_share_setopt(php_curlsh *sh, zend_long option, zval *zvalue, zval *return_value) /* {{{ */
+static int _php_curl_share_setopt(php_curlsh *sh, zend_long option, zval *zvalue, zval *return_value) /* {{{ */
 {
 	CURLSHcode error = CURLSHE_OK;
 
@@ -64,33 +80,36 @@ static bool _php_curl_share_setopt(php_curlsh *sh, zend_long option, zval *zvalu
 			break;
 
 		default:
-			zend_argument_value_error(2, "is not a valid cURL share option");
+			php_error_docref(NULL, E_WARNING, "Invalid curl share configuration option");
 			error = CURLSHE_BAD_OPTION;
 			break;
 	}
 
 	SAVE_CURLSH_ERROR(sh, error);
 
-	return error == CURLSHE_OK;
+	return error != CURLSHE_OK;
 }
 /* }}} */
 
-/* {{{ Set an option for a cURL transfer */
+/* {{{ proto bool curl_share_setopt(resource sh, int option, mixed value)
+      Set an option for a cURL transfer */
 PHP_FUNCTION(curl_share_setopt)
 {
-	zval       *z_sh, *zvalue;
+	zval       *zid, *zvalue;
 	zend_long        options;
 	php_curlsh *sh;
 
 	ZEND_PARSE_PARAMETERS_START(3,3)
-		Z_PARAM_OBJECT_OF_CLASS(z_sh, curl_share_ce)
+		Z_PARAM_RESOURCE(zid)
 		Z_PARAM_LONG(options)
 		Z_PARAM_ZVAL(zvalue)
 	ZEND_PARSE_PARAMETERS_END();
 
-	sh = Z_CURL_SHARE_P(z_sh);
+	if ((sh = (php_curlsh *)zend_fetch_resource(Z_RES_P(zid), le_curl_share_handle_name, le_curl_share_handle)) == NULL) {
+		RETURN_FALSE;
+	}
 
-	if (_php_curl_share_setopt(sh, options, zvalue, return_value)) {
+	if (!_php_curl_share_setopt(sh, options, zvalue, return_value)) {
 		RETURN_TRUE;
 	} else {
 		RETURN_FALSE;
@@ -98,24 +117,39 @@ PHP_FUNCTION(curl_share_setopt)
 }
 /* }}} */
 
-/* {{{ Return an integer containing the last share curl error number */
+void _php_curl_share_close(zend_resource *rsrc) /* {{{ */
+{
+	php_curlsh *sh = (php_curlsh *)rsrc->ptr;
+	if (sh) {
+		curl_share_cleanup(sh->share);
+		efree(sh);
+		rsrc->ptr = NULL;
+	}
+}
+/* }}} */
+
+/* {{{ proto int curl_share_errno(resource mh)
+         Return an integer containing the last share curl error number */
 PHP_FUNCTION(curl_share_errno)
 {
 	zval        *z_sh;
 	php_curlsh  *sh;
 
 	ZEND_PARSE_PARAMETERS_START(1,1)
-		Z_PARAM_OBJECT_OF_CLASS(z_sh, curl_share_ce)
+		Z_PARAM_RESOURCE(z_sh)
 	ZEND_PARSE_PARAMETERS_END();
 
-	sh = Z_CURL_SHARE_P(z_sh);
+	if ((sh = (php_curlsh *)zend_fetch_resource(Z_RES_P(z_sh), le_curl_share_handle_name, le_curl_share_handle)) == NULL) {
+		RETURN_FALSE;
+	}
 
 	RETURN_LONG(sh->err.no);
 }
 /* }}} */
 
 
-/* {{{ return string describing error code */
+/* {{{ proto bool curl_share_strerror(int code)
+         return string describing error code */
 PHP_FUNCTION(curl_share_strerror)
 {
 	zend_long code;
@@ -134,40 +168,4 @@ PHP_FUNCTION(curl_share_strerror)
 }
 /* }}} */
 
-/* CurlShareHandle class */
-
-static zend_object *curl_share_create_object(zend_class_entry *class_type) {
-	php_curlsh *intern = zend_object_alloc(sizeof(php_curlsh), class_type);
-
-	zend_object_std_init(&intern->std, class_type);
-	object_properties_init(&intern->std, class_type);
-
-	return &intern->std;
-}
-
-static zend_function *curl_share_get_constructor(zend_object *object) {
-	zend_throw_error(NULL, "Cannot directly construct CurlShareHandle, use curl_share_init() instead");
-	return NULL;
-}
-
-void curl_share_free_obj(zend_object *object)
-{
-	php_curlsh *sh = curl_share_from_obj(object);
-
-	curl_share_cleanup(sh->share);
-	zend_object_std_dtor(&sh->std);
-}
-
-static zend_object_handlers curl_share_handlers;
-
-void curl_share_register_handlers(void) {
-	curl_share_ce->create_object = curl_share_create_object;
-	curl_share_ce->default_object_handlers = &curl_share_handlers;
-
-	memcpy(&curl_share_handlers, &std_object_handlers, sizeof(zend_object_handlers));
-	curl_share_handlers.offset = XtOffsetOf(php_curlsh, std);
-	curl_share_handlers.free_obj = curl_share_free_obj;
-	curl_share_handlers.get_constructor = curl_share_get_constructor;
-	curl_share_handlers.clone_obj = NULL;
-	curl_share_handlers.compare = zend_objects_not_comparable;
-}
+#endif

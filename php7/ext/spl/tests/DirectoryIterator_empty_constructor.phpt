@@ -5,11 +5,11 @@ Havard Eide <nucleuz@gmail.com>
 #PHPTestFest2009 Norway 2009-06-09 \o/
 --FILE--
 <?php
-try {
-    $it = new DirectoryIterator("");
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+$it = new DirectoryIterator("");
 ?>
---EXPECT--
-DirectoryIterator::__construct(): Argument #1 ($directory) cannot be empty
+--EXPECTF--
+Fatal error: Uncaught RuntimeException: Directory name must not be empty. in %s:%d
+Stack trace:
+#0 %s(%d): DirectoryIterator->__construct('')
+#1 {main}
+  thrown in %s on line %d

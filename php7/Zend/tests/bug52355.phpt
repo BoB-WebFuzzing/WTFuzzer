@@ -10,15 +10,11 @@ $foo = -sin(0);
 
 var_dump($foo);
 
-try {
-    var_dump(1.0 / -0.0);
-} catch (\DivisionByZeroError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(@(1.0 / -0.0));
 
 ?>
 --EXPECT--
 float(-0)
 float(-0)
 float(-0)
-Division by zero
+float(-INF)

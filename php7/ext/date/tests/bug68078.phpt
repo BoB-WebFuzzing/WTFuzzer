@@ -12,7 +12,6 @@ var_dump($date1 == $date2);
 var_dump($date1 < $date2);
 var_dump($date2 > $date1);
 var_dump($date2 == $date3);
-?>
 --EXPECT--
 bool(false)
 bool(true)

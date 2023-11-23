@@ -3,8 +3,6 @@ Bug #65475: Session ID is not initialized when session.usr_strict_mode=1
 --INI--
 session.save_handler=files
 session.name=PHPSESSID
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -27,7 +25,6 @@ session_start();
 var_dump($session_id === session_id());
 var_dump($_SESSION['cnt']); // Should be int(2)
 session_write_close();
-?>
 --EXPECT--
 Testing file module
 bool(true)

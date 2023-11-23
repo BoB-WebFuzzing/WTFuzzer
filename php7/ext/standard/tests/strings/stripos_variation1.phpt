@@ -2,6 +2,11 @@
 Test stripos() function : usage variations - double quoted strings for 'haystack' & 'needle' arguments
 --FILE--
 <?php
+/* Prototype  : int stripos ( string $haystack, string $needle [, int $offset] );
+ * Description: Find position of first occurrence of a case-insensitive string
+ * Source code: ext/standard/string.c
+*/
+
 /* Test stripos() function by passing double quoted strings for 'haystack' & 'needle' arguments */
 
 echo "*** Testing stripos() function: with double quoted strings ***\n";
@@ -24,6 +29,8 @@ $needle = array(
 
   //nulls
   "\0",
+  NULL,
+  null,
 
   //boolean false
   FALSE,
@@ -74,7 +81,7 @@ for($index=0; $index<count($needle); $index++) {
 }
 echo "*** Done ***";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing stripos() function: with double quoted strings ***
 -- Iteration 1 --
 int(2)
@@ -110,96 +117,118 @@ int(9)
 int(8)
 bool(false)
 -- Iteration 12 --
-int(0)
-int(11)
+
+Deprecated: stripos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+int(8)
+
+Deprecated: stripos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+bool(false)
 -- Iteration 13 --
-int(0)
-int(12)
+
+Deprecated: stripos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+int(8)
+
+Deprecated: stripos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+bool(false)
 -- Iteration 14 --
-int(0)
-int(13)
+
+Deprecated: stripos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+int(8)
+
+Deprecated: stripos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+bool(false)
 -- Iteration 15 --
-int(10)
-int(47)
+
+Deprecated: stripos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+int(8)
+
+Deprecated: stripos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in %s on line %d
+bool(false)
 -- Iteration 16 --
-int(12)
+bool(false)
 bool(false)
 -- Iteration 17 --
-int(11)
-bool(false)
+int(10)
+int(47)
 -- Iteration 18 --
-int(13)
+int(12)
 bool(false)
 -- Iteration 19 --
-int(14)
+int(11)
 bool(false)
 -- Iteration 20 --
-int(16)
+int(13)
 bool(false)
 -- Iteration 21 --
-int(17)
+int(14)
 bool(false)
 -- Iteration 22 --
-int(20)
+int(16)
 bool(false)
 -- Iteration 23 --
-int(22)
-int(22)
--- Iteration 24 --
-int(23)
-int(23)
--- Iteration 25 --
-int(24)
-int(24)
--- Iteration 26 --
-int(25)
-int(25)
--- Iteration 27 --
+int(17)
 bool(false)
+-- Iteration 24 --
+int(20)
+bool(false)
+-- Iteration 25 --
+int(22)
+bool(false)
+-- Iteration 26 --
+int(23)
+bool(false)
+-- Iteration 27 --
+int(24)
 bool(false)
 -- Iteration 28 --
-int(27)
-int(27)
+int(25)
+bool(false)
 -- Iteration 29 --
-int(28)
-int(28)
+bool(false)
+bool(false)
 -- Iteration 30 --
-int(29)
-int(29)
+int(27)
+bool(false)
 -- Iteration 31 --
-int(31)
-int(31)
+int(28)
+bool(false)
 -- Iteration 32 --
-int(30)
+int(29)
 bool(false)
 -- Iteration 33 --
-int(32)
-int(32)
+int(31)
+bool(false)
 -- Iteration 34 --
-int(33)
-int(33)
+int(30)
+bool(false)
 -- Iteration 35 --
-int(33)
+int(32)
 bool(false)
 -- Iteration 36 --
-int(39)
-int(39)
+int(33)
+bool(false)
 -- Iteration 37 --
-int(15)
-int(48)
+int(33)
+bool(false)
 -- Iteration 38 --
+int(39)
+int(39)
+-- Iteration 39 --
 int(15)
 int(48)
--- Iteration 39 --
-int(51)
-int(51)
 -- Iteration 40 --
-int(51)
-int(51)
+int(15)
+int(48)
 -- Iteration 41 --
-bool(false)
-bool(false)
+int(51)
+int(51)
 -- Iteration 42 --
+int(51)
+int(51)
+-- Iteration 43 --
+bool(false)
+bool(false)
+-- Iteration 44 --
 int(0)
 bool(false)
 *** Done ***

@@ -24,40 +24,42 @@ static zend_class_entry zend_iterator_class_entry;
 
 static void iter_wrapper_free(zend_object *object);
 static void iter_wrapper_dtor(zend_object *object);
-static HashTable *iter_wrapper_get_gc(zend_object *object, zval **table, int *n);
+static HashTable *iter_wrapper_get_gc(zval *object, zval **table, int *n);
 
 static const zend_object_handlers iterator_object_handlers = {
 	0,
 	iter_wrapper_free,
 	iter_wrapper_dtor,
-	NULL, /* clone_obj */
+	NULL,
 	NULL, /* prop read */
 	NULL, /* prop write */
 	NULL, /* read dim */
 	NULL, /* write dim */
-	NULL, /* get_property_ptr_ptr */
+	NULL,
+	NULL, /* get */
+	NULL, /* set */
 	NULL, /* has prop */
 	NULL, /* unset prop */
 	NULL, /* has dim */
 	NULL, /* unset dim */
 	NULL, /* props get */
 	NULL, /* method get */
+	NULL, /* call */
 	NULL, /* get ctor */
 	NULL, /* get class name */
+	NULL, /* compare */
 	NULL, /* cast */
 	NULL, /* count */
 	NULL, /* get_debug_info */
 	NULL, /* get_closure */
 	iter_wrapper_get_gc,
 	NULL, /* do_operation */
-	NULL, /* compare */
-	NULL  /* get_properties_for */
+	NULL  /* compare */
 };
 
 ZEND_API void zend_register_iterator_wrapper(void)
 {
 	INIT_CLASS_ENTRY(zend_iterator_class_entry, "__iterator_wrapper", NULL);
-	zend_iterator_class_entry.default_object_handlers = &iterator_object_handlers;
 }
 
 static void iter_wrapper_free(zend_object *object)
@@ -70,12 +72,8 @@ static void iter_wrapper_dtor(zend_object *object)
 {
 }
 
-static HashTable *iter_wrapper_get_gc(zend_object *object, zval **table, int *n) {
-	zend_object_iterator *iter = (zend_object_iterator*)object;
-	if (iter->funcs->get_gc) {
-		return iter->funcs->get_gc(iter, table, n);
-	}
-
+static HashTable *iter_wrapper_get_gc(zval *object, zval **table, int *n) {
+	/* TODO: We need a get_gc iterator handler */
 	*table = NULL;
 	*n = 0;
 	return NULL;
@@ -84,6 +82,7 @@ static HashTable *iter_wrapper_get_gc(zend_object *object, zval **table, int *n)
 ZEND_API void zend_iterator_init(zend_object_iterator *iter)
 {
 	zend_object_std_init(&iter->std, &zend_iterator_class_entry);
+	iter->std.handlers = &iterator_object_handlers;
 }
 
 ZEND_API void zend_iterator_dtor(zend_object_iterator *iter)

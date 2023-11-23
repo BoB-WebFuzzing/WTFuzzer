@@ -1,9 +1,11 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -25,9 +27,12 @@
 #include "../common/common_date.h"
 #include "dateformat.h"
 #include "dateformat_class.h"
+#include "dateformat_format.h"
 #include "dateformat_data.h"
 
-/* {{{ Internal function which calls the udat_format */
+/* {{{
+ * Internal function which calls the udat_format
+*/
 static void internal_format(IntlDateFormatter_object *dfo, UDate timestamp, zval *return_value)
 {
 	UChar* 	formatted =  NULL;
@@ -52,7 +57,9 @@ static void internal_format(IntlDateFormatter_object *dfo, UDate timestamp, zval
 /* }}} */
 
 
-/* {{{ Internal function which fetches an element from the passed array for the key_name passed */
+/* {{{
+ * Internal function which fetches an element from the passed array for the key_name passed
+*/
 static int32_t internal_get_arr_ele(IntlDateFormatter_object *dfo,
 		HashTable* hash_arr, char* key_name, intl_error *err)
 {
@@ -88,7 +95,9 @@ static int32_t internal_get_arr_ele(IntlDateFormatter_object *dfo,
 }
 /* }}} */
 
-/* {{{ Internal function which sets UCalendar  from the passed array and retrieves timestamp */
+/* {{{
+ * Internal function which sets UCalendar  from the passed array and retrieves timestamp
+*/
 static UDate internal_get_timestamp(IntlDateFormatter_object *dfo,
 		HashTable *hash_arr)
 {
@@ -137,7 +146,10 @@ static UDate internal_get_timestamp(IntlDateFormatter_object *dfo,
 }
 
 
-/* {{{ Format the time value as a string. */
+/* {{{ proto string IntlDateFormatter::format( [mixed]int $args or array $args )
+ * Format the time value as a string. }}}*/
+/* {{{ proto string datefmt_format( [mixed]int $args or array $args )
+ * Format the time value as a string. }}}*/
 PHP_FUNCTION(datefmt_format)
 {
 	UDate 		timestamp	= 0;
@@ -151,7 +163,7 @@ PHP_FUNCTION(datefmt_format)
 			&object, IntlDateFormatter_ce_ptr, &zarg) == FAILURE) {
 		intl_error_set(NULL, U_ILLEGAL_ARGUMENT_ERROR, "datefmt_format: unable "
 				"to parse input params", 0 );
-		RETURN_THROWS();
+		RETURN_FALSE;
 	}
 
 	DATE_FORMAT_METHOD_FETCH_OBJECT;

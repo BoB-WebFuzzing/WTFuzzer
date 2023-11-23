@@ -17,5 +17,5 @@ try {
     var_dump($e->getMessage());
 }
 ?>
---EXPECT--
-string(79) "stream_filter_remove(): supplied resource is not a valid stream filter resource"
+--EXPECTF--
+Warning: stream_filter_remove(): Invalid resource given, not a stream filter in %s on line %d

@@ -1,21 +1,21 @@
 --TEST--
 CURL file uploading
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 
 function testcurl($ch, $name, $mime = '', $postname = '')
 {
-    if(!empty($postname)) {
-        $file = new CurlFile($name, $mime, $postname);
-    } else if(!empty($mime)) {
-        $file = new CurlFile($name, $mime);
-    } else {
-        $file = new CurlFile($name);
-    }
-    curl_setopt($ch, CURLOPT_POSTFIELDS, array("file" => $file));
-    var_dump(curl_exec($ch));
+	if(!empty($postname)) {
+		$file = new CurlFile($name, $mime, $postname);
+	} else if(!empty($mime)) {
+		$file = new CurlFile($name, $mime);
+	} else {
+		$file = new CurlFile($name);
+	}
+	curl_setopt($ch, CURLOPT_POSTFIELDS, array("file" => $file));
+	var_dump(curl_exec($ch));
 }
 
 include 'server.inc';
@@ -42,12 +42,7 @@ var_dump($file->getPostFilename());
 curl_setopt($ch, CURLOPT_POSTFIELDS, array("file" => $file));
 var_dump(curl_exec($ch));
 
-try {
-    curl_setopt($ch, CURLOPT_SAFE_UPLOAD, 0);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
+curl_setopt($ch, CURLOPT_SAFE_UPLOAD, 0);
 $params = array('file' => '@' . __DIR__ . '/curl_testdata1.txt');
 curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 var_dump(curl_exec($ch));
@@ -74,7 +69,8 @@ string(%d) "%s/curl_testdata1.txt"
 string(%d) "curl_testdata1.txt|text/plain|6"
 string(%d) "foo.txt"
 string(%d) "foo.txt|application/octet-stream|6"
-curl_setopt(): Disabling safe uploads is no longer supported
+
+Warning: curl_setopt(): Disabling safe uploads is no longer supported in %s on line %d
 string(0) ""
 string(0) ""
 string(%d) "array(1) {

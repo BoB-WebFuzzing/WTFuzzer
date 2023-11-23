@@ -2,6 +2,11 @@
 Test vprintf() function : basic functionality - integer format
 --FILE--
 <?php
+/* Prototype  : string vprintf(string $format , array $args)
+ * Description: Output a formatted string
+ * Source code: ext/standard/formatted_print.c
+*/
+
 /*
  *  Testing vprintf() : basic functionality - using integer format
 */
@@ -30,6 +35,7 @@ echo "\n";
 var_dump($result);
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing vprintf() : basic functionality - using integer format ***
 111
@@ -38,3 +44,4 @@ int(3)
 int(7)
 111 222 333
 int(11)
+===DONE===

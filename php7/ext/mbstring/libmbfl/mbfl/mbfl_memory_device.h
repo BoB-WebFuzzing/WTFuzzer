@@ -60,6 +60,8 @@ MBFLAPI extern mbfl_string * mbfl_memory_device_result(
 		mbfl_memory_device *device, mbfl_string *result);
 MBFLAPI extern void mbfl_memory_device_unput(mbfl_memory_device *device);
 MBFLAPI extern int mbfl_memory_device_output(int c, void *data);
+MBFLAPI extern int mbfl_memory_device_output2(int c, void *data);
+MBFLAPI extern int mbfl_memory_device_output4(int c, void *data);
 MBFLAPI extern int mbfl_memory_device_strcat(mbfl_memory_device *device, const char *psrc);
 MBFLAPI extern int mbfl_memory_device_strncat(
 		mbfl_memory_device *device, const char *psrc, size_t len);
@@ -68,5 +70,7 @@ MBFLAPI extern int mbfl_memory_device_devcat(mbfl_memory_device *dest, mbfl_memo
 MBFLAPI extern void mbfl_wchar_device_init(mbfl_wchar_device *device);
 MBFLAPI extern int mbfl_wchar_device_output(int c, void *data);
 MBFLAPI extern void mbfl_wchar_device_clear(mbfl_wchar_device *device);
+
+
 
 #endif /* MBFL_MEMORY_DEVICE_H */

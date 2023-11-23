@@ -1,7 +1,9 @@
 --TEST--
 Phar: test nested linked files
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.require_hash=0
 --FILE--
@@ -14,6 +16,7 @@ $a = fopen('phar://' . __DIR__ . '/files/links.phar.tar/link2', 'r');
 fseek($a, 3);
 echo fread($a, 10);
 ?>
+===DONE===
 --EXPECT--
 hi there
 
@@ -23,3 +26,4 @@ hi there
 
 there
 
+===DONE===

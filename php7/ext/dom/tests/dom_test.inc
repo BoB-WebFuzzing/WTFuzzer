@@ -31,11 +31,7 @@ function print_node($node)
   }
   print "\nNum Children: " . $child_count;
   if($child_count <= 1){
-    if (strlen(trim($node->nodeValue))) {
-      print "\nNode Content: " . $node->nodeValue;
-    } else {
-      print "\nNode Content:";
-    }
+    print "\nNode Content: " . $node->nodeValue;
   }
   print "\n\n";
 }
@@ -45,24 +41,6 @@ function print_node_list($nodelist)
   foreach($nodelist as $node)
   {
     print_node($node);
-  }
-}
-
-function print_node_compact($node, $spaces)
-{
-    if ($node->nodeType == 3) {
-        print str_repeat(" ", $spaces) . trim($node->nodeValue) . "\n";
-    } else {
-        print str_repeat(" ", $spaces) . "<" . $node->nodeName . ">\n";
-        print_node_list_compact($node->childNodes, $spaces + 2);
-        print str_repeat(" ", $spaces) . "</" . $node->nodeName . ">\n";
-    }
-}
-
-function print_node_list_compact($nodelist, $spaces = 0)
-{
-  foreach ($nodelist as $node) {
-    print_node_compact($node, $spaces);
   }
 }
 

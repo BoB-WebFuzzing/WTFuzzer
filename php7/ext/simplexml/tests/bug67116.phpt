@@ -1,7 +1,9 @@
 --TEST--
 Bug #67116 (Inconsistent parsing of Nodes w/o linefeed)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php
+if (!extension_loaded("simplexml")) die("skip SimpleXML not available");
+?>
 --FILE--
 <?php
 

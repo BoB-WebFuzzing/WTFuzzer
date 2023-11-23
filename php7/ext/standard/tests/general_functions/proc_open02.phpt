@@ -10,9 +10,9 @@ if (getenv('SKIP_SLOW_TESTS')) echo 'skip slow test';
 $ds = array(array('pipe', 'r'));
 
 $cat = proc_open(
-    ['/bin/sleep', '2'],
-    $ds,
-    $pipes
+	'/bin/sleep 2',
+	$ds,
+	$pipes
 );
 
 usleep(20000); // let the OS run the sleep process before sending the signal
@@ -32,13 +32,11 @@ echo "Done!\n";
 ?>
 --EXPECTF--
 bool(true)
-array(9) {
+array(8) {
   ["command"]=>
-  string(10) "/bin/sleep"
+  string(12) "/bin/sleep 2"
   ["pid"]=>
   int(%d)
-  ["cached"]=>
-  bool(false)
   ["running"]=>
   bool(true)
   ["signaled"]=>
@@ -53,13 +51,11 @@ array(9) {
   int(0)
 }
 bool(true)
-array(9) {
+array(8) {
   ["command"]=>
-  string(10) "/bin/sleep"
+  string(12) "/bin/sleep 2"
   ["pid"]=>
   int(%d)
-  ["cached"]=>
-  bool(false)
   ["running"]=>
   bool(false)
   ["signaled"]=>

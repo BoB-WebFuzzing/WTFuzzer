@@ -1,7 +1,7 @@
 --TEST--
 zend multibyte (2)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --INI--
 error_reporting=E_ALL & ~E_DEPRECATED
 zend.multibyte=On

@@ -1,19 +1,18 @@
 --TEST--
 SOAP XML Schema 12: simpleType/list (inline type) (as array)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";
 $schema = <<<EOF
-    <simpleType name="testType">
-        <list>
-            <simpleType>
-                <restriction base="int"/>
-            </simpleType>
-        </list>
-    </simpleType>
+	<simpleType name="testType">
+		<list>
+			<simpleType>
+				<restriction base="int"/>
+			</simpleType>
+		</list>
+	</simpleType>
 EOF;
 test_schema($schema,'type="tns:testType"',array(123,456.7));
 echo "ok";

@@ -3,6 +3,11 @@ Test explode() function : usage variations - misc tests
 --FILE--
 <?php
 
+/* Prototype  : array explode  ( string $delimiter  , string $string  [, int $limit  ] )
+ * Description: Split a string by string.
+ * Source code: ext/standard/string.c
+*/
+
 echo "*** Testing explode() function: misc tests ***\n";
 
 $str = "one\x00two\x00three\x00four";
@@ -27,13 +32,14 @@ $e = test_explode("\x00", $str, 100);
 
 function test_explode($delim, $string, $limit)
 {
-    $e = explode($delim, $string, $limit);
-    foreach ( $e as $v)
-    {
-        var_dump(bin2hex($v));
-    }
+	$e = explode($delim, $string, $limit);
+	foreach ( $e as $v)
+	{
+		var_dump(bin2hex($v));
+	}
 }
 ?>
+===DONE===
 --EXPECT--
 *** Testing explode() function: misc tests ***
 
@@ -61,3 +67,4 @@ string(6) "6f6e65"
 string(6) "74776f"
 string(10) "7468726565"
 string(8) "666f7572"
+===DONE===

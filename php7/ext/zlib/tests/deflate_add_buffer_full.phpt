@@ -1,7 +1,11 @@
 --TEST--
 Test deflate_add() buffer issue with data that fills deflate buffer while using ZLIB_SYNC_FLUSH on ZLIB_ENCODING_RAW.
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 
@@ -41,7 +45,9 @@ $deflated = deflate_add(
 
 echo bin2hex(substr($deflated, strlen($deflated) - 4)) . "\n";
 ?>
+===DONE===
 --EXPECT--
 0000ffff
 0000ffff
 0000ffff
+===DONE===

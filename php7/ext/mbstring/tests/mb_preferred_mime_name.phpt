@@ -1,7 +1,7 @@
 --TEST--
 mb_preferred_mime_name()
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 // TODO: Add more encoding names
@@ -34,15 +34,13 @@ $str = mb_preferred_mime_name('UCS4');
 echo "$str\n";
 
 echo "== INVALID PARAMETER ==\n";
-// Invalid encoding
-try {
-    var_dump(mb_preferred_mime_name('BAD_NAME'));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+// Invalid name
+var_dump(mb_preferred_mime_name('BAD_NAME'));
 
+// No preferred name
+var_dump(mb_preferred_mime_name('pass'));
 ?>
---EXPECT--
+--EXPECTF--
 Shift_JIS
 Shift_JIS
 EUC-JP
@@ -53,4 +51,9 @@ ISO-8859-1
 UCS-2
 UCS-4
 == INVALID PARAMETER ==
-mb_preferred_mime_name(): Argument #1 ($encoding) must be a valid encoding, "BAD_NAME" given
+
+Warning: mb_preferred_mime_name(): Unknown encoding "BAD_NAME" in %s on line %d
+bool(false)
+
+Warning: mb_preferred_mime_name(): No MIME preferred name corresponding to "pass" in %s on line %d
+bool(false)

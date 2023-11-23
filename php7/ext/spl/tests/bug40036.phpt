@@ -24,7 +24,9 @@ if (empty($view['baz']) || empty($view->baz)) {
     echo "View::baz empty\n";
 }
 ?>
+===DONE===
 --EXPECT--
 View::foo empty
 View::bar empty
 View::baz empty
+===DONE===

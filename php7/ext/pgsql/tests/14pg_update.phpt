@@ -1,17 +1,15 @@
 --TEST--
 PostgreSQL pg_update()
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
-include("inc/skipif.inc");
+include("skipif.inc");
 skip_bytea_not_escape();
 ?>
 --FILE--
 <?php
 error_reporting(E_ALL);
 
-include 'inc/config.inc';
+include 'config.inc';
 
 $db = pg_connect($conn_str);
 $fields = array('num'=>'1234', 'str'=>'ABC', 'bin'=>'XYZ');

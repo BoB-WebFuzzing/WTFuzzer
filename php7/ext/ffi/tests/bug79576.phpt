@@ -1,10 +1,9 @@
 --TEST--
 Bug #79576 ("TYPE *" shows unhelpful message when type is not defined)
---EXTENSIONS--
-ffi
 --SKIPIF--
 <?php
-if (PHP_DEBUG || getenv('SKIP_ASAN')) echo "xleak FFI cleanup after parser error is nor implemented";
+if (!extension_loaded('ffi')) die('skip ffi extension not available');
+if (PHP_DEBUG || getenv('SKIP_ASAN')) echo "xfail: FFI cleanup after parser error is nor implemented";
 ?>
 --FILE--
 <?php
@@ -30,7 +29,7 @@ typedef struct _simple_struct {
 ?>
 DONE
 --EXPECT--
-FFI\ParserException: Undefined C type "oid" at line 1
-FFI\ParserException: Undefined C type "oid" at line 1
-FFI\ParserException: Undefined C type "some_not_declared_type" at line 3
+FFI\ParserException: undefined C type 'oid' at line 1
+FFI\ParserException: undefined C type 'oid' at line 1
+FFI\ParserException: undefined C type 'some_not_declared_type' at line 3
 DONE

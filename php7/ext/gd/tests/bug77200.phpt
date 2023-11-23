@@ -1,9 +1,8 @@
 --TEST--
 Bug #77200 (imagecropauto(…, GD_CROP_SIDES) crops left but not right)
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
 if (!GD_BUNDLED) die('skip upstream bugfix has not been released');
 ?>
 --FILE--
@@ -31,6 +30,8 @@ $cropped = imagecropauto($orig, IMG_CROP_SIDES);
 var_dump(imagesx($cropped));
 
 ?>
+===DONE===
 --EXPECT--
 int(4)
 int(4)
+===DONE===

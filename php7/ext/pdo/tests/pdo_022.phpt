@@ -1,9 +1,8 @@
 --TEST--
 PDO Common: PDOStatement::getColumnMeta
---EXTENSIONS--
-pdo
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo')) die('skip');
 $dir = getenv('REDIR_TEST_DIR');
 if (false == $dir) die('skip no driver');
 require_once $dir . 'pdo_test.inc';
@@ -26,7 +25,8 @@ if (getenv('REDIR_TEST_DIR') === false) putenv('REDIR_TEST_DIR='.__DIR__ . '/../
 require_once getenv('REDIR_TEST_DIR') . 'pdo_test.inc';
 $db = PDOTest::factory();
 
-$db->exec('CREATE TABLE test022(id INT NOT NULL PRIMARY KEY, val VARCHAR(10), val2 VARCHAR(16))');
+$db->exec('CREATE TABLE test(id INT NOT NULL PRIMARY KEY, val VARCHAR(10), val2 VARCHAR(16))');
+$db->exec('insert2', "INSERT INTO test VALUES(:first, :second, :third)");
 
 $data = array(
     array('10', 'Abc', 'zxy'),
@@ -37,14 +37,15 @@ $data = array(
     array('60', 'Pqr', 'kji'),
 );
 
+
 // Insert using question mark placeholders
-$stmt = $db->prepare("INSERT INTO test022 VALUES(?, ?, ?)");
+$stmt = $db->prepare("INSERT INTO test VALUES(?, ?, ?)");
 foreach ($data as $row) {
     $stmt->execute($row);
 }
 
 // Retrieve column metadata for a result set returned by explicit SELECT
-$select = $db->query('SELECT id, val, val2 FROM test022');
+$select = $db->query('SELECT id, val, val2 FROM test');
 $meta = $select->getColumnMeta(0);
 var_dump($meta);
 $meta = $select->getColumnMeta(1);
@@ -53,16 +54,10 @@ $meta = $select->getColumnMeta(2);
 var_dump($meta);
 
 // Retrieve column metadata for a result set returned by a function
-$select = $db->query('SELECT COUNT(*) FROM test022');
+$select = $db->query('SELECT COUNT(*) FROM test');
 $meta = $select->getColumnMeta(0);
 var_dump($meta);
 
-?>
---CLEAN--
-<?php
-require_once getenv('REDIR_TEST_DIR') . 'pdo_test.inc';
-$db = PDOTest::factory();
-PDOTest::dropTableIfExists($db, "test022");
 ?>
 --EXPECT--
 The unexpected!

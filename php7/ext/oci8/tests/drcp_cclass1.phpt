@@ -1,11 +1,9 @@
 --TEST--
 DRCP: Test setting connection class inline
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
-require __DIR__.'/connect.inc';
+if (!extension_loaded('oci8')) die ("skip no oci8 extension");
+require(__DIR__.'/connect.inc');
 if (!$test_drcp) die("skip testing DRCP connection class only works in DRCP mode");
 // Looked for :pooled in EZ connect string
 if (strpos($dbase, "/") !== false && stripos($dbase, ":pooled") === false)
@@ -27,7 +25,7 @@ if (isset($matches_sv[0]) && $matches_sv[1] >= 12) {
 --FILE--
 <?php
 
-require __DIR__."/details.inc";
+require(__DIR__."/details.inc");
 
 // Initialization
 

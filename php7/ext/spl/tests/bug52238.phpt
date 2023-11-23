@@ -8,7 +8,7 @@ class Foo implements IteratorAggregate
         throw new Exception;
     }
 
-    public function getIterator(): Traversable {
+    public function getIterator() {
         return new ArrayIterator($this->bar());
     }
 }

@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -20,9 +22,26 @@
 #endif
 
 #include "php.h"
-#if defined(HAVE_LIBXML) && defined(HAVE_DOM)
+#if HAVE_LIBXML && HAVE_DOM
 #include "php_dom.h"
 #include "dom_ce.h"
+
+/* {{{ arginfo */
+ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_text_split_text, 0, 0, 1)
+	ZEND_ARG_INFO(0, offset)
+ZEND_END_ARG_INFO();
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_text_is_whitespace_in_element_content, 0, 0, 0)
+ZEND_END_ARG_INFO();
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_text_replace_whole_text, 0, 0, 1)
+	ZEND_ARG_INFO(0, content)
+ZEND_END_ARG_INFO();
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_text_construct, 0, 0, 0)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO();
+/* }}} */
 
 /*
 * class DOMText extends DOMCharacterData
@@ -31,31 +50,42 @@
 * Since:
 */
 
-/* {{{ */
-PHP_METHOD(DOMText, __construct)
+const zend_function_entry php_dom_text_class_functions[] = {
+	PHP_FALIAS(splitText, dom_text_split_text, arginfo_dom_text_split_text)
+	PHP_FALIAS(isWhitespaceInElementContent, dom_text_is_whitespace_in_element_content, arginfo_dom_text_is_whitespace_in_element_content)
+	PHP_FALIAS(isElementContentWhitespace, dom_text_is_whitespace_in_element_content, arginfo_dom_text_is_whitespace_in_element_content)
+	PHP_FALIAS(replaceWholeText, dom_text_replace_whole_text, arginfo_dom_text_replace_whole_text)
+	PHP_ME(domtext, __construct, arginfo_dom_text_construct, ZEND_ACC_PUBLIC)
+	PHP_FE_END
+};
+
+/* {{{ proto DOMText::__construct([string value]); */
+PHP_METHOD(domtext, __construct)
 {
 	xmlNodePtr nodep = NULL, oldnode = NULL;
 	dom_object *intern;
 	char *value = NULL;
 	size_t value_len;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|s", &value, &value_len) == FAILURE) {
-		RETURN_THROWS();
+	if (zend_parse_parameters_throw(ZEND_NUM_ARGS(), "|s", &value, &value_len) == FAILURE) {
+		return;
 	}
 
 	nodep = xmlNewText((xmlChar *) value);
 
 	if (!nodep) {
 		php_dom_throw_error(INVALID_STATE_ERR, 1);
-		RETURN_THROWS();
+		RETURN_FALSE;
 	}
 
 	intern = Z_DOMOBJ_P(ZEND_THIS);
-	oldnode = dom_object_get_node(intern);
-	if (oldnode != NULL) {
-		php_libxml_node_decrement_resource((php_libxml_node_object *)intern);
+	if (intern != NULL) {
+		oldnode = dom_object_get_node(intern);
+		if (oldnode != NULL) {
+			php_libxml_node_free_resource(oldnode );
+		}
+		php_libxml_increment_node_ptr((php_libxml_node_object *)intern, nodep, (void *)intern);
 	}
-	php_libxml_increment_node_ptr((php_libxml_node_object *)intern, nodep, (void *)intern);
 }
 /* }}} end DOMText::__construct */
 
@@ -64,7 +94,7 @@ readonly=yes
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-Text3-wholeText
 Since: DOM Level 3
 */
-zend_result dom_text_whole_text_read(dom_object *obj, zval *retval)
+int dom_text_whole_text_read(dom_object *obj, zval *retval)
 {
 	xmlNodePtr node;
 	xmlChar *wholetext = NULL;
@@ -72,7 +102,7 @@ zend_result dom_text_whole_text_read(dom_object *obj, zval *retval)
 	node = dom_object_get_node(obj);
 
 	if (node == NULL) {
-		php_dom_throw_error(INVALID_STATE_ERR, 1);
+		php_dom_throw_error(INVALID_STATE_ERR, 0);
 		return FAILURE;
 	}
 
@@ -99,10 +129,11 @@ zend_result dom_text_whole_text_read(dom_object *obj, zval *retval)
 
 /* }}} */
 
-/* {{{ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-38853C1D
+/* {{{ proto DOMText dom_text_split_text(int offset)
+URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-38853C1D
 Since:
 */
-PHP_METHOD(DOMText, splitText)
+PHP_FUNCTION(dom_text_split_text)
 {
 	zval       *id;
 	xmlChar    *cur;
@@ -116,34 +147,29 @@ PHP_METHOD(DOMText, splitText)
 
 	id = ZEND_THIS;
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l", &offset) == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 	DOM_GET_OBJ(node, id, xmlNodePtr, intern);
 
-	if (offset < 0) {
-		zend_argument_value_error(1, "must be greater than or equal to 0");
-		RETURN_THROWS();
-	}
-
 	if (node->type != XML_TEXT_NODE && node->type != XML_CDATA_SECTION_NODE) {
-		/* TODO Add warning? */
 		RETURN_FALSE;
 	}
 
-	cur = node->content;
+	cur = xmlNodeGetContent(node);
 	if (cur == NULL) {
-		/* TODO Add warning? */
 		RETURN_FALSE;
 	}
 	length = xmlUTF8Strlen(cur);
 
-	if (ZEND_LONG_INT_OVFL(offset) || (int)offset > length) {
-		/* TODO Add warning? */
+	if (ZEND_LONG_INT_OVFL(offset) || (int)offset > length || offset < 0) {
+		xmlFree(cur);
 		RETURN_FALSE;
 	}
 
 	first = xmlUTF8Strndup(cur, (int)offset);
 	second = xmlUTF8Strsub(cur, (int)offset, (int)(length - offset));
+
+	xmlFree(cur);
 
 	xmlNodeSetContent(node, first);
 	nnode = xmlNewDocText(node->doc, second);
@@ -152,7 +178,6 @@ PHP_METHOD(DOMText, splitText)
 	xmlFree(second);
 
 	if (nnode == NULL) {
-		/* TODO Add warning? */
 		RETURN_FALSE;
 	}
 
@@ -166,10 +191,11 @@ PHP_METHOD(DOMText, splitText)
 }
 /* }}} end dom_text_split_text */
 
-/* {{{ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-Text3-isWhitespaceInElementContent
+/* {{{ proto bool dom_text_is_whitespace_in_element_content()
+URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-Text3-isWhitespaceInElementContent
 Since: DOM Level 3
 */
-PHP_METHOD(DOMText, isWhitespaceInElementContent)
+PHP_FUNCTION(dom_text_is_whitespace_in_element_content)
 {
 	zval       *id;
 	xmlNodePtr  node;
@@ -177,7 +203,7 @@ PHP_METHOD(DOMText, isWhitespaceInElementContent)
 
 	id = ZEND_THIS;
 	if (zend_parse_parameters_none() == FAILURE) {
-		RETURN_THROWS();
+		return;
 	}
 	DOM_GET_OBJ(node, id, xmlNodePtr, intern);
 
@@ -188,5 +214,15 @@ PHP_METHOD(DOMText, isWhitespaceInElementContent)
 	}
 }
 /* }}} end dom_text_is_whitespace_in_element_content */
+
+/* {{{ proto DOMText dom_text_replace_whole_text(string content)
+URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-Text3-replaceWholeText
+Since: DOM Level 3
+*/
+PHP_FUNCTION(dom_text_replace_whole_text)
+{
+ DOM_NOT_IMPLEMENTED();
+}
+/* }}} end dom_text_replace_whole_text */
 
 #endif

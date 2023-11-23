@@ -2,6 +2,10 @@
 Test is_string() function
 --FILE--
 <?php
+/* Prototype: bool is_string ( mixed $var );
+ * Description: Finds whether the given variable is a string
+ */
+
 echo "*** Testing is_string() with valid string values ***\n";
 // different valid strings
 
@@ -13,7 +17,7 @@ EOT;
 /* heredoc string with only numerics */
 $heredoc_numeric_string = <<<EOT
 123456 3993
-4849 string
+4849 string 
 EOT;
 /* null heardoc string */
 $heredoc_empty_string = <<<EOT
@@ -136,6 +140,13 @@ foreach ($not_strings as $type ) {
   var_dump( is_string($type) );
 }
 
+echo "\n*** Testing error conditions ***\n";
+//Zero argument
+var_dump( is_string() );
+
+//arguments more than expected
+var_dump( is_string("string", "test") );
+
 echo "Done\n";
 
 // close the resources used
@@ -143,7 +154,7 @@ fclose($fp);
 closedir($dfp);
 
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing is_string() with valid string values ***
 -- Iteration 1 --
 bool(true)
@@ -280,5 +291,13 @@ bool(false)
 -- Iteration 44 --
 bool(false)
 -- Iteration 45 --
+bool(false)
+
+*** Testing error conditions ***
+
+Warning: is_string() expects exactly 1 parameter, 0 given in %s on line %d
+bool(false)
+
+Warning: is_string() expects exactly 1 parameter, 2 given in %s on line %d
 bool(false)
 Done

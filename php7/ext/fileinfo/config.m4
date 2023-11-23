@@ -12,7 +12,7 @@ if test "$PHP_FILEINFO" != "no"; then
     libmagic/encoding.c libmagic/fsmagic.c libmagic/funcs.c \
     libmagic/is_json.c libmagic/is_tar.c libmagic/magic.c libmagic/print.c \
     libmagic/readcdf.c libmagic/softmagic.c libmagic/der.c \
-    libmagic/buffer.c libmagic/is_csv.c"
+    libmagic/buffer.c"
 
   AC_MSG_CHECKING([for strcasestr])
   AC_RUN_IFELSE([AC_LANG_SOURCE([[
@@ -49,7 +49,7 @@ int main(void)
     libmagic_sources="$libmagic_sources libmagic/strcasestr.c"
   ],[AC_MSG_RESULT([skipped, cross-compiling])])
 
-  PHP_NEW_EXTENSION(fileinfo, fileinfo.c php_libmagic.c $libmagic_sources, $ext_shared,,-I@ext_srcdir@/libmagic)
+  PHP_NEW_EXTENSION(fileinfo, fileinfo.c $libmagic_sources, $ext_shared,,-I@ext_srcdir@/libmagic)
   PHP_ADD_BUILD_DIR($ext_builddir/libmagic)
 
   AC_CHECK_FUNCS([utimes strndup])

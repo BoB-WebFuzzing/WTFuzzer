@@ -1,20 +1,19 @@
 --TEST--
 Cloning unconstructed MessageFormatter
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 
 class A extends MessageFormatter {
-    function __construct() {}
+	function __construct() {}
 }
 
 $a = new A;
 try {
-    $b = clone $a;
+	$b = clone $a;
 } catch (Exception $e) {
-    var_dump($e->getMessage());
+	var_dump($e->getMessage());
 }
-?>
 --EXPECTF--
 string(%d) "Cannot clone unconstructed MessageFormatter"

@@ -2,6 +2,11 @@
 Test strrchr() function : usage variations - single quoted strings
 --FILE--
 <?php
+/* Prototype  : string strrchr(string $haystack, string $needle);
+ * Description: Finds the last occurrence of a character in a string.
+ * Source code: ext/standard/string.c
+*/
+
 /* Test strrchr() function by passing various single quoted strings to 'haystack' & 'needle' */
 
 echo "*** Testing strrchr() function: with various single quoted strings ***";
@@ -24,6 +29,8 @@ $needle = array(
 
   //nulls
   '\0',
+  NULL,
+  null,
 
   //boolean false
   FALSE,
@@ -74,7 +81,7 @@ for($index=0; $index<count($needle); $index++) {
 }
 echo "*** Done ***";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing strrchr() function: with various single quoted strings ***
 -- Iteration 1 --
 string(22) "lo123456he \x234 \101 "
@@ -110,98 +117,114 @@ bool(false)
 string(5) "\101 "
 
 -- Iteration 12 --
+
+Deprecated: strrchr(): Non-string needles will be interpreted as strings in %s on line %d
 bool(false)
 
 -- Iteration 13 --
+
+Deprecated: strrchr(): Non-string needles will be interpreted as strings in %s on line %d
 bool(false)
 
 -- Iteration 14 --
+
+Deprecated: strrchr(): Non-string needles will be interpreted as strings in %s on line %d
 bool(false)
 
 -- Iteration 15 --
-string(1) " "
+
+Deprecated: strrchr(): Non-string needles will be interpreted as strings in %s on line %d
+bool(false)
 
 -- Iteration 16 --
-string(47) "$&!#%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
+bool(false)
 
 -- Iteration 17 --
 string(1) " "
 
 -- Iteration 18 --
-string(46) "&!#%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
+string(47) "$&!#%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
 
 -- Iteration 19 --
-string(45) "!#%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
+string(1) " "
 
 -- Iteration 20 --
-string(43) "%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
+string(46) "&!#%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
 
 -- Iteration 21 --
-string(5) "\101 "
+string(45) "!#%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
 
 -- Iteration 22 --
-string(39) "()*+-./:;<=>?@hello123456he \x234 \101 "
+string(43) "%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
 
 -- Iteration 23 --
-string(37) "*+-./:;<=>?@hello123456he \x234 \101 "
-
--- Iteration 24 --
-string(36) "+-./:;<=>?@hello123456he \x234 \101 "
-
--- Iteration 25 --
-string(35) "-./:;<=>?@hello123456he \x234 \101 "
-
--- Iteration 26 --
-string(34) "./:;<=>?@hello123456he \x234 \101 "
-
--- Iteration 27 --
-string(34) "./:;<=>?@hello123456he \x234 \101 "
-
--- Iteration 28 --
-string(32) ":;<=>?@hello123456he \x234 \101 "
-
--- Iteration 29 --
-string(31) ";<=>?@hello123456he \x234 \101 "
-
--- Iteration 30 --
-string(30) "<=>?@hello123456he \x234 \101 "
-
--- Iteration 31 --
-string(28) ">?@hello123456he \x234 \101 "
-
--- Iteration 32 --
-string(29) "=>?@hello123456he \x234 \101 "
-
--- Iteration 33 --
-string(27) "?@hello123456he \x234 \101 "
-
--- Iteration 34 --
-string(26) "@hello123456he \x234 \101 "
-
--- Iteration 35 --
-string(26) "@hello123456he \x234 \101 "
-
--- Iteration 36 --
-string(2) "1 "
-
--- Iteration 37 --
 string(5) "\101 "
 
+-- Iteration 24 --
+string(39) "()*+-./:;<=>?@hello123456he \x234 \101 "
+
+-- Iteration 25 --
+string(37) "*+-./:;<=>?@hello123456he \x234 \101 "
+
+-- Iteration 26 --
+string(36) "+-./:;<=>?@hello123456he \x234 \101 "
+
+-- Iteration 27 --
+string(35) "-./:;<=>?@hello123456he \x234 \101 "
+
+-- Iteration 28 --
+string(34) "./:;<=>?@hello123456he \x234 \101 "
+
+-- Iteration 29 --
+string(34) "./:;<=>?@hello123456he \x234 \101 "
+
+-- Iteration 30 --
+string(32) ":;<=>?@hello123456he \x234 \101 "
+
+-- Iteration 31 --
+string(31) ";<=>?@hello123456he \x234 \101 "
+
+-- Iteration 32 --
+string(30) "<=>?@hello123456he \x234 \101 "
+
+-- Iteration 33 --
+string(28) ">?@hello123456he \x234 \101 "
+
+-- Iteration 34 --
+string(29) "=>?@hello123456he \x234 \101 "
+
+-- Iteration 35 --
+string(27) "?@hello123456he \x234 \101 "
+
+-- Iteration 36 --
+string(26) "@hello123456he \x234 \101 "
+
+-- Iteration 37 --
+string(26) "@hello123456he \x234 \101 "
+
 -- Iteration 38 --
-string(44) "#%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
+string(2) "1 "
 
 -- Iteration 39 --
 string(5) "\101 "
 
 -- Iteration 40 --
-bool(false)
+string(44) "#%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
 
 -- Iteration 41 --
-string(7) "4 \101 "
+string(5) "\101 "
 
 -- Iteration 42 --
-string(7) "4 \101 "
+bool(false)
 
 -- Iteration 43 --
+string(7) "4 \101 "
+
+-- Iteration 44 --
+
+Deprecated: strrchr(): Non-string needles will be interpreted as strings in %s on line %d
+string(37) "*+-./:;<=>?@hello123456he \x234 \101 "
+
+-- Iteration 45 --
 string(63) "Hello,\t\n\0\n  $&!#%\o,()*+-./:;<=>?@hello123456he \x234 \101 "
 *** Done ***

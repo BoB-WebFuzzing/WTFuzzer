@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -20,7 +22,7 @@
 
 #include "php.h"
 
-#ifdef DBA_DB1
+#if DBA_DB1
 #include "php_db1.h"
 
 #ifdef DB1_INCLUDE_FILE
@@ -30,6 +32,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#define DB1_DATA dba_db1_data *dba = info->dbf
+#define DB1_GKEY DBT gkey; gkey.data = (char *) key; gkey.size = keylen
 
 typedef struct {
 	DB  *dbp;
@@ -41,7 +46,11 @@ DBA_OPEN_FUNC(db1)
 	DB		*db;
 
 	int gmode;
-	int filemode = info->file_permission;
+	int filemode = 0644;
+
+	if (info->argc > 0) {
+		filemode = zval_get_long(&info->argv[0]);
+	}
 
 	gmode = 0;
 	switch (info->mode) {
@@ -61,7 +70,7 @@ DBA_OPEN_FUNC(db1)
 			return FAILURE; /* not possible */
 	}
 
-	db = dbopen((char *)ZSTR_VAL(info->path), gmode, filemode, DB_HASH, NULL);
+	db = dbopen((char *)info->path, gmode, filemode, DB_HASH, NULL);
 
 	if (db == NULL) {
 		return FAILURE;
@@ -77,91 +86,82 @@ DBA_OPEN_FUNC(db1)
 
 DBA_CLOSE_FUNC(db1)
 {
-	dba_db1_data *dba = info->dbf;
+	DB1_DATA;
 	dba->dbp->close(dba->dbp);
 	pefree(info->dbf, info->flags&DBA_PERSISTENT);
 }
 
 DBA_FETCH_FUNC(db1)
 {
-	dba_db1_data *dba = info->dbf;
 	DBT gval;
-	DBT gkey;
-
-	gkey.data = ZSTR_VAL(key);
-	gkey.size = ZSTR_LEN(key);
+	DB1_DATA;
+	DB1_GKEY;
 
 	memset(&gval, 0, sizeof(gval));
 	if (dba->dbp->get(dba->dbp, &gkey, &gval, 0) == RET_SUCCESS) {
-		return zend_string_init(gval.data, gval.size, /* persistent */ false);
+		if (newlen) *newlen = gval.size;
+		return estrndup(gval.data, gval.size);
 	}
 	return NULL;
 }
 
 DBA_UPDATE_FUNC(db1)
 {
-	dba_db1_data *dba = info->dbf;
 	DBT gval;
-	DBT gkey;
+	DB1_DATA;
+	DB1_GKEY;
 
-	gkey.data = ZSTR_VAL(key);
-	gkey.size = ZSTR_LEN(key);
-
-	gval.data = ZSTR_VAL(val);
-	gval.size = ZSTR_LEN(val);
+	gval.data = (char *) val;
+	gval.size = vallen;
 
 	return dba->dbp->put(dba->dbp, &gkey, &gval, mode == 1 ? R_NOOVERWRITE : 0) != RET_SUCCESS ? FAILURE : SUCCESS;
 }
 
 DBA_EXISTS_FUNC(db1)
 {
-	dba_db1_data *dba = info->dbf;
 	DBT gval;
-	DBT gkey;
-
-	gkey.data = ZSTR_VAL(key);
-	gkey.size = ZSTR_LEN(key);
+	DB1_DATA;
+	DB1_GKEY;
 
 	return dba->dbp->get(dba->dbp, &gkey, &gval, 0) != RET_SUCCESS ? FAILURE : SUCCESS;
 }
 
 DBA_DELETE_FUNC(db1)
 {
-	dba_db1_data *dba = info->dbf;
-	DBT gkey;
-
-	gkey.data = ZSTR_VAL(key);
-	gkey.size = ZSTR_LEN(key);
+	DB1_DATA;
+	DB1_GKEY;
 
 	return dba->dbp->del(dba->dbp, &gkey, 0) != RET_SUCCESS ? FAILURE : SUCCESS;
 }
 
 DBA_FIRSTKEY_FUNC(db1)
 {
-	dba_db1_data *dba = info->dbf;
 	DBT gkey;
 	DBT gval;
+	DB1_DATA;
 
 	memset(&gkey, 0, sizeof(gkey));
 	memset(&gval, 0, sizeof(gval));
 
 	if (dba->dbp->seq(dba->dbp, &gkey, &gval, R_FIRST) == RET_SUCCESS) {
-		return zend_string_init(gkey.data, gkey.size, /* persistent */ false);
+		if (newlen) *newlen = gkey.size;
+		return estrndup(gkey.data, gkey.size);
 	}
 	return NULL;
 }
 
 DBA_NEXTKEY_FUNC(db1)
 {
-	dba_db1_data *dba = info->dbf;
 	DBT gkey;
 	DBT gval;
+	DB1_DATA;
 
 	memset(&gkey, 0, sizeof(gkey));
 	memset(&gval, 0, sizeof(gval));
 
 	if (dba->dbp->seq(dba->dbp, &gkey, &gval, R_NEXT) == RET_SUCCESS) {
-		return zend_string_init(gkey.data, gkey.size, /* persistent */ false);
+		if (newlen) *newlen = gkey.size;
+		return estrndup(gkey.data, gkey.size);
 	}
 	return NULL;
 }

@@ -1,7 +1,9 @@
 --TEST--
 Bug #50576 (XML_OPTION_SKIP_TAGSTART option has no effect)
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+require_once("skipif.inc");
+?>
 --FILE--
 <?php
 

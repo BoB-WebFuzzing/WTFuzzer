@@ -1,14 +1,16 @@
 --TEST--
 Bug #37090 (mysqli_set_charset return code)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
+if (!function_exists('mysqli_set_charset')) {
+    die('skip mysqli_set_charset() not available');
+}
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     $mysql = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
 

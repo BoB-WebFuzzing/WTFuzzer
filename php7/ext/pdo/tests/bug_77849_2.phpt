@@ -1,7 +1,9 @@
 --TEST--
 PDO Common: Bug #77849 (inconsistent state of cloned statament object)
---EXTENSIONS--
-pdo
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo')) die('skip');
+?>
 --FILE--
 <?php
 $stmt = new PDOStatement();

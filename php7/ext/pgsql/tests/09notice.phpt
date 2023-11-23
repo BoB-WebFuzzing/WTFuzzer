@@ -1,26 +1,24 @@
 --TEST--
 PostgreSQL notice function
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
 
-include("inc/skipif.inc");
+include("skipif.inc");
 
-_skip_lc_messages($conn);
+_skip_lc_messages();
 
 ?>
 --FILE--
 <?php
-include 'inc/config.inc';
-include 'inc/lcmess.inc';
+include 'config.inc';
+include 'lcmess.inc';
 
 ini_set('pgsql.log_notice', TRUE);
 ini_set('pgsql.ignore_notice', FALSE);
 
 $db = pg_connect($conn_str);
 
-_set_lc_messages($db);
+_set_lc_messages();
 
 $res = pg_query($db, 'SET client_min_messages TO NOTICE;');
 var_dump($res);
@@ -44,15 +42,10 @@ var_dump(pg_last_notice($db, PGSQL_NOTICE_LAST));
 var_dump(pg_last_notice($db, PGSQL_NOTICE_ALL));
 
 // Invalid option
-try {
-    var_dump(pg_last_notice($db, 99));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(pg_last_notice($db, 99));
 ?>
 --EXPECTF--
-object(PgSql\Result)#%d (0) {
-}
+resource(%d) of type (pgsql result)
 string(0) ""
 array(0) {
 }
@@ -75,4 +68,6 @@ bool(true)
 string(0) ""
 array(0) {
 }
-pg_last_notice(): Argument #2 ($mode) must be one of PGSQL_NOTICE_LAST, PGSQL_NOTICE_ALL, or PGSQL_NOTICE_CLEAR
+
+Warning: pg_last_notice(): Invalid option specified (99) in %s%e09notice.php on line %d
+bool(false)

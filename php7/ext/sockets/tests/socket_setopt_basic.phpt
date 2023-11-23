@@ -3,8 +3,12 @@ Test socket_setopt() basic functionality
 --CREDITS--
 Rodrigo Prado de Jesus <royopa [at] gmail [dot] com>
 User Group: PHPSP #PHPTestFestBrasil
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+if (!extension_loaded('sockets')) {
+    die('skip. Sockets extension is not available.');
+}
+?>
 --FILE--
 <?php
 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);

@@ -1,16 +1,16 @@
 --TEST--
-ReflectionMethod::__toString() tests (overridden method)
+ReflectionMethod::__toString() tests (overriden method)
 --FILE--
 <?php
 class Foo {
-    function func() {
-    }
+	function func() {
+	}
 }
 class Bar extends Foo {
-    function func() {
-    }
+	function func() {
+	}
 }
-$m = ReflectionMethod::createFromMethodName("Bar::func");
+$m = new ReflectionMethod("Bar::func");
 echo $m;
 ?>
 --EXPECTF--

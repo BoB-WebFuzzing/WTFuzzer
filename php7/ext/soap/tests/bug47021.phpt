@@ -2,12 +2,13 @@
 Bug #47021 SoapClient (SoapClient stumbles over WSDL delivered with "Transfer-Encoding: chunked")
 --INI--
 soap.wsdl_cache_enabled=0
---EXTENSIONS--
-soap
 --SKIPIF--
 <?php
-require __DIR__.'/../../standard/tests/http/server.inc';
-http_server_skipif();
+
+require 'skipif.inc';
+
+require __DIR__.'/../../standard/tests/http/server.inc'; http_server_skipif('tcp://127.0.0.1:12342');
+
 ?>
 --FILE--
 <?php
@@ -48,16 +49,16 @@ $responses = [
 ];
 
 
-['pid' => $pid, 'uri' => $uri] = http_server($responses);
+$pid = http_server('tcp://127.0.0.1:12342', $responses);
 
 $options = [
     'trace' => true,
-    'location' => $uri,
+    'location' => 'http://127.0.0.1:12342/',
 ];
 
 class BugSoapClient extends SoapClient
 {
-    public function __doRequest($request, $location, $action, $version, $one_way = null): ?string
+    public function __doRequest($request, $location, $action, $version, $one_way = null)
     {
         $response = parent::__doRequest($request, $location, $action, $version, $one_way);
 
@@ -67,12 +68,13 @@ class BugSoapClient extends SoapClient
     }
 }
 
-$client = new BugSoapClient($uri, $options);
+$client = new BugSoapClient('http://127.0.0.1:12342/', $options);
 
 var_dump(count($client->getItems()));
 
 http_server_kill($pid);
 
+?>
 --EXPECT--
 int(1291)
 int(10)

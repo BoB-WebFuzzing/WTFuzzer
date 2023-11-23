@@ -6,14 +6,15 @@ Stefan Koopmanschap <stefan@stefankoopmanschap.nl>
 --FILE--
 <?php
 function ReflectionParameterTest($test, $test2 = null) {
-    echo $test;
+	echo $test;
 }
 $reflect = new ReflectionFunction('ReflectionParameterTest');
 $params = $reflect->getParameters();
 foreach($params as $key => $value) {
-    echo $value->getDeclaringFunction() . "\n";
+	echo $value->getDeclaringFunction() . "\n";
 }
 ?>
+==DONE==
 --EXPECTF--
 Function [ <user> function ReflectionParameterTest ] {
   @@ %s.php %d - %d
@@ -32,3 +33,5 @@ Function [ <user> function ReflectionParameterTest ] {
     Parameter #1 [ <optional> $test2 = NULL ]
   }
 }
+
+==DONE==

@@ -1,7 +1,9 @@
 --TEST--
 Bug #36908 (wsdl default value overrides value in soap request)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php
+  if (!extension_loaded('soap')) die('skip soap extension not available');
+?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--

@@ -1,17 +1,17 @@
 --TEST--
 mysqli_stmt_get_result - data types
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-    require_once 'skipifconnectfailure.inc';
+    require_once('skipif.inc');
+    require_once('skipifemb.inc');
+    require_once('skipifconnectfailure.inc');
 
     if (!function_exists('mysqli_stmt_get_result'))
         die("skip mysqli_stmt_get_result() not available");
 ?>
 --FILE--
 <?php
-    require 'connect.inc';
+    require('connect.inc');
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
         printf("[001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
@@ -164,7 +164,7 @@ mysqli
     func_mysqli_stmt_get_result($link, $engine, "d", "FLOAT UNSIGNED", 18446744073709551615 + 1.1, 640);
     func_mysqli_stmt_get_result($link, $engine, "d", "FLOAT UNSIGNED ", NULL, 660);
 
-    // Yes, we need the temporary variable. The PHP casting will foul us otherwise.
+    // Yes, we need the temporary variable. The PHP casting will fouls us otherwise.
     $tmp = strval('-99999999.99');
     func_mysqli_stmt_get_result($link, $engine, "d", "DOUBLE(10,2)", $tmp, 680, "string");
     func_mysqli_stmt_get_result($link, $engine, "d", "DOUBLE(10,2)", NULL, 700);
@@ -251,7 +251,7 @@ mysqli
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 done!

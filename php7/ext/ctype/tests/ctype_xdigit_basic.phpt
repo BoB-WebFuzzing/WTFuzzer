@@ -1,9 +1,14 @@
 --TEST--
 Test ctype_xdigit() function : basic functionality
---EXTENSIONS--
-ctype
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
+/* Prototype  : bool ctype_xdigit(mixed $c)
+ * Description: Checks for character(s) representing a hexadecimal digit
+ * Source code: ext/ctype/ctype.c
+ */
+
 echo "*** Testing ctype_xdigit() : basic functionality ***\n";
 $orig = setlocale(LC_CTYPE, "C");
 
@@ -15,7 +20,9 @@ var_dump(ctype_xdigit($c2));
 
 setlocale(LC_CTYPE, $orig);
 ?>
+===DONE===
 --EXPECT--
 *** Testing ctype_xdigit() : basic functionality ***
 bool(true)
 bool(false)
+===DONE===

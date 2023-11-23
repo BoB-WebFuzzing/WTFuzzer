@@ -1,7 +1,7 @@
 --TEST--
 libxml_use_internal_errors() memory leaks
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded('simplexml')) die('skip'); ?>
 --FILE--
 <?php
 var_dump(libxml_use_internal_errors(true));

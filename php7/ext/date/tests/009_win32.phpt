@@ -14,6 +14,8 @@ setlocale(LC_TIME, "en-us");
 
 $t = mktime(0,0,0, 6, 27, 2006);
 
+var_dump(strftime());
+
 var_dump(strftime(""));
 
 var_dump(strftime("%a %A %b %B %c %d %H %I %j %m %M %p %S %U %W %w %x %X %y %Y %Z %z %%", $t));
@@ -21,6 +23,8 @@ var_dump(strftime("%a %A %b %B %c %d %H %I %j %m %M %p %S %U %W %w %x %X %y %Y %
 var_dump(strftime("%%q %%a", $t));
 
 var_dump(strftime("blah", $t));
+
+var_dump(gmstrftime());
 
 var_dump(gmstrftime(""));
 
@@ -35,27 +39,17 @@ echo "Done\n";
 setlocale(LC_TIME, $loc);
 ?>
 --EXPECTF--
-Deprecated: Function strftime() is deprecated in %s on line %d
+Warning: strftime() expects at least 1 parameter, 0 given in %s on line %d
 bool(false)
-
-Deprecated: Function strftime() is deprecated in %s on line %d
+bool(false)
 string(%d) "Tue Tuesday Jun June 6/27/2006 12:00:00 AM 27 00 12 178 06 00 AM 00 26 26 2 6/27/2006 12:00:00 AM 06 2006 %s"
-
-Deprecated: Function strftime() is deprecated in %s on line %d
 string(5) "%q %a"
-
-Deprecated: Function strftime() is deprecated in %s on line %d
 string(4) "blah"
 
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
+Warning: gmstrftime() expects at least 1 parameter, 0 given in %s on line %d
 bool(false)
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
+bool(false)
 string(%d) "Mon Monday Jun June 6/26/2006 9:00:00 PM 26 21 09 177 06 00 PM 00 26 26 1 6/26/2006 9:00:00 PM 06 2006 %s"
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
 string(5) "%q %a"
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
 string(4) "blah"
 Done

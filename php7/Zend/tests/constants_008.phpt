@@ -8,10 +8,10 @@ const a = 1;
 
 
 if (defined('a')) {
-    print a;
+	print a;
 }
 
 ?>
 --EXPECTF--
-Warning: Constant a already defined in %s on line %d
+Notice: Constant a already defined in %s on line %d
 2

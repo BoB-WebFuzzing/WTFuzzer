@@ -1,8 +1,10 @@
 --TEST--
 Bug #70091 (Phar does not mark UTF-8 filenames in ZIP archives)
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded('phar')) die('skip phar extension not available');
+if (!extension_loaded('zlib')) die('skip zlib extension not available');
+?>
 --FILE--
 <?php
 $phar = new PharData(__DIR__ . '/bug70091.zip');

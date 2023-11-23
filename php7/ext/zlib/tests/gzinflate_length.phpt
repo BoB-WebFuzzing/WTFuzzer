@@ -1,7 +1,7 @@
 --TEST--
 gzinflate() and $length argument
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) print "skip"; ?>
 --FILE--
 <?php
 $original = 'aaaaaaaaaaaaaaa';

@@ -1,15 +1,11 @@
 --TEST--
 Bind with various unsupported bind types
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // These types are defined in oci8.c
 
@@ -35,6 +31,8 @@ foreach ($types as $t => $v) {
 }
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 Test - SQLT_AVC
 
@@ -57,3 +55,4 @@ Warning: oci_bind_by_name(): Unknown or unsupported datatype given: 68 in %sbind
 Test - SQLT_ODT
 
 Warning: oci_bind_by_name(): Unknown or unsupported datatype given: 156 in %sbind_unsupported_1.php on line %d
+===DONE===

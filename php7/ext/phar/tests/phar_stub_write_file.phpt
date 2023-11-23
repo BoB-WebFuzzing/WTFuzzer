@@ -1,7 +1,7 @@
 --TEST--
 Phar::setStub()/getStub() from file
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -42,17 +42,16 @@ var_dump($phar->getStub() == $stub);
 var_dump($phar->getStub() == $sexp);
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.php');
 __HALT_COMPILER();
 ?>
---EXPECTF--
+--EXPECT--
 string(48) "<?php echo "first stub\n"; __HALT_COMPILER(); ?>"
 string(48) "<?php echo "first stub\n"; __HALT_COMPILER(); ?>"
 bool(true)
-
-Deprecated: Calling Phar::setStub(resource $stub, int $length) is deprecated in %s on line %d
 string(51) "<?php echo "second stub\n"; __HALT_COMPILER(); ?>
 "
 bool(false)
@@ -63,3 +62,4 @@ bool(false)
 bool(true)
 bool(false)
 bool(true)
+===DONE===

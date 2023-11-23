@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML [profile]: Accessing a namespaced attribute
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 error_reporting(E_ALL & ~E_NOTICE);

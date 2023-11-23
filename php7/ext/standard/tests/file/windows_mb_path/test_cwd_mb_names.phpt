@@ -39,9 +39,11 @@ chdir($oldcwd);
 remove_data("dir_mb");
 
 ?>
+===DONE===
 --EXPECTF--
 Active code page: 65001
 bool(true)
 string(%d) "%s\テストマルチバイト・パス42"
 bool(true)
 Active code page: %d
+===DONE===

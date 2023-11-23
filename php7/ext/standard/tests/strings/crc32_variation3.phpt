@@ -7,6 +7,12 @@ if (PHP_INT_SIZE != 4)
 ?>
 --FILE--
 <?php
+/* Prototype  : string crc32(string $str)
+ * Description: Calculate the crc32 polynomial of a string
+ * Source code: ext/standard/crc32.c
+ * Alias to functions: none
+*/
+
 /*
  * Testing crc32() : with different strings in double quotes passed to the function
 */
@@ -71,9 +77,9 @@ echo "Done";
 --EXPECTF--
 *** Testing crc32() : with different strings in double quotes ***
 
-Warning: Undefined variable $hello in %s on line %d
+Notice: Undefined variable: hello in %s on line %d
 
-Warning: Undefined variable $world in %s on line %d
+Notice: Undefined variable: world in %s on line %d
 
 -- Iteration 1 --
 int(0)

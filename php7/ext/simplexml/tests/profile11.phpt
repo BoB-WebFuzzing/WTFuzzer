@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML [profile]: Accessing two elements with the same name, but different namespaces
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 error_reporting(E_ALL & ~E_NOTICE);
@@ -18,6 +18,7 @@ var_dump((string)$root->children('reserved-ns')->child);
 var_dump((string)$root->children('special-ns')->child);
 var_dump($root->child);
 ?>
+===DONE===
 --EXPECTF--
 object(SimpleXMLElement)#%d (1) {
   [0]=>
@@ -31,3 +32,4 @@ string(5) "Hello"
 string(5) "World"
 object(SimpleXMLElement)#%d (0) {
 }
+===DONE=== 

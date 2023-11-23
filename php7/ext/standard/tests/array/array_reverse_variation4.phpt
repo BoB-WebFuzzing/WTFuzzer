@@ -2,6 +2,11 @@
 Test array_reverse() function : usage variations - assoc. array with diff. keys for 'array' argument
 --FILE--
 <?php
+/* Prototype  : array array_reverse(array $array [, bool $preserve_keys])
+ * Description: Return input as a new array with the order of the entries reversed
+ * Source code: ext/standard/array.c
+*/
+
 /*
  * Testing the functionality of array_reverse() by giving associative arrays with different
  * keys for $array argument
@@ -39,16 +44,20 @@ $arrays = array (
        array(1 => "1"),
        array(1 => "1", 2 => "2", 3 => "3", 4 => "4"),
 
+       // arrays with float keys
+/*5*/  array(2.3333 => "float"),
+       array(1.2 => "f1", 3.33 => "f2", 4.89999922839999 => "f3", 33333333.333333 => "f4"),
+
        // arrays with string keys
        array("\tHello" => 111, "re\td" => "color", "\v\fworld" => 2.2, "pen\n" => 33),
 /*8*/  array("\tHello" => 111, "re\td" => "color", "\v\fworld" => 2.2, "pen\n" => 33),
        array("hello", $heredoc => "string"), // heredoc
 
        // array with object, unset variable and resource variable
-       array(@$unset_var => "hello", $fp => 'resource'),
+       array(new classA() => 11, @$unset_var => "hello", $fp => 'resource'),
 
        // array with mixed values
-/*11*/ array('hello' => 1, "fruit" => 2.2, $fp => 'resource', 133 => "int", @$unset_var => "unset", $heredoc => "heredoc")
+/*11*/ array('hello' => 1, new classA() => 2, "fruit" => 2.2, $fp => 'resource', 133 => "int", 444.432 => "float", @$unset_var => "unset", $heredoc => "heredoc")
 );
 
 // loop through the various elements of $arrays to test array_reverse()
@@ -74,9 +83,13 @@ echo "Done";
 --EXPECTF--
 *** Testing array_reverse() : usage variations ***
 
-Warning: Resource ID#%d used as offset, casting to integer (%d) in %s on line %d
+Warning: Illegal offset type in %s on line %d
 
-Warning: Resource ID#%d used as offset, casting to integer (%d) in %s on line %d
+Notice: Resource ID#%d used as offset, casting to integer (%d) in %s on line %d
+
+Warning: Illegal offset type in %s on line %d
+
+Notice: Resource ID#%d used as offset, casting to integer (%d) in %s on line %d
 -- Iteration 1 --
 - default argument -
 array(0) {
@@ -155,44 +168,57 @@ array(4) {
 }
 -- Iteration 5 --
 - default argument -
-array(4) {
-  ["pen
-"]=>
-  int(33)
-  ["world"]=>
-  float(2.2)
-  ["re	d"]=>
-  string(5) "color"
-  ["	Hello"]=>
-  int(111)
+array(1) {
+  [0]=>
+  string(5) "float"
 }
 - $preserve keys = true -
-array(4) {
-  ["pen
-"]=>
-  int(33)
-  ["world"]=>
-  float(2.2)
-  ["re	d"]=>
-  string(5) "color"
-  ["	Hello"]=>
-  int(111)
+array(1) {
+  [2]=>
+  string(5) "float"
 }
 - $preserve_keys = false -
-array(4) {
-  ["pen
-"]=>
-  int(33)
-  ["world"]=>
-  float(2.2)
-  ["re	d"]=>
-  string(5) "color"
-  ["	Hello"]=>
-  int(111)
+array(1) {
+  [0]=>
+  string(5) "float"
 }
 -- Iteration 6 --
 - default argument -
 array(4) {
+  [0]=>
+  string(2) "f4"
+  [1]=>
+  string(2) "f3"
+  [2]=>
+  string(2) "f2"
+  [3]=>
+  string(2) "f1"
+}
+- $preserve keys = true -
+array(4) {
+  [33333333]=>
+  string(2) "f4"
+  [4]=>
+  string(2) "f3"
+  [3]=>
+  string(2) "f2"
+  [1]=>
+  string(2) "f1"
+}
+- $preserve_keys = false -
+array(4) {
+  [0]=>
+  string(2) "f4"
+  [1]=>
+  string(2) "f3"
+  [2]=>
+  string(2) "f2"
+  [3]=>
+  string(2) "f1"
+}
+-- Iteration 7 --
+- default argument -
+array(4) {
   ["pen
 "]=>
   int(33)
@@ -227,7 +253,44 @@ array(4) {
   ["	Hello"]=>
   int(111)
 }
--- Iteration 7 --
+-- Iteration 8 --
+- default argument -
+array(4) {
+  ["pen
+"]=>
+  int(33)
+  ["world"]=>
+  float(2.2)
+  ["re	d"]=>
+  string(5) "color"
+  ["	Hello"]=>
+  int(111)
+}
+- $preserve keys = true -
+array(4) {
+  ["pen
+"]=>
+  int(33)
+  ["world"]=>
+  float(2.2)
+  ["re	d"]=>
+  string(5) "color"
+  ["	Hello"]=>
+  int(111)
+}
+- $preserve_keys = false -
+array(4) {
+  ["pen
+"]=>
+  int(33)
+  ["world"]=>
+  float(2.2)
+  ["re	d"]=>
+  string(5) "color"
+  ["	Hello"]=>
+  int(111)
+}
+-- Iteration 9 --
 - default argument -
 array(2) {
   ["Hello world"]=>
@@ -249,7 +312,7 @@ array(2) {
   [0]=>
   string(5) "hello"
 }
--- Iteration 8 --
+-- Iteration 10 --
 - default argument -
 array(2) {
   [0]=>
@@ -271,16 +334,18 @@ array(2) {
   [""]=>
   string(5) "hello"
 }
--- Iteration 9 --
+-- Iteration 11 --
 - default argument -
-array(6) {
+array(7) {
   ["Hello world"]=>
   string(7) "heredoc"
   [""]=>
   string(5) "unset"
   [0]=>
-  string(3) "int"
+  string(5) "float"
   [1]=>
+  string(3) "int"
+  [2]=>
   string(8) "resource"
   ["fruit"]=>
   float(2.2)
@@ -288,11 +353,13 @@ array(6) {
   int(1)
 }
 - $preserve keys = true -
-array(6) {
+array(7) {
   ["Hello world"]=>
   string(7) "heredoc"
   [""]=>
   string(5) "unset"
+  [444]=>
+  string(5) "float"
   [133]=>
   string(3) "int"
   [5]=>
@@ -303,14 +370,16 @@ array(6) {
   int(1)
 }
 - $preserve_keys = false -
-array(6) {
+array(7) {
   ["Hello world"]=>
   string(7) "heredoc"
   [""]=>
   string(5) "unset"
   [0]=>
-  string(3) "int"
+  string(5) "float"
   [1]=>
+  string(3) "int"
+  [2]=>
   string(8) "resource"
   ["fruit"]=>
   float(2.2)

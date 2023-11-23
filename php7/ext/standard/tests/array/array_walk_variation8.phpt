@@ -2,6 +2,11 @@
 Test array_walk() function : usage variations - buit-in function as callback
 --FILE--
 <?php
+/* Prototype  : bool array_walk(array $input, string $funcname [, mixed $userdata])
+ * Description: Apply a user function to every member of an array
+ * Source code: ext/standard/array.c
+*/
+
 /*
  * Passing different buit-in functionns as callback function
  *    pow function
@@ -20,20 +25,18 @@ echo "-- With 'min' built-in function --\n";
 var_dump( array_walk($input, "min"));
 
 echo "-- With 'echo' language construct --\n";
-try {
-    var_dump( array_walk($input, "echo"));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump( array_walk($input, "echo"));
 
 echo "Done"
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing array_walk() : built-in function as callback ***
 -- With 'pow' built-in function --
 bool(true)
 -- With 'min' built-in function --
 bool(true)
 -- With 'echo' language construct --
-array_walk(): Argument #2 ($callback) must be a valid callback, function "echo" not found or invalid function name
+
+Warning: array_walk() expects parameter 2 to be a valid callback, function 'echo' not found or invalid function name in %s on line %d
+NULL
 Done

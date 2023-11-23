@@ -14,8 +14,8 @@ var_dump($fn());
 
 ?>
 --EXPECTF--
-Warning: Undefined variable $a in %s on line %d
+Notice: Undefined variable: a in %s on line %d
 NULL
 
-Warning: Undefined variable $5 in %s on line %d
+Notice: Undefined variable: 5 in %s on line %d
 NULL

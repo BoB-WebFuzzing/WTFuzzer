@@ -5,12 +5,12 @@ Bug #37667 (Object is not added into array returned by __get)
 
 class Test
 {
-    protected $property = array('foo' => 'bar');
+	protected $property = array('foo' => 'bar');
 
-    function __get($name)
-    {
-        return $this->property;
-    }
+	function __get($name)
+	{
+		return $this->property;
+	}
 }
 
 $obj = new Test;
@@ -26,10 +26,11 @@ $obj->property[] = 2;
 var_dump($obj);
 
 ?>
+===DONE===
 --EXPECTF--
 string(3) "bar"
 
-Warning: Undefined array key 2 in %s on line %d
+Notice: Undefined offset: 2 in %sbug37667.php on line 16
 NULL
 object(Test)#%d (1) {
   ["property":protected]=>
@@ -49,3 +50,4 @@ object(Test)#%d (1) {
     string(3) "bar"
   }
 }
+===DONE===

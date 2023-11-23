@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -19,7 +21,9 @@
 
 #include "TSRM.h"
 #include <windows.h>
-#include <sys/utime.h>
+#if HAVE_UTIME
+# include <sys/utime.h>
+#endif
 #include "win32/ipc.h"
 
 struct ipc_perm {
@@ -50,6 +54,7 @@ typedef struct {
 
 typedef struct {
 	void	*addr;
+	HANDLE	info;
 	HANDLE	segment;
 	struct	shmid_ds	*descriptor;
 } shm_pair;
@@ -88,12 +93,12 @@ TSRMLS_CACHE_EXTERN()
 #define	SHM_RND		FILE_MAP_WRITE
 #define	SHM_REMAP	FILE_MAP_COPY
 
-const char * tsrm_win32_get_path_sid_key(const char *pathname, size_t pathname_len, size_t *key_len);
+char * tsrm_win32_get_path_sid_key(const char *pathname, size_t pathname_len, size_t *key_len);
 
 TSRM_API void tsrm_win32_startup(void);
 TSRM_API void tsrm_win32_shutdown(void);
 
-TSRM_API FILE *popen_ex(const char *command, const char *type, const char *cwd, const char *env);
+TSRM_API FILE *popen_ex(const char *command, const char *type, const char *cwd, char *env);
 TSRM_API FILE *popen(const char *command, const char *type);
 TSRM_API int pclose(FILE *stream);
 TSRM_API int tsrm_win32_access(const char *pathname, int mode);

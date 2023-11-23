@@ -1,14 +1,13 @@
 --TEST--
 mysqli_stmt_result_metadata
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     /*** test mysqli_connect 127.0.0.1 ***/
     $link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket);
@@ -41,6 +40,7 @@ require_once 'skipifconnectfailure.inc';
 
     var_dump(mysqli_stmt_execute($stmt));
     var_dump($stmt = @mysqli_prepare($link, "SELECT * FROM test_store_result"), mysqli_error($link));
+    var_dump(mysqli_stmt_reset($stmt));
 
     $stmt = mysqli_prepare($link, "SELECT * FROM test_store_result");
     mysqli_stmt_execute($stmt);
@@ -64,7 +64,7 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-require_once 'connect.inc';
+require_once("connect.inc");
 if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
    printf("[c001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 
@@ -102,6 +102,9 @@ object(mysqli_stmt)#%d (%d) {
 bool(true)
 bool(false)
 string(0) ""
+
+Warning: mysqli_stmt_reset() expects parameter 1 to be mysqli_stmt, bool given in %s on line %d
+NULL
 Rows: 3
 array(1) {
   [0]=>

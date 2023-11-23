@@ -3,8 +3,12 @@ Test if socket_set_option() works, option:SO_RCVTIMEO
 --DESCRIPTION--
 -wrong params
 -set/get params comparison
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+if (!extension_loaded('sockets')) {
+        die('SKIP sockets extension not available.');
+}
+?>
 --FILE--
 <?php
 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -14,11 +18,7 @@ if (!$socket) {
 socket_set_block($socket);
 
 //wrong params
-try {
-    $retval_1 = socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, []);
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+$retval_1 = socket_set_option( $socket, SOL_SOCKET, SO_RCVTIMEO, array());
 
 //set/get comparison
 $options = array("sec" => 1, "usec" => 0);
@@ -29,7 +29,10 @@ var_dump($retval_2);
 var_dump($retval_3 === $options);
 socket_close($socket);
 ?>
---EXPECT--
-socket_set_option(): Argument #4 ($value) must have key "sec"
+--EXPECTF--
+Warning: socket_set_option(): no key "sec" passed in optval in %s on line %d
 bool(true)
 bool(true)
+--CREDITS--
+Moritz Neuhaeuser, info@xcompile.net
+PHP Testfest Berlin 2009-05-10

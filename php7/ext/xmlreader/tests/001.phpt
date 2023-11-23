@@ -1,7 +1,7 @@
 --TEST--
 XMLReader: libxml2 XML Reader, string data
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -13,19 +13,16 @@ $reader->XML($xmlstring);
 
 // Only go through
 while ($reader->read()) {
-    echo $reader->name."\n";
+	echo $reader->name."\n";
 }
 $xmlstring = '';
 $reader = new XMLReader();
-
-try {
-    $reader->XML($xmlstring);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
+$reader->XML($xmlstring);
 ?>
---EXPECT--
+===DONE===
+--EXPECTF--
 books
 books
-XMLReader::XML(): Argument #1 ($source) cannot be empty
+
+Warning: XMLReader::XML(): Empty string supplied as input in %s on line %d
+===DONE===

@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -48,7 +50,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char *rcsid = "$OpenBSD: strlcat.c,v 1.17 2016/10/14 18:19:04 dtucker Exp $";
+static char *rcsid = "$OpenBSD: strlcat.c,v 1.17 2016/10/14 18:19:04 dtucker Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/types.h>
@@ -61,7 +63,10 @@ static const char *rcsid = "$OpenBSD: strlcat.c,v 1.17 2016/10/14 18:19:04 dtuck
  * Returns strlen(src) + MIN(siz, strlen(initial dst).
  * If retval >= siz, truncation occurred.
  */
-PHPAPI size_t php_strlcat(char *dst, const char *src, size_t siz)
+PHPAPI size_t php_strlcat(dst, src, siz)
+	char *dst;
+	const char *src;
+	size_t siz;
 {
 	const char *d = dst;
 	const char *s = src;

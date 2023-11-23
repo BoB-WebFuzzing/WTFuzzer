@@ -3,8 +3,8 @@ Bug #79412 (Opcache chokes and uses 100% CPU on specific script)
 --INI--
 opcache.enable=1
 opcache.optimization_level=-1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $limitPerRun = 10;
@@ -20,6 +20,6 @@ foreach ($foo as $bar) {
 }
 ?>
 --EXPECTF--
-Warning: Undefined variable $foo in %s on line %d
+Notice: Undefined variable: foo in %s on line %d
 
-Warning: foreach() argument must be of type array|object, null given in %s on line %d
+Warning: Invalid argument supplied for foreach() in %s on line %d

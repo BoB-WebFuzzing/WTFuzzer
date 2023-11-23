@@ -1,16 +1,13 @@
 --TEST--
 Bug #41442 (imagegd2() under output control)
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
-    if (!GD_BUNDLED && version_compare(GD_VERSION, '2.3.3', '>=')) {
-        die("skip test requires GD 2.3.2 or older");
-    }
-
-    if (!function_exists("imagegd2")) {
-        die("skip GD2 support unavailable");
-    }
+	if (!extension_loaded('gd')) {
+		die("skip gd extension not available.");
+	}
+	if (!function_exists("imagegd2")) {
+		die("skip GD2 support unavailable");
+	}
 ?>
 --FILE--
 <?php
@@ -34,9 +31,7 @@ var_dump(imagecreatefromstring($str2));
 
 echo "Done\n";
 ?>
---EXPECT--
-object(GdImage)#2 (0) {
-}
-object(GdImage)#2 (0) {
-}
+--EXPECTF--
+resource(%d) of type (gd)
+resource(%d) of type (gd)
 Done

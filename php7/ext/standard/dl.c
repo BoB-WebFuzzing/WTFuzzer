@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -24,7 +26,7 @@
 
 #include "SAPI.h"
 
-#ifdef HAVE_LIBDL
+#if defined(HAVE_LIBDL)
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -38,7 +40,8 @@
 #endif
 #endif /* defined(HAVE_LIBDL) */
 
-/* {{{ Load a PHP extension at runtime */
+/* {{{ proto int dl(string extension_filename)
+   Load a PHP extension at runtime */
 PHPAPI PHP_FUNCTION(dl)
 {
 	char *filename;
@@ -54,33 +57,22 @@ PHPAPI PHP_FUNCTION(dl)
 	}
 
 	if (filename_len >= MAXPATHLEN) {
-		php_error_docref(NULL, E_WARNING, "Filename exceeds the maximum allowed length of %d characters", MAXPATHLEN);
+		php_error_docref(NULL, E_WARNING, "File name exceeds the maximum allowed length of %d characters", MAXPATHLEN);
 		RETURN_FALSE;
 	}
-
-#if ZEND_RC_DEBUG
-	bool orig_rc_debug = zend_rc_debug;
-	/* FIXME: Loading extensions during the request breaks some invariants. In
-	 * particular, it will create persistent interned strings, which is not
-	 * allowed at this stage. */
-	zend_rc_debug = false;
-#endif
 
 	php_dl(filename, MODULE_TEMPORARY, return_value, 0);
 	if (Z_TYPE_P(return_value) == IS_TRUE) {
 		EG(full_tables_cleanup) = 1;
 	}
-
-#if ZEND_RC_DEBUG
-	zend_rc_debug = orig_rc_debug;
-#endif
 }
 /* }}} */
 
-#ifdef HAVE_LIBDL
+#if defined(HAVE_LIBDL)
 
-/* {{{ php_load_shlib */
-PHPAPI void *php_load_shlib(const char *path, char **errp)
+/* {{{ php_load_shlib
+ */
+PHPAPI void *php_load_shlib(char *path, char **errp)
 {
 	void *handle;
 	char *err;
@@ -106,8 +98,9 @@ PHPAPI void *php_load_shlib(const char *path, char **errp)
 }
 /* }}} */
 
-/* {{{ php_load_extension */
-PHPAPI int php_load_extension(const char *filename, int type, int start_now)
+/* {{{ php_load_extension
+ */
+PHPAPI int php_load_extension(char *filename, int type, int start_now)
 {
 	void *handle;
 	char *libpath;
@@ -173,16 +166,18 @@ PHPAPI int php_load_extension(const char *filename, int type, int start_now)
 		efree(orig_libpath);
 		efree(err1);
 	}
-	efree(libpath);
 
 #ifdef PHP_WIN32
-	if (!php_win32_image_compatible(handle, &err1)) {
+	if (!php_win32_image_compatible(libpath, &err1)) {
 			php_error_docref(NULL, error_type, err1);
 			efree(err1);
+			efree(libpath);
 			DL_UNLOAD(handle);
 			return FAILURE;
 	}
 #endif
+
+	efree(libpath);
 
 	get_module = (zend_module_entry *(*)(void)) DL_FETCH_SYMBOL(handle, "get_module");
 
@@ -205,11 +200,6 @@ PHPAPI int php_load_extension(const char *filename, int type, int start_now)
 		return FAILURE;
 	}
 	module_entry = get_module();
-	if (zend_hash_str_exists(&module_registry, module_entry->name, strlen(module_entry->name))) {
-		zend_error(E_CORE_WARNING, "Module \"%s\" is already loaded", module_entry->name);
-		DL_UNLOAD(handle);
-		return FAILURE;
-	}
 	if (module_entry->zend_api != ZEND_MODULE_API_NO) {
 			php_error_docref(NULL, error_type,
 					"%s: Unable to initialize module\n"
@@ -230,13 +220,14 @@ PHPAPI int php_load_extension(const char *filename, int type, int start_now)
 		DL_UNLOAD(handle);
 		return FAILURE;
 	}
+	module_entry->type = type;
+	module_entry->module_number = zend_next_free_module();
+	module_entry->handle = handle;
 
-	if ((module_entry = zend_register_module_ex(module_entry, type)) == NULL) {
+	if ((module_entry = zend_register_module_ex(module_entry)) == NULL) {
 		DL_UNLOAD(handle);
 		return FAILURE;
 	}
-
-	module_entry->handle = handle;
 
 	if ((type == MODULE_TEMPORARY || start_now) && zend_startup_module_ex(module_entry) == FAILURE) {
 		DL_UNLOAD(handle);
@@ -254,31 +245,9 @@ PHPAPI int php_load_extension(const char *filename, int type, int start_now)
 }
 /* }}} */
 
-#else
-
-static void php_dl_error(const char *filename)
-{
-	php_error_docref(NULL, E_WARNING, "Cannot dynamically load %s - dynamic modules are not supported", filename);
-}
-
-PHPAPI void *php_load_shlib(const char *path, char **errp)
-{
-	php_dl_error(path);
-	(*errp) = estrdup("No DL support");
-	return NULL;
-}
-
-PHPAPI int php_load_extension(const char *filename, int type, int start_now)
-{
-	php_dl_error(filename);
-
-	return FAILURE;
-}
-
-#endif
-
-/* {{{ php_dl */
-PHPAPI void php_dl(const char *file, int type, zval *return_value, int start_now)
+/* {{{ php_dl
+ */
+PHPAPI void php_dl(char *file, int type, zval *return_value, int start_now)
 {
 	/* Load extension */
 	if (php_load_extension(file, type, start_now) == FAILURE) {
@@ -291,10 +260,20 @@ PHPAPI void php_dl(const char *file, int type, zval *return_value, int start_now
 
 PHP_MINFO_FUNCTION(dl)
 {
-#if defined(HAVE_LIBDL)
-#define PHP_DL_SUPPORT_STATUS "enabled"
-#else
-#define PHP_DL_SUPPORT_STATUS "unavailable"
-#endif
-	php_info_print_table_row(2, "Dynamic Library Support", PHP_DL_SUPPORT_STATUS);
+	php_info_print_table_row(2, "Dynamic Library Support", "enabled");
 }
+
+#else
+
+PHPAPI void php_dl(char *file, int type, zval *return_value, int start_now)
+{
+	php_error_docref(NULL, E_WARNING, "Cannot dynamically load %s - dynamic modules are not supported", file);
+	RETVAL_FALSE;
+}
+
+PHP_MINFO_FUNCTION(dl)
+{
+	PUTS("Dynamic Library support not available<br />.\n");
+}
+
+#endif

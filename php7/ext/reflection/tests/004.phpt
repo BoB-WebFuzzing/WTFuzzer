@@ -4,8 +4,8 @@ ReflectionMethod::invoke() with non object or null value
 <?php
 
 class a {
-    function __construct(){
-    }
+	function a(){
+	}
 }
 class b {
 }
@@ -13,7 +13,7 @@ class b {
 $b = new b();
 
 $a=new ReflectionClass("a");
-$m=$a->getMethod("__construct");
+$m=$a->getMethod("a");
 
 try {
         $m->invoke(null);
@@ -35,7 +35,9 @@ try {
         echo $E->getMessage()."\n";
 }
 
-?>
---EXPECT--
-Trying to invoke non static method a::__construct() without an object
+echo "===DONE===\n";?>
+--EXPECTF--
+Deprecated: Methods with the same name as their class will not be constructors in a future version of PHP; a has a deprecated constructor in %s on line %d
+Trying to invoke non static method a::a() without an object
 Given object is not an instance of the class this method was declared in
+===DONE===

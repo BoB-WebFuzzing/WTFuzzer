@@ -1,7 +1,7 @@
 --TEST--
 Phar::mapPhar no __HALT_COMPILER();
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip");?>
 --FILE--
 <?php
 try {

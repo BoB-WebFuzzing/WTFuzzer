@@ -1,12 +1,12 @@
 --TEST--
 tidy_doc object overloading
---EXTENSIONS--
-tidy
+--SKIPIF--
+<?php if (!extension_loaded("tidy")) print "skip"; ?>
 --FILE--
 <?php
 
     $a = tidy_parse_string("<HTML></HTML>");
-    echo $a;
+	echo $a;
 
 ?>
 --EXPECT--

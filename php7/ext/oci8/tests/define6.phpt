@@ -1,17 +1,14 @@
 --TEST--
 oci_define_by_name tests with REF CURSORs
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Initialization
 
@@ -122,6 +119,8 @@ $stmtarray = array(
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 Test 1 - define last
 NULL
@@ -136,3 +135,4 @@ string(1) "1"
 Test 6 - fetch on wrong handle
 
 Warning: oci_fetch_row(): ORA-24374: %s in %sdefine6.php on line %d
+===DONE===

@@ -10,19 +10,28 @@ $arrayIterator = new ArrayIterator($array);
 
 try {
   $limitIterator = new LimitIterator($arrayIterator, -1);
-} catch (\ValueError $e){
+} catch (OutOfRangeException $e){
   print $e->getMessage(). "\n";
 }
 
+
 try {
   $limitIterator = new LimitIterator($arrayIterator, 0, -2);
-} catch (\ValueError $e){
+} catch (OutOfRangeException $e){
   print $e->getMessage() . "\n";
 }
 
-$limitIterator = new LimitIterator($arrayIterator, 0, -1);
+try {
+  $limitIterator = new LimitIterator($arrayIterator, 0, -1);
+} catch (OutOfRangeException $e){
+  print $e->getMessage() . "\n";
+}
+
+
 
 ?>
+===DONE===
 --EXPECT--
-LimitIterator::__construct(): Argument #2 ($offset) must be greater than or equal to 0
-LimitIterator::__construct(): Argument #3 ($limit) must be greater than or equal to -1
+Parameter offset must be >= 0
+Parameter count must either be -1 or a value greater than or equal 0
+===DONE===

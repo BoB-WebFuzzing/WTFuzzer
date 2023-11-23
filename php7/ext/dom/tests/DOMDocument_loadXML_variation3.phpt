@@ -9,8 +9,10 @@ Environment variables used in the test:
 - EXPECTED_RESULT: the expected result
 --CREDITS--
 Antonio Diaz Ruiz <dejalatele@gmail.com>
---EXTENSIONS--
-dom
+--INI--
+assert.bail=true
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --ENV--
 XML_FILE=/wrong_book_with_dtd.xml
 LOAD_OPTIONS=LIBXML_DTDVALID | LIBXML_NOERROR

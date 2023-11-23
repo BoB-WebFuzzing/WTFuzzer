@@ -1,7 +1,7 @@
 --TEST--
 Test 1: Accessing single node
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require_once("dom_test.inc");
@@ -113,7 +113,8 @@ Node Content: Title
 Node Name: #text
 Node Type: 3
 Num Children: 0
-Node Content:
+Node Content: 
+
 
 Node Name: para
 Node Type: 1
@@ -122,13 +123,15 @@ Num Children: 7
 Node Name: #text
 Node Type: 3
 Num Children: 0
-Node Content:
+Node Content: 
+
 
 --------- last
 Node Name: #text
 Node Type: 3
 Num Children: 0
-Node Content:
+Node Content: 
+
 
 --------- parent
 Node Name: chapter
@@ -144,7 +147,8 @@ Node Content: Title
 Node Name: #text
 Node Type: 3
 Num Children: 0
-Node Content:
+Node Content: 
+
 
 Node Name: para
 Node Type: 1
@@ -153,7 +157,8 @@ Num Children: 7
 Node Name: #text
 Node Type: 3
 Num Children: 0
-Node Content:
+Node Content: 
+
 
 --------- creating a new attribute
 picture.gif
@@ -231,7 +236,8 @@ Node Content: Title
 Node Name: #text
 Node Type: 3
 Num Children: 0
-Node Content:
+Node Content: 
+
 
 Node Name: para
 Node Type: 1
@@ -240,7 +246,8 @@ Num Children: 7
 Node Name: #text
 Node Type: 3
 Num Children: 0
-Node Content:
+Node Content: 
+
 
 <?xml version="1.0" standalone="yes"?>
 <!DOCTYPE chapter SYSTEM "/share/sgml/Norman_Walsh/db3xml10/db3xml10.dtd" [

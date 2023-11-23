@@ -1,14 +1,12 @@
 --TEST--
 Bug #74625 (Integer overflow in oci_bind_array_by_name)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+if (!extension_loaded('oci8')) die ("skip no oci8 extension");
 ?>
 --FILE--
 <?php
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Initialization
 
@@ -49,6 +47,8 @@ $stmtarray = array(
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 array(5) {
   [0]=>
@@ -62,3 +62,4 @@ array(5) {
   [4]=>
   int(-10)
 }
+===DONE===

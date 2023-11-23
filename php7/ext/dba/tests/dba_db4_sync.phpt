@@ -1,9 +1,5 @@
 --TEST--
 DBA DB4 Sync Test
---EXTENSIONS--
-dba
---CONFLICTS--
-dba
 --SKIPIF--
 <?php
 $handler = "db4";
@@ -29,6 +25,8 @@ if (($db_file=dba_open($db_filename, "n", $handler))!==FALSE) {
 }
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --CLEAN--
 <?php
 require(__DIR__ .'/clean.inc');
@@ -37,3 +35,4 @@ require(__DIR__ .'/clean.inc');
 database handler: db4
 YY
 bool(true)
+===DONE===

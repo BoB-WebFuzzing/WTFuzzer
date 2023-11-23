@@ -1,11 +1,9 @@
 --TEST--
 CURL file uploading from stream
---EXTENSIONS--
-curl
 --SKIPIF--
+<?php include 'skipif.inc'; ?>
 <?php
 if (curl_version()['version_number'] < 0x73800) die('skip requires curl >= 7.56.0');
-?>
 --FILE--
 <?php
 include 'server.inc';
@@ -23,6 +21,8 @@ var_dump(curl_setopt($ch, CURLOPT_POSTFIELDS, $params));
 var_dump(curl_exec($ch));
 curl_close($ch);
 ?>
+===DONE===
 --EXPECT--
 bool(true)
 string(24) "i-love-php|text/plain|11"
+===DONE===

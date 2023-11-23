@@ -1,7 +1,7 @@
 --TEST--
 ldap_dn2ufn() test
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -14,15 +14,20 @@ var_dump(ldap_dn2ufn("cn=bob,ou=users,dc=example,dc=com"));
 /* Convert DN with < > characters */
 var_dump(ldap_dn2ufn("cn=<bob>,dc=example,dc=com"));
 
+/* Too many parameters */
+ldap_dn2ufn("cn=bob,dc=example,dc=com", 1);
+
 /* Bad DN value */
 var_dump(ldap_dn2ufn("bob,dc=example,dc=com"));
 
 echo "Done\n";
 
 ?>
---EXPECT--
+--EXPECTF--
 string(16) "bob, example.com"
 string(23) "bob, users, example.com"
 bool(false)
+
+Warning: ldap_dn2ufn() expects exactly 1 parameter, 2 given in %s on line %d
 bool(false)
 Done

@@ -2,9 +2,8 @@
 Testing ftp_get_option basic functionality
 --CREDITS--
 Gabriel Caruso (carusogabriel34@gmail.com)
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --FILE--
 <?php
 require 'server.inc';
@@ -17,16 +16,12 @@ $ftp or die("Couldn't connect to the server");
 var_dump(ftp_get_option($ftp, FTP_TIMEOUT_SEC));
 var_dump(ftp_get_option($ftp, FTP_AUTOSEEK));
 var_dump(ftp_get_option($ftp, FTP_USEPASVADDRESS));
-
-try {
-    ftp_get_option($ftp, FOO_BAR);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
+var_dump(ftp_get_option($ftp, FOO_BAR));
 ?>
 --EXPECTF--
 int(%d)
 bool(true)
 bool(true)
-ftp_get_option(): Argument #2 ($option) must be one of FTP_TIMEOUT_SEC, FTP_AUTOSEEK, or FTP_USEPASVADDRESS
+
+Warning: ftp_get_option(): Unknown option '10' in %s on line %d
+bool(false)

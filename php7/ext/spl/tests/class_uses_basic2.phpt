@@ -2,6 +2,12 @@
 SPL: Test class_uses() function : basic
 --FILE--
 <?php
+/* Prototype  : array class_uses(mixed what [, bool autoload ])
+ * Description: Return all traits used by a class
+ * Source code: ext/spl/php_spl.c
+ * Alias to functions:
+ */
+
 echo "*** Testing class_uses() : basic ***\n";
 
 
@@ -14,7 +20,7 @@ class barUser { use bar; }
 class foobarUser { use foo, bar; }
 
 /** There is no semantics for traits in the inheritance chain.
-    Traits are flattened into a class, and that semantics is nothing
+    Traits are flattend into a class, and that semantics is nothing
     like a type, or interface, and thus, not propergated. */
 class fooViaBarUser extends barUser { use foo; }
 
@@ -33,6 +39,7 @@ function s_var_dump($arr) {
    var_dump($arr);
 }
 ?>
+===DONE===
 --EXPECT--
 *** Testing class_uses() : basic ***
 array(2) {
@@ -59,3 +66,4 @@ array(0) {
 }
 array(0) {
 }
+===DONE===

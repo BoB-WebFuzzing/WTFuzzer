@@ -2,8 +2,14 @@
 Test sort() function : object functionality - sorting objects with diff. accessibility of member vars
 --FILE--
 <?php
+/* Prototype  : bool sort ( array &$array [, int $sort_flags] )
+ * Description: This function sorts an array.
+                Elements will be arranged from lowest to highest when this function has completed.
+ * Source code: ext/standard/array.c
+*/
+
 /*
- * testing sort() by providing integer/string object arrays with flag values are default, SORT_REGULAR
+ * testing sort() by providing integer/string object arrays with flag values are defualt, SORT_REGULAR
 */
 
 echo "*** Testing sort() : object functionality ***\n";
@@ -60,14 +66,14 @@ $unsorted_str_obj = array (
 );
 
 
-echo "\n-- Testing sort() by supplying various object arrays, 'flag' value is default --\n";
+echo "\n-- Testing sort() by supplying various object arrays, 'flag' value is defualt --\n";
 
-// testing sort() function by supplying integer object array, flag value is default
+// testing sort() function by supplying integer object array, flag value is defualt
 $temp_array = $unsorted_int_obj;
 var_dump(sort($temp_array) );
 var_dump($temp_array);
 
-// testing sort() function by supplying string object array, flag value is default
+// testing sort() function by supplying string object array, flag value is defualt
 $temp_array = $unsorted_str_obj;
 var_dump(sort($temp_array) );
 var_dump($temp_array);
@@ -88,7 +94,7 @@ echo "Done\n";
 --EXPECTF--
 *** Testing sort() : object functionality ***
 
--- Testing sort() by supplying various object arrays, 'flag' value is default --
+-- Testing sort() by supplying various object arrays, 'flag' value is defualt --
 bool(true)
 array(4) {
   [0]=>

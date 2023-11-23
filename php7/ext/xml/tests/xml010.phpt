@@ -1,15 +1,14 @@
 --TEST--
 XML parser test, attributes
---EXTENSIONS--
-xml
 --SKIPIF--
 <?php
-if (! @xml_parser_create_ns('ISO-8859-1')) { die("skip xml_parser_create_ns is not supported on this platform");}
+require_once("skipif.inc");
+if (! @xml_parser_create_ns('ISO-8859-1')) { die("skip xml_parser_create_ns is not supported on this plattform");}
 ?>
 --FILE--
 <?php
 function start_elem($parser,$name,$attribs) {
-    print "$name ";
+	print "$name ";
 
     foreach($attribs as $key => $value) {
         print "$key = $value ";

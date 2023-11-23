@@ -10,6 +10,5 @@ while (!feof($fp)) {
     echo fread($fp, 5);
 }
 
-?>
 --EXPECT--
 IS A LOWERCASE STRING.

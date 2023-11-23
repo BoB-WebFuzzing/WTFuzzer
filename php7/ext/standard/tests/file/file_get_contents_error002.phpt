@@ -7,11 +7,7 @@ file_get_contents() test using negative parameter for length (last parameter)
 display_errors=false
 --FILE--
 <?php
-try {
-    file_get_contents("http://checkip.dyndns.com",null,null,0,-1);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+	var_dump(file_get_contents("http://checkip.dyndns.com",null,null,0,-1));
 ?>
 --EXPECT--
-file_get_contents(): Argument #5 ($length) must be greater than or equal to 0
+bool(false)

@@ -26,7 +26,6 @@ var_dump($f);
 
 $b = new Bar;
 var_dump($b);
-?>
 --EXPECTF--
 object(Foo)#%d (3) {
   ["a"]=>

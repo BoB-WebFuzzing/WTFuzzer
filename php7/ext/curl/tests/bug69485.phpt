@@ -1,14 +1,14 @@
 --TEST--
 Bug #69485 (Double free on zend_list_dtor)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 
 class O {
-    public $ch;
-    public function dummy() {
-    }
+	public $ch;
+	public function dummy() {
+	}
 }
 
 $ch = curl_init();

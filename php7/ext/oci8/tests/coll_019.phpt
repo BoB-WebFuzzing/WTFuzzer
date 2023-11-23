@@ -1,17 +1,12 @@
 --TEST--
 Test collection Oracle error handling collections and numbers (2)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
-
-error_reporting(E_ALL ^ E_DEPRECATED);
 
 require __DIR__."/connect.inc";
 
@@ -80,33 +75,33 @@ echo "Done\n";
 --EXPECTF--
 Test 0
 
-Notice: OCICollection::append(): Unknown or unsupported type of element: 113 in %s on line %d
+Notice: OCI-Collection::append(): Unknown or unsupported type of element: 113 in %s on line %d
 bool(false)
 
-Notice: OCICollection::assignElem(): Unknown or unsupported type of element: 113 in %s on line %d
+Notice: OCI-Collection::assignelem(): Unknown or unsupported type of element: 113 in %s on line %d
 bool(false)
 bool(false)
 Test 1
 
-Warning: OCICollection::assignElem(): OCI-22165: given index [1] must be in the range of %s in %s on line %d
+Warning: OCI-Collection::assignelem(): OCI-22165: given index [1] must be in the range of %s in %s on line %d
 bool(false)
 bool(false)
 Test 2
 
-Warning: OCICollection::assignElem(): OCI-22165: given index [1] must be in the range of %s in %s on line %d
+Warning: OCI-Collection::assignelem(): OCI-22165: given index [1] must be in the range of %s in %s on line %d
 bool(false)
 bool(false)
 Test 3
 
-Warning: OCICollection::assignElem(): OCI-22165: given index [1] must be in the range of %s in %s on line %d
+Warning: OCI-Collection::assignelem(): OCI-22165: given index [1] must be in the range of %s in %s on line %d
 bool(false)
 bool(false)
 Test 4
 
-Warning: OCICollection::append(): OCI-01840: input value not long enough for date format in %s on line %d
+Warning: OCI-Collection::append(): OCI-01840: input value not long enough for date format in %s on line %d
 bool(false)
 
-Warning: OCICollection::assignElem(): OCI-22165: given index [1] must be in the range of %s in %s on line %d
+Warning: OCI-Collection::assignelem(): OCI-22165: given index [1] must be in the range of %s in %s on line %d
 bool(false)
 bool(false)
 Done

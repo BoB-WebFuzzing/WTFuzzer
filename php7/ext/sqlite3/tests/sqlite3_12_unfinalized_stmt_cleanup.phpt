@@ -1,7 +1,7 @@
 --TEST--
 SQLite3::query Unfinalized statement tests
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -19,19 +19,15 @@ echo "SELECTING results\n";
 $results = $db->query("SELECT * FROM test ORDER BY id ASC");
 while ($result = $results->fetchArray(SQLITE3_NUM))
 {
-    var_dump($result);
-    /* Only read one row and break */
-    break;
+	var_dump($result);
+	/* Only read one row and break */
+	break;
 }
 
 echo "Closing database\n";
 var_dump($db->close());
 echo "Check db was closed\n";
-try {
-    var_dump($results->numColumns());
-} catch (\Error $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump($results->numColumns());
 echo "Done\n";
 ?>
 --EXPECTF--
@@ -50,5 +46,7 @@ array(2) {
 Closing database
 bool(true)
 Check db was closed
-The SQLite3Result object has not been correctly initialised or is already closed
+
+Warning: SQLite3Result::numColumns(): The SQLite3Result object has not been correctly initialised in %s on line %d
+bool(false)
 Done

@@ -1,10 +1,10 @@
 --TEST--
 Calling connect() on an open persistent connection to create a new persistent connection
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 
 ?>
 --INI--
@@ -13,7 +13,7 @@ mysqli.max_persistent=-1
 mysqli.max_links=-1
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     $host = 'p:' . $host;
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
@@ -34,7 +34,10 @@ mysqli.max_links=-1
 
     mysqli_close($link);
 
-    $link = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
+    if (!$link = new my_mysqli($host, $user, $passwd, $db, $port, $socket))
+        printf("[007] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+            $host, $user, $db, $port, $socket);
+
 
     if (true !== ($tmp = $link->real_connect($host, $user, $passwd, $db, $port, $socket)))
         printf("[009] Expecting boolean/true got %s/%s\n", gettype($tmp), $tmp);
@@ -50,15 +53,15 @@ mysqli.max_links=-1
 
     mysqli_close($link);
 
-    if (true !== ($tmp = $link->connect($host, $user, $passwd, $db, $port, $socket)))
-        printf("[013] Expecting true got %s/%s\n", gettype($tmp), $tmp);
+    if (NULL !== ($tmp = $link->connect($host, $user, $passwd, $db, $port, $socket)))
+        printf("[013] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
 
     if (!$link = mysqli_connect($host, $user, $passwd, $db, $port, $socket))
         printf("[014] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
             $host, $user, $db, $port, $socket);
 
-    if (true !== ($tmp = $link->connect($host, $user, $passwd, $db, $port, $socket)))
-        printf("[015] Expecting true got %s/%s\n", gettype($tmp), $tmp);
+    if (NULL !== ($tmp = $link->connect($host, $user, $passwd, $db, $port, $socket)))
+        printf("[015] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>

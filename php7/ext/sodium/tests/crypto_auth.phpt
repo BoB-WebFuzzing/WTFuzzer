@@ -1,7 +1,7 @@
 --TEST--
 Check for libsodium auth
---EXTENSIONS--
-sodium
+--SKIPIF--
+<?php if (!extension_loaded("sodium")) print "skip"; ?>
 --FILE--
 <?php
 $msg = random_bytes(1000);
@@ -41,7 +41,7 @@ var_dump(sodium_crypto_auth_verify($badmac, $msg, $key));
 ?>
 --EXPECT--
 bool(true)
-sodium_crypto_auth(): Argument #2 ($key) must be SODIUM_CRYPTO_AUTH_KEYBYTES bytes long
+key must be SODIUM_CRYPTO_AUTH_KEYBYTES bytes
 bool(false)
 bool(false)
 bool(false)

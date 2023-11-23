@@ -1,7 +1,9 @@
 --TEST--
 Bug #53854 (Missing constants for compression type)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 
@@ -22,7 +24,6 @@ var_dump(ZipArchive::CM_TERSE);
 var_dump(ZipArchive::CM_LZ77);
 var_dump(ZipArchive::CM_WAVPACK);
 var_dump(ZipArchive::CM_PPMD);
-?>
 --EXPECT--
 int(-1)
 int(0)

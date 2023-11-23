@@ -6,7 +6,7 @@ memory_limit=8M
 <?php
 $zend_mm_enabled = getenv("USE_ZEND_ALLOC");
 if ($zend_mm_enabled === "0") {
-    die("skip Zend MM disabled");
+	die("skip Zend MM disabled");
 }
 ?>
 --FILE--
@@ -20,7 +20,6 @@ class DestructableObject
 }
 class DestructorCreator
 {
-        public $test;
         public function __destruct()
         {
                 $this->test = new DestructableObject;
@@ -32,6 +31,5 @@ class Test
 }
 $x = new Test();
 Test::$mystatic = new DestructorCreator();
-?>
 --EXPECTF--
 Fatal error: Allowed memory size of %s bytes exhausted%s(tried to allocate %s bytes) in %s on line %d

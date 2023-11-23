@@ -1,7 +1,7 @@
 --TEST--
 openssl_digest() basic test
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 $data = "openssl_digest() basic test";

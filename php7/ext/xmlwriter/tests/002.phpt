@@ -1,7 +1,7 @@
 --TEST--
 XMLWriter: libxml2 XML Writer, membuffer, flush
---EXTENSIONS--
-xmlwriter
+--SKIPIF--
+<?php if (!extension_loaded("xmlwriter")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -13,6 +13,8 @@ xmlwriter_end_document($xw);
 // Force to write and empty the buffer
 echo xmlwriter_flush($xw, true);
 ?>
+===DONE===
 --EXPECT--
 <?xml version="1.0" encoding="UTF-8"?>
 <tag1/>
+===DONE===

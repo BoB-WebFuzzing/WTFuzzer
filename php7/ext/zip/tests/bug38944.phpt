@@ -1,7 +1,7 @@
 --TEST--
 Bug #38944 (newly created ZipArchive segfaults when accessing comment property)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php if (!extension_loaded("zip")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -25,9 +25,7 @@ int(0)
 int(0)
 string(%d) "%s"
 string(0) ""
-object(ZipArchive)#%d (6) {
-  ["lastId"]=>
-  int(-1)
+object(ZipArchive)#%d (5) {
   ["status"]=>
   int(0)
   ["statusSys"]=>

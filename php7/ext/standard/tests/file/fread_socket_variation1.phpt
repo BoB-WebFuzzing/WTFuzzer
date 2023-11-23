@@ -20,4 +20,4 @@ fclose($server);
 
 ?>
 --EXPECT--
-bool(false)
+string(0) ""

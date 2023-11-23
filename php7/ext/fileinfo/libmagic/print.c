@@ -28,11 +28,12 @@
 /*
  * print.c - debugging printout routines
  */
+#include "php.h"
 
 #include "file.h"
 
 #ifndef lint
-FILE_RCSID("@(#)$File: print.c,v 1.92 2022/09/10 13:21:42 christos Exp $")
+FILE_RCSID("@(#)$File: print.c,v 1.85 2019/03/12 20:43:05 christos Exp $")
 #endif  /* lint */
 
 #include <string.h>
@@ -43,6 +44,8 @@ FILE_RCSID("@(#)$File: print.c,v 1.92 2022/09/10 13:21:42 christos Exp $")
 #endif
 #include <time.h>
 
+#define SZOF(a)	(sizeof(a) / sizeof(a[0]))
+
 #include "cdf.h"
 
 #ifndef COMPILE_ONLY
@@ -50,7 +53,7 @@ protected void
 file_mdump(struct magic *m)
 {
 	static const char optyp[] = { FILE_OPS };
-	char tbuf[256];
+	char tbuf[26];
 
 	(void) fprintf(stderr, "%u: %.*s %u", m->lineno,
 	    (m->cont_level & 7) + 1, ">>>>>>>>", m->offset);
@@ -139,7 +142,6 @@ file_mdump(struct magic *m)
 		case FILE_BEQUAD:
 		case FILE_LEQUAD:
 		case FILE_QUAD:
-		case FILE_OFFSET:
 			(void) fprintf(stderr, "%" INT64_T_FORMAT "d",
 			    CAST(long long, m->value.q));
 			break;
@@ -157,35 +159,32 @@ file_mdump(struct magic *m)
 		case FILE_BEDATE:
 		case FILE_MEDATE:
 			(void)fprintf(stderr, "%s,",
-			    file_fmtdatetime(tbuf, sizeof(tbuf), m->value.l, 0));
+			    file_fmttime(m->value.l, 0, tbuf));
 			break;
 		case FILE_LDATE:
 		case FILE_LELDATE:
 		case FILE_BELDATE:
 		case FILE_MELDATE:
 			(void)fprintf(stderr, "%s,",
-			    file_fmtdatetime(tbuf, sizeof(tbuf), m->value.l,
-			    FILE_T_LOCAL));
+			    file_fmttime(m->value.l, FILE_T_LOCAL, tbuf));
 			break;
 		case FILE_QDATE:
 		case FILE_LEQDATE:
 		case FILE_BEQDATE:
 			(void)fprintf(stderr, "%s,",
-			    file_fmtdatetime(tbuf, sizeof(tbuf), m->value.q, 0));
+			    file_fmttime(m->value.q, 0, tbuf));
 			break;
 		case FILE_QLDATE:
 		case FILE_LEQLDATE:
 		case FILE_BEQLDATE:
 			(void)fprintf(stderr, "%s,",
-			    file_fmtdatetime(tbuf, sizeof(tbuf), m->value.q,
-			    FILE_T_LOCAL));
+			    file_fmttime(m->value.q, FILE_T_LOCAL, tbuf));
 			break;
 		case FILE_QWDATE:
 		case FILE_LEQWDATE:
 		case FILE_BEQWDATE:
 			(void)fprintf(stderr, "%s,",
-			    file_fmtdatetime(tbuf, sizeof(tbuf), m->value.q,
-			    FILE_T_WINDOWS));
+			    file_fmttime(m->value.q, FILE_T_WINDOWS, tbuf));
 			break;
 		case FILE_FLOAT:
 		case FILE_BEFLOAT:
@@ -197,27 +196,6 @@ file_mdump(struct magic *m)
 		case FILE_LEDOUBLE:
 			(void) fprintf(stderr, "%G", m->value.d);
 			break;
-		case FILE_LEVARINT:
-		case FILE_BEVARINT:
-			(void)fprintf(stderr, "%s", file_fmtvarint(
-			    tbuf, sizeof(tbuf), m->value.us, m->type));
-			break;
-		case FILE_MSDOSDATE:
-		case FILE_BEMSDOSDATE:
-		case FILE_LEMSDOSDATE:
-			(void)fprintf(stderr, "%s,",
-			    file_fmtdate(tbuf, sizeof(tbuf), m->value.h));
-			break;
-		case FILE_MSDOSTIME:
-		case FILE_BEMSDOSTIME:
-		case FILE_LEMSDOSTIME:
-			(void)fprintf(stderr, "%s,",
-			    file_fmttime(tbuf, sizeof(tbuf), m->value.h));
-			break;
-		case FILE_OCTAL:
-			(void)fprintf(stderr, "%s",
-			    file_fmtnum(tbuf, sizeof(tbuf), m->value.s, 8));
-			break;
 		case FILE_DEFAULT:
 			/* XXX - do anything here? */
 			break;
@@ -226,12 +204,6 @@ file_mdump(struct magic *m)
 		case FILE_DER:
 			(void) fprintf(stderr, "'%s'", m->value.s);
 			break;
-		case FILE_GUID:
-			(void) file_print_guid(tbuf, sizeof(tbuf),
-			    m->value.guid);
-			(void) fprintf(stderr, "%s", tbuf);
-			break;
-
 		default:
 			(void) fprintf(stderr, "*bad type %d*", m->type);
 			break;
@@ -254,21 +226,14 @@ file_magwarn(struct magic_set *ms, const char *f, ...)
 	va_end(va);
 
 	if (expanded_len >= 0 && expanded_format) {
-		php_error_docref(NULL, E_WARNING, "%s", expanded_format);
+		php_error_docref(NULL, E_NOTICE, "Warning: %s", expanded_format);
 
 		free(expanded_format);
 	}
 }
 
 protected const char *
-file_fmtvarint(char *buf, size_t blen, const unsigned char *us, int t)
-{
-	snprintf(buf, blen, "%jd", file_varint2uintmax_t(us, t, NULL));
-	return buf;
-}
-
-protected const char *
-file_fmtdatetime(char *buf, size_t bsize, uint64_t v, int flags)
+file_fmttime(uint64_t v, int flags, char *buf)
 {
 	char *pp;
 	time_t t;
@@ -298,67 +263,5 @@ file_fmtdatetime(char *buf, size_t bsize, uint64_t v, int flags)
 	pp[strcspn(pp, "\n")] = '\0';
 	return pp;
 out:
-	strlcpy(buf, "*Invalid datetime*", bsize);
-	return buf;
-}
-
-/* 
- * https://docs.microsoft.com/en-us/windows/win32/api/winbase/\
- *	nf-winbase-dosdatetimetofiletime?redirectedfrom=MSDN
- */
-protected const char *
-file_fmtdate(char *buf, size_t bsize, uint16_t v)
-{
-	struct tm tm;
-
-	memset(&tm, 0, sizeof(tm));
-	tm.tm_mday = v & 0x1f;
-	tm.tm_mon = ((v >> 5) & 0xf) - 1;
-	tm.tm_year = (v >> 9) + 80;
-
-	if (strftime(buf, bsize, "%a, %b %d %Y", &tm) == 0)
-		goto out;
-
-	return buf;
-out:
-	strlcpy(buf, "*Invalid date*", bsize);
-	return buf;
-}
-
-protected const char *
-file_fmttime(char *buf, size_t bsize, uint16_t v)
-{
-	struct tm tm;
-
-	memset(&tm, 0, sizeof(tm));
-	tm.tm_sec = (v & 0x1f) * 2;
-	tm.tm_min = ((v >> 5) & 0x3f);
-	tm.tm_hour = (v >> 11);
-
-	if (strftime(buf, bsize, "%T", &tm) == 0)
-		goto out;
-
-	return buf;
-out:
-	strlcpy(buf, "*Invalid time*", bsize);
-	return buf;
-
-}
-
-protected const char *
-file_fmtnum(char *buf, size_t blen, const char *us, int base)
-{
-	char *endptr;
-	unsigned long long val;
-
-	errno = 0;
-	val = strtoull(us, &endptr, base);
-	if (*endptr || errno) {
-bad:		strlcpy(buf, "*Invalid number*", blen);
-		return buf;
-	}
-
-	if (snprintf(buf, blen, "%llu", val) < 0)
-		goto bad;
-	return buf;
+	return strcpy(buf, "*Invalid time*");
 }

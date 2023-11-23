@@ -1,14 +1,14 @@
 --TEST--
 mysqli_connect()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     $tmp    = NULL;
     $link   = NULL;
@@ -18,6 +18,10 @@ require_once 'skipifconnectfailure.inc';
     $anon_allow = (gettype($tmp) == "object");
 
     $exptype = ($anon_allow) ? "mysqli_object" : "false";
+
+    $obj = new stdClass();
+    if (!is_null($tmp = @mysqli_connect($obj)))
+        printf("[001] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
 
     $tmp = @mysqli_connect($link);
     if (($anon_allow && gettype($tmp) != "object") || (!$anon_allow && $tmp != false)) {
@@ -118,32 +122,34 @@ require_once 'skipifconnectfailure.inc';
         mysqli_close($link);
     }
 
-    ini_set('mysqli.default_host', 'p:' . $host);
-    if (!is_object($link = mysqli_connect())) {
-        printf("[021] Usage of mysqli.default_host (persistent) failed\n") ;
-    } else {
-        if (!$res = mysqli_query($link, "SELECT 'mysqli.default_host (persistent)' AS 'testing'"))
-            printf("[022] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
-        $tmp = mysqli_fetch_assoc($res);
-        if ($tmp['testing'] !== 'mysqli.default_host (persistent)') {
-            printf("[023] Result looks strange - check manually, [%d] %s\n",
-                mysqli_errno($link), mysqli_error($link));
-            var_dump($tmp);
+    if ($IS_MYSQLND) {
+        ini_set('mysqli.default_host', 'p:' . $host);
+            if (!is_object($link = mysqli_connect())) {
+                printf("[021] Usage of mysqli.default_host (persistent) failed\n") ;
+        } else {
+            if (!$res = mysqli_query($link, "SELECT 'mysqli.default_host (persistent)' AS 'testing'"))
+                printf("[022] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+            $tmp = mysqli_fetch_assoc($res);
+            if ($tmp['testing'] !== 'mysqli.default_host (persistent)') {
+                printf("[023] Result looks strange - check manually, [%d] %s\n",
+                    mysqli_errno($link), mysqli_error($link));
+                var_dump($tmp);
+            }
+            mysqli_free_result($res);
+            mysqli_close($link);
         }
-        mysqli_free_result($res);
-        mysqli_close($link);
-    }
 
-    ini_set('mysqli.default_host', 'p:');
-    if (is_object($link = @mysqli_connect())) {
-        printf("[024] Usage of mysqli.default_host=p: did not fail\n") ;
-        mysqli_close($link);
+        ini_set('mysqli.default_host', 'p:');
+        if (is_object($link = @mysqli_connect())) {
+            printf("[024] Usage of mysqli.default_host=p: did not fail\n") ;
+            mysqli_close($link);
+        }
     }
 
     print "done!";
 ?>
 --EXPECTF--
-Warning: mysqli_connect(): (%s/%d): Access denied for user '%s'@'%s'%r( \(using password: \w+\)){0,1}%r in %s on line %d
+Warning: mysqli_connect(): (%s/%d): Access denied for user '%s'@'%s' (using password: YES) in %s on line %d
 array(1) {
   ["testing"]=>
   string(21) "mysqli.default_socket"

@@ -2,6 +2,12 @@
 Test strftime() function : usage variation - Passing literal related strings to format argument.
 --FILE--
 <?php
+/* Prototype  : string strftime(string format [, int timestamp])
+ * Description: Format a local time/date according to locale settings
+ * Source code: ext/date/php_date.c
+ * Alias to functions:
+ */
+
 echo "*** Testing strftime() : usage variation ***\n";
 
 // Initialise function arguments not being substituted (if any)
@@ -15,13 +21,11 @@ var_dump( strftime($format) );
 var_dump( strftime($format, $timestamp) );
 
 ?>
---EXPECTF--
+===DONE===
+--EXPECT--
 *** Testing strftime() : usage variation ***
 
 -- Testing strftime() function with a literal % character to format --
-
-Deprecated: Function strftime() is deprecated in %s on line %d
 string(1) "%"
-
-Deprecated: Function strftime() is deprecated in %s on line %d
 string(1) "%"
+===DONE===

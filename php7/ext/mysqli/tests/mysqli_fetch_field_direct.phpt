@@ -1,49 +1,52 @@
 --TEST--
 mysqli_fetch_field_direct()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_fetch_field_direct()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_fetch_field_direct($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_fetch_field_direct($link, $link)))
+        printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
 
     if (!$res = mysqli_query($link, "SELECT id AS ID, label FROM test AS TEST ORDER BY id LIMIT 1")) {
         printf("[004] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
     }
 
-    try {
-        var_dump(mysqli_fetch_field_direct($res, -1));
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    var_dump(mysqli_fetch_field_direct($res, -1));
     var_dump(mysqli_fetch_field_direct($res, 0));
-
-    try {
-        var_dump(mysqli_fetch_field_direct($res, 2));
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    var_dump(mysqli_fetch_field_direct($res, 2));
 
     mysqli_free_result($res);
 
-    try {
-        mysqli_fetch_field_direct($res, 0);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_fetch_field_direct($res, 0)))
+        printf("[005] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     mysqli_close($link);
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
-mysqli_fetch_field_direct(): Argument #2 ($index) must be greater than or equal to 0
+Warning: mysqli_fetch_field_direct(): Field offset is invalid for resultset in %s on line %d
+bool(false)
 object(stdClass)#%d (13) {
   ["name"]=>
   string(2) "ID"
@@ -72,6 +75,9 @@ object(stdClass)#%d (13) {
   ["decimals"]=>
   int(%d)
 }
-mysqli_fetch_field_direct(): Argument #2 ($index) must be less than the number of fields for this result set
-mysqli_result object is already closed
+
+Warning: mysqli_fetch_field_direct(): Field offset is invalid for resultset in %s on line %d
+bool(false)
+
+Warning: mysqli_fetch_field_direct(): Couldn't fetch mysqli_result in %s on line %d
 done!

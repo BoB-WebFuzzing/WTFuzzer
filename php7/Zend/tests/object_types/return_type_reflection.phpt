@@ -21,7 +21,6 @@ var_dump($returnTypeTwo->isBuiltin(), $returnTypeTwo->getName());
 
 $returnTypea = (new ReflectionFunction('a'))->getReturnType();
 var_dump($returnTypea->isBuiltin(), $returnTypea->getName());
-?>
 --EXPECT--
 bool(true)
 string(6) "object"

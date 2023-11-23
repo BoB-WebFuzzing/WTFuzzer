@@ -2,6 +2,12 @@
 Test current() function : usage variations - referenced variables
 --FILE--
 <?php
+/* Prototype  : mixed current(array $array_arg)
+ * Description: Return the element currently pointed to by the internal array pointer
+ * Source code: ext/standard/array.c
+ * Alias to functions: pos
+ */
+
 /*
  * Test how the internal pointer is affected when two variables are referenced to each other
  */
@@ -23,6 +29,7 @@ var_dump(current($array1));
 echo "\$array2: ";
 var_dump(current($array2));
 ?>
+===DONE===
 --EXPECT--
 *** Testing current() : usage variations ***
 
@@ -32,3 +39,4 @@ string(4) "zero"
 -- Position after calling next() --
 $array1: string(3) "one"
 $array2: string(3) "one"
+===DONE===

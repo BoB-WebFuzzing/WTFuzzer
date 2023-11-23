@@ -11,12 +11,12 @@
 
 PHP is a popular general-purpose scripting language that is especially suited to
 web development. Fast, flexible and pragmatic, PHP powers everything from your
-blog to the most popular websites in the world. PHP is distributed under the
-[PHP License v3.01](LICENSE).
+blog to the most popular websites in the world. PHP is distributed under the PHP
+License v3.01.
 
-[![Push](https://github.com/php/php-src/actions/workflows/push.yml/badge.svg)](https://github.com/php/php-src/actions/workflows/push.yml)
-[![Build status](https://travis-ci.com/php/php-src.svg?branch=master)](https://travis-ci.com/github/php/php-src)
-[![Fuzzing Status](https://oss-fuzz-build-logs.storage.googleapis.com/badges/php.svg)](https://bugs.chromium.org/p/oss-fuzz/issues/list?sort=-opened&can=1&q=proj:php)
+[![Build status](https://travis-ci.org/php/php-src.svg?branch=master)](https://travis-ci.org/php/php-src)
+[![Build status](https://ci.appveyor.com/api/projects/status/meyur6fviaxgdwdy?svg=true)](https://ci.appveyor.com/project/php/php-src)
+[![Build Status](https://dev.azure.com/phpazuredevops/php/_apis/build/status/php.php-src?branchName=PHP-7.4)](https://dev.azure.com/phpazuredevops/php/_build/latest?definitionId=1&branchName=PHP-7.4)
 
 ## Documentation
 
@@ -38,36 +38,24 @@ For other systems, see the [installation chapter](https://php.net/install).
 
 *For Windows, see [Build your own PHP on Windows](https://wiki.php.net/internals/windows/stepbystepbuild_sdk_2).*
 
-For a minimal PHP build from Git, you will need autoconf, bison, and re2c. For
-a default build, you will additionally need libxml2 and libsqlite3.
-
-On Ubuntu, you can install these using:
-
-    sudo apt install -y pkg-config build-essential autoconf bison re2c \
-                        libxml2-dev libsqlite3-dev
-
-On Fedora, you can install these using:
-
-    sudo dnf install re2c bison autoconf make libtool ccache libxml2-devel sqlite-devel
-
-Generate configure:
+PHP uses autotools on Unix systems to configure the build:
 
     ./buildconf
+    ./configure [options]
 
-Configure your build. `--enable-debug` is recommended for development, see
-`./configure --help` for a full list of options.
+*See `./configure -h` for configuration options.*
 
-    # For development
-    ./configure --enable-debug
-    # For production
-    ./configure
+    make [options]
 
-Build PHP. To speed up the build, specify the maximum number of jobs using `-j`:
+*See `make -h` for make options.*
+
+The `-j` option shall set the maximum number of jobs `make` can use for the
+build:
 
     make -j4
 
-The number of jobs should usually match the number of available cores, which
-can be determined using `nproc`.
+Shall run `make` with a maximum of 4 concurrent jobs: Generally the maximum
+number of jobs should not exceed the number of cores available.
 
 ## Testing PHP source code
 
@@ -103,8 +91,9 @@ Extension Community Library - [PECL](https://pecl.php.net).
 ## Contributing
 
 The PHP source code is located in the Git repository at
-[github.com/php/php-src](https://github.com/php/php-src). Contributions are most
-welcome by forking the repository and sending a pull request.
+[git.php.net](https://git.php.net). Contributions are most welcome by forking
+the [GitHub mirror repository](https://github.com/php/php-src) and sending a
+pull request.
 
 Discussions are done on GitHub, but depending on the topic can also be relayed
 to the official PHP developer mailing list internals@lists.php.net.
@@ -114,15 +103,20 @@ New features require an RFC and must be accepted by the developers. See
 [Voting on PHP features](https://wiki.php.net/rfc/voting) for more information
 on the process.
 
-Bug fixes don't require an RFC. If the bug has a GitHub issue, reference it in
-the commit message using `GH-NNNNNN`. Use `#NNNNNN` for tickets in the old
-[bugs.php.net](https://bugs.php.net) bug tracker.
+Bug fixes **do not** require an RFC but require a bug tracker ticket. Open a
+ticket at [bugs.php.net](https://bugs.php.net) and reference the bug id using
+`#NNNNNN`.
 
-    Fix GH-7815: php_uname doesn't recognise latest Windows versions
     Fix #55371: get_magic_quotes_gpc() throws deprecation warning
 
-See [Git workflow](https://wiki.php.net/vcs/gitworkflow) for details on how pull
-requests are merged.
+    After removing magic quotes, the get_magic_quotes_gpc function caused a
+    deprecated warning. get_magic_quotes_gpc can be used to detect the
+    magic_quotes behavior and therefore should not raise a warning at any time.
+    The patch removes this warning.
+
+Pull requests are not merged directly on GitHub. All PRs will be pulled and
+pushed through [git.php.net](https://git.php.net). See
+[Git workflow](https://wiki.php.net/vcs/gitworkflow) for more details.
 
 ### Guidelines for contributors
 
@@ -131,7 +125,7 @@ contribute:
 
 - [Contributing to PHP](/CONTRIBUTING.md)
 - [PHP coding standards](/CODING_STANDARDS.md)
-- [Mailing list rules](/docs/mailinglist-rules.md)
+- [Mailinglist rules](/docs/mailinglist-rules.md)
 - [PHP release process](/docs/release-process.md)
 
 ## Credits

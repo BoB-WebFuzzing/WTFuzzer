@@ -1,7 +1,9 @@
 --TEST--
 Bug #53885 (ZipArchive segfault with FL_UNCHANGED on empty archive)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 $fname = __DIR__."/test53885.zip";
@@ -16,8 +18,7 @@ $nx->statName("a",ZIPARCHIVE::FL_UNCHANGED);
 --CLEAN--
 <?php
 $fname = __DIR__."/test53885.zip";
-@unlink($fname);
+unlink($fname);
 ?>
---EXPECTF--
-Deprecated: ZipArchive::open(): Using empty file as ZipArchive is deprecated in %s
+--EXPECT--
 ==DONE==

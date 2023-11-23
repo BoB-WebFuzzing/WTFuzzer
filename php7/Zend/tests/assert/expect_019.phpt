@@ -2,6 +2,7 @@
 test assertions in namespace (assertions completely disabled)
 --INI--
 zend.assertions=-1
+assert.exception=0
 --FILE--
 <?php
 namespace Foo;

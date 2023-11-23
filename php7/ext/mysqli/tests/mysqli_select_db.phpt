@@ -1,19 +1,31 @@
 --TEST--
 mysqli_select_db()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
-    require_once 'table.inc';
+    require_once("connect.inc");
+    require_once("table.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_select_db()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_select_db($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
         printf("[003] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
             $host, $user, $db, $port, $socket);
+
+    if (!is_null($tmp = @mysqli_select_db($link, $db, "foo")))
+        printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     /* does not make too much sense, unless we have access to at least one more database than $db */
     if (!mysqli_select_db($link, $db))
@@ -56,11 +68,11 @@ require_once 'skipifconnectfailure.inc';
     $current_db = $row['dbname'];
 
     mysqli_report(MYSQLI_REPORT_OFF);
-    mysqli_select_db($link, 'I cannot imagine that this database exists');
+    mysqli_select_db($link, 'I can not imagine that this database exists');
     mysqli_report(MYSQLI_REPORT_ERROR);
 
     ob_start();
-    mysqli_select_db($link, 'I cannot imagine that this database exists');
+    mysqli_select_db($link, 'I can not imagine that this database exists');
     $output = ob_get_contents();
     ob_end_clean();
     if (!stristr($output, "1049") && !stristr($output, "1044") && !stristr($output, "1045")) {
@@ -88,16 +100,13 @@ require_once 'skipifconnectfailure.inc';
 
     mysqli_close($link);
 
-    try {
-        mysqli_select_db($link, $db);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_select_db($link, $db)))
+        printf("[019] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!\n";
 ?>
 --CLEAN--
-<?php require_once 'clean_table.inc'; ?>
---EXPECT--
-mysqli object is already closed
+<?php require_once("clean_table.inc"); ?>
+--EXPECTF--
+Warning: mysqli_select_db(): Couldn't fetch mysqli in %s on line %d
 done!

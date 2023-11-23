@@ -1,23 +1,21 @@
 --TEST--
 PDO_Firebird: bug 53280 segfaults if query column count is less than param count
---EXTENSIONS--
-pdo_firebird
 --SKIPIF--
 <?php require('skipif.inc'); ?>
---XLEAK--
-A bug in firebird causes a memory leak when calling `isc_attach_database()`.
-See https://github.com/FirebirdSQL/firebird/issues/7849
+--ENV--
+LSAN_OPTIONS=detect_leaks=0
 --FILE--
 <?php
 
 require("testdb.inc");
 
-$dbh->exec('CREATE TABLE test53280(A VARCHAR(30), B VARCHAR(30), C VARCHAR(30))');
-$dbh->exec("INSERT INTO test53280 VALUES ('A', 'B', 'C')");
+@$dbh->exec('DROP TABLE testz');
+$dbh->exec('CREATE TABLE testz(A VARCHAR(30), B VARCHAR(30), C VARCHAR(30))');
+$dbh->exec("INSERT INTO testz VALUES ('A', 'B', 'C')");
 $dbh->commit();
 
-$stmt1 = "SELECT B FROM test53280 WHERE A = ? AND B = ?";
-$stmt2 = "SELECT B, C FROM test53280 WHERE A = ? AND B = ?";
+$stmt1 = "SELECT B FROM testz WHERE A = ? AND B = ?";
+$stmt2 = "SELECT B, C FROM testz WHERE A = ? AND B = ?";
 
 $stmth2 = $dbh->prepare($stmt2);
 $stmth2->execute(array('A', 'B'));
@@ -32,15 +30,12 @@ var_dump($rows);
 $dbh->commit();
 unset($stmth1);
 unset($stmth2);
+
+$dbh->exec('DROP TABLE testz');
+
 unset($stmt);
 unset($dbh);
 
-?>
---CLEAN--
-<?php
-require 'testdb.inc';
-@$dbh->exec("DROP TABLE test53280");
-unset($dbh);
 ?>
 --EXPECT--
 array(1) {

@@ -4,31 +4,24 @@ Bug #71572: String offset assignment from an empty string inserts null byte
 <?php
 
 $str = "abc";
-try {
-    var_dump($str[0] = "");
-} catch (\Error $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump($str[1] = "");
-} catch (\Error $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump($str[3] = "");
-} catch (\Error $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump($str[10] = "");
-} catch (\Error $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump($str[0] = "");
+var_dump($str[1] = "");
+var_dump($str[3] = "");
+var_dump($str[10] = "");
 var_dump($str);
 ?>
---EXPECT--
-Cannot assign an empty string to a string offset
-Cannot assign an empty string to a string offset
-Cannot assign an empty string to a string offset
-Cannot assign an empty string to a string offset
+==DONE==
+--EXPECTF--
+Warning: Cannot assign an empty string to a string offset in %s on line %d
+NULL
+
+Warning: Cannot assign an empty string to a string offset in %s on line %d
+NULL
+
+Warning: Cannot assign an empty string to a string offset in %s on line %d
+NULL
+
+Warning: Cannot assign an empty string to a string offset in %s on line %d
+NULL
 string(3) "abc"
+==DONE==

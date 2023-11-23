@@ -7,50 +7,36 @@ $array=array(1);
 $testvalues=array(null, 0, 1, true, false,'',' ',0.1,array());
 
 foreach ($testvalues as $testvalue) {
-    try {
-        $testvalue['foo']=$array;
-    } catch (Error $e) {
-        echo $e->getMessage(), "\n";
-    }
-    var_dump($testvalue);
+	$testvalue['foo']=$array;
+	var_dump ($testvalue);
 }
 echo "\n*** Indexing - Testing reference assignment with key ***\n";
 
 $testvalues=array(null, 0, 1, true, false,0.1,array());
 
 foreach ($testvalues as $testvalue) {
-    try {
-        $testvalue['foo']=&$array;
-    } catch (Error $e) {
-        echo $e->getMessage(), "\n";
-    }
-    var_dump($testvalue);
+	$testvalue['foo']=&$array;
+	var_dump ($testvalue);
 }
 echo "*** Indexing - Testing value assignment no key ***\n";
 $array=array(1);
 $testvalues=array(null, 0, 1, true, false,0.1,array());
 
 foreach ($testvalues as $testvalue) {
-    try {
-        $testvalue[]=$array;
-    } catch (Error $e) {
-        echo $e->getMessage(), "\n";
-    }
-    var_dump ($testvalue);
+	$testvalue[]=$array;
+	var_dump ($testvalue);
 }
 echo "\n*** Indexing - Testing reference assignment no key ***\n";
 
 $testvalues=array(null, 0, 1, true, false,0.1,array());
 
 foreach ($testvalues as $testvalue) {
-    try {
-        $testvalue[]=&$array;
-    } catch (Error $e) {
-        echo $e->getMessage(), "\n";
-    }
-    var_dump ($testvalue);
+	$testvalue[]=&$array;
+	var_dump ($testvalue);
 }
 
+
+echo "\nDone";
 ?>
 --EXPECTF--
 *** Indexing - Testing value assignment with key ***
@@ -61,14 +47,15 @@ array(1) {
     int(1)
   }
 }
-Cannot use a scalar value as an array
-int(0)
-Cannot use a scalar value as an array
-int(1)
-Cannot use a scalar value as an array
-bool(true)
 
-Deprecated: Automatic conversion of false to array is deprecated in %s
+Warning: Cannot use a scalar value as an array in %s on line %d
+int(0)
+
+Warning: Cannot use a scalar value as an array in %s on line %d
+int(1)
+
+Warning: Cannot use a scalar value as an array in %s on line %d
+bool(true)
 array(1) {
   ["foo"]=>
   array(1) {
@@ -76,11 +63,18 @@ array(1) {
     int(1)
   }
 }
-Cannot access offset of type string on string
-string(0) ""
-Cannot access offset of type string on string
-string(1) " "
-Cannot use a scalar value as an array
+
+Warning: Illegal string offset 'foo' in %s on line %d
+
+Notice: Array to string conversion in %s on line %d
+string(1) "A"
+
+Warning: Illegal string offset 'foo' in %s on line %d
+
+Notice: Array to string conversion in %s on line %d
+string(1) "A"
+
+Warning: Cannot use a scalar value as an array in %s on line %d
 float(0.1)
 array(1) {
   ["foo"]=>
@@ -98,14 +92,15 @@ array(1) {
     int(1)
   }
 }
-Cannot use a scalar value as an array
-int(0)
-Cannot use a scalar value as an array
-int(1)
-Cannot use a scalar value as an array
-bool(true)
 
-Deprecated: Automatic conversion of false to array is deprecated in %s
+Warning: Cannot use a scalar value as an array in %s on line %d
+int(0)
+
+Warning: Cannot use a scalar value as an array in %s on line %d
+int(1)
+
+Warning: Cannot use a scalar value as an array in %s on line %d
+bool(true)
 array(1) {
   ["foo"]=>
   &array(1) {
@@ -113,7 +108,8 @@ array(1) {
     int(1)
   }
 }
-Cannot use a scalar value as an array
+
+Warning: Cannot use a scalar value as an array in %s on line %d
 float(0.1)
 array(1) {
   ["foo"]=>
@@ -130,14 +126,15 @@ array(1) {
     int(1)
   }
 }
-Cannot use a scalar value as an array
-int(0)
-Cannot use a scalar value as an array
-int(1)
-Cannot use a scalar value as an array
-bool(true)
 
-Deprecated: Automatic conversion of false to array is deprecated in %s
+Warning: Cannot use a scalar value as an array in %s on line %d
+int(0)
+
+Warning: Cannot use a scalar value as an array in %s on line %d
+int(1)
+
+Warning: Cannot use a scalar value as an array in %s on line %d
+bool(true)
 array(1) {
   [0]=>
   array(1) {
@@ -145,7 +142,8 @@ array(1) {
     int(1)
   }
 }
-Cannot use a scalar value as an array
+
+Warning: Cannot use a scalar value as an array in %s on line %d
 float(0.1)
 array(1) {
   [0]=>
@@ -163,14 +161,15 @@ array(1) {
     int(1)
   }
 }
-Cannot use a scalar value as an array
-int(0)
-Cannot use a scalar value as an array
-int(1)
-Cannot use a scalar value as an array
-bool(true)
 
-Deprecated: Automatic conversion of false to array is deprecated in %s
+Warning: Cannot use a scalar value as an array in %s on line %d
+int(0)
+
+Warning: Cannot use a scalar value as an array in %s on line %d
+int(1)
+
+Warning: Cannot use a scalar value as an array in %s on line %d
+bool(true)
 array(1) {
   [0]=>
   &array(1) {
@@ -178,7 +177,8 @@ array(1) {
     int(1)
   }
 }
-Cannot use a scalar value as an array
+
+Warning: Cannot use a scalar value as an array in %s on line %d
 float(0.1)
 array(1) {
   [0]=>
@@ -187,3 +187,5 @@ array(1) {
     int(1)
   }
 }
+
+Done

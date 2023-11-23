@@ -46,6 +46,8 @@ AC_DEFUN([PTHREADS_FLAGS],[
     PTHREAD_FLAGS=-D_REENTRANT;;
   *aix*)
     PTHREAD_FLAGS=-D_THREAD_SAFE;;
+  *irix*)
+    PTHREAD_FLAGS=-D_POSIX_THREAD_SAFE_FUNCTIONS;;
   *hpux*)
     PTHREAD_FLAGS=-D_REENTRANT;;
   *sco*)
@@ -71,7 +73,7 @@ void *thread_routine(void *data) {
     return data;
 }
 
-int main(void) {
+int main() {
     pthread_t thd;
     pthread_mutexattr_t mattr;
     int data = 1;

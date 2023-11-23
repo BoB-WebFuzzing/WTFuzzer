@@ -1,7 +1,11 @@
 --TEST--
 Test function gzeof while writing.
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+	print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 
@@ -14,14 +18,14 @@ var_dump(gzeof($h));
 gzwrite( $h, $str, $length);
 var_dump(gzeof($h));
 gzclose($h);
-try {
-    var_dump(gzeof($h));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(gzeof($h));
 unlink($filename);
 ?>
---EXPECT--
+===DONE===
+--EXPECTF--
 bool(false)
 bool(false)
-gzeof(): supplied resource is not a valid stream resource
+
+Warning: gzeof(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
+===DONE===

@@ -10,4 +10,4 @@ echo $x;
 --EXPECTF--
 ok
 
-Warning: Undefined variable $x in %s on line %d
+Notice: Undefined variable: x in %sunset_cv03.php on line %d

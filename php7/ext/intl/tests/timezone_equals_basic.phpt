@@ -1,7 +1,9 @@
 --TEST--
 IntlTimeZone equals handler: basic test
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -18,6 +20,7 @@ echo "Comparison to GMT:\n";
 var_dump($tz1 == intltz_get_gmt());
 
 ?>
+==DONE==
 --EXPECT--
 Comparison to self:
 bool(true)
@@ -26,4 +29,5 @@ bool(true)
 Comparison to equivalent instance:
 bool(false)
 Comparison to GMT:
-bool(false)
+bool(false)
+==DONE==

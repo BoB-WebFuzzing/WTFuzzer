@@ -1,18 +1,45 @@
 --TEST--
 mysqli_real_connect()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --INI--
 mysqli.allow_local_infile=1
 --FILE--
 <?php
-    include 'connect.inc';
+    include("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (NULL !== ($tmp = @mysqli_real_connect($link)))
+        printf("[001a] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_real_connect($link, $link)))
+        printf("[001b] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_real_connect($link, $link, $link)))
+        printf("[001c] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_real_connect($link, $link, $link, $link)))
+        printf("[001d] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_real_connect($link, $link, $link, $link, $link)))
+        printf("[001e] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_real_connect($link, $link, $link, $link, $link, $link)))
+        printf("[001f] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_real_connect($link, $link, $link, $link, $link, $link, $link)))
+        printf("[001g] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     //  ( mysqli link [, string hostname [, string username [, string passwd [, string dbname [, int port [, string socket [, int flags]]]]]]]
+    if (NULL !== ($tmp = @mysqli_real_connect($link, $link, $link, $link, $link, $link, $link, $link)))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
     if (!$link = mysqli_init())
         printf("[002] mysqli_init() failed\n");
 
@@ -113,44 +140,45 @@ mysqli.allow_local_infile=1
     mysqli_close($link);
     var_dump($link);
 
-    ini_set('mysqli.default_host', 'p:' . $host);
-    $link = mysqli_init();
-    if (!@mysqli_real_connect($link)) {
-        printf("[022] Usage of mysqli.default_host=p:%s (persistent) failed\n", $host) ;
-    } else {
-        if (!$res = mysqli_query($link, "SELECT 'mysqli.default_host (persistent)' AS 'testing'"))
-            printf("[023] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
-        $tmp = mysqli_fetch_assoc($res);
-        if ($tmp['testing'] !== 'mysqli.default_host (persistent)') {
-            printf("[024] Result looks strange - check manually, [%d] %s\n",
-                mysqli_errno($link), mysqli_error($link));
-            var_dump($tmp);
+    if ($IS_MYSQLND) {
+        ini_set('mysqli.default_host', 'p:' . $host);
+        $link = mysqli_init();
+        if (!@mysqli_real_connect($link)) {
+            printf("[022] Usage of mysqli.default_host=p:%s (persistent) failed\n", $host) ;
+        } else {
+            if (!$res = mysqli_query($link, "SELECT 'mysqli.default_host (persistent)' AS 'testing'"))
+                printf("[023] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+            $tmp = mysqli_fetch_assoc($res);
+            if ($tmp['testing'] !== 'mysqli.default_host (persistent)') {
+                printf("[024] Result looks strange - check manually, [%d] %s\n",
+                    mysqli_errno($link), mysqli_error($link));
+                var_dump($tmp);
+            }
+            mysqli_free_result($res);
+            mysqli_close($link);
         }
-        mysqli_free_result($res);
-        mysqli_close($link);
+
+        ini_set('mysqli.default_host', 'p:');
+        $link = mysqli_init();
+        if (@mysqli_real_connect($link)) {
+            printf("[025] Usage of mysqli.default_host=p: did not fail\n") ;
+            mysqli_close($link);
+        }
+        @mysqli_close($link);
     }
 
-    ini_set('mysqli.default_host', 'p:');
-    $link = mysqli_init();
-    if (@mysqli_real_connect($link)) {
-        printf("[025] Usage of mysqli.default_host=p: did not fail\n") ;
-        mysqli_close($link);
-    }
-    @mysqli_close($link);
-
-    try {
-        mysqli_real_connect($link, $host, $user, $passwd, $db, $port, $socket);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_real_connect($link, $host, $user, $passwd, $db, $port, $socket)))
+        printf("[026] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
+--CLEAN--
+<?php
+    require_once("clean_table.inc");
+?>
 --EXPECTF--
-Warning: mysqli_real_connect(): (%s/%d): Access denied for user '%s'@'%s' %r(\(using password: \w+\) ){0,1}%rin %s on line %d
+Warning: mysqli_real_connect(): (%s/%d): Access denied for user '%s'@'%s' (using password: YES) in %s on line %d
 object(mysqli)#%d (%d) {
-  ["client_info"]=>
-  string(%d) "%s"
   ["client_version"]=>
   int(%d)
   ["connect_errno"]=>
@@ -158,5 +186,6 @@ object(mysqli)#%d (%d) {
   ["connect_error"]=>
   NULL
 }
-mysqli object is already closed
+
+Warning: mysqli_real_connect(): Couldn't fetch mysqli in %s on line %d
 done!

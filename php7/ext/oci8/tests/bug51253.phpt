@@ -1,17 +1,14 @@
 --TEST--
 Bug #51253 (oci_bind_array_by_name() array references)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 $drop = "DROP table bind_test";
 $statement = oci_parse($c, $drop);

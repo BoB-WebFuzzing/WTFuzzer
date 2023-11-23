@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -61,11 +63,10 @@
 
 #define PHP_UU_DEC(c) (((c) - ' ') & 077)
 
-PHPAPI zend_string *php_uuencode(const char *src, size_t src_len) /* {{{ */
+PHPAPI zend_string *php_uuencode(char *src, size_t src_len) /* {{{ */
 {
 	size_t len = 45;
-	unsigned char *p;
-	const unsigned char *s, *e, *ee;
+	unsigned char *p, *s, *e, *ee;
 	zend_string *dest;
 
 	/* encoded length is ~ 38% greater than the original
@@ -126,16 +127,11 @@ PHPAPI zend_string *php_uuencode(const char *src, size_t src_len) /* {{{ */
 }
 /* }}} */
 
-PHPAPI zend_string *php_uudecode(const char *src, size_t src_len) /* {{{ */
+PHPAPI zend_string *php_uudecode(char *src, size_t src_len) /* {{{ */
 {
 	size_t len, total_len=0;
-	char *p;
-	const char *s, *e, *ee;
+	char *s, *e, *p, *ee;
 	zend_string *dest;
-
-	if (src_len == 0) {
-		return NULL;
-	}
 
 	dest = zend_string_alloc((size_t) ceil(src_len * 0.75), 0);
 	p = ZSTR_VAL(dest);
@@ -200,20 +196,23 @@ err:
 }
 /* }}} */
 
-/* {{{ uuencode a string */
+/* {{{ proto string convert_uuencode(string data)
+   uuencode a string */
 PHP_FUNCTION(convert_uuencode)
 {
 	zend_string *src;
 
 	ZEND_PARSE_PARAMETERS_START(1, 1)
 		Z_PARAM_STR(src)
-	ZEND_PARSE_PARAMETERS_END();
+	ZEND_PARSE_PARAMETERS_END_EX(RETURN_FALSE);
+	if (ZSTR_LEN(src) < 1) { RETURN_FALSE; }
 
 	RETURN_STR(php_uuencode(ZSTR_VAL(src), ZSTR_LEN(src)));
 }
 /* }}} */
 
-/* {{{ decode a uuencoded string */
+/* {{{ proto string convert_uudecode(string data)
+   decode a uuencoded string */
 PHP_FUNCTION(convert_uudecode)
 {
 	zend_string *src;
@@ -221,10 +220,11 @@ PHP_FUNCTION(convert_uudecode)
 
 	ZEND_PARSE_PARAMETERS_START(1, 1)
 		Z_PARAM_STR(src)
-	ZEND_PARSE_PARAMETERS_END();
+	ZEND_PARSE_PARAMETERS_END_EX(RETURN_FALSE);
+	if (ZSTR_LEN(src) < 1) { RETURN_FALSE; }
 
 	if ((dest = php_uudecode(ZSTR_VAL(src), ZSTR_LEN(src))) == NULL) {
-		php_error_docref(NULL, E_WARNING, "Argument #1 ($data) is not a valid uuencoded string");
+		php_error_docref(NULL, E_WARNING, "The given parameter is not a valid uuencoded string");
 		RETURN_FALSE;
 	}
 

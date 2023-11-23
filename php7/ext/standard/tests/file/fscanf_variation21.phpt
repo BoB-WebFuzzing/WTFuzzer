@@ -3,6 +3,11 @@ Test fscanf() function: usage variations - char formats with float values
 --FILE--
 <?php
 
+/*
+  Prototype: mixed fscanf ( resource $handle, string $format [, mixed &$...] );
+  Description: Parses input from a file according to a format
+*/
+
 /* Test fscanf() to scan float values using different char format types */
 
 $file_path = __DIR__;
@@ -37,9 +42,9 @@ $float_values = array (
 
 $char_formats = array( "%c",
                        "%hc", "%lc", "%Lc",
-               " %c", "%c ", "% c",
-               "\t%c", "\n%c", "%4c",
-               "%30c", "%[a-zA-Z@#$&0-9]", "%*c");
+		       " %c", "%c ", "% c",
+ 	 	       "\t%c", "\n%c", "%4c",
+ 		       "%30c", "%[a-zA-Z@#$&0-9]", "%*c");
 
 $counter = 1;
 
@@ -64,11 +69,7 @@ foreach($char_formats as $char_format) {
   rewind($file_handle);
   echo "\n-- iteration $counter --\n";
   while( !feof($file_handle) ) {
-    try {
-      var_dump(fscanf($file_handle,$char_format));
-    } catch (ValueError $exception) {
-      echo $exception->getMessage() . "\n";
-    }
+    var_dump( fscanf($file_handle,$char_format) );
   }
   $counter++;
 }
@@ -81,7 +82,7 @@ $file_path = __DIR__;
 $filename = "$file_path/fscanf_variation21.tmp";
 unlink($filename);
 ?>
---EXPECT--
+--EXPECTF--
 *** Test fscanf(): different char format types with float values ***
 
 -- iteration 1 --
@@ -463,21 +464,51 @@ array(1) {
 bool(false)
 
 -- iteration 7 --
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
 bool(false)
 
 -- iteration 8 --

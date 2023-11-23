@@ -8,6 +8,11 @@ if (PHP_INT_SIZE != 8) die("skip this test is for 64bit platform only");
 ?>
 --FILE--
 <?php
+/* Prototype  : number pow  ( number $base  , number $exp  )
+ * Description: Exponential expression.
+ * Source code: ext/standard/math.c
+ */
+
 echo "*** Testing pow() : usage variations ***\n";
 
 //get an unset variable
@@ -79,17 +84,14 @@ $inputs = array(
 // loop through each element of $inputs to check the behaviour of pow()
 $iterator = 1;
 foreach($inputs as $input) {
-    echo "\n-- Iteration $iterator --\n";
-    try {
-        var_dump(pow($input, 3));
-    } catch (Error $e) {
-        echo $e->getMessage(), "\n";
-    }
-    $iterator++;
+	echo "\n-- Iteration $iterator --\n";
+	var_dump(pow($input, 3));
+	$iterator++;
 };
 fclose($fp);
 ?>
---EXPECT--
+===Done===
+--EXPECTF--
 *** Testing pow() : usage variations ***
 
 -- Iteration 1 --
@@ -105,7 +107,7 @@ int(1881365963625)
 int(-12895213625)
 
 -- Iteration 5 --
-float(7.846377169233351E+56)
+float(7.8463771692334E+56)
 
 -- Iteration 6 --
 float(1157.625)
@@ -114,10 +116,10 @@ float(1157.625)
 float(-1157.625)
 
 -- Iteration 8 --
-float(1.8816763717891549E+33)
+float(1.8816763717892E+33)
 
 -- Iteration 9 --
-float(1.8816763717891545E-27)
+float(1.8816763717892E-27)
 
 -- Iteration 10 --
 float(0.125)
@@ -141,25 +143,37 @@ int(1)
 int(0)
 
 -- Iteration 17 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 18 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 19 --
-Unsupported operand types: array ** int
+int(0)
 
 -- Iteration 20 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 21 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 22 --
-Unsupported operand types: string ** int
+
+Warning: A non-numeric value encountered in %s on line %d
+int(0)
 
 -- Iteration 23 --
-Unsupported operand types: classA ** int
+
+Notice: Object of class classA could not be converted to number in %s on line %d
+int(1)
 
 -- Iteration 24 --
 int(0)
@@ -168,4 +182,5 @@ int(0)
 int(0)
 
 -- Iteration 26 --
-Unsupported operand types: resource ** int
+%s
+===Done===

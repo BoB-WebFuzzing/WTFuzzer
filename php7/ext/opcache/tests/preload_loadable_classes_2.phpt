@@ -5,23 +5,16 @@ opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
 opcache.preload={PWD}/preload_loadable_classes_2.inc
---EXTENSIONS--
-opcache
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 if (PHP_OS_FAMILY == 'Windows') die('skip Preloading is not supported on Windows');
 ?>
 --FILE--
-<?php
-const UNDEF = 1;
-class Foo {
-    const UNDEF = 2;
-}
-var_dump(class_exists("Test"));
-var_dump(Test::X);
-var_dump(Test::Y);
-?>
---EXPECT--
-bool(true)
-int(1)
-int(2)
+Unreachable
+--EXPECTF--
+Warning: Use of undefined constant UNDEF - assumed 'UNDEF' (this will throw an Error in a future version of PHP) in Unknown on line 0
+
+Fatal error: Class 'Foo' not found in Unknown on line 0
+
+Fatal error: Failed to resolve initializers of class Test during preloading in Unknown on line 0

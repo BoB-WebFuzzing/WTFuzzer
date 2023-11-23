@@ -4,13 +4,13 @@ running code with -r
 <?php
 include "skipif.inc";
 if (substr(PHP_OS, 0, 3) == 'WIN') {
-    die ("skip not for Windows");
+	die ("skip not for Windows");
 }
 ?>
 --FILE--
 <?php
 
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = getenv('TEST_PHP_EXECUTABLE');
 
 var_dump(`$php -n -r 'var_dump("hello");'`);
 

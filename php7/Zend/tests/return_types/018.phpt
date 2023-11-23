@@ -4,8 +4,7 @@ Destructors cannot declare a return type
 <?php
 
 class Foo {
-    function __destruct() : Foo {}
+	function __destruct() : Foo {}
 }
-?>
 --EXPECTF--
-Fatal error: Method Foo::__destruct() cannot declare a return type in %s on line %d
+Fatal error: Destructor %s::%s() cannot declare a return type in %s on line %d

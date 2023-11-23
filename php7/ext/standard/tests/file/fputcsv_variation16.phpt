@@ -14,6 +14,8 @@ rewind($stream);
 echo stream_get_contents($stream);
 fclose($stream);
 ?>
+===DONE===
 --EXPECT--
 \
 "\"""
+===DONE===

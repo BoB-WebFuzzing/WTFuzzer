@@ -16,7 +16,6 @@ class B implements A {
 $b = new B();
 var_dump($b->method(null));
 var_dump($b->method(1));
-?>
 --EXPECT--
 NULL
 int(1)

@@ -1,7 +1,7 @@
 --TEST--
 Bug #66289 Locale::lookup incorrectly returns en or en_US if locale is empty
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 
@@ -18,8 +18,10 @@ $availableLocales = array(Locale::getDefault());
 var_dump(locale_lookup($availableLocales, false, true));
 
 ?>
+==DONE==
 --EXPECT--
 string(5) "fr_fr"
 string(5) "en_us"
 string(5) "fr_fr"
 string(5) "de_de"
+==DONE==

@@ -2,9 +2,13 @@
 Test krsort() function : object functionality - sort objects
 --FILE--
 <?php
+/* Prototype  : bool krsort ( array &$array [, int $sort_flags] )
+ * Description: Sort an array by key in reverse order, maintaining key to data correlation
+ * Source code: ext/standard/array.c
+*/
 /*
  * testing krsort() by providing array of integer/string objects with following flag values:
- *  1.Default flag value
+ *  1.Defualt flag value
  *  2.SORT_REGULAR - compare items normally
 */
 
@@ -52,14 +56,14 @@ $unsorted_str_obj = array (
 );
 
 
-echo "\n-- Testing krsort() by supplying various object arrays, 'flag' value is default --\n";
+echo "\n-- Testing krsort() by supplying various object arrays, 'flag' value is defualt --\n";
 
-// testing krsort() function by supplying integer object array, flag value is default
+// testing krsort() function by supplying integer object array, flag value is defualt
 $temp_array = $unsorted_int_obj;
 var_dump(krsort($temp_array) );
 var_dump($temp_array);
 
-// testing krsort() function by supplying string object array, flag value is default
+// testing krsort() function by supplying string object array, flag value is defualt
 $temp_array = $unsorted_str_obj;
 var_dump(krsort($temp_array) );
 var_dump($temp_array);
@@ -80,7 +84,7 @@ echo "Done\n";
 --EXPECTF--
 *** Testing krsort() : object functionality ***
 
--- Testing krsort() by supplying various object arrays, 'flag' value is default --
+-- Testing krsort() by supplying various object arrays, 'flag' value is defualt --
 bool(true)
 array(6) {
   [50]=>

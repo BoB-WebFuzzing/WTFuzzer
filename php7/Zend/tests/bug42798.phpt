@@ -11,6 +11,5 @@ function foo($c = ok::constant) {
 }
 
 foo();
-?>
 --EXPECT--
 ok

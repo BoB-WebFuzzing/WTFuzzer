@@ -1,7 +1,7 @@
 --TEST--
 Bug #45251 (double free or corruption with setAttributeNode())
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $doc = new DOMDocument;

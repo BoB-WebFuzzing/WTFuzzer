@@ -1,7 +1,9 @@
 --TEST--
 Bug #27908 (default handler not being called)
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+require_once("skipif.inc");
+?>
 --FILE--
 <?php
 

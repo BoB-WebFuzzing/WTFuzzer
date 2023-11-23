@@ -25,7 +25,6 @@
 #include <math.h>
 #include <assert.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #ifdef HAVE_IEEEFP_H
 #include <ieeefp.h>
@@ -39,40 +38,33 @@
 #define LONG_SIGN_MASK ZEND_LONG_MIN
 
 BEGIN_EXTERN_C()
-ZEND_API zend_result ZEND_FASTCALL add_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL sub_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL mul_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL pow_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL div_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL mod_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL boolean_xor_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL boolean_not_function(zval *result, zval *op1);
-ZEND_API zend_result ZEND_FASTCALL bitwise_not_function(zval *result, zval *op1);
-ZEND_API zend_result ZEND_FASTCALL bitwise_or_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL bitwise_and_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL bitwise_xor_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL shift_left_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL shift_right_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL concat_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL add_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL sub_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL mul_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL pow_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL div_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL mod_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL boolean_xor_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL boolean_not_function(zval *result, zval *op1);
+ZEND_API int ZEND_FASTCALL bitwise_not_function(zval *result, zval *op1);
+ZEND_API int ZEND_FASTCALL bitwise_or_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL bitwise_and_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL bitwise_xor_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL shift_left_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL shift_right_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL concat_function(zval *result, zval *op1, zval *op2);
 
-ZEND_API bool ZEND_FASTCALL zend_is_identical(const zval *op1, const zval *op2);
+ZEND_API zend_bool ZEND_FASTCALL zend_is_identical(zval *op1, zval *op2);
 
-ZEND_API zend_result ZEND_FASTCALL is_equal_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL is_identical_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL is_not_identical_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL is_not_equal_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL is_smaller_function(zval *result, zval *op1, zval *op2);
-ZEND_API zend_result ZEND_FASTCALL is_smaller_or_equal_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL is_equal_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL is_identical_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL is_not_identical_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL is_not_equal_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL is_smaller_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL is_smaller_or_equal_function(zval *result, zval *op1, zval *op2);
 
-ZEND_API bool ZEND_FASTCALL zend_class_implements_interface(const zend_class_entry *class_ce, const zend_class_entry *interface_ce);
-ZEND_API bool ZEND_FASTCALL instanceof_function_slow(const zend_class_entry *instance_ce, const zend_class_entry *ce);
-
-static zend_always_inline bool instanceof_function(
-		const zend_class_entry *instance_ce, const zend_class_entry *ce) {
-	return instance_ce == ce || instanceof_function_slow(instance_ce, ce);
-}
-
-ZEND_API bool zend_string_only_has_ascii_alphanumeric(const zend_string *str);
+ZEND_API zend_bool ZEND_FASTCALL instanceof_function_ex(const zend_class_entry *instance_ce, const zend_class_entry *ce, zend_bool is_interface);
+ZEND_API zend_bool ZEND_FASTCALL instanceof_function(const zend_class_entry *instance_ce, const zend_class_entry *ce);
 
 /**
  * Checks whether the string "str" with length "length" is numeric. The value
@@ -89,8 +81,7 @@ ZEND_API bool zend_string_only_has_ascii_alphanumeric(const zend_string *str);
  * could not be represented as such due to overflow. It writes 1 to oflow_info
  * if the integer is larger than ZEND_LONG_MAX and -1 if it's smaller than ZEND_LONG_MIN.
  */
-ZEND_API uint8_t ZEND_FASTCALL _is_numeric_string_ex(const char *str, size_t length, zend_long *lval,
-	double *dval, bool allow_errors, int *oflow_info, bool *trailing_data);
+ZEND_API zend_uchar ZEND_FASTCALL _is_numeric_string_ex(const char *str, size_t length, zend_long *lval, double *dval, int allow_errors, int *oflow_info);
 
 ZEND_API const char* ZEND_FASTCALL zend_memnstr_ex(const char *haystack, const char *needle, size_t needle_len, const char *end);
 ZEND_API const char* ZEND_FASTCALL zend_memnrstr_ex(const char *haystack, const char *needle, size_t needle_len, const char *end);
@@ -102,6 +93,16 @@ ZEND_API const char* ZEND_FASTCALL zend_memnrstr_ex(const char *haystack, const 
 #	define ZEND_DOUBLE_FITS_LONG(d) (!((d) >= (double)ZEND_LONG_MAX || (d) < (double)ZEND_LONG_MIN))
 #endif
 
+#if ZEND_DVAL_TO_LVAL_CAST_OK
+static zend_always_inline zend_long zend_dval_to_lval(double d)
+{
+    if (EXPECTED(zend_finite(d)) && EXPECTED(!zend_isnan(d))) {
+        return (zend_long)d;
+    } else {
+        return 0;
+    }
+}
+#else
 ZEND_API zend_long ZEND_FASTCALL zend_dval_to_lval_slow(double d);
 
 static zend_always_inline zend_long zend_dval_to_lval(double d)
@@ -113,8 +114,8 @@ static zend_always_inline zend_long zend_dval_to_lval(double d)
 	}
 	return (zend_long)d;
 }
+#endif
 
-/* Used to convert a string float to integer during an (int) cast */
 static zend_always_inline zend_long zend_dval_to_lval_cap(double d)
 {
 	if (UNEXPECTED(!zend_finite(d)) || UNEXPECTED(zend_isnan(d))) {
@@ -126,72 +127,56 @@ static zend_always_inline zend_long zend_dval_to_lval_cap(double d)
 }
 /* }}} */
 
-static zend_always_inline bool zend_is_long_compatible(double d, zend_long l) {
-	return (double)l == d;
-}
-
-ZEND_API void zend_incompatible_double_to_long_error(double d);
-ZEND_API void zend_incompatible_string_to_long_error(const zend_string *s);
-
-static zend_always_inline zend_long zend_dval_to_lval_safe(double d)
-{
-	zend_long l = zend_dval_to_lval(d);
-	if (!zend_is_long_compatible(d, l)) {
-		zend_incompatible_double_to_long_error(d);
-	}
-	return l;
-}
-
 #define ZEND_IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
 #define ZEND_IS_XDIGIT(c) (((c) >= 'A' && (c) <= 'F') || ((c) >= 'a' && (c) <= 'f'))
 
-static zend_always_inline uint8_t is_numeric_string_ex(const char *str, size_t length, zend_long *lval,
-	double *dval, bool allow_errors, int *oflow_info, bool *trailing_data)
+static zend_always_inline zend_uchar is_numeric_string_ex(const char *str, size_t length, zend_long *lval, double *dval, int allow_errors, int *oflow_info)
 {
 	if (*str > '9') {
 		return 0;
 	}
-	return _is_numeric_string_ex(str, length, lval, dval, allow_errors, oflow_info, trailing_data);
+	return _is_numeric_string_ex(str, length, lval, dval, allow_errors, oflow_info);
 }
 
-static zend_always_inline uint8_t is_numeric_string(const char *str, size_t length, zend_long *lval, double *dval, bool allow_errors) {
-    return is_numeric_string_ex(str, length, lval, dval, allow_errors, NULL, NULL);
+static zend_always_inline zend_uchar is_numeric_string(const char *str, size_t length, zend_long *lval, double *dval, int allow_errors) {
+    return is_numeric_string_ex(str, length, lval, dval, allow_errors, NULL);
 }
 
-ZEND_API uint8_t ZEND_FASTCALL is_numeric_str_function(const zend_string *str, zend_long *lval, double *dval);
+ZEND_API zend_uchar ZEND_FASTCALL is_numeric_str_function(const zend_string *str, zend_long *lval, double *dval);
 
 static zend_always_inline const char *
 zend_memnstr(const char *haystack, const char *needle, size_t needle_len, const char *end)
 {
 	const char *p = haystack;
+	const char ne = needle[needle_len-1];
+	ptrdiff_t off_p;
 	size_t off_s;
-
-	ZEND_ASSERT(end >= p);
 
 	if (needle_len == 1) {
 		return (const char *)memchr(p, *needle, (end-p));
-	} else if (UNEXPECTED(needle_len == 0)) {
-		return p;
 	}
 
-	off_s = (size_t)(end - p);
+	off_p = end - haystack;
+	off_s = (off_p > 0) ? (size_t)off_p : 0;
 
 	if (needle_len > off_s) {
 		return NULL;
 	}
 
 	if (EXPECTED(off_s < 1024 || needle_len < 9)) {	/* glibc memchr is faster when needle is too short */
-		const char ne = needle[needle_len-1];
 		end -= needle_len;
 
 		while (p <= end) {
-			if ((p = (const char *)memchr(p, *needle, (end-p+1)))) {
-				if (ne == p[needle_len-1] && !memcmp(needle+1, p+1, needle_len-2)) {
+			if ((p = (const char *)memchr(p, *needle, (end-p+1))) && ne == p[needle_len-1]) {
+				if (!memcmp(needle+1, p+1, needle_len-2)) {
 					return p;
 				}
-			} else {
+			}
+
+			if (p == NULL) {
 				return NULL;
 			}
+
 			p++;
 		}
 
@@ -203,22 +188,17 @@ zend_memnstr(const char *haystack, const char *needle, size_t needle_len, const 
 
 static zend_always_inline const void *zend_memrchr(const void *s, int c, size_t n)
 {
-#if defined(HAVE_MEMRCHR) && !defined(i386)
-	/* On x86 memrchr() doesn't use SSE/AVX, so inlined version is faster */
-	return (const void*)memrchr(s, c, n);
-#else
 	const unsigned char *e;
 	if (0 == n) {
 		return NULL;
 	}
 
 	for (e = (const unsigned char *)s + n - 1; e >= (const unsigned char *)s; e--) {
-		if (*e == (unsigned char)c) {
+		if (*e == (const unsigned char)c) {
 			return (const void *)e;
 		}
 	}
 	return NULL;
-#endif
 }
 
 
@@ -226,12 +206,9 @@ static zend_always_inline const char *
 zend_memnrstr(const char *haystack, const char *needle, size_t needle_len, const char *end)
 {
     const char *p = end;
+    const char ne = needle[needle_len-1];
     ptrdiff_t off_p;
     size_t off_s;
-
-	if (needle_len == 0) {
-		return p;
-	}
 
     if (needle_len == 1) {
         return (const char *)zend_memrchr(haystack, *needle, (p - haystack));
@@ -245,7 +222,6 @@ zend_memnrstr(const char *haystack, const char *needle, size_t needle_len, const
     }
 
 	if (EXPECTED(off_s < 1024 || needle_len < 3)) {
-		const char ne = needle[needle_len-1];
 		p -= needle_len;
 
 		do {
@@ -264,41 +240,32 @@ zend_memnrstr(const char *haystack, const char *needle, size_t needle_len, const
 	}
 }
 
-static zend_always_inline size_t zend_strnlen(const char* s, size_t maxlen)
-{
-#if defined(HAVE_STRNLEN)
-	return strnlen(s, maxlen);
-#else
-	const char *p = memchr(s, '\0', maxlen);
-	return p ? p-s : maxlen;
-#endif
-}
-
-ZEND_API zend_result ZEND_FASTCALL increment_function(zval *op1);
-ZEND_API zend_result ZEND_FASTCALL decrement_function(zval *op2);
+ZEND_API int ZEND_FASTCALL increment_function(zval *op1);
+ZEND_API int ZEND_FASTCALL decrement_function(zval *op2);
 
 ZEND_API void ZEND_FASTCALL convert_scalar_to_number(zval *op);
+ZEND_API void ZEND_FASTCALL _convert_to_cstring(zval *op);
 ZEND_API void ZEND_FASTCALL _convert_to_string(zval *op);
 ZEND_API void ZEND_FASTCALL convert_to_long(zval *op);
 ZEND_API void ZEND_FASTCALL convert_to_double(zval *op);
+ZEND_API void ZEND_FASTCALL convert_to_long_base(zval *op, int base);
 ZEND_API void ZEND_FASTCALL convert_to_null(zval *op);
 ZEND_API void ZEND_FASTCALL convert_to_boolean(zval *op);
 ZEND_API void ZEND_FASTCALL convert_to_array(zval *op);
 ZEND_API void ZEND_FASTCALL convert_to_object(zval *op);
+ZEND_API void multi_convert_to_long_ex(int argc, ...);
+ZEND_API void multi_convert_to_double_ex(int argc, ...);
+ZEND_API void multi_convert_to_string_ex(int argc, ...);
 
-ZEND_API zend_long    ZEND_FASTCALL zval_get_long_func(const zval *op, bool is_strict);
-ZEND_API zend_long    ZEND_FASTCALL zval_try_get_long(const zval *op, bool *failed);
-ZEND_API double       ZEND_FASTCALL zval_get_double_func(const zval *op);
+ZEND_API zend_long    ZEND_FASTCALL zval_get_long_func(zval *op);
+ZEND_API double       ZEND_FASTCALL zval_get_double_func(zval *op);
 ZEND_API zend_string* ZEND_FASTCALL zval_get_string_func(zval *op);
 ZEND_API zend_string* ZEND_FASTCALL zval_try_get_string_func(zval *op);
 
-static zend_always_inline zend_long zval_get_long(const zval *op) {
-	return EXPECTED(Z_TYPE_P(op) == IS_LONG) ? Z_LVAL_P(op) : zval_get_long_func(op, false);
+static zend_always_inline zend_long zval_get_long(zval *op) {
+	return EXPECTED(Z_TYPE_P(op) == IS_LONG) ? Z_LVAL_P(op) : zval_get_long_func(op);
 }
-static zend_always_inline zend_long zval_get_long_ex(const zval *op, bool is_strict) {
-	return EXPECTED(Z_TYPE_P(op) == IS_LONG) ? Z_LVAL_P(op) : zval_get_long_func(op, is_strict);
-}
-static zend_always_inline double zval_get_double(const zval *op) {
+static zend_always_inline double zval_get_double(zval *op) {
 	return EXPECTED(Z_TYPE_P(op) == IS_DOUBLE) ? Z_DVAL_P(op) : zval_get_double_func(op);
 }
 static zend_always_inline zend_string *zval_get_string(zval *op) {
@@ -344,8 +311,8 @@ static zend_always_inline zend_string *zval_try_get_tmp_string(zval *op, zend_st
 
 /* Like convert_to_string(), but returns whether the conversion succeeded and does not modify the
  * zval in-place if it fails. */
-ZEND_API bool ZEND_FASTCALL _try_convert_to_string(zval *op);
-static zend_always_inline bool try_convert_to_string(zval *op) {
+ZEND_API zend_bool ZEND_FASTCALL _try_convert_to_string(zval *op);
+static zend_always_inline zend_bool try_convert_to_string(zval *op) {
 	if (Z_TYPE_P(op) == IS_STRING) {
 		return 1;
 	}
@@ -360,18 +327,19 @@ static zend_always_inline bool try_convert_to_string(zval *op) {
 #define _zval_get_double_func(op) zval_get_double_func(op)
 #define _zval_get_string_func(op) zval_get_string_func(op)
 
+#define convert_to_cstring(op) if (Z_TYPE_P(op) != IS_STRING) { _convert_to_cstring((op)); }
 #define convert_to_string(op) if (Z_TYPE_P(op) != IS_STRING) { _convert_to_string((op)); }
 
 
-ZEND_API int ZEND_FASTCALL zend_is_true(const zval *op);
-ZEND_API bool ZEND_FASTCALL zend_object_is_true(const zval *op);
+ZEND_API int ZEND_FASTCALL zend_is_true(zval *op);
+ZEND_API int ZEND_FASTCALL zend_object_is_true(zval *op);
 
 #define zval_is_true(op) \
 	zend_is_true(op)
 
-static zend_always_inline bool i_zend_is_true(const zval *op)
+static zend_always_inline int i_zend_is_true(zval *op)
 {
-	bool result = 0;
+	int result = 0;
 
 again:
 	switch (Z_TYPE_P(op)) {
@@ -420,48 +388,26 @@ again:
 	return result;
 }
 
-/* Indicate that two values cannot be compared. This value should be returned for both orderings
- * of the operands. This implies that all of ==, <, <= and >, >= will return false, because we
- * canonicalize >/>= to </<= with swapped operands. */
-// TODO: Use a different value to allow an actual distinction here.
-#define ZEND_UNCOMPARABLE 1
-
-ZEND_API int ZEND_FASTCALL zend_compare(zval *op1, zval *op2);
-
-ZEND_API zend_result ZEND_FASTCALL compare_function(zval *result, zval *op1, zval *op2);
+ZEND_API int ZEND_FASTCALL compare_function(zval *result, zval *op1, zval *op2);
 
 ZEND_API int ZEND_FASTCALL numeric_compare_function(zval *op1, zval *op2);
-ZEND_API int ZEND_FASTCALL string_compare_function_ex(zval *op1, zval *op2, bool case_insensitive);
+ZEND_API int ZEND_FASTCALL string_compare_function_ex(zval *op1, zval *op2, zend_bool case_insensitive);
 ZEND_API int ZEND_FASTCALL string_compare_function(zval *op1, zval *op2);
 ZEND_API int ZEND_FASTCALL string_case_compare_function(zval *op1, zval *op2);
 ZEND_API int ZEND_FASTCALL string_locale_compare_function(zval *op1, zval *op2);
 
-ZEND_API extern const unsigned char zend_tolower_map[256];
-ZEND_API extern const unsigned char zend_toupper_map[256];
-
-#define zend_tolower_ascii(c) (zend_tolower_map[(unsigned char)(c)])
-#define zend_toupper_ascii(c) (zend_toupper_map[(unsigned char)(c)])
-
 ZEND_API void         ZEND_FASTCALL zend_str_tolower(char *str, size_t length);
-ZEND_API void         ZEND_FASTCALL zend_str_toupper(char *str, size_t length);
 ZEND_API char*        ZEND_FASTCALL zend_str_tolower_copy(char *dest, const char *source, size_t length);
-ZEND_API char*        ZEND_FASTCALL zend_str_toupper_copy(char *dest, const char *source, size_t length);
 ZEND_API char*        ZEND_FASTCALL zend_str_tolower_dup(const char *source, size_t length);
-ZEND_API char*        ZEND_FASTCALL zend_str_toupper_dup(const char *source, size_t length);
 ZEND_API char*        ZEND_FASTCALL zend_str_tolower_dup_ex(const char *source, size_t length);
-ZEND_API char*        ZEND_FASTCALL zend_str_toupper_dup_ex(const char *source, size_t length);
-ZEND_API zend_string* ZEND_FASTCALL zend_string_tolower_ex(zend_string *str, bool persistent);
-ZEND_API zend_string* ZEND_FASTCALL zend_string_toupper_ex(zend_string *str, bool persistent);
+ZEND_API zend_string* ZEND_FASTCALL zend_string_tolower_ex(zend_string *str, int persistent);
 
-static zend_always_inline zend_string* zend_string_tolower(zend_string *str) {
-	return zend_string_tolower_ex(str, false);
-}
-static zend_always_inline zend_string* zend_string_toupper(zend_string *str) {
-	return zend_string_toupper_ex(str, false);
-}
+#define zend_string_tolower(str) zend_string_tolower_ex(str, 0)
 
 ZEND_API int ZEND_FASTCALL zend_binary_zval_strcmp(zval *s1, zval *s2);
 ZEND_API int ZEND_FASTCALL zend_binary_zval_strncmp(zval *s1, zval *s2, zval *s3);
+ZEND_API int ZEND_FASTCALL zend_binary_zval_strcasecmp(zval *s1, zval *s2);
+ZEND_API int ZEND_FASTCALL zend_binary_zval_strncasecmp(zval *s1, zval *s2, zval *s3);
 ZEND_API int ZEND_FASTCALL zend_binary_strcmp(const char *s1, size_t len1, const char *s2, size_t len2);
 ZEND_API int ZEND_FASTCALL zend_binary_strncmp(const char *s1, size_t len1, const char *s2, size_t len2, size_t length);
 ZEND_API int ZEND_FASTCALL zend_binary_strcasecmp(const char *s1, size_t len1, const char *s2, size_t len2);
@@ -469,30 +415,86 @@ ZEND_API int ZEND_FASTCALL zend_binary_strncasecmp(const char *s1, size_t len1, 
 ZEND_API int ZEND_FASTCALL zend_binary_strcasecmp_l(const char *s1, size_t len1, const char *s2, size_t len2);
 ZEND_API int ZEND_FASTCALL zend_binary_strncasecmp_l(const char *s1, size_t len1, const char *s2, size_t len2, size_t length);
 
-ZEND_API bool ZEND_FASTCALL zendi_smart_streq(zend_string *s1, zend_string *s2);
+ZEND_API int ZEND_FASTCALL zendi_smart_streq(zend_string *s1, zend_string *s2);
 ZEND_API int ZEND_FASTCALL zendi_smart_strcmp(zend_string *s1, zend_string *s2);
 ZEND_API int ZEND_FASTCALL zend_compare_symbol_tables(HashTable *ht1, HashTable *ht2);
 ZEND_API int ZEND_FASTCALL zend_compare_arrays(zval *a1, zval *a2);
 ZEND_API int ZEND_FASTCALL zend_compare_objects(zval *o1, zval *o2);
 
-/** Deprecatd in favor of ZEND_STRTOL() */
-ZEND_ATTRIBUTE_DEPRECATED ZEND_API int ZEND_FASTCALL zend_atoi(const char *str, size_t str_len);
+ZEND_API int ZEND_FASTCALL zend_atoi(const char *str, size_t str_len);
+ZEND_API zend_long ZEND_FASTCALL zend_atol(const char *str, size_t str_len);
 
-/** Deprecatd in favor of ZEND_STRTOL() */
-ZEND_ATTRIBUTE_DEPRECATED ZEND_API zend_long ZEND_FASTCALL zend_atol(const char *str, size_t str_len);
+ZEND_API void ZEND_FASTCALL zend_locale_sprintf_double(zval *op ZEND_FILE_LINE_DC);
 
-#define convert_to_null_ex(zv) convert_to_null(zv)
-#define convert_to_boolean_ex(zv) convert_to_boolean(zv)
-#define convert_to_long_ex(zv) convert_to_long(zv)
-#define convert_to_double_ex(zv) convert_to_double(zv)
-#define convert_to_string_ex(zv) convert_to_string(zv)
-#define convert_to_array_ex(zv) convert_to_array(zv)
-#define convert_to_object_ex(zv) convert_to_object(zv)
-#define convert_scalar_to_number_ex(zv) convert_scalar_to_number(zv)
+#define convert_to_ex_master(pzv, lower_type, upper_type)	\
+	if (Z_TYPE_P(pzv)!=upper_type) {					\
+		convert_to_##lower_type(pzv);						\
+	}
 
+#define convert_to_explicit_type(pzv, type)		\
+	do {										\
+		switch (type) {							\
+			case IS_NULL:						\
+				convert_to_null(pzv);			\
+				break;							\
+			case IS_LONG:						\
+				convert_to_long(pzv);			\
+				break;							\
+			case IS_DOUBLE:						\
+				convert_to_double(pzv);			\
+				break;							\
+			case _IS_BOOL:						\
+				convert_to_boolean(pzv);		\
+				break;							\
+			case IS_ARRAY:						\
+				convert_to_array(pzv);			\
+				break;							\
+			case IS_OBJECT:						\
+				convert_to_object(pzv);			\
+				break;							\
+			case IS_STRING:						\
+				convert_to_string(pzv);			\
+				break;							\
+			default:							\
+				assert(0);						\
+				break;							\
+		}										\
+	} while (0);
+
+#define convert_to_explicit_type_ex(pzv, str_type)	\
+	if (Z_TYPE_P(pzv) != str_type) {				\
+		convert_to_explicit_type(pzv, str_type);	\
+	}
+
+#define convert_to_boolean_ex(pzv)	do { \
+		if (Z_TYPE_INFO_P(pzv) > IS_TRUE) { \
+			convert_to_boolean(pzv); \
+		} else if (Z_TYPE_INFO_P(pzv) < IS_FALSE) { \
+			ZVAL_FALSE(pzv); \
+		} \
+	} while (0)
+#define convert_to_long_ex(pzv)		convert_to_ex_master(pzv, long, IS_LONG)
+#define convert_to_double_ex(pzv)	convert_to_ex_master(pzv, double, IS_DOUBLE)
+#define convert_to_string_ex(pzv)	convert_to_ex_master(pzv, string, IS_STRING)
+#define convert_to_array_ex(pzv)	convert_to_ex_master(pzv, array, IS_ARRAY)
+#define convert_to_object_ex(pzv)	convert_to_ex_master(pzv, object, IS_OBJECT)
+#define convert_to_null_ex(pzv)		convert_to_ex_master(pzv, null, IS_NULL)
+
+#define convert_scalar_to_number_ex(pzv)							\
+	if (Z_TYPE_P(pzv)!=IS_LONG && Z_TYPE_P(pzv)!=IS_DOUBLE) {		\
+		convert_scalar_to_number(pzv);					\
+	}
+
+#if defined(ZEND_WIN32) && !defined(ZTS) && defined(_MSC_VER)
+/* This performance improvement of tolower() on Windows gives 10-18% on bench.php */
+#define ZEND_USE_TOLOWER_L 1
+#endif
+
+#ifdef ZEND_USE_TOLOWER_L
 ZEND_API void zend_update_current_locale(void);
-
-ZEND_API void zend_reset_lc_ctype_locale(void);
+#else
+#define zend_update_current_locale()
+#endif
 
 /* The offset in bytes between the value and type fields of a zval */
 #define ZVAL_OFFSETOF_TYPE	\
@@ -718,6 +720,28 @@ overflow: ZEND_ATTRIBUTE_COLD_LABEL
 #endif
 }
 
+static zend_always_inline int fast_add_function(zval *result, zval *op1, zval *op2)
+{
+	if (EXPECTED(Z_TYPE_P(op1) == IS_LONG)) {
+		if (EXPECTED(Z_TYPE_P(op2) == IS_LONG)) {
+			fast_long_add_function(result, op1, op2);
+			return SUCCESS;
+		} else if (EXPECTED(Z_TYPE_P(op2) == IS_DOUBLE)) {
+			ZVAL_DOUBLE(result, ((double)Z_LVAL_P(op1)) + Z_DVAL_P(op2));
+			return SUCCESS;
+		}
+	} else if (EXPECTED(Z_TYPE_P(op1) == IS_DOUBLE)) {
+		if (EXPECTED(Z_TYPE_P(op2) == IS_DOUBLE)) {
+			ZVAL_DOUBLE(result, Z_DVAL_P(op1) + Z_DVAL_P(op2));
+			return SUCCESS;
+		} else if (EXPECTED(Z_TYPE_P(op2) == IS_LONG)) {
+			ZVAL_DOUBLE(result, Z_DVAL_P(op1) + ((double)Z_LVAL_P(op2)));
+			return SUCCESS;
+		}
+	}
+	return add_function(result, op1, op2);
+}
+
 static zend_always_inline void fast_long_sub_function(zval *result, zval *op1, zval *op2)
 {
 #if ZEND_USE_ASM_ARITHMETIC && defined(__i386__) && !(4 == __GNUC__ && 8 == __GNUC_MINOR__)
@@ -800,7 +824,12 @@ overflow: ZEND_ATTRIBUTE_COLD_LABEL
 #endif
 }
 
-static zend_always_inline bool zend_fast_equal_strings(zend_string *s1, zend_string *s2)
+static zend_always_inline int fast_div_function(zval *result, zval *op1, zval *op2)
+{
+	return div_function(result, op1, op2);
+}
+
+static zend_always_inline int zend_fast_equal_strings(zend_string *s1, zend_string *s2)
 {
 	if (s1 == s2) {
 		return 1;
@@ -811,8 +840,9 @@ static zend_always_inline bool zend_fast_equal_strings(zend_string *s1, zend_str
 	}
 }
 
-static zend_always_inline bool fast_equal_check_function(zval *op1, zval *op2)
+static zend_always_inline int fast_equal_check_function(zval *op1, zval *op2)
 {
+	zval result;
 	if (EXPECTED(Z_TYPE_P(op1) == IS_LONG)) {
 		if (EXPECTED(Z_TYPE_P(op2) == IS_LONG)) {
 			return Z_LVAL_P(op1) == Z_LVAL_P(op2);
@@ -830,26 +860,31 @@ static zend_always_inline bool fast_equal_check_function(zval *op1, zval *op2)
 			return zend_fast_equal_strings(Z_STR_P(op1), Z_STR_P(op2));
 		}
 	}
-	return zend_compare(op1, op2) == 0;
+	compare_function(&result, op1, op2);
+	return Z_LVAL(result) == 0;
 }
 
-static zend_always_inline bool fast_equal_check_long(zval *op1, zval *op2)
+static zend_always_inline int fast_equal_check_long(zval *op1, zval *op2)
 {
+	zval result;
 	if (EXPECTED(Z_TYPE_P(op2) == IS_LONG)) {
 		return Z_LVAL_P(op1) == Z_LVAL_P(op2);
 	}
-	return zend_compare(op1, op2) == 0;
+	compare_function(&result, op1, op2);
+	return Z_LVAL(result) == 0;
 }
 
-static zend_always_inline bool fast_equal_check_string(zval *op1, zval *op2)
+static zend_always_inline int fast_equal_check_string(zval *op1, zval *op2)
 {
+	zval result;
 	if (EXPECTED(Z_TYPE_P(op2) == IS_STRING)) {
 		return zend_fast_equal_strings(Z_STR_P(op1), Z_STR_P(op2));
 	}
-	return zend_compare(op1, op2) == 0;
+	compare_function(&result, op1, op2);
+	return Z_LVAL(result) == 0;
 }
 
-static zend_always_inline bool fast_is_identical_function(zval *op1, zval *op2)
+static zend_always_inline zend_bool fast_is_identical_function(zval *op1, zval *op2)
 {
 	if (Z_TYPE_P(op1) != Z_TYPE_P(op2)) {
 		return 0;
@@ -859,7 +894,7 @@ static zend_always_inline bool fast_is_identical_function(zval *op1, zval *op2)
 	return zend_is_identical(op1, op2);
 }
 
-static zend_always_inline bool fast_is_not_identical_function(zval *op1, zval *op2)
+static zend_always_inline zend_bool fast_is_not_identical_function(zval *op1, zval *op2)
 {
 	if (Z_TYPE_P(op1) != Z_TYPE_P(op2)) {
 		return 1;
@@ -868,6 +903,45 @@ static zend_always_inline bool fast_is_not_identical_function(zval *op1, zval *o
 	}
 	return !zend_is_identical(op1, op2);
 }
+
+#define ZEND_TRY_BINARY_OP1_OBJECT_OPERATION(opcode, binary_op)                                            \
+	if (UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT)                                                             \
+		&& op1 == result                                                                                   \
+		&& UNEXPECTED(Z_OBJ_HANDLER_P(op1, get))                                                           \
+		&& EXPECTED(Z_OBJ_HANDLER_P(op1, set))) {                                                          \
+		int ret;                                                                                           \
+		zval rv;                                                                                           \
+		zval *objval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv);                                      \
+		Z_TRY_ADDREF_P(objval);                                                                                \
+		ret = binary_op(objval, objval, op2);                                                    \
+		Z_OBJ_HANDLER_P(op1, set)(op1, objval);                                                  \
+		zval_ptr_dtor(objval);                                                                             \
+		return ret;                                                                                        \
+	} else if (UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT)                                                      \
+		&& UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation))) {                                               \
+		if (EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(opcode, result, op1, op2))) { \
+			return SUCCESS;                                                                                \
+		}                                                                                                  \
+	}
+
+#define ZEND_TRY_BINARY_OP2_OBJECT_OPERATION(opcode)                                                       \
+	if (UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT)                                                             \
+		&& UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation))                                                  \
+		&& EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(opcode, result, op1, op2))) {  \
+		return SUCCESS;                                                                                    \
+	}
+
+#define ZEND_TRY_BINARY_OBJECT_OPERATION(opcode, binary_op)                                                \
+	ZEND_TRY_BINARY_OP1_OBJECT_OPERATION(opcode, binary_op)                                                \
+	else                                                                                                   \
+	ZEND_TRY_BINARY_OP2_OBJECT_OPERATION(opcode)
+
+#define ZEND_TRY_UNARY_OBJECT_OPERATION(opcode)                                                            \
+	if (UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT)                                                             \
+		&& UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation))                                                  \
+		&& EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(opcode, result, op1, NULL))) { \
+		return SUCCESS;                                                                                    \
+	}
 
 /* buf points to the END of the buffer */
 static zend_always_inline char *zend_print_ulong_to_buf(char *buf, zend_ulong num) {
@@ -891,10 +965,6 @@ static zend_always_inline char *zend_print_long_to_buf(char *buf, zend_long num)
 }
 
 ZEND_API zend_string* ZEND_FASTCALL zend_long_to_str(zend_long num);
-ZEND_API zend_string* ZEND_FASTCALL zend_ulong_to_str(zend_ulong num);
-ZEND_API zend_string* ZEND_FASTCALL zend_u64_to_str(uint64_t num);
-ZEND_API zend_string* ZEND_FASTCALL zend_i64_to_str(int64_t num);
-ZEND_API zend_string* ZEND_FASTCALL zend_double_to_str(double num);
 
 static zend_always_inline void zend_unwrap_reference(zval *op) /* {{{ */
 {
@@ -906,67 +976,6 @@ static zend_always_inline void zend_unwrap_reference(zval *op) /* {{{ */
 	}
 }
 /* }}} */
-
-static zend_always_inline bool zend_strnieq(const char *ptr1, const char *ptr2, size_t num)
-{
-	const char *end = ptr1 + num;
-	while (ptr1 < end) {
-		if (zend_tolower_ascii(*ptr1++) != zend_tolower_ascii(*ptr2++)) {
-			return 0;
-		}
-	}
-	return 1;
-}
-
-static zend_always_inline const char *
-zend_memnistr(const char *haystack, const char *needle, size_t needle_len, const char *end)
-{
-	ZEND_ASSERT(end >= haystack);
-
-	if (UNEXPECTED(needle_len == 0)) {
-		return haystack;
-	}
-
-	if (UNEXPECTED(needle_len > (size_t)(end - haystack))) {
-		return NULL;
-	}
-
-	const char first_lower = zend_tolower_ascii(*needle);
-	const char first_upper = zend_toupper_ascii(*needle);
-	const char *p_lower = (const char *)memchr(haystack, first_lower, end - haystack);
-	const char *p_upper = NULL;
-	if (first_lower != first_upper) {
-		// If the needle length is 1 we don't need to look beyond p_lower as it is a guaranteed match
-		size_t upper_search_length = needle_len == 1 && p_lower != NULL ? p_lower - haystack : end - haystack;
-		p_upper = (const char *)memchr(haystack, first_upper, upper_search_length);
-	}
-	const char *p = !p_upper || (p_lower && p_lower < p_upper) ? p_lower : p_upper;
-
-	if (needle_len == 1) {
-		return p;
-	}
-
-	const char needle_end_lower = zend_tolower_ascii(needle[needle_len - 1]);
-	const char needle_end_upper = zend_toupper_ascii(needle[needle_len - 1]);
-	end -= needle_len;
-
-	while (p && p <= end) {
-		if (needle_end_lower == p[needle_len - 1] || needle_end_upper == p[needle_len - 1]) {
-			if (zend_strnieq(needle + 1, p + 1, needle_len - 2)) {
-				return p;
-			}
-		}
-		if (p_lower == p) {
-			p_lower = (const char *)memchr(p_lower + 1, first_lower, end - p_lower);
-		}
-		if (p_upper == p) {
-			p_upper = (const char *)memchr(p_upper + 1, first_upper, end - p_upper);
-		}
-		p = !p_upper || (p_lower && p_lower < p_upper) ? p_lower : p_upper;
-	}
-
-	return NULL;
-}
 
 
 END_EXTERN_C()

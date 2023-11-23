@@ -1,8 +1,10 @@
 --TEST--
 Bug #69279 (Compressed ZIP Phar extractTo() creates garbage files)
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded('phar')) die('skip phar extension not available');
+if (!extension_loaded('zlib')) die('skip zlib extension not available');
+?>
 --FILE--
 <?php
 $phar = new PharData(__DIR__ . '/bug69279a.zip');
@@ -23,4 +25,3 @@ int(0)
 @unlink(__DIR__ . '/bug69279a/2.txt');
 @unlink(__DIR__ . '/bug69279a/3.txt');
 @rmdir(__DIR__ . '/bug69279a');
-?>

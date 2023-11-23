@@ -7,7 +7,7 @@ and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
      Original API code Copyright (c) 1997-2012 University of Cambridge
-          New API code Copyright (c) 2015-2022 University of Cambridge
+          New API code Copyright (c) 2015-2020 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* #define DEBUG_SHOW_OPS */
 /* #define DEBUG_SHOW_RMATCH */
 
-#ifdef DEBUG_FRAMES_DISPLAY
+#ifdef DEBUG_FRAME_DISPLAY
 #include <stdarg.h>
 #endif
 
@@ -159,8 +159,7 @@ enum { RM100=100, RM101 };
 #ifdef SUPPORT_UNICODE
 enum { RM200=200, RM201, RM202, RM203, RM204, RM205, RM206, RM207,
        RM208,     RM209, RM210, RM211, RM212, RM213, RM214, RM215,
-       RM216,     RM217, RM218, RM219, RM220, RM221, RM222, RM223,
-       RM224,     RM225 };
+       RM216,     RM217, RM218, RM219, RM220, RM221, RM222 };
 #endif
 
 /* Define short names for general fields in the current backtrack frame, which
@@ -204,7 +203,6 @@ Arguments:
   P           a previous frame of interest
   frame_size  the frame size
   mb          points to the match block
-  match_data  points to the match data block
   s           identification text
 
 Returns:    nothing
@@ -212,7 +210,7 @@ Returns:    nothing
 
 static void
 display_frames(FILE *f, heapframe *F, heapframe *P, PCRE2_SIZE frame_size,
-  match_block *mb, pcre2_match_data *match_data, const char *s, ...)
+  match_block *mb, const char *s, ...)
 {
 uint32_t i;
 heapframe *Q;
@@ -224,10 +222,10 @@ vfprintf(f, s, ap);
 va_end(ap);
 
 if (P != NULL) fprintf(f, " P=%lu",
-  ((char *)P - (char *)(match_data->heapframes))/frame_size);
+  ((char *)P - (char *)(mb->match_frames))/frame_size);
 fprintf(f, "\n");
 
-for (i = 0, Q = match_data->heapframes;
+for (i = 0, Q = mb->match_frames;
      Q <= F;
      i++, Q = (heapframe *)((char *)Q + frame_size))
   {
@@ -491,16 +489,10 @@ A version did exist that used individual frames on the heap instead of calling
 match() recursively, but this ran substantially slower. The current version is
 a refactoring that uses a vector of frames to remember backtracking points.
 This runs no slower, and possibly even a bit faster than the original recursive
-implementation.
+implementation. An initial vector of size START_FRAMES_SIZE (enough for maybe
+50 frames) is allocated on the system stack. If this is not big enough, the
+heap is used for a larger vector.
 
-At first, an initial vector of size START_FRAMES_SIZE (enough for maybe 50
-frames) was allocated on the system stack. If this was not big enough, the heap
-was used for a larger vector. However, it turns out that there are environments
-where taking as little as 20KiB from the system stack is an embarrassment.
-After another refactoring, the heap is used exclusively, but a pointer the
-frames vector and its size are cached in the match_data block, so that there is
-no new memory allocation if the same match_data block is used for multiple
-matches (unless the frames vector has to be extended).
 *******************************************************************************
 ******************************************************************************/
 
@@ -573,9 +565,10 @@ made performance worse.
 Arguments:
    start_eptr   starting character in subject
    start_ecode  starting position in compiled code
+   ovector      pointer to the final output vector
+   oveccount    number of pairs in ovector
    top_bracket  number of capturing parentheses in the pattern
    frame_size   size of each backtracking frame
-   match_data   pointer to the match_data block
    mb           pointer to "static" variables block
 
 Returns:        MATCH_MATCH if matched            )  these values are >= 0
@@ -586,19 +579,17 @@ Returns:        MATCH_MATCH if matched            )  these values are >= 0
 */
 
 static int
-match(PCRE2_SPTR start_eptr, PCRE2_SPTR start_ecode, uint16_t top_bracket,
-  PCRE2_SIZE frame_size, pcre2_match_data *match_data, match_block *mb)
+match(PCRE2_SPTR start_eptr, PCRE2_SPTR start_ecode, PCRE2_SIZE *ovector,
+  uint16_t oveccount, uint16_t top_bracket, PCRE2_SIZE frame_size,
+  match_block *mb)
 {
 /* Frame-handling variables */
 
 heapframe *F;           /* Current frame pointer */
 heapframe *N = NULL;    /* Temporary frame pointers */
 heapframe *P = NULL;
-
-heapframe *frames_top;  /* End of frames vector */
 heapframe *assert_accept_frame = NULL;  /* For passing back a frame with captures */
-PCRE2_SIZE heapframes_size;   /* Usable size of frames vector */
-PCRE2_SIZE frame_copy_size;   /* Amount to copy when creating a new frame */
+PCRE2_SIZE frame_copy_size;     /* Amount to copy when creating a new frame */
 
 /* Local variables that do not need to be preserved over calls to RRMATCH(). */
 
@@ -635,14 +626,10 @@ copied when a new frame is created. */
 
 frame_copy_size = frame_size - offsetof(heapframe, eptr);
 
-/* Set up the first frame and the end of the frames vector. We set the local
-heapframes_size to the usuable amount of the vector, that is, a whole number of
-frames. */
+/* Set up the first current frame at the start of the vector, and initialize
+fields that are not reset for new frames. */
 
-F = match_data->heapframes;
-heapframes_size = (match_data->heapframes_size / frame_size) * frame_size;
-frames_top = (heapframe *)((char *)F + heapframes_size);
-
+F = mb->match_frames;
 Frdepth = 0;                        /* "Recursion" depth */
 Fcapture_last = 0;                  /* Number of most recent capture */
 Fcurrent_recurse = RECURSE_UNSET;   /* Not pattern recursing. */
@@ -658,35 +645,34 @@ backtracking point. */
 
 MATCH_RECURSE:
 
-/* Set up a new backtracking frame. If the vector is full, get a new one,
-doubling the size, but constrained by the heap limit (which is in KiB). */
+/* Set up a new backtracking frame. If the vector is full, get a new one
+on the heap, doubling the size, but constrained by the heap limit. */
 
 N = (heapframe *)((char *)F + frame_size);
-if (N >= frames_top)
+if (N >= mb->match_frames_top)
   {
+  PCRE2_SIZE newsize = mb->frame_vector_size * 2;
   heapframe *new;
-  PCRE2_SIZE newsize = match_data->heapframes_size * 2;
 
-  if (newsize > mb->heap_limit)
+  if ((newsize / 1024) > mb->heap_limit)
     {
-    PCRE2_SIZE maxsize = (mb->heap_limit/frame_size) * frame_size;
-    if (match_data->heapframes_size >= maxsize) return PCRE2_ERROR_HEAPLIMIT;
+    PCRE2_SIZE maxsize = ((mb->heap_limit * 1024)/frame_size) * frame_size;
+    if (mb->frame_vector_size >= maxsize) return PCRE2_ERROR_HEAPLIMIT;
     newsize = maxsize;
     }
 
-  new = match_data->memctl.malloc(newsize, match_data->memctl.memory_data);
+  new = mb->memctl.malloc(newsize, mb->memctl.memory_data);
   if (new == NULL) return PCRE2_ERROR_NOMEMORY;
-  memcpy(new, match_data->heapframes, heapframes_size);
+  memcpy(new, mb->match_frames, mb->frame_vector_size);
 
-  F = (heapframe *)((char *)new + ((char *)F - (char *)match_data->heapframes));
+  F = (heapframe *)((char *)new + ((char *)F - (char *)mb->match_frames));
   N = (heapframe *)((char *)F + frame_size);
 
-  match_data->memctl.free(match_data->heapframes, match_data->memctl.memory_data);
-  match_data->heapframes = new;
-  match_data->heapframes_size = newsize;
-
-  heapframes_size = (newsize / frame_size) * frame_size;
-  frames_top = (heapframe *)((char *)new + heapframes_size);
+  if (mb->match_frames != mb->stack_frames)
+    mb->memctl.free(mb->match_frames, mb->memctl.memory_data);
+  mb->match_frames = new;
+  mb->match_frames_top = (heapframe *)((char *)mb->match_frames + newsize);
+  mb->frame_vector_size = newsize;
   }
 
 #ifdef DEBUG_SHOW_RMATCH
@@ -744,7 +730,7 @@ recursion value. */
 
 if (group_frame_type != 0)
   {
-  Flast_group_offset = (char *)F - (char *)match_data->heapframes;
+  Flast_group_offset = (char *)F - (char *)mb->match_frames;
   if (GF_IDMASK(group_frame_type) == GF_RECURSE)
     Fcurrent_recurse = GF_DATAMASK(group_frame_type);
   group_frame_type = 0;
@@ -786,7 +772,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
       for(;;)
         {
         if (offset == PCRE2_UNSET) return PCRE2_ERROR_INTERNAL;
-        N = (heapframe *)((char *)match_data->heapframes + offset);
+        N = (heapframe *)((char *)mb->match_frames + offset);
         P = (heapframe *)((char *)N - frame_size);
         if (N->group_frame_type == (GF_CAPTURE | number)) break;
         offset = P->last_group_offset;
@@ -824,7 +810,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
       for(;;)
         {
         if (offset == PCRE2_UNSET) return PCRE2_ERROR_INTERNAL;
-        N = (heapframe *)((char *)match_data->heapframes + offset);
+        N = (heapframe *)((char *)mb->match_frames + offset);
         P = (heapframe *)((char *)N - frame_size);
         if (GF_IDMASK(N->group_frame_type) == GF_RECURSE) break;
         offset = P->last_group_offset;
@@ -832,12 +818,10 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
 
       /* N is now the frame of the recursion; the previous frame is at the
       OP_RECURSE position. Go back there, copying the current subject position
-      and mark, and the start_match position (\K might have changed it), and
-      then move on past the OP_RECURSE. */
+      and mark, and move on past the OP_RECURSE. */
 
       P->eptr = Feptr;
       P->mark = Fmark;
-      P->start_match = Fstart_match;
       F = P;
       Fecode += 1 + LINK_SIZE;
       continue;
@@ -877,15 +861,14 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
     mb->mark = Fmark;                    /* and the last success mark */
     if (Feptr > mb->last_used_ptr) mb->last_used_ptr = Feptr;
 
-    match_data->ovector[0] = Fstart_match - mb->start_subject;
-    match_data->ovector[1] = Feptr - mb->start_subject;
+    ovector[0] = Fstart_match - mb->start_subject;
+    ovector[1] = Feptr - mb->start_subject;
 
     /* Set i to the smaller of the sizes of the external and frame ovectors. */
 
-    i = 2 * ((top_bracket + 1 > match_data->oveccount)?
-      match_data->oveccount : top_bracket + 1);
-    memcpy(match_data->ovector + 2, Fovector, (i - 2) * sizeof(PCRE2_SIZE));
-    while (--i >= Foffset_top + 2) match_data->ovector[i] = PCRE2_UNSET;
+    i = 2 * ((top_bracket + 1 > oveccount)? oveccount : top_bracket + 1);
+    memcpy(ovector + 2, Fovector, (i - 2) * sizeof(PCRE2_SIZE));
+    while (--i >= Foffset_top + 2) ovector[i] = PCRE2_UNSET;
     return MATCH_MATCH;  /* Note: NOT RRETURN */
 
 
@@ -2436,49 +2419,40 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
       {
       const uint32_t *cp;
       const ucd_record *prop = GET_UCD(fc);
-      BOOL notmatch = Fop == OP_NOTPROP;
 
       switch(Fecode[1])
         {
         case PT_ANY:
-        if (notmatch) RRETURN(MATCH_NOMATCH);
+        if (Fop == OP_NOTPROP) RRETURN(MATCH_NOMATCH);
         break;
 
         case PT_LAMP:
         if ((prop->chartype == ucp_Lu ||
              prop->chartype == ucp_Ll ||
-             prop->chartype == ucp_Lt) == notmatch)
+             prop->chartype == ucp_Lt) == (Fop == OP_NOTPROP))
           RRETURN(MATCH_NOMATCH);
         break;
 
         case PT_GC:
-        if ((Fecode[2] == PRIV(ucp_gentype)[prop->chartype]) == notmatch)
+        if ((Fecode[2] != PRIV(ucp_gentype)[prop->chartype]) == (Fop == OP_PROP))
           RRETURN(MATCH_NOMATCH);
         break;
 
         case PT_PC:
-        if ((Fecode[2] == prop->chartype) == notmatch)
+        if ((Fecode[2] != prop->chartype) == (Fop == OP_PROP))
           RRETURN(MATCH_NOMATCH);
         break;
 
         case PT_SC:
-        if ((Fecode[2] == prop->script) == notmatch)
+        if ((Fecode[2] != prop->script) == (Fop == OP_PROP))
           RRETURN(MATCH_NOMATCH);
-        break;
-
-        case PT_SCX:
-          {
-          BOOL ok = (Fecode[2] == prop->script ||
-                     MAPBIT(PRIV(ucd_script_sets) + UCD_SCRIPTX_PROP(prop), Fecode[2]) != 0);
-          if (ok == notmatch) RRETURN(MATCH_NOMATCH);
-          }
         break;
 
         /* These are specials */
 
         case PT_ALNUM:
         if ((PRIV(ucp_gentype)[prop->chartype] == ucp_L ||
-             PRIV(ucp_gentype)[prop->chartype] == ucp_N) == notmatch)
+             PRIV(ucp_gentype)[prop->chartype] == ucp_N) == (Fop == OP_NOTPROP))
           RRETURN(MATCH_NOMATCH);
         break;
 
@@ -2492,12 +2466,12 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
           {
           HSPACE_CASES:
           VSPACE_CASES:
-          if (notmatch) RRETURN(MATCH_NOMATCH);
+          if (Fop == OP_NOTPROP) RRETURN(MATCH_NOMATCH);
           break;
 
           default:
-          if ((PRIV(ucp_gentype)[prop->chartype] == ucp_Z) == notmatch)
-            RRETURN(MATCH_NOMATCH);
+          if ((PRIV(ucp_gentype)[prop->chartype] == ucp_Z) ==
+            (Fop == OP_NOTPROP)) RRETURN(MATCH_NOMATCH);
           break;
           }
         break;
@@ -2505,7 +2479,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
         case PT_WORD:
         if ((PRIV(ucp_gentype)[prop->chartype] == ucp_L ||
              PRIV(ucp_gentype)[prop->chartype] == ucp_N ||
-             fc == CHAR_UNDERSCORE) == notmatch)
+             fc == CHAR_UNDERSCORE) == (Fop == OP_NOTPROP))
           RRETURN(MATCH_NOMATCH);
         break;
 
@@ -2514,30 +2488,17 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
         for (;;)
           {
           if (fc < *cp)
-            { if (notmatch) break; else { RRETURN(MATCH_NOMATCH); } }
+            { if (Fop == OP_PROP) { RRETURN(MATCH_NOMATCH); } else break; }
           if (fc == *cp++)
-            { if (notmatch) { RRETURN(MATCH_NOMATCH); } else break; }
+            { if (Fop == OP_PROP) break; else { RRETURN(MATCH_NOMATCH); } }
           }
         break;
 
         case PT_UCNC:
         if ((fc == CHAR_DOLLAR_SIGN || fc == CHAR_COMMERCIAL_AT ||
              fc == CHAR_GRAVE_ACCENT || (fc >= 0xa0 && fc <= 0xd7ff) ||
-             fc >= 0xe000) == notmatch)
+             fc >= 0xe000) == (Fop == OP_NOTPROP))
           RRETURN(MATCH_NOMATCH);
-        break;
-
-        case PT_BIDICL:
-        if ((UCD_BIDICLASS_PROP(prop) == Fecode[2]) == notmatch)
-          RRETURN(MATCH_NOMATCH);
-        break;
-
-        case PT_BOOL:
-          {
-          BOOL ok = MAPBIT(PRIV(ucd_boolprop_sets) +
-            UCD_BPROPS_PROP(prop), Fecode[2]) != 0;
-          if (ok == notmatch) RRETURN(MATCH_NOMATCH);
-          }
         break;
 
         /* This should never occur */
@@ -2653,20 +2614,18 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
 
     /* First, ensure the minimum number of matches are present. Use inline
     code for maximizing the speed, and do the type test once at the start
-    (i.e. keep it out of the loops). As there are no calls to RMATCH in the
-    loops, we can use an ordinary variable for "notmatch". The code for UTF
-    mode is separated out for tidiness, except for Unicode property tests. */
+    (i.e. keep it out of the loop). The code for UTF mode is separated out for
+    tidiness, except for Unicode property tests. */
 
     if (Lmin > 0)
       {
 #ifdef SUPPORT_UNICODE
       if (proptype >= 0)  /* Property tests in all modes */
         {
-        BOOL notmatch = Lctype == OP_NOTPROP;
         switch(proptype)
           {
           case PT_ANY:
-          if (notmatch) RRETURN(MATCH_NOMATCH);
+          if (Lctype == OP_NOTPROP) RRETURN(MATCH_NOMATCH);
           for (i = 1; i <= Lmin; i++)
             {
             if (Feptr >= mb->end_subject)
@@ -2691,7 +2650,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
             chartype = UCD_CHARTYPE(fc);
             if ((chartype == ucp_Lu ||
                  chartype == ucp_Ll ||
-                 chartype == ucp_Lt) == notmatch)
+                 chartype == ucp_Lt) == (Lctype == OP_NOTPROP))
               RRETURN(MATCH_NOMATCH);
             }
           break;
@@ -2705,7 +2664,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               RRETURN(MATCH_NOMATCH);
               }
             GETCHARINCTEST(fc, Feptr);
-            if ((UCD_CATEGORY(fc) == Lpropvalue) == notmatch)
+            if ((UCD_CATEGORY(fc) == Lpropvalue) == (Lctype == OP_NOTPROP))
               RRETURN(MATCH_NOMATCH);
             }
           break;
@@ -2719,7 +2678,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               RRETURN(MATCH_NOMATCH);
               }
             GETCHARINCTEST(fc, Feptr);
-            if ((UCD_CHARTYPE(fc) == Lpropvalue) == notmatch)
+            if ((UCD_CHARTYPE(fc) == Lpropvalue) == (Lctype == OP_NOTPROP))
               RRETURN(MATCH_NOMATCH);
             }
           break;
@@ -2733,26 +2692,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               RRETURN(MATCH_NOMATCH);
               }
             GETCHARINCTEST(fc, Feptr);
-            if ((UCD_SCRIPT(fc) == Lpropvalue) == notmatch)
-              RRETURN(MATCH_NOMATCH);
-            }
-          break;
-
-          case PT_SCX:
-          for (i = 1; i <= Lmin; i++)
-            {
-            BOOL ok;
-            const ucd_record *prop;
-            if (Feptr >= mb->end_subject)
-              {
-              SCHECK_PARTIAL();
-              RRETURN(MATCH_NOMATCH);
-              }
-            GETCHARINCTEST(fc, Feptr);
-            prop = GET_UCD(fc);
-            ok = (prop->script == Lpropvalue ||
-                  MAPBIT(PRIV(ucd_script_sets) + UCD_SCRIPTX_PROP(prop), Lpropvalue) != 0);
-            if (ok == notmatch)
+            if ((UCD_SCRIPT(fc) == Lpropvalue) == (Lctype == OP_NOTPROP))
               RRETURN(MATCH_NOMATCH);
             }
           break;
@@ -2768,7 +2708,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               }
             GETCHARINCTEST(fc, Feptr);
             category = UCD_CATEGORY(fc);
-            if ((category == ucp_L || category == ucp_N) == notmatch)
+            if ((category == ucp_L || category == ucp_N) == (Lctype == OP_NOTPROP))
               RRETURN(MATCH_NOMATCH);
             }
           break;
@@ -2791,11 +2731,11 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               {
               HSPACE_CASES:
               VSPACE_CASES:
-              if (notmatch) RRETURN(MATCH_NOMATCH);
+              if (Lctype == OP_NOTPROP) RRETURN(MATCH_NOMATCH);
               break;
 
               default:
-              if ((UCD_CATEGORY(fc) == ucp_Z) == notmatch)
+              if ((UCD_CATEGORY(fc) == ucp_Z) == (Lctype == OP_NOTPROP))
                 RRETURN(MATCH_NOMATCH);
               break;
               }
@@ -2814,7 +2754,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
             GETCHARINCTEST(fc, Feptr);
             category = UCD_CATEGORY(fc);
             if ((category == ucp_L || category == ucp_N ||
-                fc == CHAR_UNDERSCORE) == notmatch)
+                fc == CHAR_UNDERSCORE) == (Lctype == OP_NOTPROP))
               RRETURN(MATCH_NOMATCH);
             }
           break;
@@ -2834,12 +2774,12 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               {
               if (fc < *cp)
                 {
-                if (notmatch) break;
+                if (Lctype == OP_NOTPROP) break;
                 RRETURN(MATCH_NOMATCH);
                 }
               if (fc == *cp++)
                 {
-                if (notmatch) RRETURN(MATCH_NOMATCH);
+                if (Lctype == OP_NOTPROP) RRETURN(MATCH_NOMATCH);
                 break;
                 }
               }
@@ -2857,40 +2797,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
             GETCHARINCTEST(fc, Feptr);
             if ((fc == CHAR_DOLLAR_SIGN || fc == CHAR_COMMERCIAL_AT ||
                  fc == CHAR_GRAVE_ACCENT || (fc >= 0xa0 && fc <= 0xd7ff) ||
-                 fc >= 0xe000) == notmatch)
-              RRETURN(MATCH_NOMATCH);
-            }
-          break;
-
-          case PT_BIDICL:
-          for (i = 1; i <= Lmin; i++)
-            {
-            if (Feptr >= mb->end_subject)
-              {
-              SCHECK_PARTIAL();
-              RRETURN(MATCH_NOMATCH);
-              }
-            GETCHARINCTEST(fc, Feptr);
-            if ((UCD_BIDICLASS(fc) == Lpropvalue) == notmatch)
-              RRETURN(MATCH_NOMATCH);
-            }
-          break;
-
-          case PT_BOOL:
-          for (i = 1; i <= Lmin; i++)
-            {
-            BOOL ok;
-            const ucd_record *prop;
-            if (Feptr >= mb->end_subject)
-              {
-              SCHECK_PARTIAL();
-              RRETURN(MATCH_NOMATCH);
-              }
-            GETCHARINCTEST(fc, Feptr);
-            prop = GET_UCD(fc);
-            ok = MAPBIT(PRIV(ucd_boolprop_sets) +
-              UCD_BPROPS_PROP(prop), Lpropvalue) != 0;
-            if (ok == notmatch)
+                 fc >= 0xe000) == (Lctype == OP_NOTPROP))
               RRETURN(MATCH_NOMATCH);
             }
           break;
@@ -3434,9 +3341,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
     if (Lmin == Lmax) continue;
 
     /* If minimizing, we have to test the rest of the pattern before each
-    subsequent match. This means we cannot use a local "notmatch" variable as
-    in the other cases. As all 4 temporary 32-bit values in the frame are
-    already in use, just test the type each time. */
+    subsequent match. */
 
     if (reptype == REPTYPE_MIN)
       {
@@ -3533,28 +3438,6 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
             }
           /* Control never gets here */
 
-          case PT_SCX:
-          for (;;)
-            {
-            BOOL ok;
-            const ucd_record *prop;
-            RMATCH(Fecode, RM225);
-            if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-            if (Lmin++ >= Lmax) RRETURN(MATCH_NOMATCH);
-            if (Feptr >= mb->end_subject)
-              {
-              SCHECK_PARTIAL();
-              RRETURN(MATCH_NOMATCH);
-              }
-            GETCHARINCTEST(fc, Feptr);
-            prop = GET_UCD(fc);
-            ok = (prop->script == Lpropvalue
-                  || MAPBIT(PRIV(ucd_script_sets) + UCD_SCRIPTX_PROP(prop), Lpropvalue) != 0);
-            if (ok == (Lctype == OP_NOTPROP))
-              RRETURN(MATCH_NOMATCH);
-            }
-          /* Control never gets here */
-
           case PT_ALNUM:
           for (;;)
             {
@@ -3569,7 +3452,8 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               }
             GETCHARINCTEST(fc, Feptr);
             category = UCD_CATEGORY(fc);
-            if ((category == ucp_L || category == ucp_N) == (Lctype == OP_NOTPROP))
+            if ((category == ucp_L || category == ucp_N) ==
+                (Lctype == OP_NOTPROP))
               RRETURN(MATCH_NOMATCH);
             }
           /* Control never gets here */
@@ -3672,45 +3556,6 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
             if ((fc == CHAR_DOLLAR_SIGN || fc == CHAR_COMMERCIAL_AT ||
                  fc == CHAR_GRAVE_ACCENT || (fc >= 0xa0 && fc <= 0xd7ff) ||
                  fc >= 0xe000) == (Lctype == OP_NOTPROP))
-              RRETURN(MATCH_NOMATCH);
-            }
-          /* Control never gets here */
-
-          case PT_BIDICL:
-          for (;;)
-            {
-            RMATCH(Fecode, RM224);
-            if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-            if (Lmin++ >= Lmax) RRETURN(MATCH_NOMATCH);
-            if (Feptr >= mb->end_subject)
-              {
-              SCHECK_PARTIAL();
-              RRETURN(MATCH_NOMATCH);
-              }
-            GETCHARINCTEST(fc, Feptr);
-            if ((UCD_BIDICLASS(fc) == Lpropvalue) == (Lctype == OP_NOTPROP))
-              RRETURN(MATCH_NOMATCH);
-            }
-          /* Control never gets here */
-
-          case PT_BOOL:
-          for (;;)
-            {
-            BOOL ok;
-            const ucd_record *prop;
-            RMATCH(Fecode, RM223);
-            if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-            if (Lmin++ >= Lmax) RRETURN(MATCH_NOMATCH);
-            if (Feptr >= mb->end_subject)
-              {
-              SCHECK_PARTIAL();
-              RRETURN(MATCH_NOMATCH);
-              }
-            GETCHARINCTEST(fc, Feptr);
-            prop = GET_UCD(fc);
-            ok = MAPBIT(PRIV(ucd_boolprop_sets) +
-              UCD_BPROPS_PROP(prop), Lpropvalue) != 0;
-            if (ok == (Lctype == OP_NOTPROP))
               RRETURN(MATCH_NOMATCH);
             }
           /* Control never gets here */
@@ -4023,9 +3868,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
       }
 
     /* If maximizing, it is worth using inline code for speed, doing the type
-    test once at the start (i.e. keep it out of the loops). Once again,
-    "notmatch" can be an ordinary local variable because the loops do not call
-    RMATCH. */
+    test once at the start (i.e. keep it out of the loop). */
 
     else
       {
@@ -4034,7 +3877,6 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
 #ifdef SUPPORT_UNICODE
       if (proptype >= 0)
         {
-        BOOL notmatch = Lctype == OP_NOTPROP;
         switch(proptype)
           {
           case PT_ANY:
@@ -4047,7 +3889,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               break;
               }
             GETCHARLENTEST(fc, Feptr, len);
-            if (notmatch) break;
+            if (Lctype == OP_NOTPROP) break;
             Feptr+= len;
             }
           break;
@@ -4066,7 +3908,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
             chartype = UCD_CHARTYPE(fc);
             if ((chartype == ucp_Lu ||
                  chartype == ucp_Ll ||
-                 chartype == ucp_Lt) == notmatch)
+                 chartype == ucp_Lt) == (Lctype == OP_NOTPROP))
               break;
             Feptr+= len;
             }
@@ -4082,7 +3924,8 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               break;
               }
             GETCHARLENTEST(fc, Feptr, len);
-            if ((UCD_CATEGORY(fc) == Lpropvalue) == notmatch) break;
+            if ((UCD_CATEGORY(fc) == Lpropvalue) == (Lctype == OP_NOTPROP))
+              break;
             Feptr+= len;
             }
           break;
@@ -4097,7 +3940,8 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               break;
               }
             GETCHARLENTEST(fc, Feptr, len);
-            if ((UCD_CHARTYPE(fc) == Lpropvalue) == notmatch) break;
+            if ((UCD_CHARTYPE(fc) == Lpropvalue) == (Lctype == OP_NOTPROP))
+              break;
             Feptr+= len;
             }
           break;
@@ -4112,27 +3956,8 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               break;
               }
             GETCHARLENTEST(fc, Feptr, len);
-            if ((UCD_SCRIPT(fc) == Lpropvalue) == notmatch) break;
-            Feptr+= len;
-            }
-          break;
-
-          case PT_SCX:
-          for (i = Lmin; i < Lmax; i++)
-            {
-            BOOL ok;
-            const ucd_record *prop;
-            int len = 1;
-            if (Feptr >= mb->end_subject)
-              {
-              SCHECK_PARTIAL();
+            if ((UCD_SCRIPT(fc) == Lpropvalue) == (Lctype == OP_NOTPROP))
               break;
-              }
-            GETCHARLENTEST(fc, Feptr, len);
-            prop = GET_UCD(fc);
-            ok = (prop->script == Lpropvalue ||
-                  MAPBIT(PRIV(ucd_script_sets) + UCD_SCRIPTX_PROP(prop), Lpropvalue) != 0);
-            if (ok == notmatch) break;
             Feptr+= len;
             }
           break;
@@ -4149,7 +3974,8 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               }
             GETCHARLENTEST(fc, Feptr, len);
             category = UCD_CATEGORY(fc);
-            if ((category == ucp_L || category == ucp_N) == notmatch)
+            if ((category == ucp_L || category == ucp_N) ==
+                (Lctype == OP_NOTPROP))
               break;
             Feptr+= len;
             }
@@ -4174,11 +4000,11 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
               {
               HSPACE_CASES:
               VSPACE_CASES:
-              if (notmatch) goto ENDLOOP99;  /* Break the loop */
+              if (Lctype == OP_NOTPROP) goto ENDLOOP99;  /* Break the loop */
               break;
 
               default:
-              if ((UCD_CATEGORY(fc) == ucp_Z) == notmatch)
+              if ((UCD_CATEGORY(fc) == ucp_Z) == (Lctype == OP_NOTPROP))
                 goto ENDLOOP99;   /* Break the loop */
               break;
               }
@@ -4200,7 +4026,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
             GETCHARLENTEST(fc, Feptr, len);
             category = UCD_CATEGORY(fc);
             if ((category == ucp_L || category == ucp_N ||
-                 fc == CHAR_UNDERSCORE) == notmatch)
+                 fc == CHAR_UNDERSCORE) == (Lctype == OP_NOTPROP))
               break;
             Feptr+= len;
             }
@@ -4221,9 +4047,9 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
             for (;;)
               {
               if (fc < *cp)
-                { if (notmatch) break; else goto GOT_MAX; }
+                { if (Lctype == OP_NOTPROP) break; else goto GOT_MAX; }
               if (fc == *cp++)
-                { if (notmatch) goto GOT_MAX; else break; }
+                { if (Lctype == OP_NOTPROP) goto GOT_MAX; else break; }
               }
             Feptr += len;
             }
@@ -4242,44 +4068,9 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
             GETCHARLENTEST(fc, Feptr, len);
             if ((fc == CHAR_DOLLAR_SIGN || fc == CHAR_COMMERCIAL_AT ||
                  fc == CHAR_GRAVE_ACCENT || (fc >= 0xa0 && fc <= 0xd7ff) ||
-                 fc >= 0xe000) == notmatch)
+                 fc >= 0xe000) == (Lctype == OP_NOTPROP))
               break;
             Feptr += len;
-            }
-          break;
-
-          case PT_BIDICL:
-          for (i = Lmin; i < Lmax; i++)
-            {
-            int len = 1;
-            if (Feptr >= mb->end_subject)
-              {
-              SCHECK_PARTIAL();
-              break;
-              }
-            GETCHARLENTEST(fc, Feptr, len);
-            if ((UCD_BIDICLASS(fc) == Lpropvalue) == notmatch) break;
-            Feptr+= len;
-            }
-          break;
-
-          case PT_BOOL:
-          for (i = Lmin; i < Lmax; i++)
-            {
-            BOOL ok;
-            const ucd_record *prop;
-            int len = 1;
-            if (Feptr >= mb->end_subject)
-              {
-              SCHECK_PARTIAL();
-              break;
-              }
-            GETCHARLENTEST(fc, Feptr, len);
-            prop = GET_UCD(fc);
-            ok = MAPBIT(PRIV(ucd_boolprop_sets) +
-              UCD_BPROPS_PROP(prop), Lpropvalue) != 0;
-            if (ok == notmatch) break;
-            Feptr+= len;
             }
           break;
 
@@ -5342,7 +5133,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
       offset = Flast_group_offset;
       while (offset != PCRE2_UNSET)
         {
-        N = (heapframe *)((char *)match_data->heapframes + offset);
+        N = (heapframe *)((char *)mb->match_frames + offset);
         P = (heapframe *)((char *)N - frame_size);
         if (N->group_frame_type == (GF_RECURSE | number))
           {
@@ -5743,7 +5534,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
 
     if (*bracode != OP_BRA && *bracode != OP_COND)
       {
-      N = (heapframe *)((char *)match_data->heapframes + Flast_group_offset);
+      N = (heapframe *)((char *)mb->match_frames + Flast_group_offset);
       P = (heapframe *)((char *)N - frame_size);
       Flast_group_offset = P->last_group_offset;
 
@@ -5847,7 +5638,7 @@ fprintf(stderr, "++ op=%d\n", *Fecode);
         {
         P = (heapframe *)((char *)N - frame_size);
         memcpy((char *)F + offsetof(heapframe, ovector), P->ovector,
-          Foffset_top * sizeof(PCRE2_SIZE));
+          P->offset_top * sizeof(PCRE2_SIZE));
         Foffset_top = P->offset_top;
         Fcapture_last = P->capture_last;
         Fcurrent_recurse = P->current_recurse;
@@ -6273,7 +6064,7 @@ switch (Freturn_id)
   LBL(200) LBL(201) LBL(202) LBL(203) LBL(204) LBL(205) LBL(206)
   LBL(207) LBL(208) LBL(209) LBL(210) LBL(211) LBL(212) LBL(213)
   LBL(214) LBL(215) LBL(216) LBL(217) LBL(218) LBL(219) LBL(220)
-  LBL(221) LBL(222) LBL(223) LBL(224) LBL(225)
+  LBL(221) LBL(222)
 #endif
 
   default:
@@ -6324,8 +6115,8 @@ BOOL has_req_cu = FALSE;
 BOOL startline;
 
 #if PCRE2_CODE_UNIT_WIDTH == 8
-PCRE2_SPTR memchr_found_first_cu;
-PCRE2_SPTR memchr_found_first_cu2;
+BOOL memchr_not_found_first_cu = FALSE;
+BOOL memchr_not_found_first_cu2 = FALSE;
 #endif
 
 PCRE2_UCHAR first_cu = 0;
@@ -6336,8 +6127,8 @@ PCRE2_UCHAR req_cu2 = 0;
 PCRE2_SPTR bumpalong_limit;
 PCRE2_SPTR end_subject;
 PCRE2_SPTR true_end_subject;
-PCRE2_SPTR start_match;
-PCRE2_SPTR req_cu_ptr;
+PCRE2_SPTR start_match = subject + start_offset;
+PCRE2_SPTR req_cu_ptr = start_match - 1;
 PCRE2_SPTR start_partial;
 PCRE2_SPTR match_partial;
 
@@ -6360,7 +6151,6 @@ BOOL jit_checked_utf = FALSE;
 #endif  /* SUPPORT_UNICODE */
 
 PCRE2_SIZE frame_size;
-PCRE2_SIZE heapframes_size;
 
 /* We need to have mb as a pointer to a match block, because the IS_NEWLINE
 macro is used below, and it expects NLBLOCK to be defined as a pointer. */
@@ -6369,18 +6159,18 @@ pcre2_callout_block cb;
 match_block actual_match_block;
 match_block *mb = &actual_match_block;
 
-/* Recognize NULL, length 0 as an empty string. */
+/* Allocate an initial vector of backtracking frames on the stack. If this
+proves to be too small, it is replaced by a larger one on the heap. To get a
+vector of the size required that is aligned for pointers, allocate it as a
+vector of pointers. */
 
-if (subject == NULL && length == 0) subject = (PCRE2_SPTR)"";
+PCRE2_SPTR stack_frames_vector[START_FRAMES_SIZE/sizeof(PCRE2_SPTR)]
+    PCRE2_KEEP_UNINITIALIZED;
+mb->stack_frames = (heapframe *)stack_frames_vector;
 
-/* Plausibility checks */
+/* A length equal to PCRE2_ZERO_TERMINATED implies a zero-terminated
+subject string. */
 
-if ((options & ~PUBLIC_MATCH_OPTIONS) != 0) return PCRE2_ERROR_BADOPTION;
-if (code == NULL || subject == NULL || match_data == NULL)
-  return PCRE2_ERROR_NULL;
-
-start_match = subject + start_offset;
-req_cu_ptr = start_match - 1;
 if (length == PCRE2_ZERO_TERMINATED)
   {
   length = PRIV(strlen)(subject);
@@ -6388,6 +6178,11 @@ if (length == PCRE2_ZERO_TERMINATED)
   }
 true_end_subject = end_subject = subject + length;
 
+/* Plausibility checks */
+
+if ((options & ~PUBLIC_MATCH_OPTIONS) != 0) return PCRE2_ERROR_BADOPTION;
+if (code == NULL || subject == NULL || match_data == NULL)
+  return PCRE2_ERROR_NULL;
 if (start_offset > length) return PCRE2_ERROR_BADOFFSET;
 
 /* Check that the first field in the block is the magic number. */
@@ -6685,7 +6480,7 @@ if (utf &&
     /* If the end precedes start_match, it means there is invalid UTF in the
     extra code units we reversed over because of a lookbehind. Advance past the
     first bad code unit, and then skip invalid character starting code units in
-    8-bit and 16-bit modes, and try again with the original end point. */
+    8-bit and 16-bit modes, and try again. */
 
     if (end_subject < start_match)
       {
@@ -6694,7 +6489,6 @@ if (utf &&
       while (mb->check_subject < start_match && NOT_FIRSTCU(*mb->check_subject))
         mb->check_subject++;
 #endif
-      end_subject = true_end_subject;
       }
 
     /* Otherwise, set the not end of line option, and do the match. */
@@ -6799,24 +6593,22 @@ switch(re->newline_convention)
 vector at the end, whose size depends on the number of capturing parentheses in
 the pattern. It is not used at all if there are no capturing parentheses.
 
-  frame_size                   is the total size of each frame
-  match_data->heapframes       is the pointer to the frames vector
-  match_data->heapframes_size  is the total size of the vector
+  frame_size             is the total size of each frame
+  mb->frame_vector_size  is the total usable size of the vector (rounded down
+                           to a whole number of frames)
 
-We must pad the frame_size for alignment to ensure subsequent frames are as
-aligned as heapframe. Whilst ovector is word-aligned due to being a PCRE2_SIZE
-array, that does not guarantee it is suitably aligned for pointers, as some
-architectures have pointers that are larger than a size_t. */
+The last of these is changed within the match() function if the frame vector
+has to be expanded. We therefore put it into the match block so that it is
+correct when calling match() more than once for non-anchored patterns. */
 
-frame_size = (offsetof(heapframe, ovector) +
-  re->top_bracket * 2 * sizeof(PCRE2_SIZE) + HEAPFRAME_ALIGNMENT - 1) &
-  ~(HEAPFRAME_ALIGNMENT - 1);
+frame_size = offsetof(heapframe, ovector) +
+  re->top_bracket * 2 * sizeof(PCRE2_SIZE);
 
 /* Limits set in the pattern override the match context only if they are
 smaller. */
 
-mb->heap_limit = ((mcontext->heap_limit < re->limit_heap)?
-  mcontext->heap_limit : re->limit_heap) * 1024;
+mb->heap_limit = (mcontext->heap_limit < re->limit_heap)?
+  mcontext->heap_limit : re->limit_heap;
 
 mb->match_limit = (mcontext->match_limit < re->limit_match)?
   mcontext->match_limit : re->limit_match;
@@ -6825,41 +6617,36 @@ mb->match_limit_depth = (mcontext->depth_limit < re->limit_depth)?
   mcontext->depth_limit : re->limit_depth;
 
 /* If a pattern has very many capturing parentheses, the frame size may be very
-large. Set the initial frame vector size to ensure that there are at least 10
-available frames, but enforce a minimum of START_FRAMES_SIZE. If this is
-greater than the heap limit, get as large a vector as possible. Always round
-the size to a multiple of the frame size. */
+large. Ensure that there are at least 10 available frames by getting an initial
+vector on the heap if necessary, except when the heap limit prevents this. Get
+fewer if possible. (The heap limit is in kibibytes.) */
 
-heapframes_size = frame_size * 10;
-if (heapframes_size < START_FRAMES_SIZE) heapframes_size = START_FRAMES_SIZE;
-if (heapframes_size > mb->heap_limit)
+if (frame_size <= START_FRAMES_SIZE/10)
   {
-  if (frame_size > mb->heap_limit ) return PCRE2_ERROR_HEAPLIMIT;
-  heapframes_size = mb->heap_limit;
+  mb->match_frames = mb->stack_frames;   /* Initial frame vector on the stack */
+  mb->frame_vector_size = ((START_FRAMES_SIZE/frame_size) * frame_size);
   }
-
-/* If an existing frame vector in the match_data block is large enough, we can
-use it.Otherwise, free any pre-existing vector and get a new one. */
-
-if (match_data->heapframes_size < heapframes_size)
+else
   {
-  match_data->memctl.free(match_data->heapframes,
-    match_data->memctl.memory_data);
-  match_data->heapframes = match_data->memctl.malloc(heapframes_size,
-    match_data->memctl.memory_data);
-  if (match_data->heapframes == NULL)
+  mb->frame_vector_size = frame_size * 10;
+  if ((mb->frame_vector_size / 1024) > mb->heap_limit)
     {
-    match_data->heapframes_size = 0;
-    return PCRE2_ERROR_NOMEMORY;
+    if (frame_size > mb->heap_limit * 1024) return PCRE2_ERROR_HEAPLIMIT;
+    mb->frame_vector_size = ((mb->heap_limit * 1024)/frame_size) * frame_size;
     }
-  match_data->heapframes_size = heapframes_size;
+  mb->match_frames = mb->memctl.malloc(mb->frame_vector_size,
+    mb->memctl.memory_data);
+  if (mb->match_frames == NULL) return PCRE2_ERROR_NOMEMORY;
   }
+
+mb->match_frames_top =
+  (heapframe *)((char *)mb->match_frames + mb->frame_vector_size);
 
 /* Write to the ovector within the first frame to mark every capture unset and
 to avoid uninitialized memory read errors when it is copied to a new frame. */
 
-memset((char *)(match_data->heapframes) + offsetof(heapframe, ovector), 0xff,
-  frame_size - offsetof(heapframe, ovector));
+memset((char *)(mb->match_frames) + offsetof(heapframe, ovector), 0xff,
+  re->top_bracket * 2 * sizeof(PCRE2_SIZE));
 
 /* Pointers to the individual character tables */
 
@@ -6921,11 +6708,6 @@ FRAGMENT_RESTART:
 
 start_partial = match_partial = NULL;
 mb->hitend = FALSE;
-
-#if PCRE2_CODE_UNIT_WIDTH == 8
-memchr_found_first_cu = NULL;
-memchr_found_first_cu2 = NULL;
-#endif
 
 for(;;)
   {
@@ -6993,7 +6775,13 @@ for(;;)
         }
       }
 
-    /* Not anchored. Advance to a unique first code unit if there is one. */
+    /* Not anchored. Advance to a unique first code unit if there is one. In
+    8-bit mode, the use of memchr() gives a big speed up, even though we have
+    to call it twice in caseless mode, in order to find the earliest occurrence
+    of the character in either of its cases. If a call to memchr() that
+    searches the rest of the subject fails to find one case, remember that in
+    order not to keep on repeating the search. This can make a huge difference
+    when the strings are very long and only one case is present. */
 
     else
       {
@@ -7001,68 +6789,43 @@ for(;;)
         {
         if (first_cu != first_cu2)  /* Caseless */
           {
-          /* In 16-bit and 32_bit modes we have to do our own search, so can
-          look for both cases at once. */
-
 #if PCRE2_CODE_UNIT_WIDTH != 8
           PCRE2_UCHAR smc;
           while (start_match < end_subject &&
                 (smc = UCHAR21TEST(start_match)) != first_cu &&
-                 smc != first_cu2)
+                  smc != first_cu2)
             start_match++;
-#else
-          /* In 8-bit mode, the use of memchr() gives a big speed up, even
-          though we have to call it twice in order to find the earliest
-          occurrence of the code unit in either of its cases. Caching is used
-          to remember the positions of previously found code units. This can
-          make a huge difference when the strings are very long and only one
-          case is actually present. */
 
+#else  /* 8-bit code units */
           PCRE2_SPTR pp1 = NULL;
           PCRE2_SPTR pp2 = NULL;
-          PCRE2_SIZE searchlength = end_subject - start_match;
+          PCRE2_SIZE cu2size = end_subject - start_match;
 
-          /* If we haven't got a previously found position for first_cu, or if
-          the current starting position is later, we need to do a search. If
-          the code unit is not found, set it to the end. */
-
-          if (memchr_found_first_cu == NULL ||
-              start_match > memchr_found_first_cu)
+          if (!memchr_not_found_first_cu)
             {
-            pp1 = memchr(start_match, first_cu, searchlength);
-            memchr_found_first_cu = (pp1 == NULL)? end_subject : pp1;
+            pp1 = memchr(start_match, first_cu, end_subject - start_match);
+            if (pp1 == NULL) memchr_not_found_first_cu = TRUE;
+              else cu2size = pp1 - start_match;
             }
 
-          /* If the start is before a previously found position, use the
-          previous position, or NULL if a previous search failed. */
+          /* If pp1 is not NULL, we have arranged to search only as far as pp1,
+          to see if the other case is earlier, so we can set "not found" only
+          when both searches have returned NULL. */
 
-          else pp1 = (memchr_found_first_cu == end_subject)? NULL :
-            memchr_found_first_cu;
-
-          /* Do the same thing for the other case. */
-
-          if (memchr_found_first_cu2 == NULL ||
-              start_match > memchr_found_first_cu2)
+          if (!memchr_not_found_first_cu2)
             {
-            pp2 = memchr(start_match, first_cu2, searchlength);
-            memchr_found_first_cu2 = (pp2 == NULL)? end_subject : pp2;
+            pp2 = memchr(start_match, first_cu2, cu2size);
+            memchr_not_found_first_cu2 = (pp2 == NULL && pp1 == NULL);
             }
-
-          else pp2 = (memchr_found_first_cu2 == end_subject)? NULL :
-            memchr_found_first_cu2;
-
-          /* Set the start to the end of the subject if neither case was found.
-          Otherwise, use the earlier found point. */
 
           if (pp1 == NULL)
             start_match = (pp2 == NULL)? end_subject : pp2;
           else
             start_match = (pp2 == NULL || pp1 < pp2)? pp1 : pp2;
-
-#endif  /* 8-bit handling */
+#endif
           }
 
-        /* The caseful case is much simpler. */
+        /* The caseful case */
 
         else
           {
@@ -7286,8 +7049,8 @@ for(;;)
   mb->end_offset_top = 0;
   mb->skip_arg_count = 0;
 
-  rc = match(start_match, mb->start_code, re->top_bracket, frame_size,
-    match_data, mb);
+  rc = match(start_match, mb->start_code, match_data->ovector,
+    match_data->oveccount, re->top_bracket, frame_size, mb);
 
   if (mb->hitend && start_partial == NULL)
     {
@@ -7424,7 +7187,6 @@ if (utf && end_subject != true_end_subject &&
     starting code units in 8-bit and 16-bit modes. */
 
     start_match = end_subject + 1;
-
 #if PCRE2_CODE_UNIT_WIDTH != 32
     while (start_match < true_end_subject && NOT_FIRSTCU(*start_match))
       start_match++;
@@ -7469,6 +7231,11 @@ if (utf && end_subject != true_end_subject &&
     }
   }
 #endif  /* SUPPORT_UNICODE */
+
+/* Release an enlarged frame vector that is on the heap. */
+
+if (mb->match_frames != mb->stack_frames)
+  mb->memctl.free(mb->match_frames, mb->memctl.memory_data);
 
 /* Fill in fields that are always returned in the match data. */
 
@@ -7534,11 +7301,5 @@ else match_data->rc = PCRE2_ERROR_NOMATCH;
 
 return match_data->rc;
 }
-
-/* These #undefs are here to enable unity builds with CMake. */
-
-#undef NLBLOCK /* Block containing newline information */
-#undef PSSTART /* Field containing processed string start */
-#undef PSEND   /* Field containing processed string end */
 
 /* End of pcre2_match.c */

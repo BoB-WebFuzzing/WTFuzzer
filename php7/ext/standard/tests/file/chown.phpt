@@ -7,9 +7,9 @@ if(substr(PHP_OS, 0, 3) == "WIN")
 ?>
 --FILE--
 <?php
-chown("sjhgfskhagkfdgskjfhgskfsdgfkdsajf", 0);
+chown("sjhgfskhagkfdgskjfhgskfsdgfkdsajf", NULL);
 echo "ALIVE\n";
 ?>
 --EXPECTF--
-Warning: chown(): No such file or directory in %s on line %d
+Warning: chown(): parameter 2 should be string or int, null given in %schown.php on line %d
 ALIVE

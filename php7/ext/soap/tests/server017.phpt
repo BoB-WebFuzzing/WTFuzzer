@@ -1,11 +1,11 @@
 --TEST--
 SOAP Server 17: user fault (through return)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test() {
-    return new SoapFault("MyFault","My fault string");
+	return new SoapFault("MyFault","My fault string");
 }
 
 $server = new soapserver(null,array('uri'=>"http://testuri.org"));

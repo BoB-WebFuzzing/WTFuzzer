@@ -10,6 +10,13 @@ if (PHP_OS_FAMILY === 'Windows') {
 ?>
 --FILE--
 <?php
+/* Prototype: array lstat ( string $filename );
+   Description: Gives information about a file or symbolic link
+
+   Prototype: array stat ( string $filename );
+   Description: Gives information about a file
+*/
+
 /* test the effects of is_link() on stats of link */
 
 $file_path = __DIR__;
@@ -30,7 +37,7 @@ $linkname = "$file_path/lstat_stat_variation12_link.tmp";
 $old_stat = lstat($linkname);
 // clear the stat
 clearstatcache();
-sleep(1);
+sleep(2);
 var_dump( is_link($linkname) );
 $new_stat = lstat($linkname);
 // compare self stats

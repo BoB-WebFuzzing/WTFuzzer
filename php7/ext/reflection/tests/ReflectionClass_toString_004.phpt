@@ -14,4 +14,4 @@ try {
 
 ?>
 --EXPECT--
-Undefined constant self::UNKNOWN
+Undefined class constant 'self::UNKNOWN'

@@ -1,7 +1,7 @@
 --TEST--
 Bug #26463 (token_get_all() does not correctly handle semicolons after T_END_HEREDOC)
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip"; ?>
 --FILE--
 <?php
 $str = '<?php

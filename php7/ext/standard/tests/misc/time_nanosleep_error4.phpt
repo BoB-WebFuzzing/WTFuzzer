@@ -10,12 +10,8 @@ if (!function_exists('time_nanosleep')) die("skip");
 --FILE--
 <?php
 
-time_nanosleep(0, -10);
+$nano = time_nanosleep(0, -10);
 
 ?>
 --EXPECTF--
-Fatal error: Uncaught ValueError: time_nanosleep(): Argument #2 ($nanoseconds) must be greater than or equal to 0 in %s:%d
-Stack trace:
-#0 %s(%d): time_nanosleep(0, -10)
-#1 {main}
-  thrown in %s on line %d
+Warning: time_nanosleep(): The nanoseconds value must be greater than 0 in %stime_nanosleep_error4.php on line %d

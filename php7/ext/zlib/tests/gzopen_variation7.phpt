@@ -1,7 +1,11 @@
 --TEST--
 Test function gzopen() by calling it twice on the same file and not closing one of them at the end of the script
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+	print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 
@@ -16,6 +20,7 @@ gzclose($h1);
 var_dump(gzread($h2, 50));
 // deliberately do not close $h2
 ?>
+===DONE===
 --EXPECT--
 string(30) "When you're taught through fee"
 string(10) "When you'r"
@@ -23,3 +28,4 @@ string(15) "lings
 Destiny f"
 string(50) "e taught through feelings
 Destiny flying high abov"
+===DONE===

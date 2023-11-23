@@ -1,20 +1,15 @@
 --TEST--
 bcpow() does not support non-integral exponents
---EXTENSIONS--
-bcmath
+--SKIPIF--
+<?php
+if (!extension_loaded('bcmath')) die('skip bcmath extension is not available');
+?>
 --FILE--
 <?php
-try {
-    var_dump(bcpow('1', '1.1', 2));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(bcpow('1', '0.1', 2));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(bcpow('1', '1.1', 2));
 ?>
---EXPECT--
-bcpow(): Argument #2 ($exponent) cannot have a fractional part
-bcpow(): Argument #2 ($exponent) cannot have a fractional part
+===DONE===
+--EXPECTF--
+Warning: bcpow(): non-zero scale in exponent in %s on line %d
+string(4) "1.00"
+===DONE===

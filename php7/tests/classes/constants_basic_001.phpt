@@ -9,6 +9,8 @@ Class constant declarations
 
   class C
   {
+      const c0 = UNDEFINED;
+
       const c1 = 1, c2 = 1.5;
       const c3 =  + 1, c4 =  + 1.5;
       const c5 = -1, c6 = -1.5;
@@ -30,6 +32,7 @@ Class constant declarations
   }
 
   echo "\nAttempt to access various kinds of class constants:\n";
+  var_dump(C::c0);
   var_dump(C::c1);
   var_dump(C::c2);
   var_dump(C::c3);
@@ -55,16 +58,19 @@ Class constant declarations
   echo "\nYou should not see this.";
 ?>
 --EXPECTF--
-Warning: Undefined variable $undef in %s on line %d
+Notice: Undefined variable: undef in %s on line 5
 
 Attempt to access various kinds of class constants:
+
+Warning: Use of undefined constant UNDEFINED - assumed 'UNDEFINED' (this will throw an Error in a future version of PHP) in %s on line %d
+string(9) "UNDEFINED"
 int(1)
 float(1.5)
 int(1)
 float(1.5)
 int(-1)
 float(-1.5)
-int(13)
+int(15)
 string(%d) "%s"
 string(1) "C"
 string(0) ""
@@ -79,7 +85,7 @@ string(6) "hello2"
 
 Expecting fatal error:
 
-Fatal error: Uncaught Error: Undefined constant C::c19 in %s:%d
+Fatal error: Uncaught Error: Undefined class constant 'c19' in %s:53
 Stack trace:
 #0 {main}
-  thrown in %s on line %d
+  thrown in %s on line 53

@@ -36,11 +36,11 @@ try {
 
 ?>
 --EXPECT--
-Undefined array key 0
+Undefined offset: 0
 array(0) {
 }
-Undefined array key "key"
+Undefined index: key
 array(0) {
 }
-Undefined global variable $test
-Undefined variable $test
+Undefined index: test
+Undefined variable: test

@@ -4,6 +4,7 @@ JSON (http://www.crockford.com/JSON/JSON_checker/test/pass1.json)
 serialize_precision=-1
 --SKIPIF--
 <?php
+if (!extension_loaded('json')) die('skip');
 if (PHP_INT_SIZE != 8) die("skip this test is for 64bit platform only");
 ?>
 --FILE--
@@ -78,7 +79,7 @@ $test = "
 ,\"rosebud\"]
 ";
 
-echo 'Testing:' . $test . "\n";
+echo 'Testing: ' . $test . "\n";
 echo "DECODE: AS OBJECT\n";
 $obj = json_decode($test);
 var_dump($obj);
@@ -102,7 +103,7 @@ var_dump($arr);
 
 ?>
 --EXPECTF--
-Testing:
+Testing: 
 [
     "JSON Test Pattern pass1",
     {"object with 1 member":["array with 1 element"]},

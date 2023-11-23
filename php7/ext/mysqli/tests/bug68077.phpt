@@ -1,15 +1,16 @@
 --TEST--
 Bug #68077 (LOAD DATA LOCAL INFILE / open_basedir restriction)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'connect.inc';
-if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
-    die(sprintf("skip Can't connect to MySQL Server - [%d] %s", mysqli_connect_errno(), mysqli_connect_error()));
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
+if (!$IS_MYSQLND) {
+    die("skip: test applies only to mysqlnd");
 }
+if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
+    die("skip Cannot connect to MySQL");
 
-include_once "local_infile_tools.inc";
+include_once("local_infile_tools.inc");
 if ($msg = check_local_infile_support($link, $engine))
     die(sprintf("skip %s, [%d] %s", $msg, $link->errno, $link->error));
 
@@ -22,7 +23,7 @@ mysqli.max_persistent=1
 open_basedir=
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     ini_set("open_basedir", __DIR__);
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
@@ -61,15 +62,15 @@ open_basedir=
 ?>
 --CLEAN--
 <?php
-require_once 'connect.inc';
+require_once('connect.inc');
 
 if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
-	printf("[clean] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
-		$host, $user, $db, $port, $socket);
+    printf("[clean] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+        $host, $user, $db, $port, $socket);
 }
 
 if (!$link->query($link, 'DROP TABLE IF EXISTS test')) {
-	printf("[clean] Failed to drop old test table: [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+    printf("[clean] Failed to drop old test table: [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 }
 
 $link->close();

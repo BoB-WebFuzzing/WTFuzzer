@@ -1,7 +1,7 @@
 --TEST--
 numfmt_parse_currency()
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

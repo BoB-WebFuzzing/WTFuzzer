@@ -1,14 +1,10 @@
 --TEST--
-Ensures an exception is thrown if versions are compared with an invalid operator
+Ensures null is returned if versions are compared with invalid operator
 --CREDITS--
 David Stockton - <dave@davidstockton.com> - i3logix PHP Testfest 2017
 --FILE--
 <?php
-try {
-    version_compare('1.2', '2.1', '??');
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(version_compare('1.2', '2.1', '??'));
 ?>
 --EXPECT--
-version_compare(): Argument #3 ($operator) must be a valid comparison operator
+NULL

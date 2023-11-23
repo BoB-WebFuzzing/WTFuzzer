@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: concatenating attributes
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $xml =<<<EOF
@@ -16,6 +16,7 @@ $people->person['name'] .= 'Bar';
 var_dump($people->person['name']);
 
 ?>
+===DONE===
 --EXPECTF--
 object(SimpleXMLElement)#%d (1) {
   [0]=>
@@ -25,3 +26,4 @@ object(SimpleXMLElement)#%d (1) {
   [0]=>
   string(6) "FooBar"
 }
+===DONE===

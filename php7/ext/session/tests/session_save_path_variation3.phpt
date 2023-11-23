@@ -1,7 +1,5 @@
 --TEST--
 Test session_save_path() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -11,6 +9,12 @@ session.gc_probability=0
 <?php
 
 ob_start();
+
+/*
+ * Prototype : string session_save_path([string $path])
+ * Description : Get and/or set the current session save path
+ * Source code : ext/session/session.c
+ */
 
 echo "*** Testing session_save_path() : variation ***\n";
 

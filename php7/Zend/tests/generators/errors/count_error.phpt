@@ -9,10 +9,10 @@ $gen = gen();
 
 try {
     count($gen);
-} catch (\TypeError $e) {
-    echo $e->getMessage(), PHP_EOL;
+} catch (Exception $e) {
+    echo $e;
 }
 
 ?>
---EXPECT--
-count(): Argument #1 ($value) must be of type Countable|array, Generator given
+--EXPECTF--
+Warning: count(): Parameter must be an array or an object that implements Countable in %s on line %d

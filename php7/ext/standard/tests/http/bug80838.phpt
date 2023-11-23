@@ -3,7 +3,7 @@ Bug #80838 (HTTP wrapper waits for HTTP 1 response after HTTP 101)
 --INI--
 allow_url_fopen=1
 --SKIPIF--
-<?php require 'server.inc'; http_server_skipif(); ?>
+<?php require 'server.inc'; http_server_skipif('tcp://127.0.0.1:12342'); ?>
 --FILE--
 <?php
 require 'server.inc';
@@ -13,7 +13,7 @@ $responses = [
     . "Hello from another protocol"
 ];
 
-['pid' => $pid, 'uri' => $uri] = http_server($responses);
+$pid = http_server('tcp://127.0.0.1:12342', $responses);
 
 $options = [
   'http' => [
@@ -23,7 +23,7 @@ $options = [
 
 $ctx = stream_context_create($options);
 
-$fd = fopen($uri, 'rb', false, $ctx);
+$fd = fopen('http://127.0.0.1:12342/', 'rb', false, $ctx);
 fclose($fd);
 var_dump($http_response_header);
 

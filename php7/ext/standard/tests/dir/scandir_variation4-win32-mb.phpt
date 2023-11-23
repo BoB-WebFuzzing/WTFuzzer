@@ -8,6 +8,11 @@ if (substr(PHP_OS, 0, 3) != 'WIN') {
 ?>
 --FILE--
 <?php
+/* Prototype  : array scandir(string $dir [, int $sorting_order [, resource $context]])
+ * Description: List files & directories inside the specified path
+ * Source code: ext/standard/dir.c
+ */
+
 /*
  * Test scandir() with relative paths as $dir argument
  */
@@ -60,6 +65,7 @@ var_dump(scandir('../../私はガラスを食べられますlevel_one'));
 @delete_files($level_one_dir_path, 2, '私はガラスを食べられますlevel_one');
 @delete_files($level_two_dir_path, 2, '私はガラスを食べられますlevel_two');
 ?>
+===DONE===
 --CLEAN--
 <?php
 $base_dir_path = __DIR__ . '/scandir_variation4-win32-mb';
@@ -168,3 +174,4 @@ array(5) {
   [4]=>
   string(45) "私はガラスを食べられますlevel_two"
 }
+===DONE===

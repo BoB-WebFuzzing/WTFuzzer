@@ -2,10 +2,15 @@
 Test krsort() function : usage variations - sort array with/without key values
 --FILE--
 <?php
+/* Prototype  : bool krsort ( array &$array [, int $sort_flags] )
+ * Description: Sort an array by key in reverse order, maintaining key to data correlation.
+ * Source code: ext/standard/array.c
+*/
+
 /*
  * Testing krsort() by providing arrays  with/without key values for $array argument
  * with following flag values:
- *  1.flag value as default
+ *  1.flag value as defualt
  *  2.SORT_REGULAR - compare items normally
  */
 
@@ -29,7 +34,7 @@ echo "\n-- Testing krsort() by supplying various arrays with/without key values 
 foreach ($various_arrays as $array) {
   echo "\n-- Iteration $count --\n";
 
-  echo "- With default sort flag -\n";
+  echo "- With defualt sort flag -\n";
   $temp_array = $array;
   var_dump( krsort($temp_array) );
   var_dump($temp_array);
@@ -49,7 +54,7 @@ echo "Done\n";
 -- Testing krsort() by supplying various arrays with/without key values --
 
 -- Iteration 1 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(5) {
   [9]=>
@@ -79,29 +84,29 @@ array(5) {
 }
 
 -- Iteration 2 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(3) {
-  ["c"]=>
-  string(5) "apple"
   ["a"]=>
   string(6) "orange"
   [0]=>
   string(6) "banana"
+  ["c"]=>
+  string(5) "apple"
 }
 - Sort flag = SORT_REGULAR -
 bool(true)
 array(3) {
-  ["c"]=>
-  string(5) "apple"
   ["a"]=>
   string(6) "orange"
   [0]=>
   string(6) "banana"
+  ["c"]=>
+  string(5) "apple"
 }
 
 -- Iteration 3 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(6) {
   [5]=>
@@ -135,7 +140,7 @@ array(6) {
 }
 
 -- Iteration 4 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(3) {
   [5]=>
@@ -157,7 +162,7 @@ array(3) {
 }
 
 -- Iteration 5 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(6) {
   [9]=>
@@ -191,7 +196,7 @@ array(6) {
 }
 
 -- Iteration 6 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(2) {
   ["foo"]=>
@@ -209,7 +214,7 @@ array(2) {
 }
 
 -- Iteration 7 --
-- With default sort flag -
+- With defualt sort flag -
 bool(true)
 array(4) {
   ["d"]=>

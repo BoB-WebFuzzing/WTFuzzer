@@ -1,13 +1,17 @@
 --TEST--
 Test mb_ereg() function : usage variations - Test anchors in regex
---EXTENSIONS--
-mbstring
 --SKIPIF--
 <?php
+extension_loaded('mbstring') or die('skip');
 function_exists('mb_ereg') or die("skip mb_ereg() is not available in this build");
 ?>
 --FILE--
 <?php
+/* Prototype  : int mb_ereg(string $pattern, string $string [, array $registers])
+ * Description: Regular expression match for multibyte string
+ * Source code: ext/mbstring/php_mbregex.c
+ */
+
 /*
  * Test mb_ereg with anchors (start and end of string) in $pattern
  */
@@ -41,36 +45,36 @@ echo "Done";
  * @param array $regs
  */
 function base64_encode_var_dump($regs) {
-    if ($regs) {
-        echo "array(" . count($regs) . ") {\n";
-        foreach ($regs as $key => $value) {
-            echo "  [$key]=>\n  ";
-            if (is_string($value)) {
-                var_dump(base64_encode($value));
-            } else {
-                var_dump($value);
-            }
-        }
-        echo "}\n";
-    } else {
-        echo "NULL\n";
-    }
+	if ($regs) {
+		echo "array(" . count($regs) . ") {\n";
+		foreach ($regs as $key => $value) {
+			echo "  [$key]=>\n  ";
+			if (is_string($value)) {
+				var_dump(base64_encode($value));
+			} else {
+				var_dump($value);
+			}
+		}
+		echo "}\n";
+	} else {
+		echo "NULL\n";
+	}
 }
 ?>
 --EXPECT--
 *** Testing mb_ereg() : usage variations ***
 
-ASCII String without $regs arg:		bool(true)
+ASCII String without $regs arg:		int(1)
 ASCII String with $regs arg:
-bool(true)
+int(38)
 array(1) {
   [0]=>
   string(52) "VGhpcyBpcyBhbiBFbmdsaXNoIHN0cmluZy4gMDEyMzQ1Njc4OS4="
 }
 
-Multibyte String without $regs arg:	bool(true)
+Multibyte String without $regs arg:	int(1)
 Multubyte String with $regs arg:
-bool(true)
+int(53)
 array(1) {
   [0]=>
   string(72) "5pel5pys6Kqe44OG44Kt44K544OI44Gn44GZ44CCMDEyMzTvvJXvvJbvvJfvvJjvvJnjgII="

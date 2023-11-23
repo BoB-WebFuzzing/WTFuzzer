@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -19,7 +21,7 @@
 #include "Zend/zend.h"
 #include "Zend/zend_signal.h"
 
-/* php_signal using sigaction is derived from Advanced Programming
+/* php_signal using sigaction is derived from Advanced Programing
  * in the Unix Environment by W. Richard Stevens p 298. */
 Sigfunc *php_signal4(int signo, Sigfunc *func, int restart, int mask_all)
 {
@@ -35,7 +37,7 @@ Sigfunc *php_signal4(int signo, Sigfunc *func, int restart, int mask_all)
 	} else {
 		sigemptyset(&act.sa_mask);
 	}
-	act.sa_flags = SA_ONSTACK;
+	act.sa_flags = 0;
 #ifdef HAVE_STRUCT_SIGINFO_T
 	act.sa_flags |= SA_SIGINFO;
 #endif
@@ -48,7 +50,9 @@ Sigfunc *php_signal4(int signo, Sigfunc *func, int restart, int mask_all)
 		act.sa_flags |= SA_RESTART; /* SVR4, 4.3+BSD */
 #endif
 	}
-	zend_sigaction(signo, &act, &oact);
+	if (zend_sigaction(signo, &act, &oact) < 0) {
+		return (Sigfunc*)SIG_ERR;
+	}
 
 #ifdef HAVE_STRUCT_SIGINFO_T
 	return oact.sa_sigaction;

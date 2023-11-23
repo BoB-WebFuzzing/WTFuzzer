@@ -2,15 +2,12 @@
 Test cal_to_jd() function : error conditions
 --CREDITS--
 edgarsandi - <edgar.r.sandi@gmail.com>
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
-try {
-    cal_to_jd(-1, 8, 26, 74);
-} catch (ValueError $ex) {
-    echo "{$ex->getMessage()}\n";
-}
+var_dump(cal_to_jd(-1, 8, 26, 74));
 ?>
---EXPECT--
-cal_to_jd(): Argument #1 ($calendar) must be a valid calendar ID
+--EXPECTF--
+Warning: cal_to_jd(): invalid calendar ID -1 in %s on line %d
+bool(false)

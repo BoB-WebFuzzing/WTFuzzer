@@ -1,10 +1,8 @@
 --TEST--
 PDO_OCI: Attribute: Basic autocommit functionality
---EXTENSIONS--
-pdo
-pdo_oci
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo') || !extension_loaded('pdo_oci')) die('skip not loaded');
 require(__DIR__.'/../../pdo/tests/pdo_test.inc');
 PDOTest::skip();
 ?>
@@ -15,6 +13,8 @@ require(__DIR__ . '/../../pdo/tests/pdo_test.inc');
 
 $dbh = PDOTest::factory();
 
+$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+$dbh->exec("drop table pdo_ac_tab");
 $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 print "PDO::ATTR_AUTOCOMMIT: Default: ";
@@ -37,26 +37,22 @@ var_dump($dbh->getAttribute(PDO::ATTR_AUTOCOMMIT));
 // Use 2nd connection to check that autocommit does commit
 
 echo "Insert data\n";
-$dbh->exec("create table test_pdo_oci_attr_autocommit_1 (col1 varchar2(20))");
-$dbh->exec("insert into test_pdo_oci_attr_autocommit_1 (col1) values ('some data')");
+$dbh->exec("create table pdo_ac_tab (col1 varchar2(20))");
+$dbh->exec("insert into pdo_ac_tab (col1) values ('some data')");
 
 $dbh2 = PDOTest::factory();
 
 echo "Second connection should be able to see committed data\n";
-$s = $dbh2->prepare("select col1 from test_pdo_oci_attr_autocommit_1");
+$s = $dbh2->prepare("select col1 from pdo_ac_tab");
 $s->execute();
 while ($r = $s->fetch()) {
     echo "Data is: " . $r[0] . "\n";
 }
 
+$dbh->exec("drop table pdo_ac_tab");
+
 echo "Done\n";
 
-?>
---CLEAN--
-<?php
-require 'ext/pdo/tests/pdo_test.inc';
-$db = PDOTest::test_factory('ext/pdo_oci/tests/common.phpt');
-PDOTest::dropTableIfExists($db, "test_pdo_oci_attr_autocommit_1");
 ?>
 --EXPECT--
 PDO::ATTR_AUTOCOMMIT: Default: bool(true)

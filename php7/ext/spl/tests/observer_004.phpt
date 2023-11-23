@@ -5,22 +5,22 @@ SPL: SplObjectStorage serialization & overloading
 
 class TestClass
 {
-    public $test = 25;
+	public $test = 25;
 
-    public function __construct($test = 42)
-    {
-        $this->test = $test;
-    }
+	public function __construct($test = 42)
+	{
+		$this->test = $test;
+	}
 }
 
 class MyStorage extends SplObjectStorage
 {
-    public $bla = 25;
+	public $bla = 25;
 
-    public function __construct($bla = 26)
-    {
-        $this->bla = $bla;
-    }
+	public function __construct($bla = 26)
+	{
+		$this->bla = $bla;
+	}
 }
 
 $storage = new MyStorage();
@@ -34,7 +34,7 @@ var_dump(count($storage));
 
 foreach($storage as $object)
 {
-    var_dump($object->test);
+	var_dump($object->test);
 }
 
 var_dump($storage);
@@ -48,12 +48,14 @@ var_dump(count($storage2));
 
 foreach($storage2 as $object)
 {
-    var_dump($object->test);
+	var_dump($object->test);
 }
 
 var_dump($storage2);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 int(2)
 int(1)
@@ -63,7 +65,7 @@ object(MyStorage)#%d (2) {
   int(26)
   ["storage":"SplObjectStorage":private]=>
   array(2) {
-    [0]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -73,7 +75,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       NULL
     }
-    [1]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -95,7 +97,7 @@ object(MyStorage)#%d (2) {
   int(26)
   ["storage":"SplObjectStorage":private]=>
   array(2) {
-    [0]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -105,7 +107,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       NULL
     }
-    [1]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -117,3 +119,4 @@ object(MyStorage)#%d (2) {
     }
   }
 }
+===DONE===

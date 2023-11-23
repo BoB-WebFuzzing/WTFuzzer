@@ -5,14 +5,13 @@ flock() tests
 
 $file = __DIR__."/flock.dat";
 
+var_dump(flock());
+var_dump(flock("", "", $var));
+
 $fp = fopen($file, "w");
 fclose($fp);
 
-try {
-    var_dump(flock($fp, LOCK_SH|LOCK_NB));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(flock($fp, LOCK_SH|LOCK_NB));
 
 $fp = fopen($file, "w");
 
@@ -32,21 +31,24 @@ var_dump(flock($fp, LOCK_UN, $would));
 var_dump($would);
 
 var_dump(flock($fp, -1));
+var_dump(flock($fp, 0));
 
-try {
-    var_dump(flock($fp, 0));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-
+echo "Done\n";
 ?>
 --CLEAN--
 <?php
 $file = __DIR__."/flock.dat";
 unlink($file);
 ?>
---EXPECT--
-flock(): supplied resource is not a valid stream resource
+--EXPECTF--
+Warning: flock() expects at least 2 parameters, 0 given in %s on line %d
+NULL
+
+Warning: flock() expects parameter 1 to be resource, string given in %s on line %d
+NULL
+
+Warning: flock(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
 bool(true)
 bool(true)
 bool(true)
@@ -60,4 +62,7 @@ int(0)
 bool(true)
 int(0)
 bool(true)
-flock(): Argument #2 ($operation) must be one of LOCK_SH, LOCK_EX, or LOCK_UN
+
+Warning: flock(): Illegal operation argument in %s on line %d
+bool(false)
+Done

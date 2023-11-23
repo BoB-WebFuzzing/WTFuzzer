@@ -3,6 +3,9 @@ str_ireplace() tests
 --FILE--
 <?php
 
+var_dump(str_ireplace());
+var_dump(str_ireplace(""));
+var_dump(str_ireplace("", ""));
 var_dump(str_ireplace("", "", ""));
 
 var_dump(str_ireplace("tt", "a", "ttttTttttttttTT"));
@@ -36,15 +39,23 @@ var_dump(str_ireplace(array("t"=>"tt", "y"=>"y"), array("a"=>"aaa", "b"=>"bbb"),
 /* separate testcase for str_ireplace() off-by-one */
 
 $Data = "Change tracking and management software designed to watch
-    for abnormal system behavior.\nSuggest features, report bugs, or ask
-    questions here.";
+	for abnormal system behavior.\nSuggest features, report bugs, or ask
+	questions here.";
 var_dump($Data = str_ireplace("\r\n", "<br>", $Data));
 var_dump($Data = str_ireplace("\n", "<br>", $Data));
 
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
+Warning: str_ireplace() expects at least 3 parameters, 0 given in %s on line %d
+NULL
+
+Warning: str_ireplace() expects at least 3 parameters, 1 given in %s on line %d
+NULL
+
+Warning: str_ireplace() expects at least 3 parameters, 2 given in %s on line %d
+NULL
 string(0) ""
 string(8) "aaaaaaaT"
 string(8) "aaaaaaaT"
@@ -82,9 +93,9 @@ array(2) {
   ["test"]=>
   string(36) "aabbbbbbaabbbasdabbbbbbahsdbbbbbbbbb"
 }
-string(149) "Change tracking and management software designed to watch
-    for abnormal system behavior.
+string(143) "Change tracking and management software designed to watch
+	for abnormal system behavior.
 Suggest features, report bugs, or ask
-    questions here."
-string(158) "Change tracking and management software designed to watch<br>    for abnormal system behavior.<br>Suggest features, report bugs, or ask<br>    questions here."
+	questions here."
+string(152) "Change tracking and management software designed to watch<br>	for abnormal system behavior.<br>Suggest features, report bugs, or ask<br>	questions here."
 Done

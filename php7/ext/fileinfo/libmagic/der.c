@@ -35,11 +35,8 @@
 #include "file.h"
 
 #ifndef lint
-FILE_RCSID("@(#)$File: der.c,v 1.24 2022/07/30 18:08:36 christos Exp $")
+FILE_RCSID("@(#)$File: der.c,v 1.16 2019/02/20 02:35:27 christos Exp $")
 #endif
-#else
-#define SIZE_T_FORMAT "z"
-#define CAST(a, b) ((a)(b))
 #endif
 
 #include <sys/types.h>
@@ -54,7 +51,7 @@ FILE_RCSID("@(#)$File: der.c,v 1.24 2022/07/30 18:08:36 christos Exp $")
 #include "magic.h"
 #include "der.h"
 #else
-#ifdef HAVE_SYS_MMAN_H
+#ifndef PHP_WIN32
 #include <sys/mman.h>
 #endif
 #include <sys/stat.h>
@@ -67,13 +64,13 @@ FILE_RCSID("@(#)$File: der.c,v 1.24 2022/07/30 18:08:36 christos Exp $")
 #define	DER_CLASS_APPLICATION	1
 #define	DER_CLASS_CONTEXT	2
 #define	DER_CLASS_PRIVATE	3
-#if defined(DEBUG_DER) || defined(TEST_DER)
+#ifdef DEBUG_DER
 static const char der_class[] = "UACP";
 #endif
 
 #define DER_TYPE_PRIMITIVE	0
 #define DER_TYPE_CONSTRUCTED	1
-#if defined(DEBUG_DER) || defined(TEST_DER)
+#ifdef DEBUG_DER
 static const char der_type[] = "PC";
 #endif
 
@@ -91,7 +88,7 @@ static const char der_type[] = "PC";
 #define	DER_TAG_EMBEDDED_PDV		0x0b
 #define	DER_TAG_UTF8_STRING		0x0c
 #define	DER_TAG_RELATIVE_OID		0x0d
-#define DER_TAG_TIME			0x0e
+#define DER_TAG_RESERVED_1		0x0e
 #define DER_TAG_RESERVED_2		0x0f
 #define	DER_TAG_SEQUENCE		0x10
 #define	DER_TAG_SET			0x11
@@ -108,23 +105,16 @@ static const char der_type[] = "PC";
 #define	DER_TAG_UNIVERSAL_STRING	0x1c
 #define	DER_TAG_CHARACTER_STRING	0x1d
 #define	DER_TAG_BMP_STRING		0x1e
-#define	DER_TAG_DATE			0x1f
-#define	DER_TAG_TIME_OF_DAY		0x20
-#define	DER_TAG_DATE_TIME		0x21
-#define	DER_TAG_DURATION		0x22
-#define	DER_TAG_OID_IRI			0x23
-#define	DER_TAG_RELATIVE_OID_IRI	0x24
-#define	DER_TAG_LAST			0x25
+#define	DER_TAG_LONG			0x1f
 
 static const char *der__tag[] = {
 	"eoc", "bool", "int", "bit_str", "octet_str",
 	"null", "obj_id", "obj_desc", "ext", "real",
-	"enum", "embed", "utf8_str", "rel_oid", "time",
+	"enum", "embed", "utf8_str", "oid", "res1",
 	"res2", "seq", "set", "num_str", "prt_str",
-	"t61_str", "vid_str", "ia5_str", "utc_time", "gen_time",
-	"gr_str", "vis_str", "gen_str", "univ_str", "char_str",
-	"bmp_str", "date", "tod", "datetime", "duration",
-	"oid-iri", "rel-oid-iri",
+	"t61_str", "vid_str", "ia5_str", "utc_time",
+	"gen_time", "gr_str", "vis_str", "gen_str",
+	"char_str", "bmp_str", "long"
 };
 
 #ifdef DEBUG_DER
@@ -187,10 +177,8 @@ getlength(const uint8_t *c, size_t *p, size_t l)
 	size_t len;
 	int is_onebyte_result;
 
-	if (*p >= l) {
-		DPRINTF(("%s:[1] %zu >= %zu\n", __func__, *p, l));
+	if (*p >= l)
 		return DER_BAD;
-	}
 
 	/*
 	 * Digits can either be 0b0 followed by the result, or 0b1
@@ -199,10 +187,8 @@ getlength(const uint8_t *c, size_t *p, size_t l)
 	 */
 	is_onebyte_result = (c[*p] & 0x80) == 0;
 	digits = c[(*p)++] & 0x7f;
-	if (*p + digits >= l) {
-		DPRINTF(("%s:[2] %zu + %u >= %zu\n", __func__, *p, digits, l));
+	if (*p + digits >= l)
 		return DER_BAD;
-	}
 
 	if (is_onebyte_result)
 		return digits;
@@ -215,18 +201,15 @@ getlength(const uint8_t *c, size_t *p, size_t l)
 	for (i = 0; i < digits; i++)
 		len = (len << 8) | c[(*p)++];
 
-	if (len > UINT32_MAX - *p || *p + len > l) {
-		DPRINTF(("%s:[3] bad len %zu + %zu >= %zu\n",
-		    __func__, *p, len, l));
+	if (len > UINT32_MAX - *p || *p + len >= l)
 		return DER_BAD;
-	}
 	return CAST(uint32_t, len);
 }
 
 static const char *
 der_tag(char *buf, size_t len, uint32_t tag)
 {
-	if (tag < DER_TAG_LAST)
+	if (tag < DER_TAG_LONG)
 		strlcpy(buf, der__tag[tag], len);
 	else
 		snprintf(buf, len, "%#x", tag);
@@ -237,24 +220,19 @@ der_tag(char *buf, size_t len, uint32_t tag)
 static int
 der_data(char *buf, size_t blen, uint32_t tag, const void *q, uint32_t len)
 {
-	uint32_t i;
+	uint32_t i = 0;
 	const uint8_t *d = CAST(const uint8_t *, q);
 	switch (tag) {
 	case DER_TAG_PRINTABLE_STRING:
 	case DER_TAG_UTF8_STRING:
 	case DER_TAG_IA5_STRING:
-		return snprintf(buf, blen, "%.*s", len, RCAST(const char *, q));
 	case DER_TAG_UTCTIME:
-		if (len < 12)
-			break;
-		return snprintf(buf, blen,
-		    "20%c%c-%c%c-%c%c %c%c:%c%c:%c%c GMT", d[0], d[1], d[2],
-		    d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11]);
+		return snprintf(buf, blen, "%.*s", len, RCAST(const char *, q));
 	default:
 		break;
 	}
 
-	for (i = 0; i < len; i++) {
+	for (; i < len; i++) {
 		uint32_t z = i << 1;
 		if (z < blen - 2)
 			snprintf(buf + z, blen - z, "%.2x", d[i]);
@@ -268,26 +246,21 @@ der_offs(struct magic_set *ms, struct magic *m, size_t nbytes)
 	const uint8_t *b = RCAST(const uint8_t *, ms->search.s);
 	size_t offs = 0, len = ms->search.s_len ? ms->search.s_len : nbytes;
 
-	if (gettag(b, &offs, len) == DER_BAD) {
-		DPRINTF(("%s: bad tag 1\n", __func__));
+	if (gettag(b, &offs, len) == DER_BAD)
 		return -1;
-	}
 	DPRINTF(("%s1: %d %" SIZE_T_FORMAT "u %u\n", __func__, ms->offset,
 	    offs, m->offset));
 
 	uint32_t tlen = getlength(b, &offs, len);
-	if (tlen == DER_BAD) {
-		DPRINTF(("%s: bad tag 2\n", __func__));
+	if (tlen == DER_BAD)
 		return -1;
-	}
 	DPRINTF(("%s2: %d %" SIZE_T_FORMAT "u %u\n", __func__, ms->offset,
 	    offs, tlen));
 
 	offs += ms->offset + m->offset;
 	DPRINTF(("cont_level = %d\n", m->cont_level));
 #ifdef DEBUG_DER
-	size_t i;
-	for (i = 0; i < m->cont_level; i++)
+	for (size_t i = 0; i < m->cont_level; i++)
 		printf("cont_level[%" SIZE_T_FORMAT "u] = %u\n", i,
 		    ms->c.li[i].off);
 #endif
@@ -310,22 +283,13 @@ der_cmp(struct magic_set *ms, struct magic *m)
 	uint32_t tag, tlen;
 	char buf[128];
 
-	DPRINTF(("%s: compare %zu bytes\n", __func__, len));
-
 	tag = gettag(b, &offs, len);
-	if (tag == DER_BAD) {
-		DPRINTF(("%s: bad tag 1\n", __func__));
+	if (tag == DER_BAD)
 		return -1;
-	}
-
-	DPRINTF(("%s1: %d %" SIZE_T_FORMAT "u %u\n", __func__, ms->offset,
-	    offs, m->offset));
 
 	tlen = getlength(b, &offs, len);
-	if (tlen == DER_BAD) {
-		DPRINTF(("%s: bad tag 2\n", __func__));
+	if (tlen == DER_BAD)
 		return -1;
-	}
 
 	der_tag(buf, sizeof(buf), tag);
 	if ((ms->flags & MAGIC_DEBUG) != 0)
@@ -333,26 +297,21 @@ der_cmp(struct magic_set *ms, struct magic *m)
 		    buf, s);
 	size_t slen = strlen(buf);
 
-	if (strncmp(buf, s, slen) != 0) {
-		DPRINTF(("%s: no string match %s != %s\n", __func__, buf, s));
+	if (strncmp(buf, s, slen) != 0)
 		return 0;
-	}
 
 	s += slen;
 
 again:
 	switch (*s) {
 	case '\0':
-		DPRINTF(("%s: EOF match\n", __func__));
 		return 1;
 	case '=':
 		s++;
 		goto val;
 	default:
-		if (!isdigit(CAST(unsigned char, *s))) {
-			DPRINTF(("%s: no digit %c\n", __func__, *s));
+		if (!isdigit(CAST(unsigned char, *s)))
 			return 0;
-		}
 
 		slen = 0;
 		do
@@ -361,10 +320,8 @@ again:
 		if ((ms->flags & MAGIC_DEBUG) != 0)
 			fprintf(stderr, "%s: len %" SIZE_T_FORMAT "u %u\n",
 			    __func__, slen, tlen);
-		if (tlen != slen) {
-			DPRINTF(("%s: len %u != %zu\n", __func__, tlen, slen));
+		if (tlen != slen)
 			return 0;
-		}
 		goto again;
 	}
 val:
@@ -373,12 +330,9 @@ val:
 	der_data(buf, sizeof(buf), tag, b + offs, tlen);
 	if ((ms->flags & MAGIC_DEBUG) != 0)
 		fprintf(stderr, "%s: data %s %s\n", __func__, buf, s);
-	if (strcmp(buf, s) != 0 && strcmp("x", s) != 0) {
-		DPRINTF(("%s: no string match %s != %s\n", __func__, buf, s));
+	if (strcmp(buf, s) != 0 && strcmp("x", s) != 0)
 		return 0;
-	}
 	strlcpy(ms->ms_value.s, buf, sizeof(ms->ms_value.s));
-	DPRINTF(("%s: complete match\n", __func__));
 	return 1;
 }
 #endif
@@ -391,8 +345,6 @@ printtag(uint32_t tag, const void *q, uint32_t len)
 	switch (tag) {
 	case DER_TAG_PRINTABLE_STRING:
 	case DER_TAG_UTF8_STRING:
-	case DER_TAG_IA5_STRING:
-	case DER_TAG_UTCTIME:
 		printf("%.*s\n", len, (const char *)q);
 		return;
 	default:
@@ -416,8 +368,8 @@ printdata(size_t level, const void *v, size_t x, size_t l)
 		uint8_t c = getclass(p[x]);
 		uint8_t t = gettype(p[x]);
 		ox = x;
-//		if (x != 0)
-//		printf("%.2x %.2x %.2x\n", p[x - 1], p[x], p[x + 1]);
+		if (x != 0)
+		printf("%.2x %.2x %.2x\n", p[x - 1], p[x], p[x + 1]);
 		uint32_t tag = gettag(p, &x, ep - p + x);
 		if (p + x >= ep)
 			break;

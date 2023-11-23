@@ -5,17 +5,13 @@ Dynamic calls to scope introspection functions are forbidden (misoptimization)
 
 function test() {
     $i = 1;
-    try {
-        array_map('extract', [['i' => new stdClass]]);
-    } catch (\Error $e) {
-        echo $e->getMessage() . "\n";
-    }
+    array_map('extract', [['i' => new stdClass]]);
     $i += 1;
     var_dump($i);
 }
 test();
 
 ?>
---EXPECT--
-Cannot call extract() dynamically
+--EXPECTF--
+Warning: Cannot call extract() dynamically in %s on line %d
 int(2)

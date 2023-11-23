@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 11: bind
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --GET--
 wsdl
 --INI--
@@ -20,7 +20,7 @@ ob_end_clean();
 if ($wsdl == file_get_contents(__DIR__."/test.wsdl")) {
   echo "ok\n";
 } else {
-    echo "fail\n";
+	echo "fail\n";
 }
 ?>
 --EXPECT--

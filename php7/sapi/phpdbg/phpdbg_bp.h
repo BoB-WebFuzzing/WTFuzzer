@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -39,9 +41,9 @@ typedef struct _zend_op *phpdbg_opline_ptr_t; /* }}} */
 /* {{{ breakpoint base structure */
 #define phpdbg_breakbase(name) \
 	int         id; \
-	uint8_t  type; \
+	zend_uchar  type; \
 	zend_ulong  hits; \
-	bool   disabled; \
+	zend_bool   disabled; \
 	const char *name /* }}} */
 
 /* {{{ breakpoint base */
@@ -54,7 +56,7 @@ typedef struct _phpdbg_breakbase_t {
  */
 typedef struct _phpdbg_breakfile_t {
 	phpdbg_breakbase(filename);
-	zend_ulong line;
+	long        line;
 } phpdbg_breakfile_t;
 
 /**
@@ -109,7 +111,7 @@ typedef struct _phpdbg_breakop_t {
 typedef struct _phpdbg_breakcond_t {
 	phpdbg_breakbase(code);
 	size_t          code_len;
-	bool       paramed;
+	zend_bool       paramed;
 	phpdbg_param_t  param;
 	zend_ulong      hash;
 	zend_op_array  *ops;
@@ -123,7 +125,7 @@ PHPDBG_API HashTable *phpdbg_resolve_pending_file_break_ex(const char *file, uin
 PHPDBG_API void phpdbg_resolve_pending_file_break(const char *file); /* }}} */
 
 /* {{{ Breakpoint Creation API */
-PHPDBG_API void phpdbg_set_breakpoint_file(const char* filename, size_t path_len, zend_ulong lineno);
+PHPDBG_API void phpdbg_set_breakpoint_file(const char* filename, size_t path_len, long lineno);
 PHPDBG_API void phpdbg_set_breakpoint_symbol(const char* func_name, size_t func_name_len);
 PHPDBG_API void phpdbg_set_breakpoint_method(const char* class_name, const char* func_name);
 PHPDBG_API void phpdbg_set_breakpoint_opcode(const char* opname, size_t opname_len);
@@ -139,7 +141,7 @@ PHPDBG_API void phpdbg_set_breakpoint_at(const phpdbg_param_t *param); /* }}} */
 PHPDBG_API phpdbg_breakbase_t* phpdbg_find_breakpoint(zend_execute_data*); /* }}} */
 
 /* {{{ Misc Breakpoint API */
-PHPDBG_API void phpdbg_hit_breakpoint(phpdbg_breakbase_t* brake, bool output);
+PHPDBG_API void phpdbg_hit_breakpoint(phpdbg_breakbase_t* brake, zend_bool output);
 PHPDBG_API void phpdbg_print_breakpoints(zend_ulong type);
 PHPDBG_API void phpdbg_print_breakpoint(phpdbg_breakbase_t* brake);
 PHPDBG_API void phpdbg_reset_breakpoints(void);

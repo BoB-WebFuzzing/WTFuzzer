@@ -3,13 +3,12 @@ define() tests
 --FILE--
 <?php
 
-try {
-    var_dump(define(array(1,2,3,4,5), 1));
-} catch (TypeError $e) {
-    echo "TypeError: ", $e->getMessage(), "\n";
-}
-
+var_dump(define());
+var_dump(define("TRUE"));
 var_dump(define("TRUE", 1));
+var_dump(define("TRUE", 1, array(1)));
+
+var_dump(define(array(1,2,3,4,5), 1));
 var_dump(define(" ", 1));
 var_dump(define("[[[", 2));
 var_dump(define("test const", 3));
@@ -25,19 +24,29 @@ var_dump(constant("test const"));
 echo "Done\n";
 ?>
 --EXPECTF--
-TypeError: define(): Argument #1 ($constant_name) must be of type string, array given
+Warning: define() expects at least 2 parameters, 0 given in %s on line %d
+NULL
 
-Warning: Constant TRUE already defined in %s on line %d
+Warning: define() expects at least 2 parameters, 1 given in %s on line %d
+NULL
+bool(true)
+
+Warning: define() expects parameter 3 to be bool, array given in %s on line %d
+NULL
+
+Warning: define() expects parameter 1 to be string, array given in %s on line %d
+NULL
+bool(true)
+bool(true)
+bool(true)
+
+Notice: Constant test const already defined in %s on line %d
 bool(false)
 bool(true)
 bool(true)
-bool(true)
 
-Warning: Constant test const already defined in %s on line %d
+Warning: Constants may only evaluate to scalar values, arrays or resources in %s on line %d
 bool(false)
-bool(true)
-bool(true)
-bool(true)
 int(1)
 int(2)
 int(3)

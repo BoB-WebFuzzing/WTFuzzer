@@ -12,7 +12,6 @@ class Bar extends Foo {}
 
 var_dump(Foo::getInstance());
 var_dump(Bar::getInstance());
-?>
 --EXPECTF--
 object(Foo)#%d (%d) {
 }

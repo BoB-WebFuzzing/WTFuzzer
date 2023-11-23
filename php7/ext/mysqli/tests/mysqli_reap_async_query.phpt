@@ -1,14 +1,18 @@
 --TEST--
 mysqli_reap_async_query()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('connect.inc');
+require_once('skipifconnectfailure.inc');
+
+if (!$IS_MYSQLND)
+    die("skip mysqlnd only feature, compile PHP using --with-mysqli=mysqlnd");
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once('connect.inc');
 
     function get_connection() {
         global $host, $user, $passwd, $db, $port, $socket;
@@ -20,6 +24,16 @@ require_once 'skipifconnectfailure.inc';
 
     if (!$link = get_connection())
         printf("[001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
+
+    if (NULL !== ($tmp = @mysqli_reap_async_query()))
+        printf("[002] Expecting NULL got %s\n", var_export($tmp, true));
+
+    $l = array($link);
+    if (NULL !== ($tmp = @mysqli_reap_async_query($l)))
+        printf("[003] Expecting NULL got %s\n", var_export($tmp, true));
+
+    if (NULL !== ($tmp = @mysqli_reap_async_query($link, $link)))
+        printf("[004] Expecting NULL got %s\n", var_export($tmp, true));
 
 
     function poll_async($offset, $link, $links, $errors, $reject, $exp_ready, $use_oo_syntax) {
@@ -54,7 +68,7 @@ require_once 'skipifconnectfailure.inc';
 
     }
 
-    // Connections on which no query has been sent - 1
+    // Connections on which no query has been send - 1
     $link = get_connection();
     $link->query("SELECT 1 AS _one", MYSQLI_ASYNC | MYSQLI_STORE_RESULT);
     $links = array($link);

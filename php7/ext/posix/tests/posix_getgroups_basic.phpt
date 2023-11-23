@@ -1,7 +1,9 @@
 --TEST--
 Test posix_getgroups() function : basic functionality
---EXTENSIONS--
-posix
+--SKIPIF--
+<?php
+	if (!extension_loaded('posix')) die('skip - POSIX extension not loaded');
+?>
 --FILE--
 <?php
   echo "Basic test of POSIX getgroups\n";
@@ -9,12 +11,14 @@ posix
   $groups = posix_getgroups();
 
   if (!is_array($groups)) {
-    echo "TEST FAILED: ", posix_strerror(posix_get_last_error()), "\n";
+  	echo "TEST FAILED - array result expected\n";
   } else {
-    echo "TEST PASSED\n";
+  	echo "TEST PASSED\n";
   }
 
 ?>
+===DONE===
 --EXPECT--
 Basic test of POSIX getgroups
 TEST PASSED
+===DONE===

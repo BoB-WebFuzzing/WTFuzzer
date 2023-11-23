@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -78,7 +80,7 @@ xmlDocPtr soap_xmlParseFile(const char *filename)
 {
 	xmlParserCtxtPtr ctxt = NULL;
 	xmlDocPtr ret;
-	bool old_allow_url_fopen;
+	zend_bool old_allow_url_fopen;
 
 /*
 	xmlInitParser();
@@ -89,9 +91,8 @@ xmlDocPtr soap_xmlParseFile(const char *filename)
 	ctxt = xmlCreateFileParserCtxt(filename);
 	PG(allow_url_fopen) = old_allow_url_fopen;
 	if (ctxt) {
-		bool old;
+		zend_bool old;
 
-		php_libxml_sanitize_parse_ctxt_options(ctxt);
 		ctxt->keepBlanks = 0;
 		ctxt->sax->ignorableWhitespace = soap_ignorableWhitespace;
 		ctxt->sax->comment = soap_Comment;
@@ -138,9 +139,8 @@ xmlDocPtr soap_xmlParseMemory(const void *buf, size_t buf_size)
 */
 	ctxt = xmlCreateMemoryParserCtxt(buf, buf_size);
 	if (ctxt) {
-		bool old;
+		zend_bool old;
 
-		php_libxml_sanitize_parse_ctxt_options(ctxt);
 		ctxt->sax->ignorableWhitespace = soap_ignorableWhitespace;
 		ctxt->sax->comment = soap_Comment;
 		ctxt->sax->warning = NULL;

@@ -1,7 +1,13 @@
 --TEST--
 Bug #77946 (Errored cURL resources returned by curl_multi_info_read() must be compatible with curl_errno() and curl_error())
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+
+if (!extension_loaded('curl')) {
+	exit('skip curl extension not loaded');
+}
+
+?>
 --FILE--
 <?php
 $urls = array(

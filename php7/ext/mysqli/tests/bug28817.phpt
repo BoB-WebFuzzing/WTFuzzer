@@ -1,14 +1,13 @@
 --TEST--
 Bug #28817 (problems with properties declared in the class extending MySQLi)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     class my_mysql extends mysqli {
         public $p_test;
@@ -23,11 +22,7 @@ require_once 'skipifconnectfailure.inc';
     $mysql = new my_mysql();
 
     var_dump($mysql->p_test);
-    try {
-        $mysql->errno;
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    var_dump($mysql->errno);
 
     $mysql->connect($host, $user, $passwd, $db, $port, $socket);
     $mysql->select_db("nonexistingdb");
@@ -43,5 +38,7 @@ array(2) {
   [1]=>
   %s(3) "bar"
 }
-my_mysql object is already closed
+
+Warning: main(): Couldn't fetch my_mysql in %s on line %d
+bool(false)
 bool(true)

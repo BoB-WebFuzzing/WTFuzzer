@@ -1,7 +1,9 @@
 <?php
 
+if (!extension_loaded('oci8')) die("skip oci8 extension is not available\n");
+
 // Check the test file is valid for this DB type
-require dirname(__FILE__).'/connect.inc';
+require(dirname(__FILE__).'/connect.inc');
 $v = oci_server_version($c);
 if (strpos($v, 'Oracle Database') !== false)
     $dbtype = 'oracledb';

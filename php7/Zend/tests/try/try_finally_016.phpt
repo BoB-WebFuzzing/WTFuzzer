@@ -32,6 +32,8 @@ try {
     echo "outer catch\n";
 }
 ?>
+===DONE===
 --EXPECT--
 finally
 outer catch
+===DONE===

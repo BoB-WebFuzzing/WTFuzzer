@@ -1,7 +1,7 @@
 --TEST--
 Bug #74439 Wrong reflection on the Locale methods
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if (!extension_loaded('intl')) die('skip intl extension not available'); ?>
 --FILE--
 <?php
 
@@ -31,6 +31,7 @@ foreach ($methods as $method) {
     printf("%s: %d, %d\n", $method, $rm->getNumberOfParameters(), $rm->getNumberOfRequiredParameters());
 }
 ?>
+===DONE===
 --EXPECT--
 getDefault: 0, 0
 acceptFromHttp: 1, 1
@@ -50,3 +51,4 @@ getDisplayScript: 2, 1
 getDisplayVariant: 2, 1
 filterMatches: 3, 2
 lookup: 4, 2
+===DONE===

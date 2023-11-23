@@ -2,6 +2,11 @@
 Test array_filter() function : object functionality
 --FILE--
 <?php
+/* Prototype  : array array_filter(array $input [, callback $callback])
+ * Description: Filters elements from the array via the callback.
+ * Source code: ext/standard/array.c
+*/
+
 /* This file uses 'input' array with different types of objects and passes
  * it to array_filter() to test object functionality
  * i.e. object of simple class with members and functions
@@ -47,7 +52,7 @@ class FinalClass
 {
   private $var4;
   final function finalMethod() {
-    echo 'This cannot be overloaded';
+    echo 'This can not be overloaded';
   }
 }
 
@@ -60,6 +65,7 @@ class StaticClass
   }
 }
 
+// Callback function which returns always true
 function always_true($input)
 {
   return true;
@@ -105,10 +111,10 @@ array(5) {
   }
   [2]=>
   object(ChildClass)#%d (2) {
-    ["var2":protected]=>
-    int(5)
     ["var3":"ChildClass":private]=>
     NULL
+    ["var2":protected]=>
+    int(5)
   }
   [3]=>
   object(FinalClass)#%d (1) {
@@ -130,10 +136,10 @@ array(5) {
   }
   [2]=>
   object(ChildClass)#%d (2) {
-    ["var2":protected]=>
-    int(5)
     ["var3":"ChildClass":private]=>
     NULL
+    ["var2":protected]=>
+    int(5)
   }
   [3]=>
   object(FinalClass)#%d (1) {

@@ -6,7 +6,6 @@ date.timezone=Europe/Berlin
 <?php
 $z = '';
 var_dump(date_parse_from_format("aHa0", "0=G{$z}9UCNnF"));
-?>
 --EXPECT--
 array(12) {
   ["year"]=>
@@ -16,13 +15,13 @@ array(12) {
   ["day"]=>
   bool(false)
   ["hour"]=>
-  bool(false)
+  int(0)
   ["minute"]=>
-  bool(false)
+  int(0)
   ["second"]=>
-  bool(false)
+  int(0)
   ["fraction"]=>
-  bool(false)
+  float(0)
   ["warning_count"]=>
   int(0)
   ["warnings"]=>
@@ -31,11 +30,13 @@ array(12) {
   ["error_count"]=>
   int(3)
   ["errors"]=>
-  array(2) {
+  array(3) {
     [0]=>
+    string(51) "Meridian can only come after an hour has been found"
+    [1]=>
     string(29) "A meridian could not be found"
     [9]=>
-    string(43) "Not enough data available to satisfy format"
+    string(12) "Data missing"
   }
   ["is_localtime"]=>
   bool(false)

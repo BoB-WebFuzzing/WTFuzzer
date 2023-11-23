@@ -2,6 +2,12 @@
 Test array_intersect_assoc() function : usage variations - two dimensional arrays for $arr1 and $arr2 arguments
 --FILE--
 <?php
+/* Prototype  : array array_intersect_assoc(array $arr1, array $arr2 [, array $...])
+ * Description: Returns the entries of arr1 that have values which are present in all the other arguments.
+ * Keys are used to do more restrictive check
+ * Source code: ext/standard/array.c
+*/
+
 /*
 * Testing the behavior of array_intersect_assoc() by passing 2-D arrays
 * to both $arr1 and $arr2 argument.
@@ -56,13 +62,13 @@ echo "Done";
 -- Passing the entire 2-D array to $arr1 and $arr2 --
 - With default arguments -
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 array(2) {
   [0]=>
   array(4) {
@@ -89,21 +95,21 @@ array(2) {
 }
 - With more arguments -
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sarray_intersect_assoc_variation9.php on line %d
 array(2) {
   [0]=>
   array(4) {

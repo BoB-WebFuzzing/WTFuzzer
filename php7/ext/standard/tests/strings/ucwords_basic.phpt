@@ -2,9 +2,14 @@
 Test ucwords() function : basic functionality
 --FILE--
 <?php
+/* Prototype  : string ucwords ( string $str )
+ * Description: Uppercase the first character of each word in a string
+ * Source code: ext/standard/string.c
+*/
+
 echo "*** Testing ucwords() : basic functionality ***\n";
 
-// lines with different whitespace character
+// lines with different whitespace charecter
 $str_array = array(
  "testing ucwords",
  'testing ucwords',

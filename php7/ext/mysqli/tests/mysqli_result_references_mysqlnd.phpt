@@ -1,14 +1,19 @@
 --TEST--
 References to result sets - mysqlnd (no copies but references)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
-?>
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
+
+require_once('connect.inc');
+if (!$IS_MYSQLND)
+    die("skip Test for mysqlnd only");
+require_once('skipifemb.inc'); ?>
 --FILE--
 <?php
-    require_once 'table.inc';
+    require_once('connect.inc');
+    require_once('table.inc');
 
     $references = array();
 
@@ -47,80 +52,62 @@ require_once 'skipifconnectfailure.inc';
     debug_zval_dump($references);
     print "done!";
 ?>
---CLEAN--
-<?php
-require_once 'clean_table.inc';
-?>
 --EXPECTF--
 array(1) refcount(%d){
   [0]=>
   array(4) refcount(%d){
     ["row_ref"]=>
-    reference refcount(2) {
-      NULL
-    }
+    &NULL
     ["row_copy"]=>
     array(2) refcount(1){
       ["id"]=>
-      string(1) "1" interned
+      string(1) "1" refcount(%d)
       ["label"]=>
-      string(1) "a" interned
+      string(1) "a" refcount(%d)
     }
     ["id_ref"]=>
-    reference refcount(1) {
-      string(1) "1" interned
-    }
+    string(1) "1" refcount(%d)
     ["id_copy"]=>
-    string(1) "1" interned
+    string(1) "1" refcount(%d)
   }
 }
 array(2) refcount(%d){
   [0]=>
   array(4) refcount(%d){
     ["row_ref"]=>
-    reference refcount(2) {
-      NULL
-    }
+    &NULL
     ["row_copy"]=>
     array(2) refcount(%d){
       ["id"]=>
-      string(1) "1" interned
+      string(1) "1" refcount(%d)
       ["label"]=>
-      string(1) "a" interned
+      string(1) "a" refcount(%d)
     }
     ["id_ref"]=>
-    reference refcount(1) {
-      string(1) "1" interned
-    }
+    string(1) "1" refcount(%d)
     ["id_copy"]=>
-    string(1) "1" interned
+    string(1) "1" refcount(%d)
   }
   [1]=>
   array(5) refcount(%d){
     ["row_ref"]=>
-    reference refcount(2) {
-      array(2) refcount(1){
-        ["id"]=>
-        reference refcount(2) {
-          string(1) "2" interned
-        }
-        ["label"]=>
-        string(1) "b" interned
-      }
+    &array(2) refcount(%d){
+      ["id"]=>
+      &string(1) "2" refcount(%d)
+      ["label"]=>
+      string(1) "b" refcount(%d)
     }
     ["row_copy"]=>
     array(2) refcount(%d){
       ["id"]=>
-      string(1) "2" interned
+      string(1) "2" refcount(%d)
       ["label"]=>
-      string(1) "b" interned
+      string(1) "b" refcount(%d)
     }
     ["id_ref"]=>
-    reference refcount(2) {
-      string(1) "2" interned
-    }
+    &string(1) "2" refcount(%d)
     ["id_copy"]=>
-    string(1) "2" interned
+    string(1) "2" refcount(%d)
     ["id_copy_mod"]=>
     int(2)
   }

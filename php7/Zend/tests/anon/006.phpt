@@ -9,7 +9,6 @@ namespace lone {
 namespace {
     var_dump ($hello);
 }
-?>
 --EXPECTF--
 object(class@%s)#1 (0) {
 }

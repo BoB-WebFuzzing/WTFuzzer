@@ -1,9 +1,9 @@
 --TEST--
 openssl_pkey_export() with EC key
---EXTENSIONS--
-openssl
 --SKIPIF--
 <?php
+if (!extension_loaded("openssl"))
+    die("skip");
 if (!defined('OPENSSL_KEYTYPE_EC'))
     die("skip no EC available");
 ?>
@@ -39,23 +39,17 @@ $tempname = tempnam(sys_get_temp_dir(), 'openssl_ec');
 var_dump(openssl_pkey_export_to_file($key, $tempname, NULL, $config_arg));
 $details = openssl_pkey_get_details(openssl_pkey_get_private('file://' . $tempname));
 var_dump(OPENSSL_KEYTYPE_EC === $details['type']);
-var_dump($key instanceof OpenSSLAsymmetricKey);
+var_dump(is_resource($key));
 // Clean the temporary file
 @unlink($tempname);
 ?>
 --EXPECTF--
-object(OpenSSLAsymmetricKey)#%d (0) {
-}
+resource(%d) of type (OpenSSL key)
 bool(true)
------BEGIN PRIVATE KEY-----
-MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgs+Sqh7IzteDBiS5K
-PfTvuWuyt9YkrkuoyiW/6bag6NmhRANCAAQ+riFshYe8HnWt1avx6OuNajipU1ZW
-6BgW0+D/EtDDSYeQg9ngO8qyo5M6cyh7ORtKZVUy7DP1+W+eocaZC+a6
------END PRIVATE KEY-----
+-----BEGIN EC PRIVATE KEY-----%a-----END EC PRIVATE KEY-----
 bool(true)
 bool(true)
-object(OpenSSLAsymmetricKey)#%d (0) {
-}
+resource(%d) of type (OpenSSL key)
 array(1) {
   ["d"]=>
   string(32) "%a"

@@ -1,48 +1,40 @@
 --TEST--
 IntlGregorianCalendar::__construct(): bad arguments
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
 
-try {
-    var_dump(intlgregcal_create_instance(1,2,3,4,5,6,7));
-} catch (ArgumentCountError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(intlgregcal_create_instance(1,2,3,4,5,6,7,8));
-} catch (ArgumentCountError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(intlgregcal_create_instance(1,2,3,4));
-} catch (ArgumentCountError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(new IntlGregorianCalendar(1,2,NULL,4));
-} catch (ArgumentCountError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(new IntlGregorianCalendar(1,2,3,4,5,array()));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
+function print_exception($e) {
+	echo "\nException: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine() . "\n";
 }
 
-$cal = new IntlGregorianCalendar();
+var_dump(intlgregcal_create_instance(1,2,3,4,5,6,7));
+var_dump(intlgregcal_create_instance(1,2,3,4,5,6,7,8));
+var_dump(intlgregcal_create_instance(1,2,3,4));
 try {
-    $cal->__construct();
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
+	var_dump(new IntlGregorianCalendar(1,2,NULL,4));
+} catch (IntlException $e) {
+	print_exception($e);
 }
-?>
---EXPECT--
-Too many arguments
-Too many arguments
-No variant with 4 arguments (excluding trailing NULLs)
-No variant with 4 arguments (excluding trailing NULLs)
-IntlGregorianCalendar::__construct(): Argument #6 ($second) must be of type int, array given
-IntlGregorianCalendar object is already constructed
+try {
+	var_dump(new IntlGregorianCalendar(1,2,3,4,NULL,array()));
+} catch (TypeError $e) {
+	print_exception($e);
+}
+--EXPECTF--
+Warning: intlgregcal_create_instance(): intlgregcal_create_instance: too many arguments in %s on line %d
+NULL
+
+Warning: intlgregcal_create_instance(): intlgregcal_create_instance: too many arguments in %s on line %d
+NULL
+
+Warning: intlgregcal_create_instance(): intlgregcal_create_instance: no variant with 4 arguments (excluding trailing NULLs) in %s on line %d
+NULL
+
+Exception: IntlGregorianCalendar::__construct(): intlgregcal_create_instance: no variant with 4 arguments (excluding trailing NULLs) in %s on line %d
+
+Exception: IntlGregorianCalendar::__construct() expects parameter 6 to be int, array given in %s on line %d

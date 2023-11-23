@@ -1,9 +1,8 @@
 --TEST--
 Test 10: EXSLT Support
---EXTENSIONS--
-xsl
 --SKIPIF--
 <?php
+require_once __DIR__ .'/skipif.inc';
 $proc = new xsltprocessor;
 if (!$proc->hasExsltSupport()) die('skip EXSLT support not available');
 if (LIBXSLT_VERSION < 10117) die('skip too old libxsl');
@@ -22,7 +21,6 @@ $dom = new domDocument();
   $xml->load(__DIR__."/exslt.xml");
 
   print $proc->transformToXml($xml);
-?>
 --EXPECT--
 Test 10: EXSLT Support
   

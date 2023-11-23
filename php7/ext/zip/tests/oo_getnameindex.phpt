@@ -1,7 +1,9 @@
 --TEST--
 getNameIndex
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 $dirname = __DIR__ . '/';
@@ -12,7 +14,7 @@ $file = $dirname . 'oo_getnameindex.zip';
 
 $zip = new ZipArchive;
 if (!$zip->open($file, ZIPARCHIVE::CREATE)) {
-    exit('failed');
+	exit('failed');
 }
 
 $zip->addFromString('entry1.txt', 'entry #1');
@@ -20,12 +22,12 @@ $zip->addFromString('entry2.txt', 'entry #2');
 $zip->addFromString('dir/entry2d.txt', 'entry #2');
 
 if (!$zip->status == ZIPARCHIVE::ER_OK) {
-    echo "failed to write zip\n";
+	echo "failed to write zip\n";
 }
 $zip->close();
 
 if (!$zip->open($file)) {
-    exit('failed');
+	exit('failed');
 }
 
 
@@ -42,7 +44,3 @@ string(10) "entry1.txt"
 string(10) "entry2.txt"
 string(15) "dir/entry2d.txt"
 bool(false)
---CLEAN--
-<?php
-unlink(__DIR__ . '/oo_getnameindex.zip');
-?>

@@ -18,6 +18,7 @@ var_dump( lchgrp( $filename, $gid ) );
 var_dump( filegroup( $symlink ) === $gid );
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 
@@ -32,3 +33,4 @@ bool(true)
 bool(true)
 bool(true)
 bool(true)
+===DONE===

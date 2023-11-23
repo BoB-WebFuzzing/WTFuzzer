@@ -2,6 +2,10 @@
 Test is_numeric() function
 --FILE--
 <?php
+/* Prototype: bool is_numeric ( mixed $var );
+ * Description: Finds whether a variable is a number or a numeric string
+ */
+
 echo "*** Testing is_numeric() with valid numeric values ***\n";
 // different valid numeric  values
 $numerics = array(
@@ -68,14 +72,12 @@ $numerics = array(
   "-1",
   "1e2",
   " 1",
-  "1 ",
   "2974394749328742328432",
   "-1e-2",
   '1',
   '-1',
   '1e2',
   ' 1',
-  '1 ',
   '2974394749328742328432',
   '-1e-2',
   "0123",
@@ -116,6 +118,7 @@ $not_numerics = array(
   array(),
   array("string"),
   "",
+  "1 ",
   "- 1",
   "1.2.4",
   "1e7.6",
@@ -142,6 +145,13 @@ foreach ($not_numerics as $type ) {
   var_dump( is_numeric($type) );
 }
 
+echo "\n*** Testing error conditions ***\n";
+//Zero argument
+var_dump( is_numeric() );
+
+//arguments more than expected
+var_dump( is_numeric("10", "20") );
+
 echo "Done\n";
 
 // close the resources used
@@ -149,7 +159,7 @@ fclose($fp);
 closedir($dfp);
 
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing is_numeric() with valid numeric values ***
 -- Iteration 1 --
 bool(true)
@@ -303,10 +313,6 @@ bool(true)
 bool(true)
 -- Iteration 76 --
 bool(true)
--- Iteration 77 --
-bool(true)
--- Iteration 78 --
-bool(true)
 
 *** Testing is_numeric() on non numeric types ***
 -- Iteration 1 --
@@ -365,4 +371,14 @@ bool(false)
 bool(false)
 -- Iteration 28 --
 bool(false)
+-- Iteration 29 --
+bool(false)
+
+*** Testing error conditions ***
+
+Warning: is_numeric() expects exactly 1 parameter, 0 given in %s on line %d
+NULL
+
+Warning: is_numeric() expects exactly 1 parameter, 2 given in %s on line %d
+NULL
 Done

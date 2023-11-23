@@ -1,7 +1,7 @@
 --TEST--
 Bug #75299 Wrong reflection on inflate_init and inflate_add
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) die("skip"); ?>
 --FILE--
 <?php
 $r = new ReflectionFunction('inflate_init');
@@ -11,8 +11,10 @@ $r = new ReflectionFunction('inflate_add');
 var_dump($r->getNumberOfRequiredParameters());
 var_dump($r->getNumberOfParameters());
 ?>
+===DONE===
 --EXPECT--
 int(1)
 int(2)
 int(2)
 int(3)
+===DONE===

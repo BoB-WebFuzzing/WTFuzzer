@@ -1,7 +1,5 @@
 --TEST--
 Test hrtime() aligns with microtime()
---FLAKY--
-This test frequently fails in CI
 --FILE--
 <?php
 
@@ -18,9 +16,9 @@ $d1 = $h1 - $h0;
 $d = abs($d0 - $d1)/$d1;
 
 if ($d > 0.05) {
-    print "FAIL, $d";
+	print "FAIL, $d";
 } else {
-    print "OK, $d";
+	print "OK, $d";
 }
 
 ?>

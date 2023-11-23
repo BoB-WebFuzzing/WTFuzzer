@@ -1,7 +1,7 @@
 --TEST--
 Transliterator - "id" property
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 $tr = Transliterator::create("Katakana-Latin");
@@ -11,7 +11,6 @@ echo $revtr->id, "\n";
 var_dump($revtr);
 
 echo "Done.\n";
-?>
 --EXPECTF--
 Katakana-Latin
 Latin-Katakana

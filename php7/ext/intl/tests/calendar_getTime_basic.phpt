@@ -2,8 +2,10 @@
 IntlCalendar::getTime() basic test
 --INI--
 date.timezone=Atlantic/Azores
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -20,6 +22,8 @@ $time = strtotime('2012-02-29 00:00:00 +0000');
 var_dump((float)$time*1000, $intlcal->getTime());
 
 ?>
+==DONE==
 --EXPECT--
 float(1330473600000)
-float(1330473600000)
+float(1330473600000)
+==DONE==

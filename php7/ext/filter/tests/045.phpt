@@ -1,7 +1,7 @@
 --TEST--
 Options must not be changed by filter_var()
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 $a = array("flags"=>(string)FILTER_FLAG_ALLOW_HEX, "options" => array("min_range"=>"0", "max_range"=>"1024"));

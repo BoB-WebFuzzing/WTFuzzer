@@ -1,7 +1,7 @@
 --TEST--
 zlib.inflate of gzip-encoded stream
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -33,8 +33,7 @@ fclose($fp);
 <?php
 @unlink(__DIR__ . '/test.txt.gz');
 ?>
---EXPECTF--
-Notice: fread(): zlib: data error in %s on line %d
+--EXPECT--
 1
 2
 This is quite the thing ain't it

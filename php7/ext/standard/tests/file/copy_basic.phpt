@@ -2,6 +2,11 @@
 Test copy() function: basic functionality
 --FILE--
 <?php
+/* Prototype: bool copy ( string $source, string $dest );
+ * Description: Makes a copy of the file source to dest.
+ *              Returns TRUE on success or FALSE on failure.
+ */
+
 echo "*** Testing copy() function: to copy file from source to destination --\n";
 
 var_dump( file_exists(__FILE__) );

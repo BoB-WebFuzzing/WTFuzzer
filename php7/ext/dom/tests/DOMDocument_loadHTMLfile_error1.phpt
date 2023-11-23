@@ -4,8 +4,10 @@ Test DOMDocument::loadHTMLFile when the file doesn't exist
 Verifies that an error message is showed if the file doesn't exist
 --CREDITS--
 Antonio Diaz Ruiz <dejalatele@gmail.com>
---EXTENSIONS--
-dom
+--INI--
+assert.bail=true
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --FILE--
 <?php
 $doc = new DOMDocument();

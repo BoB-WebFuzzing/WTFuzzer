@@ -1,25 +1,15 @@
 --TEST--
 gzencode() and invalid params
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) print "skip"; ?>
 --FILE--
 <?php
 
-try {
-    var_dump(gzencode("", -10));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(gzencode("", 100));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(gzencode("", 1, 100));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gzencode());
+var_dump(gzencode(1,1,1,1));
+var_dump(gzencode("", -10));
+var_dump(gzencode("", 100));
+var_dump(gzencode("", 1, 100));
 
 var_dump(gzencode("", -1, ZLIB_ENCODING_GZIP));
 var_dump(gzencode("", 9, ZLIB_ENCODING_DEFLATE));
@@ -29,22 +19,33 @@ Light in this temple
 Light in my truth
 Lies in the darkness";
 
-try {
-    var_dump(gzencode($string, 9, 3));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gzencode($string, 9, 3));
 
 var_dump(gzencode($string, -1, ZLIB_ENCODING_GZIP));
 var_dump(gzencode($string, 9, ZLIB_ENCODING_DEFLATE));
 
+echo "Done\n";
 ?>
 --EXPECTF--
-gzencode(): Argument #2 ($level) must be between -1 and 9
-gzencode(): Argument #2 ($level) must be between -1 and 9
-gzencode(): Argument #3 ($encoding) must be one of ZLIB_ENCODING_RAW, ZLIB_ENCODING_GZIP, or ZLIB_ENCODING_DEFLATE
+Warning: gzencode() expects at least 1 parameter, 0 given in %s on line %d
+NULL
+
+Warning: gzencode() expects at most 3 parameters, 4 given in %s on line %d
+NULL
+
+Warning: gzencode(): compression level (-10) must be within -1..9 in %s on line %d
+bool(false)
+
+Warning: gzencode(): compression level (100) must be within -1..9 in %s on line %d
+bool(false)
+
+Warning: gzencode(): encoding mode must be either ZLIB_ENCODING_RAW, ZLIB_ENCODING_GZIP or ZLIB_ENCODING_DEFLATE in %s on line %d
+bool(false)
 string(%d) "%a"
 string(%d) "%a"
-gzencode(): Argument #3 ($encoding) must be one of ZLIB_ENCODING_RAW, ZLIB_ENCODING_GZIP, or ZLIB_ENCODING_DEFLATE
+
+Warning: gzencode(): encoding mode must be either ZLIB_ENCODING_RAW, ZLIB_ENCODING_GZIP or ZLIB_ENCODING_DEFLATE in %s on line %d
+bool(false)
 string(%d) "%a"
 string(%d) "%a"
+Done

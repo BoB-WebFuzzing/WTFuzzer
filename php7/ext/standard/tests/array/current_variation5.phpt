@@ -2,6 +2,12 @@
 Test current() function : usage variations - reference & normal parameters
 --FILE--
 <?php
+/* Prototype  : mixed current(array $array_arg)
+ * Description: Return the element currently pointed to by the internal array pointer
+ * Source code: ext/standard/array.c
+ * Alias to functions: pos
+ */
+
 echo "*** Testing current() : usage variations ***\n";
 
 echo "\n-- Function: reference parameter --\n";
@@ -33,6 +39,8 @@ var_dump(next($a));
 current_variation5($a);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 *** Testing current() : usage variations ***
 
@@ -47,3 +55,4 @@ string(3) "yes"
 string(5) "maybe"
 string(5) "maybe"
 string(2) "no"
+===DONE===

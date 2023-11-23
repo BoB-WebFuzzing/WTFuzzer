@@ -5,13 +5,13 @@
                                 ".$type_name."
                    ";
 
-        $statement = oci_parse($c,$ora_sql);
-        @oci_execute($statement);
+        $statement = OCIParse($c,$ora_sql);
+        @OCIExecute($statement);
 
         $ora_sql = "CREATE TYPE ".$type_name." AS TABLE OF NUMBER(11)";
 
-        $statement = oci_parse($c,$ora_sql);
-        oci_execute($statement);
+        $statement = OCIParse($c,$ora_sql);
+        OCIExecute($statement);
     }
 
 ?>

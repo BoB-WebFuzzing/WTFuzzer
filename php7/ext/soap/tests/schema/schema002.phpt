@@ -1,18 +1,17 @@
 --TEST--
 SOAP XML Schema 2: simpleType/restriction (reference to type)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";
 $schema = <<<EOF
-    <simpleType name="testType2">
-        <restriction base="xsd:int"/>
-    </simpleType>
-    <simpleType name="testType">
-        <restriction base="tns:testType2"/>
-    </simpleType>
+	<simpleType name="testType2">
+		<restriction base="xsd:int"/>
+	</simpleType>
+	<simpleType name="testType">
+		<restriction base="tns:testType2"/>
+	</simpleType>
 EOF;
 test_schema($schema,'type="tns:testType"',123.5);
 echo "ok";

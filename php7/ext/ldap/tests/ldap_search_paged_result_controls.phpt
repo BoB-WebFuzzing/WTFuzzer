@@ -2,10 +2,9 @@
 ldap_search() test with paged result controls
 --CREDITS--
 Côme Chilliet <mcmic@php.net>
---EXTENSIONS--
-ldap
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifbindfailure.inc');
 require_once('skipifcontrol.inc');
 skipifunsupportedcontrol(LDAP_CONTROL_PAGEDRESULTS);
@@ -14,31 +13,31 @@ skipifunsupportedcontrol(LDAP_CONTROL_PAGEDRESULTS);
 <?php
 include "connect.inc";
 
-$link = ldap_connect_and_bind($uri, $user, $passwd, $protocol_version);
+$link = ldap_connect_and_bind($host, $port, $user, $passwd, $protocol_version);
 insert_dummy_data($link, $base);
 
 $dn = "$base";
 $filter = "(cn=user*)";
 var_dump(
-    $result = ldap_search($link, $dn, $filter, array('cn'), 0, 0, 0, LDAP_DEREF_NEVER,
-        [['oid' => LDAP_CONTROL_PAGEDRESULTS, 'value' => ['size' => 2]]]),
-    ldap_get_entries($link, $result),
-    ldap_parse_result($link, $result, $errcode , $matcheddn , $errmsg , $referrals, $controls),
-    $result = ldap_search($link, $dn, $filter, array('cn'), 0, 0, 0, LDAP_DEREF_NEVER,
-        [['oid' => LDAP_CONTROL_PAGEDRESULTS, 'value' => ['size' => 20, 'cookie' => $controls[LDAP_CONTROL_PAGEDRESULTS]['value']['cookie']]]]),
-    ldap_get_entries($link, $result)
+	$result = ldap_search($link, $dn, $filter, array('cn'), 0, 0, 0, LDAP_DEREF_NEVER,
+		[['oid' => LDAP_CONTROL_PAGEDRESULTS, 'value' => ['size' => 2]]]),
+	ldap_get_entries($link, $result),
+	ldap_parse_result($link, $result, $errcode , $matcheddn , $errmsg , $referrals, $controls),
+	$result = ldap_search($link, $dn, $filter, array('cn'), 0, 0, 0, LDAP_DEREF_NEVER,
+		[['oid' => LDAP_CONTROL_PAGEDRESULTS, 'value' => ['size' => 20, 'cookie' => $controls[LDAP_CONTROL_PAGEDRESULTS]['value']['cookie']]]]),
+	ldap_get_entries($link, $result)
 );
 ?>
+===DONE===
 --CLEAN--
 <?php
 include "connect.inc";
 
-$link = ldap_connect_and_bind($uri, $user, $passwd, $protocol_version);
+$link = ldap_connect_and_bind($host, $port, $user, $passwd, $protocol_version);
 remove_dummy_data($link, $base);
 ?>
 --EXPECTF--
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(3) {
   ["count"]=>
   int(2)
@@ -76,8 +75,7 @@ array(3) {
   }
 }
 bool(true)
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(2) {
   ["count"]=>
   int(1)
@@ -98,3 +96,4 @@ array(2) {
     string(%d) "cn=userC,cn=userB,%s"
   }
 }
+===DONE===

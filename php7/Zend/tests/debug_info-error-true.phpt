@@ -15,6 +15,5 @@ class C {
 
 $c = new C(true);
 var_dump($c);
-?>
 --EXPECTF--
 Fatal error: __debuginfo() must return an array in %s%eZend%etests%edebug_info-error-true.php on line %d

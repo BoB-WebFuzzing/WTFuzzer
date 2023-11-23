@@ -1,9 +1,11 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -19,49 +21,41 @@
 #include "php_intl.h"
 #include "spoofchecker_class.h"
 
-/* {{{ Checks if a given text contains any suspicious characters */
+/* {{{ proto bool Spoofchecker::isSuspicious( string text[, int &error_code ] )
+ * Checks if a given text contains any suspicious characters
+ */
 PHP_METHOD(Spoofchecker, isSuspicious)
 {
-	int32_t ret, errmask;
+	int ret;
 	char *text;
 	size_t text_len;
 	zval *error_code = NULL;
 	SPOOFCHECKER_METHOD_INIT_VARS;
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "s|z", &text, &text_len, &error_code)) {
-		RETURN_THROWS();
+		return;
 	}
 
 	SPOOFCHECKER_METHOD_FETCH_OBJECT;
 
-#if U_ICU_VERSION_MAJOR_NUM >= 58
-	ret = uspoof_check2UTF8(co->uspoof, text, text_len, co->uspoofres, SPOOFCHECKER_ERROR_CODE_P(co));
-#else
 	ret = uspoof_checkUTF8(co->uspoof, text, text_len, NULL, SPOOFCHECKER_ERROR_CODE_P(co));
-#endif
 
 	if (U_FAILURE(SPOOFCHECKER_ERROR_CODE(co))) {
 		php_error_docref(NULL, E_WARNING, "(%d) %s", SPOOFCHECKER_ERROR_CODE(co), u_errorName(SPOOFCHECKER_ERROR_CODE(co)));
-#if U_ICU_VERSION_MAJOR_NUM >= 58
-		errmask = uspoof_getCheckResultChecks(co->uspoofres, SPOOFCHECKER_ERROR_CODE_P(co));
-
-		if (errmask != ret) {
-			php_error_docref(NULL, E_WARNING, "unexpected error (%d), does not relate to the flags passed to setChecks (%d)", ret, errmask);
-		}
-#endif
 		RETURN_TRUE;
 	}
 
 	if (error_code) {
 		zval_ptr_dtor(error_code);
-		ZVAL_LONG(Z_REFVAL_P(error_code), ret);
-		Z_TRY_ADDREF_P(error_code);
+		ZVAL_LONG(error_code, ret);
 	}
 	RETVAL_BOOL(ret != 0);
 }
 /* }}} */
 
-/* {{{ Checks if a given text contains any confusable characters */
+/* {{{ proto bool Spoofchecker::areConfusable( string str1, string str2[, int &error_code ] )
+ * Checks if a given text contains any confusable characters
+ */
 PHP_METHOD(Spoofchecker, areConfusable)
 {
 	int ret;
@@ -72,7 +66,7 @@ PHP_METHOD(Spoofchecker, areConfusable)
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "ss|z", &s1, &s1_len,
 										 &s2, &s2_len, &error_code)) {
-		RETURN_THROWS();
+		return;
 	}
 
 	SPOOFCHECKER_METHOD_FETCH_OBJECT;
@@ -88,14 +82,15 @@ PHP_METHOD(Spoofchecker, areConfusable)
 
 	if (error_code) {
 		zval_ptr_dtor(error_code);
-		ZVAL_LONG(Z_REFVAL_P(error_code), ret);
-		Z_TRY_ADDREF_P(error_code);
+		ZVAL_LONG(error_code, ret);
 	}
 	RETVAL_BOOL(ret != 0);
 }
 /* }}} */
 
-/* {{{ Locales to use when running checks */
+/* {{{ proto void Spoofchecker::setAllowedLocales( string locales )
+ * Locales to use when running checks
+ */
 PHP_METHOD(Spoofchecker, setAllowedLocales)
 {
 	char *locales;
@@ -103,7 +98,7 @@ PHP_METHOD(Spoofchecker, setAllowedLocales)
 	SPOOFCHECKER_METHOD_INIT_VARS;
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "s", &locales, &locales_len)) {
-		RETURN_THROWS();
+		return;
 	}
 
 	SPOOFCHECKER_METHOD_FETCH_OBJECT;
@@ -117,14 +112,16 @@ PHP_METHOD(Spoofchecker, setAllowedLocales)
 }
 /* }}} */
 
-/* {{{ Set the checks to run */
+/* {{{ proto void Spoofchecker::setChecks( int checks )
+ * Set the checks to run
+ */
 PHP_METHOD(Spoofchecker, setChecks)
 {
 	zend_long checks;
 	SPOOFCHECKER_METHOD_INIT_VARS;
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "l", &checks)) {
-		RETURN_THROWS();
+		return;
 	}
 
 	SPOOFCHECKER_METHOD_FETCH_OBJECT;
@@ -138,15 +135,16 @@ PHP_METHOD(Spoofchecker, setChecks)
 /* }}} */
 
 #if U_ICU_VERSION_MAJOR_NUM >= 58
-/* TODO Document this method on PHP.net */
-/* {{{ Set the loosest restriction level allowed for strings. */
+/* {{{ proto void Spoofchecker::setRestrictionLevel( int $restriction_level )
+ * Set the loosest restriction level allowed for strings.
+ */
 PHP_METHOD(Spoofchecker, setRestrictionLevel)
 {
 	zend_long level;
 	SPOOFCHECKER_METHOD_INIT_VARS;
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "l", &level)) {
-		RETURN_THROWS();
+		return;
 	}
 
 	SPOOFCHECKER_METHOD_FETCH_OBJECT;
@@ -157,10 +155,8 @@ PHP_METHOD(Spoofchecker, setRestrictionLevel)
 			USPOOF_MODERATELY_RESTRICTIVE != level &&
 			USPOOF_MINIMALLY_RESTRICTIVE != level &&
 			USPOOF_UNRESTRICTIVE != level) {
-		zend_argument_value_error(1, "must be one of Spoofchecker::ASCII, Spoofchecker::SINGLE_SCRIPT_RESTRICTIVE, "
-			"Spoofchecker::SINGLE_HIGHLY_RESTRICTIVE, Spoofchecker::SINGLE_MODERATELY_RESTRICTIVE, "
-			"Spoofchecker::SINGLE_MINIMALLY_RESTRICTIVE, or Spoofchecker::UNRESTRICTIVE");
-		RETURN_THROWS();
+		php_error_docref(NULL, E_WARNING, "Invalid restriction level value");
+		return;
 	}
 
 	uspoof_setRestrictionLevel(co->uspoof, (URestrictionLevel)level);

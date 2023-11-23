@@ -1,22 +1,18 @@
 --TEST--
 Bug #72709 (imagesetstyle() causes OOB read for empty $styles)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip ext/gd not available');
+?>
 --FILE--
 <?php
 $im = imagecreatetruecolor(1, 1);
-
-try {
-    var_dump(imagesetstyle($im, array()));
-}
-catch (\Error $ex) {
-    echo $ex->getMessage() . "\n";
-}
-
+var_dump(imagesetstyle($im, array()));
 imagesetpixel($im, 0, 0, IMG_COLOR_STYLED);
 imagedestroy($im);
 ?>
 ====DONE====
---EXPECT--
-imagesetstyle(): Argument #2 ($style) cannot be empty
+--EXPECTF--
+Warning: imagesetstyle(): styles array must not be empty in %s%ebug72709.php on line %d
+bool(false)
 ====DONE====

@@ -3,8 +3,8 @@ Read $ownerElement with null parent.
 --CREDITS--
 Travis Pew
 # TestFest Atlanta 2009-05-14
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -16,5 +16,8 @@ $document->removeChild($root);
 $root = null;
 var_dump($attr->ownerElement);
 ?>
---EXPECT--
+--EXPECTF--
+Warning: Couldn't fetch DOMAttr. Node no longer exists in %s on line %d
+
+Notice: Undefined property: DOMAttr::$ownerElement in %s on line %d
 NULL

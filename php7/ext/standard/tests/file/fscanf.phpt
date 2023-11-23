@@ -5,6 +5,10 @@ fscanf() tests
 
 $filename = __DIR__."/fscanf.dat";
 
+var_dump(fscanf());
+var_dump(fscanf(array()));
+var_dump(fscanf(array(), array()));
+
 file_put_contents($filename, "data");
 
 $fp = fopen($filename, "rt");
@@ -18,11 +22,7 @@ var_dump($v);
 fclose($fp);
 
 $fp = fopen($filename, "rt");
-try {
-    fscanf($fp, "%s", $v, $v1);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(fscanf($fp, "%s", $v, $v1));
 var_dump($v);
 var_dump($v1);
 fclose($fp);
@@ -30,11 +30,7 @@ fclose($fp);
 $v = array();
 $v1 = array();
 $fp = fopen($filename, "rt");
-try {
-    fscanf($fp, "", $v, $v1);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(fscanf($fp, "", $v, $v1));
 var_dump($v);
 var_dump($v1);
 fclose($fp);
@@ -42,11 +38,7 @@ fclose($fp);
 $v = array();
 $v1 = array();
 $fp = fopen($filename, "rt");
-try {
-    fscanf($fp, "%.a", $v, $v1);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(fscanf($fp, "%.a", $v, $v1));
 var_dump($v);
 var_dump($v1);
 fclose($fp);
@@ -62,11 +54,7 @@ fclose($fp);
 file_put_contents($filename, "data");
 
 $fp = fopen($filename, "rt");
-try {
-    var_dump(fscanf($fp, "%s%d", $v));
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+var_dump(fscanf($fp, "%s%d", $v));
 
 echo "Done\n";
 ?>
@@ -75,20 +63,34 @@ echo "Done\n";
 $filename = __DIR__."/fscanf.dat";
 unlink($filename);
 ?>
---EXPECT--
+--EXPECTF--
+Warning: fscanf() expects at least 2 parameters, 0 given in %s on line %d
+NULL
+
+Warning: fscanf() expects at least 2 parameters, 1 given in %s on line %d
+NULL
+
+Warning: fscanf() expects parameter 1 to be resource, array given in %s on line %d
+NULL
 int(0)
 NULL
 int(1)
 string(4) "data"
-Variable is not assigned by any conversion specifiers
+
+Warning: fscanf(): Variable is not assigned by any conversion specifiers in %s on line %d
+int(-1)
 string(4) "data"
 NULL
-Variable is not assigned by any conversion specifiers
+
+Warning: fscanf(): Variable is not assigned by any conversion specifiers in %s on line %d
+int(-1)
 array(0) {
 }
 array(0) {
 }
-Bad scan conversion character "."
+
+Warning: fscanf(): Bad scan conversion character "." in %s on line %d
+int(-1)
 array(0) {
 }
 array(0) {
@@ -96,5 +98,7 @@ array(0) {
 bool(false)
 array(0) {
 }
-Different numbers of variable names and field specifiers
+
+Warning: fscanf(): Different numbers of variable names and field specifiers in %s on line %d
+int(-1)
 Done

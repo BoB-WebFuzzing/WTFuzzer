@@ -22,23 +22,24 @@ $paths = array("多国語", "王", "汚れて掘る");
 
 mkdir($prefix);
 foreach ($paths as $d) {
-    mkdir($prefix . $d);
-    file_put_contents($prefix . $d . ".test", $d);
+	mkdir($prefix . $d);
+	file_put_contents($prefix . $d . ".test", $d);
 }
 
 $myDirectory = opendir($prefix);
 while($entryName = readdir($myDirectory)) {
-    echo get_basename_with_cp($prefix . $entryName, 65001, false) . "\n";
+	echo get_basename_with_cp($prefix . $entryName, 65001, false) . "\n";
 }
 closedir($myDirectory);
 
 foreach ($paths as $d) {
-    rmdir($prefix . $d);
-    unlink($prefix . $d . ".test");
+	rmdir($prefix . $d);
+	unlink($prefix . $d . ".test");
 }
 rmdir($prefix);
 
 ?>
+===DONE===
 --EXPECT--
 testBug54977
 windows_mb_path
@@ -48,3 +49,4 @@ windows_mb_path
 汚れて掘る.test
 王
 王.test
+===DONE===

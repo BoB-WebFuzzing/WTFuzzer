@@ -1,7 +1,9 @@
 --TEST--
 Bug #66550 (SQLite prepared statement use-after-free)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded('sqlite3')) die('skip');
+?>
 --FILE--
 <?php
 
@@ -13,11 +15,9 @@ $stmt = $db->prepare('SELECT bar FROM foo WHERE id=:id');
 // Close the database connection and free the internal sqlite3_stmt object
 $db->close();
 // Access the sqlite3_stmt object via the php_sqlite3_stmt container
-try {
-    $stmt->reset();
-} catch (\Error $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+$stmt->reset();
 ?>
---EXPECT--
-The SQLite3 object has not been correctly initialised or is already closed
+==DONE==
+--EXPECTF--
+Warning: SQLite3Stmt::reset(): The SQLite3 object has not been correctly initialised in %s
+==DONE==

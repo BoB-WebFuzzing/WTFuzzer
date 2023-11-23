@@ -4,6 +4,12 @@ Test parse_ini_file() function : variation: identical properties and values are 
 Dave Kelsey <d_kelsey@uk.ibm.com>
 --FILE--
 <?php
+/* Prototype  : array parse_ini_file(string filename [, bool process_sections])
+ * Description: Parse configuration file
+ * Source code: ext/standard/basic_functions.c
+ * Alias to functions:
+ */
+
 echo "*** Testing parse_ini_file() : variation ***\n";
 $output_file = __FILE__.".ini";
 $iniFile = <<<FILE
@@ -24,6 +30,7 @@ var_dump($a);
 
 unlink($output_file);
 ?>
+===DONE===
 --EXPECT--
 *** Testing parse_ini_file() : variation ***
 array(2) {
@@ -58,3 +65,4 @@ array(2) {
     string(9) "different"
   }
 }
+===DONE===

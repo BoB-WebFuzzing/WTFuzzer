@@ -1,7 +1,7 @@
 --TEST--
 Transliterator clone handler
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -14,7 +14,6 @@ $u = clone $t;
 echo $u->id, ": ", $u->transliterate($str), "\n";
 
 echo "Done.\n";
-?>
 --EXPECT--
 hex-any: a 万
 hex-any: a 万

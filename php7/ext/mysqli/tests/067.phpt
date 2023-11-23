@@ -1,18 +1,19 @@
 --TEST--
 function test: nested selects (cursors)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-    require_once 'connect.inc';
+    require_once('skipif.inc');
+    require_once('skipifconnectfailure.inc');
+    require_once("connect.inc");
 
-    if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
-        die(sprintf("skip Can't connect to MySQL Server - [%d] %s", mysqli_connect_errno(), mysqli_connect_error()));
+    if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
+        die("skip Cannot connect to check required version");
 
-    /* skip cursor test for server versions < 50009 */
-    if (mysqli_get_server_version($link) < 50009) {
-            die(sprintf("skip Server doesn't support cursors (%s)",
-                    mysqli_get_server_version($link)));
+    /* skip cursor test for versions < 50004 */
+    if ((!$IS_MYSQLND && (mysqli_get_client_version() < 50009)) ||
+            (mysqli_get_server_version($link) < 50009)) {
+            die(sprintf("skip Client library doesn't support cursors (%s/%s)",
+                    mysqli_get_client_version(), mysqli_get_server_version($link)));
     }
     mysqli_close($link);
 ?>
@@ -28,10 +29,11 @@ mysqli
         return $stmt;
     }
 
-    require_once 'connect.inc';
+    require_once("connect.inc");
     $mysql = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
 
-    if (mysqli_get_server_version($mysql) < 50009) {
+    if ((!$IS_MYSQLND && mysqli_get_client_version() < 50009) ||
+        (mysqli_get_server_version($mysql) < 50009)) {
         /* we really want to skip it... */
         die(var_dump(63));
     }
@@ -64,7 +66,7 @@ mysqli
 ?>
 --CLEAN--
 <?php
-require_once 'connect.inc';
+require_once("connect.inc");
 if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
    printf("[c001] [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 

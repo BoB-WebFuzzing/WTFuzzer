@@ -3,6 +3,11 @@ Test fscanf() function: usage variations - octal formats with boolean
 --FILE--
 <?php
 
+/*
+  Prototype: mixed fscanf ( resource $handle, string $format [, mixed &$...] );
+  Description: Parses input from a file according to a format
+*/
+
 /* Test fscanf() to scan boolean data using different octal format types */
 
 $file_path = __DIR__;
@@ -24,11 +29,11 @@ $bool_types = array (
 );
 
 $octal_formats = array(  "%o",
-             "%ho", "%lo", "%Lo",
-             " %o", "%o ", "% o",
-             "\t%o", "\n%o", "%4o",
-             "%30o", "%[0-7]", "%*o"
-         );
+			 "%ho", "%lo", "%Lo",
+			 " %o", "%o ", "% o",
+			 "\t%o", "\n%o", "%4o",
+			 "%30o", "%[0-7]", "%*o"
+ 		 );
 
 $counter = 1;
 
@@ -53,11 +58,7 @@ foreach($octal_formats as $octal_format) {
   rewind($file_handle);
   echo "\n-- iteration $counter --\n";
   while( !feof($file_handle) ) {
-    try {
-      var_dump(fscanf($file_handle,$octal_format));
-    } catch (ValueError $exception) {
-      echo $exception->getMessage() . "\n";
-    }
+    var_dump( fscanf($file_handle,$octal_format) );
   }
   $counter++;
 }
@@ -70,7 +71,7 @@ $file_path = __DIR__;
 $filename = "$file_path/fscanf_variation32.tmp";
 unlink($filename);
 ?>
---EXPECT--
+--EXPECTF--
 *** Test fscanf(): different octal format types with boolean data ***
 
 -- iteration 1 --
@@ -152,10 +153,18 @@ NULL
 bool(false)
 
 -- iteration 7 --
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
-Bad scan conversion character " "
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
+
+Warning: fscanf(): Bad scan conversion character " " in %s on line %d
+NULL
 bool(false)
 
 -- iteration 8 --

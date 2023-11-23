@@ -3,7 +3,6 @@ Bug #78662 (stream_write bad error detection)
 --FILE--
 <?php
 class FailedStream {
-    public $context;
     function stream_open($path, $mode, $options, &$opened_path)
     {
         return true;
@@ -27,7 +26,7 @@ var_dump(fwrite($f, "bar"));
 var_dump(fread($f, 100));
 ?>
 Done
---EXPECT--
+--EXPECTF--
 bool(false)
 bool(false)
 Done

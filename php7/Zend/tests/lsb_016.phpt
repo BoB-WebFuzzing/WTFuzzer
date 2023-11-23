@@ -33,7 +33,9 @@ $o->test();
 $o->a = "b";
 echo $o->a;
 ?>
+==DONE==
 --EXPECT--
 TestChild
 TestChild
 TestChild
+==DONE==

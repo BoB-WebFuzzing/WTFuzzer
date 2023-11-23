@@ -1,7 +1,7 @@
 --TEST--
 Phar object: ArrayAccess and isset
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded('phar')) die('skip'); ?>
 --INI--
 phar.require_hash=0
 --FILE--
@@ -32,6 +32,7 @@ var_dump(isset($phar[12]));
 var_dump(isset($phar['b']));
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/files/phar_oo_010.phar.php');
@@ -50,3 +51,4 @@ bool(false)
 bool(false)
 bool(false)
 bool(true)
+===DONE===

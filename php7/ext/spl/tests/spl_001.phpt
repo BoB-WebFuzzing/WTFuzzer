@@ -13,10 +13,11 @@ print_r($ar);
 
 foreach($ar as $v)
 {
-    var_dump($v);
+	var_dump($v);
 }
 
 ?>
+===DONE===
 --EXPECT--
 int(4)
 Array
@@ -30,3 +31,4 @@ int(1)
 int(5)
 int(3)
 int(4)
+===DONE===

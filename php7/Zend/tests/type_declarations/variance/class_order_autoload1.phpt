@@ -24,6 +24,7 @@ spl_autoload_register(function($class) {
 var_dump(new C);
 
 ?>
+===DONE===
 --EXPECT--
 object(A)#2 (0) {
 }
@@ -33,3 +34,4 @@ object(C)#2 (0) {
 }
 object(C)#2 (0) {
 }
+===DONE===

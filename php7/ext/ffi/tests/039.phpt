@@ -1,14 +1,14 @@
 --TEST--
 FFI 039: Pointer arithmetic
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--
 <?php
-$a = FFI::cdef()->new("int[10]");
+$a = FFI::new("int[10]");
 for ($i = 0; $i < 10; $i++) {
-    $a[$i] = $i;
+	$a[$i] = $i;
 }
 $p = $a + 0;
 var_dump($p[0]);

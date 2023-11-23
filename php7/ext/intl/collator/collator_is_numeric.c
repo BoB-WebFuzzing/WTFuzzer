@@ -1,9 +1,11 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -15,7 +17,9 @@
 
 #include "collator_is_numeric.h"
 
-/* {{{ Taken from PHP6:zend_u_strtod() */
+/* {{{ collator_u_strtod
+ * Taken from PHP6:zend_u_strtod()
+ */
 static double collator_u_strtod(const UChar *nptr, UChar **endptr) /* {{{ */
 {
 	const UChar *u = nptr, *nstart;
@@ -67,7 +71,7 @@ static double collator_u_strtod(const UChar *nptr, UChar **endptr) /* {{{ */
 		char buf[64], *numbuf, *bufpos;
 		size_t length = u - nstart;
 		double value;
-		ALLOCA_FLAG(use_heap = 0);
+		ALLOCA_FLAG(use_heap);
 
 		if (length < sizeof(buf)) {
 			numbuf = buf;
@@ -110,13 +114,16 @@ static double collator_u_strtod(const UChar *nptr, UChar **endptr) /* {{{ */
  *
  * Ignores `locale' stuff.
  */
-static zend_long collator_u_strtol(const UChar *nptr, UChar **endptr, int base)
+static zend_long collator_u_strtol(nptr, endptr, base)
+	const UChar *nptr;
+	UChar **endptr;
+	register int base;
 {
-	const UChar *s = nptr;
-	zend_ulong acc;
-	UChar c;
-	zend_ulong cutoff;
-	int neg = 0, any, cutlim;
+	register const UChar *s = nptr;
+	register zend_ulong acc;
+	register UChar c;
+	register zend_ulong cutoff;
+	register int neg = 0, any, cutlim;
 
 	if (s == NULL) {
 		errno = ERANGE;
@@ -204,18 +211,24 @@ static zend_long collator_u_strtol(const UChar *nptr, UChar **endptr, int base)
 /* {{{ collator_is_numeric]
  * Taken from PHP6:is_numeric_unicode()
  */
-uint8_t collator_is_numeric( UChar *str, int32_t length, zend_long *lval, double *dval, bool allow_errors )
+zend_uchar collator_is_numeric( UChar *str, int32_t length, zend_long *lval, double *dval, int allow_errors )
 {
 	zend_long local_lval;
 	double local_dval;
 	UChar *end_ptr_long, *end_ptr_double;
+	int conv_base=10;
 
 	if (!length) {
 		return 0;
 	}
 
+	/* handle hex numbers */
+	if (length>=2 && str[0]=='0' && (str[1]=='x' || str[1]=='X')) {
+		conv_base=16;
+	}
+
 	errno=0;
-	local_lval = collator_u_strtol(str, &end_ptr_long, 10);
+	local_lval = collator_u_strtol(str, &end_ptr_long, conv_base);
 	if (errno != ERANGE) {
 		if (end_ptr_long == str+length) { /* integer string */
 			if (lval) {
@@ -227,6 +240,11 @@ uint8_t collator_is_numeric( UChar *str, int32_t length, zend_long *lval, double
 		}
 	} else {
 		end_ptr_long = NULL;
+	}
+
+	if (conv_base == 16) { /* hex string, under UNIX strtod() messes it up */
+		/* UTODO: keep compatibility with is_numeric_string() here? */
+		return 0;
 	}
 
 	local_dval = collator_u_strtod(str, &end_ptr_double);
@@ -248,6 +266,9 @@ uint8_t collator_is_numeric( UChar *str, int32_t length, zend_long *lval, double
 
 	if (!allow_errors) {
 		return 0;
+	}
+	if (allow_errors == -1) {
+		zend_error(E_NOTICE, "A non well formed numeric value encountered");
 	}
 
 	if (allow_errors) {

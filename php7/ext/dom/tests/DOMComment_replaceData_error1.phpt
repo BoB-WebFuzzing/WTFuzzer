@@ -3,8 +3,8 @@ Test replacing data into a DOMComment basic test
 --CREDITS--
 Andrew Larssen <al@larssen.org>
 London TestFest 2008
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -15,10 +15,10 @@ try {
   $comment->replaceData(-1,4,'-inserted');
 } catch (DOMException $e ) {
   if ($e->getMessage() == 'Index Size Error'){
-    echo "Throws DOMException for -ve offset\n";
+    echo "Throws DOMException for -ve offest\n";
   }
 }
 
 ?>
 --EXPECT--
-Throws DOMException for -ve offset
+Throws DOMException for -ve offest

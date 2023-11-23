@@ -2,8 +2,8 @@
 Phar front controller index.php relocate [cache_list]
 --INI--
 phar.cache_list={PWD}/frontcontroller5.php
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller5.php
 REQUEST_URI=/frontcontroller5.php/

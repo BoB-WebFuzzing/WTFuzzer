@@ -1,10 +1,8 @@
 --TEST--
 PDO_OCI: check fread() EOF
---EXTENSIONS--
-pdo
-pdo_oci
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo') || !extension_loaded('pdo_oci')) die('skip not loaded');
 require(__DIR__.'/../../pdo/tests/pdo_test.inc');
 if (!strpos(strtolower(getenv('PDOTEST_DSN')), 'charset=we8mswin1252')) die('skip expected output valid for WE8MSWIN1252 character set');
 PDOTest::skip();
@@ -20,21 +18,22 @@ $dbh->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
 
 // Initialization
 $stmtarray = array(
-    "create table test_oci_fread_1 (id number, data clob)",
+    "begin execute immediate 'drop table pdo_oci_fread_tab'; exception when others then null; end;",
+	"create table pdo_oci_fread_tab (id number, data clob)",
     "declare
     lob1 clob := 'abc' || lpad('j',4020,'j') || 'xyz';
    begin
-    insert into test_oci_fread_1 (id,data) values (1, lob1);
+    insert into pdo_oci_fread_tab (id,data) values (1, lob1);
   end;"
 );
 
 foreach ($stmtarray as $stmt) {
-    $dbh->exec($stmt);
+	$dbh->exec($stmt);
 }
 
 echo "Test 1\n";
 
-$s = $dbh->query("select data from test_oci_fread_1 where id = 1");
+$s = $dbh->query("select data from pdo_oci_fread_tab where id = 1");
 $r = $s->fetch();
 $sh = $r['data'];
 
@@ -44,12 +43,17 @@ while (!feof($sh)) {
 }
 echo "\n";
 fclose($sh);
-?>
---CLEAN--
-<?php
-require 'ext/pdo/tests/pdo_test.inc';
-$db = PDOTest::test_factory('ext/pdo_oci/tests/common.phpt');
-PDOTest::dropTableIfExists($db, test_oci_fread_1");
+
+// Clean up
+
+$stmtarray = array(
+	"drop table pdo_oci_fread_tab"
+);
+
+foreach ($stmtarray as $stmt) {
+	$dbh->exec($stmt);
+}
+
 ?>
 --EXPECT--
 Test 1

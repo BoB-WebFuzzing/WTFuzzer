@@ -23,6 +23,7 @@ unset($a);
 var_dump(class_exists("C", true));
 ?>
 ===DONE===
+<?php exit(0); ?>
 --EXPECT--
 var:2
 bool(false)

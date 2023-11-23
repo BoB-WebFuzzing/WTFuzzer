@@ -3,6 +3,7 @@ pathinfo() tests
 --FILE--
 <?php
 
+var_dump(pathinfo());
 var_dump(pathinfo(""));
 var_dump(pathinfo("."));
 var_dump(pathinfo(".."));
@@ -26,6 +27,8 @@ var_dump(pathinfo(__FILE__, PATHINFO_DIRNAME|PATHINFO_BASENAME));
 echo "Done\n";
 ?>
 --EXPECTF--
+Warning: pathinfo() expects at least 1 parameter, 0 given in %s on line %d
+NULL
 array(2) {
   ["basename"]=>
   string(0) ""

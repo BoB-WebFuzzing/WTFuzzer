@@ -1,7 +1,5 @@
 --TEST--
 Bug #78230: Incorrect type check optimization
---EXTENSIONS--
-opcache
 --FILE--
 <?php
 

@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -48,7 +50,7 @@ ZEND_DECLARE_MODULE_GLOBALS(pdo_mysql)
 # ifdef PHP_MYSQL_UNIX_SOCK_ADDR
 #  define PDO_MYSQL_UNIX_ADDR PHP_MYSQL_UNIX_SOCK_ADDR
 # else
-#  ifndef PHP_WIN32
+#  if !PHP_WIN32
 #   define PDO_MYSQL_UNIX_ADDR "/tmp/mysql.sock"
 #  else
 #   define PDO_MYSQL_UNIX_ADDR NULL
@@ -63,7 +65,10 @@ static MYSQLND * pdo_mysql_convert_zv_to_mysqlnd(zval * zv)
 	if (Z_TYPE_P(zv) == IS_OBJECT && instanceof_function(Z_OBJCE_P(zv), php_pdo_get_dbh_ce())) {
 		pdo_dbh_t * dbh = Z_PDO_DBH_P(zv);
 
-		ZEND_ASSERT(dbh);
+		if (!dbh) {
+			php_error_docref(NULL, E_WARNING, "Failed to retrieve handle from object store");
+			return NULL;
+		}
 
 		if (dbh->driver != &pdo_mysql_driver) {
 			php_error_docref(NULL, E_WARNING, "Provided PDO instance is not using MySQL but %s", dbh->driver->driver_name);
@@ -82,7 +87,8 @@ static const MYSQLND_REVERSE_API pdo_mysql_reverse_api = {
 #endif
 
 
-/* {{{ PHP_INI_BEGIN */
+/* {{{ PHP_INI_BEGIN
+*/
 PHP_INI_BEGIN()
 #ifndef PHP_WIN32
 	STD_PHP_INI_ENTRY("pdo_mysql.default_socket", PDO_MYSQL_UNIX_ADDR, PHP_INI_SYSTEM, OnUpdateStringUnempty, default_socket, zend_pdo_mysql_globals, pdo_mysql_globals)
@@ -95,7 +101,8 @@ PHP_INI_END()
 
 /* true global environment */
 
-/* {{{ PHP_MINIT_FUNCTION */
+/* {{{ PHP_MINIT_FUNCTION
+ */
 static PHP_MINIT_FUNCTION(pdo_mysql)
 {
 	REGISTER_INI_ENTRIES();
@@ -124,9 +131,6 @@ static PHP_MINIT_FUNCTION(pdo_mysql)
 #ifdef PDO_USE_MYSQLND
 	REGISTER_PDO_CLASS_CONST_LONG("MYSQL_ATTR_SSL_VERIFY_SERVER_CERT", (zend_long)PDO_MYSQL_ATTR_SSL_VERIFY_SERVER_CERT);
 #endif
-#if MYSQL_VERSION_ID >= 80021 || defined(PDO_USE_MYSQLND)
-	REGISTER_PDO_CLASS_CONST_LONG("MYSQL_ATTR_LOCAL_INFILE_DIRECTORY", (zend_long)PDO_MYSQL_ATTR_LOCAL_INFILE_DIRECTORY);
-#endif
 
 #ifdef PDO_USE_MYSQLND
 	mysqlnd_reverse_api_register_api(&pdo_mysql_reverse_api);
@@ -136,11 +140,12 @@ static PHP_MINIT_FUNCTION(pdo_mysql)
 }
 /* }}} */
 
-/* {{{ PHP_MSHUTDOWN_FUNCTION */
+/* {{{ PHP_MSHUTDOWN_FUNCTION
+ */
 static PHP_MSHUTDOWN_FUNCTION(pdo_mysql)
 {
 	php_pdo_unregister_driver(&pdo_mysql_driver);
-#ifdef PDO_USE_MYSQLND
+#if PDO_USE_MYSQLND
 	UNREGISTER_INI_ENTRIES();
 #endif
 
@@ -148,12 +153,13 @@ static PHP_MSHUTDOWN_FUNCTION(pdo_mysql)
 }
 /* }}} */
 
-/* {{{ PHP_MINFO_FUNCTION */
+/* {{{ PHP_MINFO_FUNCTION
+ */
 static PHP_MINFO_FUNCTION(pdo_mysql)
 {
 	php_info_print_table_start();
 
-	php_info_print_table_row(2, "PDO Driver for MySQL", "enabled");
+	php_info_print_table_header(2, "PDO Driver for MySQL", "enabled");
 	php_info_print_table_row(2, "Client API version", mysql_get_client_info());
 
 	php_info_print_table_end();
@@ -165,8 +171,9 @@ static PHP_MINFO_FUNCTION(pdo_mysql)
 /* }}} */
 
 
-#if defined(PDO_USE_MYSQLND) && PDO_DBG_ENABLED
-/* {{{ PHP_RINIT_FUNCTION */
+#if PDO_USE_MYSQLND && PDO_DBG_ENABLED
+/* {{{ PHP_RINIT_FUNCTION
+ */
 static PHP_RINIT_FUNCTION(pdo_mysql)
 {
 	if (PDO_MYSQL_G(debug)) {
@@ -182,7 +189,8 @@ static PHP_RINIT_FUNCTION(pdo_mysql)
 }
 /* }}} */
 
-/* {{{ PHP_RSHUTDOWN_FUNCTION */
+/* {{{ PHP_RSHUTDOWN_FUNCTION
+ */
 static PHP_RSHUTDOWN_FUNCTION(pdo_mysql)
 {
 	MYSQLND_DEBUG *dbg = PDO_MYSQL_G(dbg);
@@ -198,7 +206,8 @@ static PHP_RSHUTDOWN_FUNCTION(pdo_mysql)
 /* }}} */
 #endif
 
-/* {{{ PHP_GINIT_FUNCTION */
+/* {{{ PHP_GINIT_FUNCTION
+ */
 static PHP_GINIT_FUNCTION(pdo_mysql)
 {
 #if defined(COMPILE_DL_PDO_MYSQL) && defined(ZTS)
@@ -212,6 +221,12 @@ ZEND_TSRMLS_CACHE_UPDATE();
 	pdo_mysql_globals->dbg = NULL;	/* The DBG object*/
 #endif
 }
+/* }}} */
+
+/* {{{ pdo_mysql_functions[] */
+static const zend_function_entry pdo_mysql_functions[] = {
+	PHP_FE_END
+};
 /* }}} */
 
 /* {{{ pdo_mysql_deps[] */
@@ -229,10 +244,10 @@ zend_module_entry pdo_mysql_module_entry = {
 	STANDARD_MODULE_HEADER_EX, NULL,
 	pdo_mysql_deps,
 	"pdo_mysql",
-	NULL,
+	pdo_mysql_functions,
 	PHP_MINIT(pdo_mysql),
 	PHP_MSHUTDOWN(pdo_mysql),
-#if defined(PDO_USE_MYSQLND) && PDO_DBG_ENABLED
+#if PDO_USE_MYSQLND && PDO_DBG_ENABLED
 	PHP_RINIT(pdo_mysql),
 	PHP_RSHUTDOWN(pdo_mysql),
 #else

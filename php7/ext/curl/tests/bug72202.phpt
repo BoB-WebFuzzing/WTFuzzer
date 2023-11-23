@@ -1,7 +1,11 @@
 --TEST--
 Bug #72202 (curl_close doesn't close cURL handle)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+if (!extension_loaded("curl")) {
+	exit("skip curl extension not loaded");
+}
+?>
 --FILE--
 <?php
 $a = fopen(__FILE__, "r");
@@ -23,11 +27,7 @@ resource(%d) of type (stream)
 resource(%d) of type (stream)
 resource(%d) of type (Unknown)
 resource(%d) of type (Unknown)
-object(CurlHandle)#1 (0) {
-}
-object(CurlHandle)#1 (0) {
-}
-object(CurlHandle)#1 (0) {
-}
-object(CurlHandle)#1 (0) {
-}
+resource(%d) of type (curl)
+resource(%d) of type (curl)
+resource(%d) of type (Unknown)
+resource(%d) of type (Unknown)

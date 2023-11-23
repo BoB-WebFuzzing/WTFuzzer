@@ -2,6 +2,11 @@
 Bug #47481 (natcasesort() does not sort extended ASCII characters correctly)
 --FILE--
 <?php
+/* Prototype  : bool natcasesort(array &$array_arg)
+ * Description: Sort an array using case-insensitive natural sort
+ * Source code: ext/standard/array.c
+ */
+
 /*
  * Test natcasesort() with extended ASCII characters
  */

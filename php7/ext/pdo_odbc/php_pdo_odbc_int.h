@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
-  | This source file is subject to version 3.01 of the PHP license,      |
+  | This source file is subject to version 3.0 of the PHP license,       |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_0.txt.                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -24,74 +26,74 @@
 #endif
 
 /* {{{ Roll a dice, pick a header at random... */
-#ifdef HAVE_SQLCLI1_H
+#if HAVE_SQLCLI1_H
 # include <sqlcli1.h>
 # if defined(DB268K) && HAVE_LIBRARYMANAGER_H
 #  include <LibraryManager.h>
 # endif
 #endif
 
-#ifdef HAVE_ODBC_H
+#if HAVE_ODBC_H
 # include <odbc.h>
 #endif
 
-#ifdef HAVE_IODBC_H
+#if HAVE_IODBC_H
 # include <iodbc.h>
 #endif
 
-#if defined(HAVE_SQLUNIX_H) && !defined(PHP_WIN32)
+#if HAVE_SQLUNIX_H && !defined(PHP_WIN32)
 # include <sqlunix.h>
 #endif
 
-#ifdef HAVE_SQLTYPES_H
+#if HAVE_SQLTYPES_H
 # include <sqltypes.h>
 #endif
 
-#ifdef HAVE_SQLUCODE_H
+#if HAVE_SQLUCODE_H
 # include <sqlucode.h>
 #endif
 
-#ifdef HAVE_SQL_H
+#if HAVE_SQL_H
 # include <sql.h>
 #endif
 
-#ifdef HAVE_ISQL_H
+#if HAVE_ISQL_H
 # include <isql.h>
 #endif
 
-#ifdef HAVE_SQLEXT_H
+#if HAVE_SQLEXT_H
 # include <sqlext.h>
 #endif
 
-#ifdef HAVE_ISQLEXT_H
+#if HAVE_ISQLEXT_H
 # include <isqlext.h>
 #endif
 
-#ifdef HAVE_UDBCEXT_H
+#if HAVE_UDBCEXT_H
 # include <udbcext.h>
 #endif
 
-#ifdef HAVE_CLI0CORE_H
+#if HAVE_CLI0CORE_H
 # include <cli0core.h>
 #endif
 
-#ifdef HAVE_CLI0EXT1_H
+#if HAVE_CLI0EXT1_H
 # include <cli0ext.h>
 #endif
 
-#ifdef HAVE_CLI0CLI_H
+#if HAVE_CLI0CLI_H
 # include <cli0cli.h>
 #endif
 
-#ifdef HAVE_CLI0DEFS_H
+#if HAVE_CLI0DEFS_H
 # include <cli0defs.h>
 #endif
 
-#ifdef HAVE_CLI0ENV_H
+#if HAVE_CLI0ENV_H
 # include <cli0env.h>
 #endif
 
-#ifdef HAVE_ODBCSDK_H
+#if HAVE_ODBCSDK_H
 # include <odbcsdk.h>
 #endif
 

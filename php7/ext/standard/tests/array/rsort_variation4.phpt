@@ -2,6 +2,11 @@
 Test rsort() function : usage variations - referenced variables
 --FILE--
 <?php
+/* Prototype  : bool rsort(array &$array_arg [, int $sort_flags])
+ * Description: Sort an array in reverse order
+ * Source code: ext/standard/array.c
+ */
+
 /*
  * Test behaviour of rsort() when:
  * 1. passed an array of referenced variables
@@ -18,7 +23,7 @@ $value3 = 555;
 // an array containing integer references
 $unsorted_numerics =  array( &$value1 , &$value2, &$value3);
 
-echo "\n-- 'flag' value is default --\n";
+echo "\n-- 'flag' value is defualt --\n";
 $temp_array = $unsorted_numerics;
 var_dump( rsort($temp_array) );
 var_dump( $temp_array);
@@ -33,7 +38,7 @@ echo "Done";
 --EXPECT--
 *** Testing rsort() : variation ***
 
--- 'flag' value is default --
+-- 'flag' value is defualt --
 bool(true)
 array(3) {
   [0]=>

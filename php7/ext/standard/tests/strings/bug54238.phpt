@@ -1,5 +1,7 @@
 --TEST--
 Bug #54238 (use-after-free in substr_replace())
+--INI--
+error_reporting=E_ALL&~E_NOTICE
 --FILE--
 <?php
 $f = array(array('A', 'A'));
@@ -7,10 +9,7 @@ $f = array(array('A', 'A'));
 $z = substr_replace($f, $f, $f, 1);
 var_dump($z, $f);
 ?>
---EXPECTF--
-Warning: Array to string conversion in %s on line %d
-
-Warning: Array to string conversion in %s on line %d
+--EXPECT--
 array(1) {
   [0]=>
   string(9) "AArrayray"

@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -27,7 +29,7 @@ typedef struct _php_zlib_filter_data {
 	unsigned char *outbuf;
 	size_t outbuf_len;
 	int persistent;
-	bool finished; /* for zlib.deflate: signals that no flush is pending */
+	zend_bool finished; /* for zlib.deflate: signals that no flush is pending */
 } php_zlib_filter_data;
 
 /* }}} */
@@ -90,7 +92,6 @@ static php_stream_filter_status_t php_zlib_inflate_filter(
 				exit_status = PSFS_PASS_ON;
 			} else if (status != Z_OK && status != Z_BUF_ERROR) {
 				/* Something bad happened */
-				php_error_docref(NULL, E_NOTICE, "zlib: %s", zError(status));
 				php_stream_bucket_delref(bucket);
 				/* reset these because despite the error the filter may be used again */
 				data->strm.next_in = data->inbuf;
@@ -327,7 +328,7 @@ static php_stream_filter *php_zlib_filter_create(const char *filtername, zval *f
 				/* log-2 base of history window (9 - 15) */
 				zend_long tmp = zval_get_long(tmpzval);
 				if (tmp < -MAX_WBITS || tmp > MAX_WBITS + 32) {
-					php_error_docref(NULL, E_WARNING, "Invalid parameter given for window size (" ZEND_LONG_FMT ")", tmp);
+					php_error_docref(NULL, E_WARNING, "Invalid parameter give for window size. (" ZEND_LONG_FMT ")", tmp);
 				} else {
 					windowBits = tmp;
 				}
@@ -359,7 +360,7 @@ static php_stream_filter *php_zlib_filter_create(const char *filtername, zval *f
 						/* Memory Level (1 - 9) */
 						tmp = zval_get_long(tmpzval);
 						if (tmp < 1 || tmp > MAX_MEM_LEVEL) {
-							php_error_docref(NULL, E_WARNING, "Invalid parameter given for memory level (" ZEND_LONG_FMT ")", tmp);
+							php_error_docref(NULL, E_WARNING, "Invalid parameter give for memory level. (" ZEND_LONG_FMT ")", tmp);
 						} else {
 							memLevel = tmp;
 						}
@@ -369,7 +370,7 @@ static php_stream_filter *php_zlib_filter_create(const char *filtername, zval *f
 						/* log-2 base of history window (9 - 15) */
 						tmp = zval_get_long(tmpzval);
 						if (tmp < -MAX_WBITS || tmp > MAX_WBITS + 16) {
-							php_error_docref(NULL, E_WARNING, "Invalid parameter given for window size (" ZEND_LONG_FMT ")", tmp);
+							php_error_docref(NULL, E_WARNING, "Invalid parameter give for window size. (" ZEND_LONG_FMT ")", tmp);
 						} else {
 							windowBits = tmp;
 						}

@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -170,20 +172,21 @@ static HRESULT STDMETHODCALLTYPE disp_getidsofnames(
 	FETCH_DISP("GetIDsOfNames");
 
 	for (i = 0; i < cNames; i++) {
-		zend_string *name;
+		char *name;
+		size_t namelen;
 		zval *tmp;
 
-		name = php_com_olestring_to_string(rgszNames[i], COMG(code_page));
+		name = php_com_olestring_to_string(rgszNames[i], &namelen, COMG(code_page));
 
 		/* Lookup the name in the hash */
-		if ((tmp = zend_hash_find(disp->name_to_dispid, name)) == NULL) {
+		if ((tmp = zend_hash_str_find(disp->name_to_dispid, name, namelen)) == NULL) {
 			ret = DISP_E_UNKNOWNNAME;
 			rgDispId[i] = 0;
 		} else {
 			rgDispId[i] = (DISPID)Z_LVAL_P(tmp);
 		}
 
-		zend_string_release_ex(name, /* persistent */ false);
+		efree(name);
 
 	}
 
@@ -213,22 +216,23 @@ static HRESULT STDMETHODCALLTYPE disp_getdispid(
 	/* [out] */ DISPID *pid)
 {
 	HRESULT ret = DISP_E_UNKNOWNNAME;
-	zend_string *name;
+	char *name;
+	size_t namelen;
 	zval *tmp;
 	FETCH_DISP("GetDispID");
 
-	name = php_com_olestring_to_string(bstrName, COMG(code_page));
+	name = php_com_olestring_to_string(bstrName, &namelen, COMG(code_page));
 
-	trace("Looking for %s, namelen=%d in %p\n", ZSTR_VAL(name), ZSTR_LEN(name), disp->name_to_dispid);
+	trace("Looking for %s, namelen=%d in %p\n", name, namelen, disp->name_to_dispid);
 
 	/* Lookup the name in the hash */
-	if ((tmp = zend_hash_find(disp->name_to_dispid, name)) != NULL) {
+	if ((tmp = zend_hash_str_find(disp->name_to_dispid, name, namelen)) != NULL) {
 		trace("found it\n");
 		*pid = (DISPID)Z_LVAL_P(tmp);
 		ret = S_OK;
 	}
 
-	zend_string_release_ex(name, /* persistent */ false);
+	efree(name);
 
 	return ret;
 }
@@ -276,9 +280,9 @@ static HRESULT STDMETHODCALLTYPE disp_invokeex(
 		 * and expose it as a COM exception */
 
 		if (wFlags & DISPATCH_PROPERTYGET) {
-			retval = zend_read_property(Z_OBJCE(disp->object), Z_OBJ(disp->object), Z_STRVAL_P(name), Z_STRLEN_P(name)+1, 1, &rv);
+			retval = zend_read_property(Z_OBJCE(disp->object), &disp->object, Z_STRVAL_P(name), Z_STRLEN_P(name)+1, 1, &rv);
 		} else if (wFlags & DISPATCH_PROPERTYPUT) {
-			zend_update_property(Z_OBJCE(disp->object), Z_OBJ(disp->object), Z_STRVAL_P(name), Z_STRLEN_P(name), &params[0]);
+			zend_update_property(Z_OBJCE(disp->object), &disp->object, Z_STRVAL_P(name), Z_STRLEN_P(name), &params[0]);
 		} else if (wFlags & DISPATCH_METHOD) {
 			zend_try {
 				retval = &rv;
@@ -495,7 +499,7 @@ static void generate_dispids(php_dispatchex *disp)
 
 			char namebuf[32];
 			if (keytype == HASH_KEY_IS_LONG) {
-				snprintf(namebuf, sizeof(namebuf), ZEND_ULONG_FMT, pid);
+				snprintf(namebuf, sizeof(namebuf), "%d", pid);
 				name = zend_string_init(namebuf, strlen(namebuf), 0);
 			} else {
 				zend_string_addref(name);

@@ -1,25 +1,24 @@
 --TEST--
 SOAP XML Schema 15: simpleType/union (inline type)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";
 $schema = <<<EOF
-    <simpleType name="testType">
-        <union>
-            <simpleType>
-                <restriction base="string"/>
-            </simpleType>
-            <simpleType>
-                <restriction base="int"/>
-            </simpleType>
-            <simpleType>
-                <restriction base="float"/>
-            </simpleType>
-        </union>
-    </simpleType>
+	<simpleType name="testType">
+		<union>
+			<simpleType>
+				<restriction base="string"/>
+			</simpleType>
+			<simpleType>
+				<restriction base="int"/>
+			</simpleType>
+			<simpleType>
+				<restriction base="float"/>
+			</simpleType>
+		</union>
+	</simpleType>
 EOF;
 test_schema($schema,'type="tns:testType"',"str");
 echo "ok";

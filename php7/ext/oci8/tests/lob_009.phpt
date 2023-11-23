@@ -1,12 +1,9 @@
 --TEST--
 oci_lob_import()/read()
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -38,7 +35,7 @@ oci_execute($s, OCI_DEFAULT);
 var_dump($row = oci_fetch_array($s));
 
 while (!$row[0]->eof()) {
-    var_dump(str_replace("\r", "", $row[0]->read(1024)));
+	var_dump(str_replace("\r", "", $row[0]->read(1024)));
 }
 
 require __DIR__.'/drop_table.inc';
@@ -47,7 +44,7 @@ echo "Done\n";
 
 ?>
 --EXPECTF--
-object(OCILob)#%d (1) {
+object(OCI-Lob)#%d (1) {
   ["descriptor"]=>
   resource(%d) of type (oci8 descriptor)
 }
@@ -55,12 +52,12 @@ bool(true)
 bool(true)
 array(2) {
   [0]=>
-  object(OCILob)#%d (1) {
+  object(OCI-Lob)#%d (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
   ["BLOB"]=>
-  object(OCILob)#%d (1) {
+  object(OCI-Lob)#%d (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }

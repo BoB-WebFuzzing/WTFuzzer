@@ -10,6 +10,7 @@ $d = (microtime(true)-$_SERVER['REQUEST_TIME_FLOAT'])*1000;
 echo "created in $d ms\n";
 echo ((bool)($d >= 0)) . "\n";
 ?>
+===DONE===
 --EXPECTF--
 $_SERVER['REQUEST_TIME']: %d
 $_SERVER['REQUEST_TIME_FLOAT']: %f
@@ -17,3 +18,4 @@ time(): %d
 microtime(true): %f
 created in %f ms
 1
+===DONE===

@@ -8,6 +8,11 @@ if (substr(PHP_OS, 0, 3) == 'WIN') {
 ?>
 --FILE--
 <?php
+/*
+ Prototype: bool ftruncate ( resource $handle, int $size );
+ Description: Truncates a file to a given length
+*/
+
 /* truncate the file to smaller size and display the content */
 
 // include common file related test functions

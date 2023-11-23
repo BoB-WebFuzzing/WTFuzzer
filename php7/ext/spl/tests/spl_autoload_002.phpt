@@ -1,5 +1,9 @@
 --TEST--
 SPL: spl_autoload_functions()
+--SKIPIF--
+<?php
+if (spl_autoload_functions() !== false) die('skip __autoload() registered by php.ini');
+?>
 --FILE--
 <?php
 
@@ -35,9 +39,10 @@ spl_autoload_unregister('spl_autoload');
 var_dump(spl_autoload_functions());
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
-array(0) {
-}
+bool(false)
 array(1) {
   [0]=>
   string(12) "spl_autoload"
@@ -56,11 +61,10 @@ array(2) {
   [1]=>
   string(16) "SplAutoloadTest2"
 }
-array(0) {
-}
+bool(false)
 array(1) {
   [0]=>
   string(12) "spl_autoload"
 }
-array(0) {
-}
+bool(false)
+===DONE===

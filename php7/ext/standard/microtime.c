@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -36,6 +38,7 @@
 #include <stdio.h>
 #include <errno.h>
 
+#include "microtime.h"
 #include "ext/date/php_date.h"
 
 #define NUL  '\0'
@@ -45,7 +48,7 @@
 #ifdef HAVE_GETTIMEOFDAY
 static void _php_gettimeofday(INTERNAL_FUNCTION_PARAMETERS, int mode)
 {
-	bool get_as_float = 0;
+	zend_bool get_as_float = 0;
 	struct timeval tp = {0};
 
 	ZEND_PARSE_PARAMETERS_START(0, 1)
@@ -79,14 +82,16 @@ static void _php_gettimeofday(INTERNAL_FUNCTION_PARAMETERS, int mode)
 	}
 }
 
-/* {{{ Returns either a string or a float containing the current time in seconds and microseconds */
+/* {{{ proto mixed microtime([bool get_as_float])
+   Returns either a string or a float containing the current time in seconds and microseconds */
 PHP_FUNCTION(microtime)
 {
 	_php_gettimeofday(INTERNAL_FUNCTION_PARAM_PASSTHRU, 0);
 }
 /* }}} */
 
-/* {{{ Returns the current time as array */
+/* {{{ proto array gettimeofday([bool get_as_float])
+   Returns the current time as array */
 PHP_FUNCTION(gettimeofday)
 {
 	_php_gettimeofday(INTERNAL_FUNCTION_PARAM_PASSTHRU, 1);
@@ -95,7 +100,8 @@ PHP_FUNCTION(gettimeofday)
 /* }}} */
 
 #ifdef HAVE_GETRUSAGE
-/* {{{ Returns an array of usage statistics */
+/* {{{ proto array getrusage([int who])
+   Returns an array of usage statistics */
 PHP_FUNCTION(getrusage)
 {
 	struct rusage usg;
@@ -125,7 +131,7 @@ PHP_FUNCTION(getrusage)
 #ifdef PHP_WIN32 /* Windows only implements a limited amount of fields from the rusage struct */
 	PHP_RUSAGE_PARA(ru_majflt);
 	PHP_RUSAGE_PARA(ru_maxrss);
-#elif !defined(_OSD_POSIX) && !defined(__HAIKU__)
+#elif !defined(_OSD_POSIX)
 	PHP_RUSAGE_PARA(ru_oublock);
 	PHP_RUSAGE_PARA(ru_inblock);
 	PHP_RUSAGE_PARA(ru_msgsnd);

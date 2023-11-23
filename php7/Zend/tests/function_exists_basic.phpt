@@ -3,6 +3,7 @@ function_exists function : basic functionality
 --FILE--
 <?php
 /*
+ * proto bool function_exists(string function_name)
  * Function is implemented in Zend/zend_builtin_functions.c
 */
 
@@ -23,10 +24,11 @@ var_dump(function_exists('g'));
 
 echo "Method: ";
 Class C {
-    static function f() {}
+	static function f() {}
 }
 var_dump(function_exists('C::f'));
 ?>
+===Done===
 --EXPECT--
 *** Testing function_exists() : basic functionality ***
 Internal function: bool(true)
@@ -34,3 +36,4 @@ User defined function: bool(true)
 Case sensitivity: bool(true)
 Non existent function: bool(false)
 Method: bool(false)
+===Done===

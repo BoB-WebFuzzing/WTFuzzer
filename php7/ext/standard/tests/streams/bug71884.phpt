@@ -4,11 +4,7 @@ Bug #71884 (Null pointer deref (segfault) in stream_context_get_default)
 <?php
 $arr=array();
 $arr[0]['A']=0;
-try {
-    stream_context_get_default($arr);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
+stream_context_get_default($arr);
 ?>
---EXPECT--
-Options should have the form ["wrappername"]["optionname"] = $value
+--EXPECTF--
+Warning: stream_context_get_default(): options should have the form ["wrappername"]["optionname"] = $value in %sbug71884.php on line %d

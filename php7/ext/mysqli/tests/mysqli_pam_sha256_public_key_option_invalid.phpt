@@ -1,9 +1,11 @@
 --TEST--
 PAM: SHA-256, option: MYSQLI_SERVER_PUBLIC_KEY (invalid)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
+
 ob_start();
 phpinfo(INFO_MODULES);
 $tmp = ob_get_contents();
@@ -11,9 +13,9 @@ ob_end_clean();
 if (!stristr($tmp, "auth_plugin_sha256_password"))
     die("skip SHA256 auth plugin not built-in to mysqlnd");
 
-require_once 'connect.inc';
-if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
-    die(sprintf("skip Can't connect to MySQL Server - [%d] %s", mysqli_connect_errno(), mysqli_connect_error()));
+require_once('connect.inc');
+if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
+        die(printf("skip: [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error()));
 
 if (mysqli_get_server_version($link) < 50606)
     die("skip: SHA-256 requires MySQL 5.6.6+");
@@ -53,8 +55,10 @@ if (strlen($row['Value']) != fwrite($fp, $row['Value'])) {
     die(sprintf("skip Failed to create pub key file"));
 }
 
-// Ignore errors because this variable exists only in MySQL 5.6 and 5.7
-$link->query("SET @@session.old_passwords=2");
+
+if (!$link->query("SET @@session.old_passwords=2")) {
+    die(sprintf("skip Cannot set @@session.old_passwords=2 [%d] %s", $link->errno, $link->error));
+}
 
 $link->query('DROP USER shatest');
 $link->query("DROP USER shatest@localhost");
@@ -65,8 +69,8 @@ if (!$link->query('CREATE USER shatest@"%" IDENTIFIED WITH sha256_password') ||
     die(sprintf("skip CREATE USER failed [%d] %s", $link->errno, $link->error));
 }
 
-if (!$link->query('SET PASSWORD FOR shatest@"%" = "shatest"') ||
-    !$link->query('SET PASSWORD FOR shatest@"localhost" = "shatest"')) {
+if (!$link->query('SET PASSWORD FOR shatest@"%" = PASSWORD("shatest")') ||
+    !$link->query('SET PASSWORD FOR shatest@"localhost" = PASSWORD("shatest")')) {
     die(sprintf("skip SET PASSWORD failed [%d] %s", $link->errno, $link->error));
 }
 
@@ -82,11 +86,10 @@ if (!$link->query(sprintf("GRANT SELECT ON TABLE %s.test TO shatest@'%%'", $db))
 }
 
 $link->close();
-echo "nocache";
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     function sha_connect($offset, $host, $db, $port, $socket, $file) {
 
@@ -163,7 +166,7 @@ echo "nocache";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
     $link->query('DROP USER shatest');
     $link->query('DROP USER shatest@localhost');
     $file = sprintf("%s%s%s_%s", sys_get_temp_dir(), DIRECTORY_SEPARATOR, "test_sha256_" , @date("Ymd"));
@@ -178,7 +181,7 @@ Warning: mysqli::real_connect(): (HY000/1045): %s in %s on line %d
 Warning: mysqli::real_connect(): (HY000/1045): %s in %s on line %d
 [300 + 002] [1045] %s
 
-Warning: mysqli::real_connect(%sest_sha256_wrong_%d): Failed to open stream: No such file or directory in %s on line %d
+Warning: mysqli::real_connect(%sest_sha256_wrong_%d): failed to open stream: No such file or directory in %s on line %d
 
 Warning: mysqli::real_connect(): (HY000/1045): %s in %s on line %d
 [400 + 002] [1045] %s

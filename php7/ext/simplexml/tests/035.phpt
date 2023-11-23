@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: __toString
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $string = '<?xml version="1.0"?>
@@ -18,7 +18,9 @@ echo $p."\n";
 echo $p->__toString()."\n";
 echo $p."\n";
 ?>
+==Done==
 --EXPECT--
 Blah 1
 Blah 1
 Blah 1
+==Done==

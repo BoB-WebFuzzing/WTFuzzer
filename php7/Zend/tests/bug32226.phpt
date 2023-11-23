@@ -26,9 +26,11 @@ $a = new A();
 }
 catch(Exception $e)
 {
-    echo "Caught\n";
+	echo "Caught\n";
 }
 
 ?>
+===DONE===
 --EXPECT--
 Caught
+===DONE===

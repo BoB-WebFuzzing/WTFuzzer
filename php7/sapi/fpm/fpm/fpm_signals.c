@@ -182,7 +182,7 @@ static void sig_handler(int signo) /* {{{ */
 }
 /* }}} */
 
-int fpm_signals_init_main(void)
+int fpm_signals_init_main() /* {{{ */
 {
 	struct sigaction act;
 
@@ -197,7 +197,7 @@ int fpm_signals_init_main(void)
 	}
 
 	if (0 > fcntl(sp[0], F_SETFD, FD_CLOEXEC) || 0 > fcntl(sp[1], F_SETFD, FD_CLOEXEC)) {
-		zlog(ZLOG_SYSERROR, "failed to init signals: fcntl(F_SETFD, FD_CLOEXEC)");
+		zlog(ZLOG_SYSERROR, "falied to init signals: fcntl(F_SETFD, FD_CLOEXEC)");
 		return -1;
 	}
 
@@ -222,8 +222,9 @@ int fpm_signals_init_main(void)
 	}
 	return 0;
 }
+/* }}} */
 
-int fpm_signals_init_child(void)
+int fpm_signals_init_child() /* {{{ */
 {
 	struct sigaction act, act_dfl;
 
@@ -256,18 +257,20 @@ int fpm_signals_init_child(void)
 	}
 	return 0;
 }
+/* }}} */
 
-int fpm_signals_get_fd(void)
+int fpm_signals_get_fd() /* {{{ */
 {
 	return sp[0];
 }
+/* }}} */
 
-int fpm_signals_init_mask(void)
+int fpm_signals_init_mask() /* {{{ */
 {
 	/* Subset of signals from fpm_signals_init_main() and fpm_got_signal()
 		blocked to avoid unexpected death during early init
 		or during reload just after execvp() or fork */
-	static const int init_signal_array[] = { SIGUSR1, SIGUSR2, SIGCHLD };
+	int init_signal_array[] = { SIGUSR1, SIGUSR2, SIGCHLD };
 	size_t size = sizeof(init_signal_array)/sizeof(init_signal_array[0]);
 	size_t i = 0;
 	if (0 > sigemptyset(&block_sigset) ||
@@ -295,8 +298,9 @@ int fpm_signals_init_mask(void)
 	}
 	return 0;
 }
+/* }}} */
 
-int fpm_signals_block(void)
+int fpm_signals_block() /* {{{ */
 {
 	if (0 > sigprocmask(SIG_BLOCK, &block_sigset, NULL)) {
 		zlog(ZLOG_SYSERROR, "failed to block signals");
@@ -304,8 +308,9 @@ int fpm_signals_block(void)
 	}
 	return 0;
 }
+/* }}} */
 
-int fpm_signals_child_block(void)
+int fpm_signals_child_block() /* {{{ */
 {
 	if (0 > sigprocmask(SIG_BLOCK, &child_block_sigset, NULL)) {
 		zlog(ZLOG_SYSERROR, "failed to block child signals");
@@ -313,8 +318,9 @@ int fpm_signals_child_block(void)
 	}
 	return 0;
 }
+/* }}} */
 
-int fpm_signals_unblock(void)
+int fpm_signals_unblock() /* {{{ */
 {
 	/* Ensure that during reload after upgrade all signals are unblocked.
 		block_sigset could have different value before execve() */
@@ -326,3 +332,4 @@ int fpm_signals_unblock(void)
 	}
 	return 0;
 }
+/* }}} */

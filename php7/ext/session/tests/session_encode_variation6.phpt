@@ -1,13 +1,17 @@
 --TEST--
 Test session_encode() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
 <?php
 
 ob_start();
+
+/*
+ * Prototype : string session_encode(void)
+ * Description : Encodes the current session data as a string
+ * Source code : ext/session/session.c
+ */
 
 echo "*** Testing session_encode() : variation ***\n";
 
@@ -31,17 +35,17 @@ ob_end_flush();
 *** Testing session_encode() : variation ***
 bool(true)
 
-Warning: session_encode(): Skipping numeric key 0 in %s on line %d
+Notice: session_encode(): Skipping numeric key 0 in %s on line %d
 bool(false)
 bool(true)
 bool(true)
 
-Warning: session_encode(): Skipping numeric key 1234567890 in %s on line %d
+Notice: session_encode(): Skipping numeric key 1234567890 in %s on line %d
 bool(false)
 bool(true)
 bool(true)
 
-Warning: session_encode(): Skipping numeric key -1234567890 in %s on line %d
+Notice: session_encode(): Skipping numeric key -1234567890 in %s on line %d
 bool(false)
 bool(true)
 Done

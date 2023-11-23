@@ -1,7 +1,7 @@
 --TEST--
 Bug #26384 (domxslt->process causes segfault with xsl:key)
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php require_once __DIR__ .'/skipif.inc'; ?>
 --FILE--
 <?php
 $dom = new domDocument;
@@ -27,7 +27,6 @@ print $proc->transformToXml($dom);
 
 //this segfaulted before
 print $dom->documentElement->firstChild->nextSibling->nodeName;
-?>
 --EXPECT--
 HERE
 ROW

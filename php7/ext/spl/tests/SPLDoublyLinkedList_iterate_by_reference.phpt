@@ -17,7 +17,7 @@ try {
         $value *= $value;
         echo $value, PHP_EOL;
     }
-} catch (\Error $e) {
+} catch (Exception $e) {
     echo $e->getMessage(), PHP_EOL;
 }
 

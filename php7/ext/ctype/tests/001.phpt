@@ -1,21 +1,18 @@
 --TEST--
 ctype on integers
---EXTENSIONS--
-ctype
---INI--
-error_reporting=E_ALL&~E_DEPRECATED
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
-setlocale(LC_ALL,"C");
+  setlocale(LC_ALL,"C");
 
-function ctype_test_001($function) {
+  function ctype_test_001($function) {
     $n=0;
     for($a=0;$a<256;$a++) {
-        if($function($a)) $n++;
+	    if($function($a)) $n++;
     }
-    echo "$function $n\n";
-}
-
+	  echo "$function $n\n";
+  }
 ctype_test_001("ctype_lower");
 ctype_test_001("ctype_upper");
 ctype_test_001("ctype_alpha");

@@ -41,6 +41,7 @@ spl_autoload_register(function($class) {
 var_dump(new B);
 
 ?>
+===DONE===
 --EXPECT--
 object(A)#2 (0) {
 }
@@ -56,3 +57,4 @@ object(B)#2 (0) {
 }
 object(B)#2 (0) {
 }
+===DONE===

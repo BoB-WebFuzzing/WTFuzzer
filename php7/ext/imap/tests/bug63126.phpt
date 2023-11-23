@@ -1,14 +1,14 @@
 --TEST--
 imap_open() DISABLE_AUTHENTICATOR ignores array param
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
-require_once(__DIR__. '/setup/imap_include.inc');
+extension_loaded('imap') or die('skip imap extension not available in this build');
 
-$in = @imap_open(IMAP_SERVER_DEBUG, IMAP_MAILBOX_USERNAME, IMAP_MAILBOX_PASSWORD, OP_HALFOPEN, 1);
+require_once(__DIR__.'/imap_include.inc');
+
+$in = imap_open($default_mailbox, $username, $password, OP_HALFOPEN, 1);
 if (!$in) {
-    die("skip could not connect to mailbox " . IMAP_SERVER_DEBUG);
+    die("skip could not connect to mailbox $default_mailbox");
 }
 $kerberos = false;
 if (is_array($errors = imap_errors())) {
@@ -22,19 +22,16 @@ if (!$kerberos) {
     die("skip need a GSSAPI/Kerberos aware server");
 }
 ?>
---CONFLICTS--
-defaultmailbox
 --FILE--
 <?php
-// TODO Test Kerberos on CI
 $tests = array(
     'Array'  => array('DISABLE_AUTHENTICATOR' => array('GSSAPI','NTLM')),
     'String' => array('DISABLE_AUTHENTICATOR' => 'GSSAPI'),
 );
-require_once(__DIR__. '/setup/imap_include.inc');
+require_once(__DIR__.'/imap_include.inc');
 foreach ($tests as $name => $testparams) {
     echo "Test for $name\n";
-    $in = imap_open(IMAP_SERVER_DEBUG, IMAP_MAILBOX_USERNAME, IMAP_MAILBOX_PASSWORD, OP_HALFOPEN, 1, $testparams);
+    $in = imap_open($default_mailbox, $username, $password, OP_HALFOPEN, 1, $testparams);
     if ($in) {
         if (is_array($errors = imap_errors())) {
             foreach ($errors as $err) {

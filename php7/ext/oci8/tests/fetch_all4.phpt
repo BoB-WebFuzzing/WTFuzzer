@@ -1,22 +1,18 @@
 --TEST--
 Test oci_fetch_* array overwriting when query returns no rows
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Initialization
 
 $stmtarray = array(
-    "drop table fetch_all4_tab",
-    "create table fetch_all4_tab (mycol1 number, mycol2 varchar2(20))",
-    "insert into fetch_all4_tab values (1, 'abc')"
+	"drop table fetch_all4_tab",
+	"create table fetch_all4_tab (mycol1 number, mycol2 varchar2(20))",
+	"insert into fetch_all4_tab values (1, 'abc')"
 );
 
 oci8_test_sql_execute($c, $stmtarray);
@@ -43,12 +39,14 @@ var_dump($row);
 // Clean up
 
 $stmtarray = array(
-    "drop table fetch_all4_tab"
+	"drop table fetch_all4_tab"
 );
 
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Test 1
 int(0)
@@ -62,3 +60,4 @@ array(2) {
 }
 Test 2
 bool(false)
+===DONE===

@@ -1,7 +1,7 @@
 --TEST--
 gmp_gcd() basic tests
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -21,10 +21,13 @@ $n = gmp_init("8127346234");
 var_dump(gmp_strval(gmp_gcd($n,$n)));
 $n = gmp_init("8127346234");
 var_dump(gmp_strval(gmp_gcd($n,0)));
+var_dump(gmp_gcd($n,$n,1));
+var_dump(gmp_gcd($n,array(),1));
+var_dump(gmp_gcd(array(),$n,1));
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 string(1) "3"
 string(5) "12387"
 string(3) "224"
@@ -36,4 +39,13 @@ string(1) "2"
 string(1) "1"
 string(10) "8127346234"
 string(10) "8127346234"
+
+Warning: gmp_gcd() expects exactly 2 parameters, 3 given in %s on line %d
+NULL
+
+Warning: gmp_gcd() expects exactly 2 parameters, 3 given in %s on line %d
+NULL
+
+Warning: gmp_gcd() expects exactly 2 parameters, 3 given in %s on line %d
+NULL
 Done

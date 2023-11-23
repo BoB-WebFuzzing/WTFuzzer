@@ -1,9 +1,11 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7														  |
+   +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,	  |
    | that is bundled with this package in the file LICENSE, and is		  |
    | available through the world-wide-web at the following url:			  |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt								  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to		  |
    | license@php.net so we can mail you a copy immediately.				  |
@@ -24,6 +26,7 @@
 #endif
 #include "normalizer.h"
 #include "normalizer_class.h"
+#include "normalizer_normalize.h"
 #include "intl_convert.h"
 #include <unicode/utf8.h>
 
@@ -56,8 +59,26 @@ static const UNormalizer2 *intl_get_normalizer(zend_long form, UErrorCode *err)
 
 static int32_t intl_normalize(zend_long form, const UChar *src, int32_t src_len, UChar *dst, int32_t dst_len, UErrorCode *err)
 {/*{{{*/
-	const UNormalizer2 *norm = intl_get_normalizer(form, err);
-	if (U_FAILURE(*err)) {
+	const UNormalizer2 *norm;
+
+	/* Mimic the behavior of ICU < 56. */
+	if (UNEXPECTED(NORMALIZER_NONE == form)) {
+		/* FIXME This is a noop which should be removed somewhen after PHP 7.3.*/
+		zend_error(E_DEPRECATED, "Normalizer::NONE is obsolete with ICU 56 and above and will be removed in later PHP versions");
+
+		if (dst_len >= src_len) {
+			memmove(dst, src, sizeof(UChar) * src_len);
+			dst[src_len] = '\0';
+			*err = U_ZERO_ERROR;
+			return src_len;
+		}
+
+		*err = U_BUFFER_OVERFLOW_ERROR;
+		return -1;
+	}
+
+	norm = intl_get_normalizer(form, err);
+	if(U_FAILURE(*err)) {
 		return -1;
 	}
 
@@ -69,14 +90,18 @@ static UBool intl_is_normalized(zend_long form, const UChar *uinput, int32_t uin
 	const UNormalizer2 *norm = intl_get_normalizer(form, err);
 
 	if(U_FAILURE(*err)) {
-		return false;
+		return FALSE;
 	}
 
 	return unorm2_isNormalized(norm, uinput, uinput_len, err);
 }/*}}}*/
 #endif
 
-/* {{{ Normalize a string. */
+/* {{{ proto string Normalizer::normalize( string $input [, string $form = FORM_C] )
+ * Normalize a string. }}} */
+/* {{{ proto string normalizer_normalize( string $input [, string $form = FORM_C] )
+ * Normalize a string.
+ */
 PHP_FUNCTION( normalizer_normalize )
 {
 	char*			input = NULL;
@@ -102,12 +127,17 @@ PHP_FUNCTION( normalizer_normalize )
 	if( zend_parse_method_parameters( ZEND_NUM_ARGS(), getThis(), "s|l",
 				&input, &input_len, &form ) == FAILURE )
 	{
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+						 "normalizer_normalize: unable to parse input params", 0 );
+
+		RETURN_FALSE;
 	}
 
 	expansion_factor = 1;
 
 	switch(form) {
+		case NORMALIZER_NONE:
+			break;
 		case NORMALIZER_FORM_D:
 			expansion_factor = 3;
 			break;
@@ -121,8 +151,9 @@ PHP_FUNCTION( normalizer_normalize )
 #endif
 			break;
 		default:
-			zend_argument_value_error(2, "must be a a valid normalization form");
-			RETURN_THROWS();
+			intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+						"normalizer_normalize: illegal normalization form", 0 );
+			RETURN_FALSE;
 	}
 
 	/*
@@ -162,10 +193,9 @@ PHP_FUNCTION( normalizer_normalize )
 	 * (U_STRING_NOT_TERMINATED_WARNING usually means that the input string is empty).
 	 */
 	if( U_FAILURE(status) && status != U_BUFFER_OVERFLOW_ERROR && status != U_STRING_NOT_TERMINATED_WARNING ) {
-		intl_error_set_custom_msg( NULL, "Error normalizing string", 0 );
 		efree( uret_buf );
 		efree( uinput );
-		RETURN_FALSE;
+		RETURN_NULL();
 	}
 
 	if ( size_needed > uret_len ) {
@@ -215,7 +245,11 @@ PHP_FUNCTION( normalizer_normalize )
 }
 /* }}} */
 
-/* {{{ Test if a string is in a given normalization form. */
+/* {{{ proto bool Normalizer::isNormalized( string $input [, string $form = FORM_C] )
+ * Test if a string is in a given normalization form. }}} */
+/* {{{ proto bool normalizer_is_normalized( string $input [, string $form = FORM_C] )
+ * Test if a string is in a given normalization form.
+ */
 PHP_FUNCTION( normalizer_is_normalized )
 {
 	char*	 	input = NULL;
@@ -227,7 +261,7 @@ PHP_FUNCTION( normalizer_is_normalized )
 	int		uinput_len = 0;
 	UErrorCode	status = U_ZERO_ERROR;
 
-	UBool		uret = false;
+	UBool		uret = FALSE;
 
 	intl_error_reset( NULL );
 
@@ -235,10 +269,15 @@ PHP_FUNCTION( normalizer_is_normalized )
 	if( zend_parse_method_parameters( ZEND_NUM_ARGS(), getThis(), "s|l",
 				&input, &input_len, &form) == FAILURE )
 	{
-		RETURN_THROWS();
+		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+				"normalizer_is_normalized: unable to parse input params", 0 );
+
+		RETURN_FALSE;
 	}
 
 	switch(form) {
+		/* case NORMALIZER_NONE: not allowed - doesn't make sense */
+
 		case NORMALIZER_FORM_D:
 		case NORMALIZER_FORM_KD:
 		case NORMALIZER_FORM_C:
@@ -248,8 +287,9 @@ PHP_FUNCTION( normalizer_is_normalized )
 #endif
 			break;
 		default:
-			zend_argument_value_error(2, "must be a a valid normalization form");
-			RETURN_THROWS();
+			intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,
+						"normalizer_normalize: illegal normalization form", 0 );
+			RETURN_FALSE;
 	}
 
 
@@ -297,7 +337,11 @@ PHP_FUNCTION( normalizer_is_normalized )
 }
 /* }}} */
 
-/* {{{ Returns the Decomposition_Mapping property for the given UTF-8 encoded code point. */
+/* {{{ proto string|null Normalizer::getRawDecomposition( string $input [, string $form = FORM_C] )
+ * Returns the Decomposition_Mapping property for the given UTF-8 encoded code point. }}} */
+/* {{{ proto string|null normalizer_get_raw_decomposition( string $input [, string $form = FORM_C] )
+ * Returns the Decomposition_Mapping property for the given UTF-8 encoded code point.
+ */
 #if U_ICU_VERSION_MAJOR_NUM >= 56
 PHP_FUNCTION( normalizer_get_raw_decomposition )
 {
@@ -307,17 +351,17 @@ PHP_FUNCTION( normalizer_get_raw_decomposition )
 	UChar32 codepoint = -1;
 	int32_t offset = 0;
 
-	UErrorCode status = U_ZERO_ERROR;
-	const UNormalizer2 *norm;
-	UChar decomposition[32];
-	int32_t decomposition_length;
+    UErrorCode status = U_ZERO_ERROR;
+    const UNormalizer2 *norm;
+    UChar decomposition[32];
+    int32_t decomposition_length;
 
 	zend_long form = NORMALIZER_DEFAULT;
 
 	intl_error_reset(NULL);
 
 	if ((zend_parse_parameters(ZEND_NUM_ARGS(), "s|l", &input, &input_length, &form) == FAILURE)) {
-		RETURN_THROWS();
+		return;
 	}
 
 	norm = intl_get_normalizer(form, &status);

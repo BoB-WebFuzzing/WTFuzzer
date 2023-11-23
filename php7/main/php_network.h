@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -47,13 +49,6 @@
 
 #ifndef EWOULDBLOCK
 # define EWOULDBLOCK EAGAIN
-#endif
-
-/* This is a workaround for GCC bug 69602: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69602 */
-#if EAGAIN != EWOULDBLOCK
-# define PHP_IS_TRANSIENT_ERROR(err) (err == EAGAIN || err == EWOULDBLOCK)
-#else
-# define PHP_IS_TRANSIENT_ERROR(err) (err == EAGAIN)
 #endif
 
 #ifdef PHP_WIN32
@@ -211,37 +206,18 @@ static inline int php_pollfd_for_ms(php_socket_t fd, int events, int timeout)
 /* emit warning and suggestion for unsafe select(2) usage */
 PHPAPI void _php_emit_fd_setsize_warning(int max_fd);
 
-static inline bool _php_check_fd_setsize(php_socket_t *max_fd, int setsize)
-{
-#ifdef PHP_WIN32
-	(void)(max_fd); // Unused
-	if (setsize + 1 >= FD_SETSIZE) {
-		_php_emit_fd_setsize_warning(setsize);
-		return false;
-	}
-#else
-	(void)(setsize); // Unused
-	if (*max_fd >= FD_SETSIZE) {
-		_php_emit_fd_setsize_warning(*max_fd);
-		*max_fd = FD_SETSIZE - 1;
-		return false;
-	}
-#endif
-	return true;
-}
-
 #ifdef PHP_WIN32
 /* it is safe to FD_SET too many fd's under win32; the macro will simply ignore
  * descriptors that go beyond the default FD_SETSIZE */
 # define PHP_SAFE_FD_SET(fd, set)	FD_SET(fd, set)
 # define PHP_SAFE_FD_CLR(fd, set)	FD_CLR(fd, set)
 # define PHP_SAFE_FD_ISSET(fd, set)	FD_ISSET(fd, set)
-# define PHP_SAFE_MAX_FD(m, n)		_php_check_fd_setsize(&m, n)
+# define PHP_SAFE_MAX_FD(m, n)		do { if (n + 1 >= FD_SETSIZE) { _php_emit_fd_setsize_warning(n); }} while(0)
 #else
 # define PHP_SAFE_FD_SET(fd, set)	do { if (fd < FD_SETSIZE) FD_SET(fd, set); } while(0)
 # define PHP_SAFE_FD_CLR(fd, set)	do { if (fd < FD_SETSIZE) FD_CLR(fd, set); } while(0)
 # define PHP_SAFE_FD_ISSET(fd, set)	((fd < FD_SETSIZE) && FD_ISSET(fd, set))
-# define PHP_SAFE_MAX_FD(m, n)		_php_check_fd_setsize(&m, n)
+# define PHP_SAFE_MAX_FD(m, n)		do { if (m >= FD_SETSIZE) { _php_emit_fd_setsize_warning(m); m = FD_SETSIZE - 1; }} while(0)
 #endif
 
 
@@ -267,7 +243,7 @@ PHPAPI void php_network_freeaddresses(struct sockaddr **sal);
 
 PHPAPI php_socket_t php_network_connect_socket_to_host(const char *host, unsigned short port,
 		int socktype, int asynchronous, struct timeval *timeout, zend_string **error_string,
-		int *error_code, const char *bindto, unsigned short bindport, long sockopts
+		int *error_code, char *bindto, unsigned short bindport, long sockopts
 		);
 
 PHPAPI int php_network_connect_socket(php_socket_t sockfd,
@@ -341,7 +317,7 @@ PHPAPI void php_network_populate_name_from_sockaddr(
 PHPAPI int php_network_parse_network_address_with_port(const char *addr,
 		zend_long addrlen, struct sockaddr *sa, socklen_t *sl);
 
-PHPAPI struct hostent*	php_network_gethostbyname(const char *name);
+PHPAPI struct hostent*	php_network_gethostbyname(char *name);
 
 PHPAPI int php_set_sock_blocking(php_socket_t socketd, int block);
 END_EXTERN_C()

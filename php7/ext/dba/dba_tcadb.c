@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -20,12 +22,14 @@
 
 #include "php.h"
 
-#ifdef DBA_TCADB
+#if DBA_TCADB
 #include "php_tcadb.h"
 
 #ifdef TCADB_INCLUDE_FILE
 #include TCADB_INCLUDE_FILE
 #endif
+
+#define TCADB_DATA dba_tcadb_data *dba = info->dbf
 
 typedef struct {
 	TCADB *tcadb;
@@ -39,16 +43,16 @@ DBA_OPEN_FUNC(tcadb)
 	if (tcadb) {
 		switch(info->mode) {
 			case DBA_READER:
-				spprintf(&path_string, 0, "%s#mode=r", ZSTR_VAL(info->path));
+				spprintf(&path_string, 0, "%s#mode=r", info->path);
 				break;
 			case DBA_WRITER:
-				spprintf(&path_string, 0, "%s#mode=w", ZSTR_VAL(info->path));
+				spprintf(&path_string, 0, "%s#mode=w", info->path);
 				break;
 			case DBA_CREAT:
-				spprintf(&path_string, 0, "%s#mode=wc", ZSTR_VAL(info->path));
+				spprintf(&path_string, 0, "%s#mode=wc", info->path);
 				break;
 			case DBA_TRUNC:
-				spprintf(&path_string, 0, "%s#mode=wct", ZSTR_VAL(info->path));
+				spprintf(&path_string, 0, "%s#mode=wct", info->path);
 				break;
 			default:
 				tcadbdel(tcadb);
@@ -74,7 +78,7 @@ DBA_OPEN_FUNC(tcadb)
 
 DBA_CLOSE_FUNC(tcadb)
 {
-	dba_tcadb_data *dba = info->dbf;
+	TCADB_DATA;
 
 	tcadbclose(dba->tcadb);
 	tcadbdel(dba->tcadb);
@@ -83,49 +87,51 @@ DBA_CLOSE_FUNC(tcadb)
 
 DBA_FETCH_FUNC(tcadb)
 {
-	dba_tcadb_data *dba = info->dbf;
-	char *value;
+	TCADB_DATA;
+	char *value, *new = NULL;
 	int value_size;
-	zend_string *fetched_val = NULL;
 
-	value = tcadbget(dba->tcadb, ZSTR_VAL(key), ZSTR_LEN(key), &value_size);
+	value = tcadbget(dba->tcadb, key, keylen, &value_size);
 	if (value) {
-		fetched_val = zend_string_init(value, value_size, /* persistent */ false);
+		if (newlen) {
+			*newlen = value_size;
+		}
+		new = estrndup(value, value_size);
 		tcfree(value);
 	}
 
-	return fetched_val;
+	return new;
 }
 
 DBA_UPDATE_FUNC(tcadb)
 {
-	dba_tcadb_data *dba = info->dbf;
+	TCADB_DATA;
 	int result;
 
 	if (mode == 1) {
 		/* Insert */
-		if (tcadbvsiz(dba->tcadb, ZSTR_VAL(key), ZSTR_LEN(key)) > -1) {
+		if (tcadbvsiz(dba->tcadb, key, keylen) > -1) {
 			return FAILURE;
 		}
 	}
 
-	result = tcadbput(dba->tcadb, ZSTR_VAL(key), ZSTR_LEN(key), ZSTR_VAL(val), ZSTR_LEN(val));
+	result = tcadbput(dba->tcadb, key, keylen, val, vallen);
 
 	if (result) {
 		return SUCCESS;
 	}
 
-	php_error_docref(NULL, E_WARNING, "Error updating data");
+	php_error_docref2(NULL, key, val, E_WARNING, "Error updating data");
 	return FAILURE;
 }
 
 DBA_EXISTS_FUNC(tcadb)
 {
-	dba_tcadb_data *dba = info->dbf;
+	TCADB_DATA;
 	char *value;
 	int value_len;
 
-	value = tcadbget(dba->tcadb, ZSTR_VAL(key), ZSTR_LEN(key), &value_len);
+	value = tcadbget(dba->tcadb, key, keylen, &value_len);
 	if (value) {
 		tcfree(value);
 		return SUCCESS;
@@ -136,48 +142,52 @@ DBA_EXISTS_FUNC(tcadb)
 
 DBA_DELETE_FUNC(tcadb)
 {
-	dba_tcadb_data *dba = info->dbf;
+	TCADB_DATA;
 
-	return tcadbout(dba->tcadb, ZSTR_VAL(key), ZSTR_LEN(key)) ? SUCCESS : FAILURE;
+	return tcadbout(dba->tcadb, key, keylen) ? SUCCESS : FAILURE;
 }
 
 DBA_FIRSTKEY_FUNC(tcadb)
 {
-	dba_tcadb_data *dba = info->dbf;
+	TCADB_DATA;
 	int value_size;
-	char *value;
-	zend_string *key = NULL;
+	char *value, *new = NULL;
 
 	tcadbiterinit(dba->tcadb);
 
 	value = tcadbiternext(dba->tcadb, &value_size);
 	if (value) {
-		key = zend_string_init(value, value_size, /* persistent */ false);
+		if (newlen) {
+			*newlen = value_size;
+		}
+		new = estrndup(value, value_size);
 		tcfree(value);
 	}
 
-	return key;
+	return new;
 }
 
 DBA_NEXTKEY_FUNC(tcadb)
 {
-	dba_tcadb_data *dba = info->dbf;
+	TCADB_DATA;
 	int value_size;
-	char *value;
-	zend_string *key = NULL;
+	char *value, *new = NULL;
 
 	value = tcadbiternext(dba->tcadb, &value_size);
 	if (value) {
-		key = zend_string_init(value, value_size, /* persistent */ false);
+		if (newlen) {
+			*newlen = value_size;
+		}
+		new = estrndup(value, value_size);
 		tcfree(value);
 	}
 
-	return key;
+	return new;
 }
 
 DBA_OPTIMIZE_FUNC(tcadb)
 {
-	dba_tcadb_data *dba = info->dbf;
+	TCADB_DATA;
 
 #if _TC_LIBVER >= 811
 	return tcadboptimize(dba->tcadb, NULL) ? SUCCESS : FAILURE;
@@ -188,7 +198,7 @@ DBA_OPTIMIZE_FUNC(tcadb)
 
 DBA_SYNC_FUNC(tcadb)
 {
-	dba_tcadb_data *dba = info->dbf;
+	TCADB_DATA;
 
 	return tcadbsync(dba->tcadb) ? SUCCESS : FAILURE;
 }

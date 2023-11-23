@@ -14,8 +14,10 @@ $c = clone $a;
 var_dump((string)$c == (string)$a);
 var_dump($a->key() == $c->key());
 ?>
+===DONE===
 --EXPECT--
 bool(true)
 bool(true)
 bool(true)
 bool(true)
+===DONE===

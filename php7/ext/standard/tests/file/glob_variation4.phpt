@@ -15,6 +15,7 @@ var_dump(glob("$path/directly_not_exists"));
 
 var_dump($path == ini_get('open_basedir'));
 ?>
+==DONE==
 --EXPECT--
 array(0) {
 }
@@ -29,3 +30,4 @@ array(0) {
 array(0) {
 }
 bool(true)
+==DONE==

@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -87,16 +89,6 @@ typedef unsigned short mode_t;
 #else
 #ifdef HAVE_DIRENT_H
 #include <dirent.h>
-
-#ifndef DT_UNKNOWN
-# define DT_UNKNOWN 0
-#endif
-#ifndef DT_DIR
-# define DT_DIR 4
-#endif
-#ifndef DT_REG
-# define DT_REG 8
-#endif
 #endif
 
 #define DEFAULT_SLASH '/'
@@ -170,7 +162,7 @@ CWD_API int virtual_cwd_activate(void);
 CWD_API int virtual_cwd_deactivate(void);
 CWD_API char *virtual_getcwd_ex(size_t *length);
 CWD_API char *virtual_getcwd(char *buf, size_t size);
-CWD_API zend_result virtual_chdir(const char *path);
+CWD_API int virtual_chdir(const char *path);
 CWD_API int virtual_chdir_file(const char *path, int (*p_chdir)(const char *path));
 CWD_API int virtual_filepath(const char *path, char **filepath);
 CWD_API int virtual_filepath_ex(const char *path, char **filepath, verify_path_func verify_path);
@@ -199,7 +191,6 @@ CWD_API int virtual_chown(const char *filename, uid_t owner, gid_t group, int li
 /* One of the following constants must be used as the last argument
    in virtual_file_ex() call. */
 
-// TODO Make this into an enum
 #define CWD_EXPAND   0 /* expand "." and ".." but don't resolve symlinks     */
 #define CWD_FILEPATH 1 /* resolve symlinks if file is exist otherwise expand */
 #define CWD_REALPATH 2 /* call realpath(), resolve symlinks. File must exist */
@@ -270,7 +261,7 @@ extern void virtual_cwd_main_cwd_init(uint8_t);
 #define VCWD_OPEN_MODE(path, flags, mode) virtual_open(path, flags, mode)
 #define VCWD_CREAT(path, mode) virtual_creat(path, mode)
 #define VCWD_CHDIR(path) virtual_chdir(path)
-#define VCWD_CHDIR_FILE(path) virtual_chdir_file(path, (int (*)(const char *)) virtual_chdir)
+#define VCWD_CHDIR_FILE(path) virtual_chdir_file(path, virtual_chdir)
 #define VCWD_GETWD(buf)
 #define VCWD_REALPATH(path, real_path) virtual_realpath(path, real_path)
 #define VCWD_RENAME(oldname, newname) virtual_rename(oldname, newname)

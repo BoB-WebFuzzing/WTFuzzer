@@ -1,7 +1,5 @@
 --TEST--
 Bug #31454 (Incorrect adding PHPSESSID to links, which contains \r\n)
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--

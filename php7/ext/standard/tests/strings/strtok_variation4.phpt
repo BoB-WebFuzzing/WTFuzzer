@@ -2,6 +2,11 @@
 Test strtok() function : usage variations - with embedded nulls in the strings
 --FILE--
 <?php
+/* Prototype  : string strtok ( str $str, str $token )
+ * Description: splits a string (str) into smaller strings (tokens), with each token being delimited by any character from token
+ * Source code: ext/standard/string.c
+*/
+
 /*
  * Testing strtok() : with embedded nulls in the strings
 */
@@ -10,8 +15,8 @@ echo "*** Testing strtok() : with embedded nulls in the strings ***\n";
 
 // defining varous strings with embedded nulls
 $strings_with_nulls = array(
-                   "\0",
-                   '\0',
+ 		           "\0",
+ 		           '\0',
                            "hello\0world",
                            "\0hel\0lo",
                            "hello\0",
@@ -36,25 +41,15 @@ foreach( $strings_with_nulls as $string )  {
 
 echo "Done\n";
 ?>
---EXPECTF--
+--EXPECT--
 *** Testing strtok() : with embedded nulls in the strings ***
 
 --- Iteration 1 ---
 bool(false)
-
-Warning: strtok(): Both arguments must be provided when starting tokenization in %s on line %d
 bool(false)
-
-Warning: strtok(): Both arguments must be provided when starting tokenization in %s on line %d
 bool(false)
-
-Warning: strtok(): Both arguments must be provided when starting tokenization in %s on line %d
 bool(false)
-
-Warning: strtok(): Both arguments must be provided when starting tokenization in %s on line %d
 bool(false)
-
-Warning: strtok(): Both arguments must be provided when starting tokenization in %s on line %d
 bool(false)
 
 --- Iteration 2 ---
@@ -92,17 +87,9 @@ bool(false)
 --- Iteration 6 ---
 string(11) "hello	world"
 bool(false)
-
-Warning: strtok(): Both arguments must be provided when starting tokenization in %s on line %d
 bool(false)
-
-Warning: strtok(): Both arguments must be provided when starting tokenization in %s on line %d
 bool(false)
-
-Warning: strtok(): Both arguments must be provided when starting tokenization in %s on line %d
 bool(false)
-
-Warning: strtok(): Both arguments must be provided when starting tokenization in %s on line %d
 bool(false)
 
 --- Iteration 7 ---

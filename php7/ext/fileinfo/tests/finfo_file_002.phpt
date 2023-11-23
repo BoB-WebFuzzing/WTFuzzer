@@ -1,7 +1,7 @@
 --TEST--
 finfo_file(): Testing mime types
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -9,9 +9,9 @@ $fp = finfo_open(FILEINFO_MIME_TYPE);
 $results = array();
 
 foreach (glob(__DIR__ . "/resources/*") as $filename) {
-    if (is_file($filename)) {
-        $results["$filename"] = finfo_file($fp, $filename);
-    }
+	if (is_file($filename)) {
+		$results["$filename"] = finfo_file($fp, $filename);
+	}
 }
 ksort($results);
 
@@ -24,7 +24,7 @@ array(%d) {
   ["%s/resources/test.awk"]=>
   string(10) "text/plain"
   ["%s/resources/test.bmp"]=>
-  string(9) "image/bmp"
+  string(14) "image/x-ms-bmp"
   ["%s/resources/test.gif"]=>
   string(9) "image/gif"
   ["%s/resources/test.jpg"]=>
@@ -43,8 +43,4 @@ array(%d) {
   string(11) "image/x-tga"
   ["%s/resources/test.webm"]=>
   string(10) "video/webm"
-  ["%s/resources/test.woff"]=>
-  string(9) "font/woff"
-  ["%s/resources/test.xz"]=>
-  string(16) "application/x-xz"
 }

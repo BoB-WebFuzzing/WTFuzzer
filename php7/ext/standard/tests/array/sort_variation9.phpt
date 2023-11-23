@@ -1,11 +1,17 @@
 --TEST--
-Test sort() function : usage variations - sort diff. associative arrays, 'sort_flags' as default/SORT_REGULAR
+Test sort() function : usage variations - sort diff. associative arrays, 'sort_flags' as defualt/SORT_REGULAR
 --FILE--
 <?php
+/* Prototype  : bool sort ( array &$array [, int $sort_flags] )
+ * Description: This function sorts an array.
+                Elements will be arranged from lowest to highest when this function has completed.
+ * Source code: ext/standard/array.c
+*/
+
 /*
  * Testing sort() by providing arrays  with key values for $array argument
  * with following flag values.
- * 1.flag value as default
+ * 1.flag value as defualt
  * 2.SORT_REGULAR - compare items normally
  * To test the new keys for the elements in the sorted array.
  */
@@ -32,7 +38,7 @@ echo "\n-- Testing sort() by supplying various arrays with key values --\n";
 foreach ($various_arrays as $array) {
   echo "\n-- Iteration $count --\n";
 
-  echo "- With Default sort flag -\n";
+  echo "- With Defualt sort flag -\n";
   $temp_array = $array;
   var_dump(sort($temp_array) );
   var_dump($temp_array);
@@ -52,7 +58,7 @@ echo "Done\n";
 -- Testing sort() by supplying various arrays with key values --
 
 -- Iteration 1 --
-- With Default sort flag -
+- With Defualt sort flag -
 bool(true)
 array(5) {
   [0]=>
@@ -82,7 +88,7 @@ array(5) {
 }
 
 -- Iteration 2 --
-- With Default sort flag -
+- With Defualt sort flag -
 bool(true)
 array(3) {
   [0]=>
@@ -158,7 +164,7 @@ array(3) {
 }
 
 -- Iteration 3 --
-- With Default sort flag -
+- With Defualt sort flag -
 bool(true)
 array(6) {
   [0]=>
@@ -192,25 +198,25 @@ array(6) {
 }
 
 -- Iteration 4 --
-- With Default sort flag -
+- With Defualt sort flag -
 bool(true)
 array(2) {
   [0]=>
-  int(1)
-  [1]=>
   string(3) "baz"
+  [1]=>
+  int(1)
 }
 - Sort flag = SORT_REGULAR -
 bool(true)
 array(2) {
   [0]=>
-  int(1)
-  [1]=>
   string(3) "baz"
+  [1]=>
+  int(1)
 }
 
 -- Iteration 5 --
-- With Default sort flag -
+- With Defualt sort flag -
 bool(true)
 array(4) {
   [0]=>

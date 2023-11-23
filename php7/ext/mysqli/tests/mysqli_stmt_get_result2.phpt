@@ -1,10 +1,10 @@
 --TEST--
 mysqli_stmt_get_result()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 if (!function_exists('mysqli_stmt_get_result'))
     die('skip mysqli_stmt_get_result not available');
 ?>
@@ -15,10 +15,24 @@ if (!function_exists('mysqli_stmt_get_result'))
     mysqli_stmt_bind_result.phpt already. Restrict
     this test case to the basics.
     */
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp	= NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_stmt_get_result()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_stmt_get_result($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
 
     if (!$stmt = mysqli_stmt_init($link))
         printf("[003] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+
+    if (!is_null($tmp = @mysqli_stmt_get_result($stmt, "foo")))
+        printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!mysqli_stmt_prepare($stmt, "SELECT id, label FROM test ORDER BY id ASC LIMIT 1"))
         printf("[005] [%d] %s\n", mysqli_stmt_errno($stmt), mysqli_stmt_error($stmt));
@@ -130,19 +144,18 @@ if (!function_exists('mysqli_stmt_get_result'))
     mysqli_stmt_close($stmt);
     mysqli_close($link);
 
-    try {
-        mysqli_stmt_get_result($stmt);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
+    if (false !== ($res = mysqli_stmt_get_result($stmt))) {
+        printf("[026] Expecting false got %s/%s\n",
+            gettype($res), $res);
     }
 
-    print "done!";
+        print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
+--EXPECTF--
 array(2) {
   ["id"]=>
   int(1)
@@ -158,5 +171,6 @@ array(2) {
 }
 NULL
 [017] [2014] Commands out of sync; you can't run this command now
-mysqli_stmt object is already closed
+
+Warning: mysqli_stmt_get_result(): Couldn't fetch mysqli_stmt in %s on line %d
 done!

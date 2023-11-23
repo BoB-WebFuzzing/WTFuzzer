@@ -12,7 +12,6 @@ $subject = "aaaaxyzaaaa";
 preg_match($regex, $subject, $matches);
 
 var_dump($matches);
-?>
 --EXPECTF--
 bool(false)
 

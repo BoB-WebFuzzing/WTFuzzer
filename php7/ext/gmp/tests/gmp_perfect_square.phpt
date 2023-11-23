@@ -1,7 +1,7 @@
 --TEST--
 gmp_perfect_square() basic tests
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -21,15 +21,12 @@ var_dump(gmp_perfect_square($n));
 $n = gmp_init(-5);
 var_dump(gmp_perfect_square($n));
 
-try {
-    var_dump(gmp_perfect_square(array()));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gmp_perfect_square());
+var_dump(gmp_perfect_square(array()));
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 bool(true)
 bool(true)
 bool(false)
@@ -41,5 +38,10 @@ bool(false)
 bool(false)
 bool(true)
 bool(false)
-gmp_perfect_square(): Argument #1 ($num) must be of type GMP|string|int, array given
+
+Warning: gmp_perfect_square() expects exactly 1 parameter, 0 given in %s on line %d
+NULL
+
+Warning: gmp_perfect_square(): Unable to convert variable to GMP - wrong type in %s on line %d
+bool(false)
 Done

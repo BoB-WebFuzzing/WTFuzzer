@@ -1,15 +1,22 @@
 --TEST--
 mysqli->fetch_array()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
-    $mysqli = $link;
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    require('table.inc');
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket))
+        printf("[001] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+            $host, $user, $db, $port, $socket);
 
     if (!$res = $mysqli->query("SELECT * FROM test ORDER BY id LIMIT 5")) {
         printf("[004] [%d] %s\n", $mysqli->errno, $mysqli->error);
@@ -49,17 +56,15 @@ require_once 'skipifconnectfailure.inc';
         $illegal_mode = mt_rand(-10000, 10000);
     } while (in_array($illegal_mode, array(MYSQLI_ASSOC, MYSQLI_NUM, MYSQLI_BOTH)));
     // NOTE: for BC reasons with ext/mysql, ext/mysqli accepts invalid result modes.
-    try {
-        $res->fetch_array($illegal_mode);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    $tmp = $res->fetch_array($illegal_mode);
+    if (false !== $tmp)
+        printf("[013] Expecting boolean/false although, got %s/%s. [%d] %s\n",
+            gettype($tmp), $tmp, $mysqli->errno, $mysqli->error);
 
-    try {
-        $res->fetch_array($illegal_mode);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    $tmp = $res->fetch_array($illegal_mode);
+    if (false !== $tmp)
+        printf("[014] Expecting boolean/false, got %s/%s. [%d] %s\n",
+            gettype($tmp), $tmp, $mysqli->errno, $mysqli->error);
 
     $res->free_result();
 
@@ -164,10 +169,14 @@ require_once 'skipifconnectfailure.inc';
     func_mysqli_fetch_array($mysqli, $engine, "INTEGER UNSIGNED", "4294967295", "4294967295", 230);
     func_mysqli_fetch_array($mysqli, $engine, "INTEGER UNSIGNED", NULL, NULL, 240);
 
-    func_mysqli_fetch_array($mysqli, $engine, "BIGINT", "-9223372036854775808", "-9223372036854775808", 250);
-    func_mysqli_fetch_array($mysqli, $engine, "BIGINT", NULL, NULL, 260);
-    func_mysqli_fetch_array($mysqli, $engine, "BIGINT UNSIGNED", "18446744073709551615", "18446744073709551615", 270);
-    func_mysqli_fetch_array($mysqli, $engine, "BIGINT UNSIGNED", NULL, NULL, 280);
+    if ($IS_MYSQLND ||
+        ((mysqli_get_server_version($link) >= 51000) &&
+         (mysqli_get_client_version($link) >= 51000))) {
+        func_mysqli_fetch_array($mysqli, $engine, "BIGINT", "-9223372036854775808", "-9223372036854775808", 250);
+        func_mysqli_fetch_array($mysqli, $engine, "BIGINT", NULL, NULL, 260);
+        func_mysqli_fetch_array($mysqli, $engine, "BIGINT UNSIGNED", "18446744073709551615", "18446744073709551615", 270);
+        func_mysqli_fetch_array($mysqli, $engine, "BIGINT UNSIGNED", NULL, NULL, 280);
+    }
 
     func_mysqli_fetch_array($mysqli, $engine, "FLOAT", (string)(-9223372036854775808 - 1.1), "-9.22337e+18", 290, "/-9\.22337e\+?[0]?18/iu");
     func_mysqli_fetch_array($mysqli, $engine, "FLOAT", NULL, NULL, 300);
@@ -262,19 +271,16 @@ require_once 'skipifconnectfailure.inc';
 
     $mysqli->close();
 
-    try {
-        $res->fetch_array(MYSQLI_ASSOC);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = $res->fetch_array(MYSQLI_ASSOC)))
+        printf("[015] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
+--EXPECTF--
 [005]
 array(4) {
   [0]=>
@@ -347,7 +353,10 @@ array(11) {
   ["e"]=>
   string(1) "1"
 }
-mysqli_result::fetch_array(): Argument #1 ($mode) must be one of MYSQLI_NUM, MYSQLI_ASSOC, or MYSQLI_BOTH
-mysqli_result::fetch_array(): Argument #1 ($mode) must be one of MYSQLI_NUM, MYSQLI_ASSOC, or MYSQLI_BOTH
-mysqli_result object is already closed
+
+Warning: mysqli_result::fetch_array(): The result type should be either MYSQLI_NUM, MYSQLI_ASSOC or MYSQLI_BOTH in %s on line %d
+
+Warning: mysqli_result::fetch_array(): The result type should be either MYSQLI_NUM, MYSQLI_ASSOC or MYSQLI_BOTH in %s on line %d
+
+Warning: mysqli_result::fetch_array(): Couldn't fetch mysqli_result in %s on line %d
 done!

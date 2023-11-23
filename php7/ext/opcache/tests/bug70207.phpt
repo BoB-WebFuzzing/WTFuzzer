@@ -5,18 +5,16 @@ opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
 opcache.file_update_protection=0
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function bar() {
-    return "bar";
+	return "bar";
 }
 function foo() {
     try { return bar(); }
-    finally {
-        @fopen("non-existent", 'r');
-    }
+    finally { @fclose(null); }
 }
 
 var_dump(foo());

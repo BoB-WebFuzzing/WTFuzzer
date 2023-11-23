@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -46,8 +48,9 @@ static void php_filter_encode_html(zval *value, const unsigned char *chars)
 		s++;
 	}
 
+	smart_str_0(&str);
 	zval_ptr_dtor(value);
-	ZVAL_STR(value, smart_str_extract(&str));
+	ZVAL_NEW_STR(value, str.s);
 }
 
 static const unsigned char hexchars[] = "0123456789ABCDEF";
@@ -71,7 +74,17 @@ static void php_filter_encode_url(zval *value, const unsigned char* chars, const
 	while (s < e) {
 		tmp[*s++] = '\0';
 	}
-
+/* XXX: This is not needed since these chars in the allowed list never include the high/low/null value
+	if (encode_nul) {
+		tmp[0] = 1;
+	}
+	if (high) {
+		memset(tmp + 127, 1, sizeof(tmp) - 127);
+	}
+	if (low) {
+		memset(tmp, 1, 32);
+	}
+*/
 	str = zend_string_safe_alloc(Z_STRLEN_P(value), 3, 0, 0);
 	p = (unsigned char *) ZSTR_VAL(str);
 	s = (unsigned char *) Z_STRVAL_P(value);
@@ -193,7 +206,7 @@ void php_filter_string(PHP_INPUT_FILTER_PARAM_DECL)
 	php_filter_encode_html(value, enc);
 
 	/* strip tags, implicitly also removes \0 chars */
-	new_len = php_strip_tags_ex(Z_STRVAL_P(value), Z_STRLEN_P(value), NULL, 0, 1);
+	new_len = php_strip_tags_ex(Z_STRVAL_P(value), Z_STRLEN_P(value), NULL, NULL, 0, 1);
 	Z_STRLEN_P(value) = new_len;
 
 	if (new_len == 0) {
@@ -250,9 +263,7 @@ void php_filter_full_special_chars(PHP_INPUT_FILTER_PARAM_DECL)
 	} else {
 		quotes = ENT_NOQUOTES;
 	}
-	buf = php_escape_html_entities_ex(
-		(unsigned char *) Z_STRVAL_P(value), Z_STRLEN_P(value), /* all */ 1, quotes,
-		/* charset_hint */ NULL, /* double_encode */ 0, /* quiet */ 0);
+	buf = php_escape_html_entities_ex((unsigned char *) Z_STRVAL_P(value), Z_STRLEN_P(value), 1, quotes, SG(default_charset), 0);
 	zval_ptr_dtor(value);
 	ZVAL_STR(value, buf);
 }
@@ -359,6 +370,20 @@ void php_filter_number_float(PHP_INPUT_FILTER_PARAM_DECL)
 void php_filter_add_slashes(PHP_INPUT_FILTER_PARAM_DECL)
 {
 	zend_string *buf = php_addslashes(Z_STR_P(value));
+
+	zval_ptr_dtor(value);
+	ZVAL_STR(value, buf);
+}
+/* }}} */
+
+/* {{{ php_filter_magic_quotes */
+void php_filter_magic_quotes(PHP_INPUT_FILTER_PARAM_DECL)
+{
+	zend_string *buf;
+	php_error_docref(NULL, E_DEPRECATED,
+		"FILTER_SANITIZE_MAGIC_QUOTES is deprecated, use FILTER_SANITIZE_ADD_SLASHES instead");
+
+	buf = php_addslashes(Z_STR_P(value));
 
 	zval_ptr_dtor(value);
 	ZVAL_STR(value, buf);

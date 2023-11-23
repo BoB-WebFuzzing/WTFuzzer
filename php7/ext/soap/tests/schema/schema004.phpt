@@ -1,17 +1,16 @@
 --TEST--
 SOAP XML Schema 4: simpleType/restriction (reference to undefined type)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--
 <?php
 include "test_schema.inc";
 $schema = <<<EOF
-    <simpleType name="testType">
-        <restriction base="tns:testType2"/>
-    </simpleType>
+	<simpleType name="testType">
+		<restriction base="tns:testType2"/>
+	</simpleType>
 EOF;
 test_schema($schema,'type="tns:testType"',123.5);
 echo "ok";

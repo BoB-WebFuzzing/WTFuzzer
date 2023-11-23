@@ -1,7 +1,7 @@
 --TEST--
 mb_language()
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip');
 --INI--
 mbstring.language=
 --FILE--
@@ -20,14 +20,10 @@ echo "Confirm language was changed:\n";
 var_dump(mb_language());
 
 echo "Try changing to a non-existent language:\n";
-try {
-    var_dump(mb_language('Pig Latin'));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(mb_language('Pig Latin'));
 var_dump(mb_language());
 ?>
---EXPECT--
+--EXPECTF--
 Checking default language:
 string(7) "neutral"
 Checking default language after ini_set:
@@ -37,5 +33,7 @@ bool(true)
 Confirm language was changed:
 string(7) "English"
 Try changing to a non-existent language:
-mb_language(): Argument #1 ($language) must be a valid language, "Pig Latin" given
+
+Warning: mb_language(): Unknown language "Pig Latin" in %s on line %d
+bool(false)
 string(7) "neutral"

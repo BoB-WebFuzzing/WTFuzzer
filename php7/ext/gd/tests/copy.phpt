@@ -1,7 +1,9 @@
 --TEST--
 imagecopy
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+        if (!function_exists('imagecopy')) die("skip gd extension not available\n");
+?>
 --FILE--
 <?php
 
@@ -19,7 +21,7 @@ $p2 = imagecolorat($dst_tc, 0,0) == 0x0000ff;
 $p3 = imagecolorat($dst_tc, 4,4) == 0x00ff00;
 
 if ($p1 && $p2 && $p3) {
-    echo "TC/TC: ok\n";
+	echo "TC/TC: ok\n";
 }
 
 imagedestroy($src_tc); imagedestroy($dst_tc);
@@ -44,7 +46,7 @@ $p2 = $c2['red'] == 0x00 && $c2['blue']==0xff && $c2['green']==0x00;
 $p3 = $c3['red'] == 0x00 && $c3['blue']==0x00 && $c3['green']==0xff;
 
 if ($p1 && $p2 && $p3) {
-    echo "TC/P: ok\n";
+	echo "TC/P: ok\n";
 }
 imagedestroy($src_tc); imagedestroy($dst_tc);
 
@@ -74,7 +76,7 @@ $p3 = $c3['red'] == 0x00 && $c3['blue']==0x00 && $c3['green']==0xff;
 
 
 if ($p1 && $p2 && $p3) {
-    echo "P/P: ok\n";
+	echo "P/P: ok\n";
 }
 
 
@@ -97,7 +99,7 @@ $p2 = imagecolorat($dst_tc, 0,0) == 0x0000ff;
 $p3 = imagecolorat($dst_tc, 4,4) == 0x00ff00;
 
 if ($p1 && $p2 && $p3) {
-    echo "P/TC: ok\n";
+	echo "P/TC: ok\n";
 }
 ?>
 --EXPECT--

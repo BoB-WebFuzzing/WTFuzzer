@@ -1,10 +1,10 @@
 --TEST--
 mysqli_stmt_bind_param()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
@@ -17,7 +17,21 @@ require_once 'skipifconnectfailure.inc';
     in this file and we test mysqli_stmt_bind_result() in the other
     test -- therefore the "duplicate" makes some sense to me.
     */
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_stmt_bind_param()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_stmt_bind_param($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_stmt_bind_param($link, $link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
 
     $stmt = mysqli_stmt_init($link);
     if (!mysqli_stmt_prepare($stmt, "INSERT INTO test(id, label) VALUES (?, ?)"))
@@ -30,75 +44,35 @@ require_once 'skipifconnectfailure.inc';
     libmysql gives a less descriptive error message but mysqlnd,
     we did not unify the error messages but ignore this slight difference silently
     */
-    try {
-        if (!false === ($tmp = mysqli_stmt_bind_param($stmt, " ", $tmp)))
-            printf("[003d] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (\ArgumentCountError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (!false === ($tmp = @mysqli_stmt_bind_param($stmt, " ", $tmp)))
+        printf("[003d] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "", $id, $label)))
-            printf("[003a] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (!false === ($tmp = @mysqli_stmt_bind_param($stmt, "", $id, $label)))
+        printf("[003a] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
     /* TODO: somehwhat undocumented syntax! */
     $param = array($id);
-    try {
-        if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "is", $param)))
-         printf("[003b] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (\ArgumentCountError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "is", $param)))
+        printf("[003b] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
     $param = array($id, $label, $id);
-    try {
-        if (!false === ($tmp = mysqli_stmt_bind_param($stmt, " ", $tmp)))
-            printf("[003d] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (\ArgumentCountError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
-    try {
-        if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "is", $param)))
-            printf("[003c] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (\ArgumentCountError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "is", $param)))
+        printf("[003c] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "a", $id)))
-            printf("[004] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (\ArgumentCountError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "a", $id)))
+        printf("[004] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "a", $id, $label)))
-            printf("[005] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (\ArgumentCountError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "a", $id, $label)))
+        printf("[005] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        mysqli_stmt_bind_param($stmt, "aa", $id, $label);
-    } catch (ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "aa", $id, $label)))
+        printf("[006] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        mysqli_stmt_bind_param($stmt, "ia", $id, $label);
-    } catch (ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (!false === ($tmp = mysqli_stmt_bind_param($stmt, "ia", $id, $label)))
+        printf("[007] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        if (!true === ($tmp = mysqli_stmt_bind_param($stmt, "is", $id, $label)))
-            printf("[008] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
-    } catch (\ArgumentCountError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
+    if (!true === ($tmp = mysqli_stmt_bind_param($stmt, "is", $id, $label)))
+        printf("[008] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 
     if (function_exists("memory_get_usage")) {
         $mem = memory_get_usage();
@@ -348,7 +322,7 @@ require_once 'skipifconnectfailure.inc';
         printf("[2002] [%d] %s\n", mysqli_stmt_errno($stmt), mysqli_stmt_error($stmt));
 
     mysqli_stmt_close($stmt);
-    include 'table.inc';
+    include("table.inc");
 
     if (!$stmt = mysqli_stmt_init($link))
         printf("[2003] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -405,20 +379,26 @@ require_once 'skipifconnectfailure.inc';
     mysqli_stmt_close($stmt);
     mysqli_close($link);
 
+    /* Check that the function alias exists. It's a deprecated function,
+    but we have not announce the removal so far, therefore we need to check for it */
+    if (!is_null($tmp = @mysqli_stmt_bind_param()))
+            printf("[021] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
-The number of variables must match the number of parameters in the prepared statement
-mysqli_stmt_bind_param(): Argument #2 ($types) cannot be empty
-The number of elements in the type definition string must match the number of bind variables
-The number of variables must match the number of parameters in the prepared statement
-The number of elements in the type definition string must match the number of bind variables
-The number of variables must match the number of parameters in the prepared statement
-The number of elements in the type definition string must match the number of bind variables
-mysqli_stmt_bind_param(): Argument #2 ($types) must only contain the "b", "d", "i", "s" type specifiers
-mysqli_stmt_bind_param(): Argument #2 ($types) must only contain the "b", "d", "i", "s" type specifiers
+--EXPECTF--
+Warning: mysqli_stmt_bind_param(): Number of elements in type definition string doesn't match number of bind variables in %s on line %d
+
+Warning: mysqli_stmt_bind_param(): Number of elements in type definition string doesn't match number of bind variables in %s on line %d
+
+Warning: mysqli_stmt_bind_param(): Number of variables doesn't match number of parameters in prepared statement in %s on line %d
+
+Warning: mysqli_stmt_bind_param(): Number of elements in type definition string doesn't match number of bind variables in %s on line %d
+
+Warning: mysqli_stmt_bind_param(): Undefined fieldtype a (parameter 3) in %s on line %d
+
+Warning: mysqli_stmt_bind_param(): Undefined fieldtype a (parameter 4) in %s on line %d
 done!

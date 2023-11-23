@@ -34,9 +34,11 @@ var_dump(unlink($dest_file));
 var_dump(rmdir($dest_dir));
 
 ?>
+===DONE===
 --EXPECT--
 bool(true)
 bool(true)
 bool(true)
 bool(true)
 bool(true)
+===DONE===

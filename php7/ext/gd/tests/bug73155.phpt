@@ -1,12 +1,8 @@
 --TEST--
 Bug #73155 (imagegd2() writes wrong chunk sizes on boundaries)
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
-    if (!GD_BUNDLED && version_compare(GD_VERSION, '2.3.3', '>=')) {
-        die("skip test requires GD 2.3.2 or older");
-    }
+if (!extension_loaded('gd')) die('skip gd extension not available');
 ?>
 --FILE--
 <?php
@@ -23,8 +19,10 @@ printf("x chunk count: %d\n", $header['x_count']);
 printf("y chunk count: %d\n", $header['y_count']);
 printf("file size: %d\n", strlen($buffer));
 ?>
+===DONE===
 --EXPECT--
 chunk size: 64
 x chunk count: 1
 y chunk count: 1
 file size: 5145
+===DONE===

@@ -2,7 +2,14 @@
 Test pathinfo() function: usage variations
 --FILE--
 <?php
-echo "*** Testing pathinfo() with miscellaneous input arguments ***\n";
+/* Prototype: mixed pathinfo ( string $path [, int $options] );
+   Description: Returns information about a file path
+*/
+
+echo "*** Testing pathinfo() with miscelleneous input arguments ***\n";
+
+$fp = fopen(__FILE__, "r");
+unset($fp);
 
 class object_temp {
   public $url_var = "www.foo.com";
@@ -36,6 +43,9 @@ $paths = array (
   "./array(1, 2)",
   "array( array(), null)",
 
+  /* pathname as object */
+  $obj,
+
   /* pathname as spaces */
   " ",
   ' ',
@@ -43,6 +53,13 @@ $paths = array (
   /* empty pathname */
   "",
   '',
+
+  /* pathname as NULL */
+  NULL,
+  null,
+
+  /* filename as resource */
+  $fp,
 
   /* pathname as members of object */
   $obj->url_var,
@@ -73,8 +90,10 @@ foreach($paths as $path) {
 
 echo "Done\n";
 ?>
---EXPECT--
-*** Testing pathinfo() with miscellaneous input arguments ***
+--EXPECTF--
+*** Testing pathinfo() with miscelleneous input arguments ***
+
+Notice: Undefined variable: fp in %s on line %d
 -- Iteration 1 --
 array(3) {
   ["dirname"]=>
@@ -180,18 +199,21 @@ string(21) "array( array(), null)"
 string(0) ""
 string(21) "array( array(), null)"
 -- Iteration 9 --
-array(3) {
-  ["dirname"]=>
-  string(1) "."
-  ["basename"]=>
-  string(1) " "
-  ["filename"]=>
-  string(1) " "
-}
-string(1) "."
-string(1) " "
-string(0) ""
-string(1) " "
+
+Warning: pathinfo() expects parameter 1 to be string, object given in %s on line %d
+NULL
+
+Warning: pathinfo() expects parameter 1 to be string, object given in %s on line %d
+NULL
+
+Warning: pathinfo() expects parameter 1 to be string, object given in %s on line %d
+NULL
+
+Warning: pathinfo() expects parameter 1 to be string, object given in %s on line %d
+NULL
+
+Warning: pathinfo() expects parameter 1 to be string, object given in %s on line %d
+NULL
 -- Iteration 10 --
 array(3) {
   ["dirname"]=>
@@ -206,16 +228,18 @@ string(1) " "
 string(0) ""
 string(1) " "
 -- Iteration 11 --
-array(2) {
+array(3) {
+  ["dirname"]=>
+  string(1) "."
   ["basename"]=>
-  string(0) ""
+  string(1) " "
   ["filename"]=>
-  string(0) ""
+  string(1) " "
 }
+string(1) "."
+string(1) " "
 string(0) ""
-string(0) ""
-string(0) ""
-string(0) ""
+string(1) " "
 -- Iteration 12 --
 array(2) {
   ["basename"]=>
@@ -228,6 +252,50 @@ string(0) ""
 string(0) ""
 string(0) ""
 -- Iteration 13 --
+array(2) {
+  ["basename"]=>
+  string(0) ""
+  ["filename"]=>
+  string(0) ""
+}
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+-- Iteration 14 --
+array(2) {
+  ["basename"]=>
+  string(0) ""
+  ["filename"]=>
+  string(0) ""
+}
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+-- Iteration 15 --
+array(2) {
+  ["basename"]=>
+  string(0) ""
+  ["filename"]=>
+  string(0) ""
+}
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+-- Iteration 16 --
+array(2) {
+  ["basename"]=>
+  string(0) ""
+  ["filename"]=>
+  string(0) ""
+}
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+-- Iteration 17 --
 array(4) {
   ["dirname"]=>
   string(1) "."
@@ -242,7 +310,7 @@ string(1) "."
 string(11) "www.foo.com"
 string(3) "com"
 string(7) "www.foo"
--- Iteration 14 --
+-- Iteration 18 --
 array(4) {
   ["dirname"]=>
   string(17) "/var/html/testdir"
@@ -257,62 +325,6 @@ string(17) "/var/html/testdir"
 string(12) "example.html"
 string(4) "html"
 string(7) "example"
--- Iteration 15 --
-array(3) {
-  ["dirname"]=>
-  string(12) "/testdir/foo"
-  ["basename"]=>
-  string(4) "test"
-  ["filename"]=>
-  string(4) "test"
-}
-string(12) "/testdir/foo"
-string(4) "test"
-string(0) ""
-string(4) "test"
--- Iteration 16 --
-array(4) {
-  ["dirname"]=>
-  string(4) "/foo"
-  ["basename"]=>
-  string(12) "symlink.link"
-  ["extension"]=>
-  string(4) "link"
-  ["filename"]=>
-  string(7) "symlink"
-}
-string(4) "/foo"
-string(12) "symlink.link"
-string(4) "link"
-string(7) "symlink"
--- Iteration 17 --
-array(3) {
-  ["dirname"]=>
-  string(1) "."
-  ["basename"]=>
-  string(5) "12345"
-  ["filename"]=>
-  string(5) "12345"
-}
-string(1) "."
-string(5) "12345"
-string(0) ""
-string(5) "12345"
--- Iteration 18 --
-array(4) {
-  ["dirname"]=>
-  string(1) "."
-  ["basename"]=>
-  string(15) "www.example.com"
-  ["extension"]=>
-  string(3) "com"
-  ["filename"]=>
-  string(11) "www.example"
-}
-string(1) "."
-string(15) "www.example.com"
-string(3) "com"
-string(11) "www.example"
 -- Iteration 19 --
 array(3) {
   ["dirname"]=>
@@ -329,6 +341,62 @@ string(4) "test"
 -- Iteration 20 --
 array(4) {
   ["dirname"]=>
+  string(4) "/foo"
+  ["basename"]=>
+  string(12) "symlink.link"
+  ["extension"]=>
+  string(4) "link"
+  ["filename"]=>
+  string(7) "symlink"
+}
+string(4) "/foo"
+string(12) "symlink.link"
+string(4) "link"
+string(7) "symlink"
+-- Iteration 21 --
+array(3) {
+  ["dirname"]=>
+  string(1) "."
+  ["basename"]=>
+  string(5) "12345"
+  ["filename"]=>
+  string(5) "12345"
+}
+string(1) "."
+string(5) "12345"
+string(0) ""
+string(5) "12345"
+-- Iteration 22 --
+array(4) {
+  ["dirname"]=>
+  string(1) "."
+  ["basename"]=>
+  string(15) "www.example.com"
+  ["extension"]=>
+  string(3) "com"
+  ["filename"]=>
+  string(11) "www.example"
+}
+string(1) "."
+string(15) "www.example.com"
+string(3) "com"
+string(11) "www.example"
+-- Iteration 23 --
+array(3) {
+  ["dirname"]=>
+  string(12) "/testdir/foo"
+  ["basename"]=>
+  string(4) "test"
+  ["filename"]=>
+  string(4) "test"
+}
+string(12) "/testdir/foo"
+string(4) "test"
+string(0) ""
+string(4) "test"
+-- Iteration 24 --
+array(4) {
+  ["dirname"]=>
   string(6) "../foo"
   ["basename"]=>
   string(9) "test.link"
@@ -341,7 +409,7 @@ string(6) "../foo"
 string(9) "test.link"
 string(4) "link"
 string(4) "test"
--- Iteration 21 --
+-- Iteration 25 --
 array(4) {
   ["dirname"]=>
   string(76) "./test/work/scratch/mydir/yourdir/ourdir/test1/test2/test3/test4/test5/test6"
@@ -356,7 +424,7 @@ string(76) "./test/work/scratch/mydir/yourdir/ourdir/test1/test2/test3/test4/tes
 string(8) "test.tmp"
 string(3) "tmp"
 string(4) "test"
--- Iteration 22 --
+-- Iteration 26 --
 array(4) {
   ["dirname"]=>
   string(1) "."

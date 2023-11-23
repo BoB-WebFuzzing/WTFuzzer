@@ -2,6 +2,11 @@
 Test printf() function : basic functionality - float format
 --FILE--
 <?php
+/* Prototype  : int printf  ( string $format  [, mixed $args  [, mixed $...  ]] )
+ * Description: Produces output according to format .
+ * Source code: ext/standard/formatted_print.c
+ */
+
 echo "*** Testing printf() : basic functionality - using float format ***\n";
 
 
@@ -49,6 +54,7 @@ echo "\n";
 var_dump($result);
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing printf() : basic functionality - using float format ***
 
@@ -73,3 +79,4 @@ int(19)
 int(29)
 11.110000 22.220000 33.330000
 int(29)
+===DONE===

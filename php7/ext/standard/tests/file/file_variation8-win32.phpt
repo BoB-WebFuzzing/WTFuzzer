@@ -9,6 +9,12 @@ if(substr(PHP_OS, 0, 3) != "WIN")
 ?>
 --FILE--
 <?php
+/* Prototype  : array file(string filename [, int flags[, resource context]])
+ * Description: Read entire file into an array
+ * Source code: ext/standard/file.c
+ * Alias to functions:
+ */
+
 echo "*** Testing file() : variation ***\n";
 $mainDir = "fileVar8.dir";
 $subDir = "fileVar8Sub";
@@ -54,21 +60,12 @@ for($i = 0; $i<count($allDirs); $i++) {
   var_dump(file($dir."\\".$filename));
 }
 
-chdir($old_dir_path);
-
-echo "\n*** Done ***\n";
-?>
---CLEAN--
-<?php
-$mainDir = "fileVar8.dir";
-$subDir = "fileVar8Sub";
-$absMainDir = __DIR__."/".$mainDir;
-$absSubDir = $absMainDir."/".$subDir;
-$filename = 'FileGetContentsVar7.tmp';
-$absFile = $absSubDir.'/'.$filename;
 unlink($absFile);
+chdir($old_dir_path);
 rmdir($absSubDir);
 rmdir($absMainDir);
+
+echo "\n*** Done ***\n";
 ?>
 --EXPECTF--
 *** Testing file() : variation ***
@@ -99,12 +96,12 @@ array(1) {
 
 -- Iteration 5 --
 
-Warning: file(%sfileVar8.dir\fileVar8Sub\..\\\fileVar8Sub\\..\\..\fileVar8Sub\FileGetContentsVar7.tmp): Failed to open stream: No such file or directory in %s on line %d
+Warning: file(%sfileVar8.dir\fileVar8Sub\..\\\fileVar8Sub\\..\\..\fileVar8Sub\FileGetContentsVar7.tmp): failed to open stream: No such file or directory in %s on line %d
 bool(false)
 
 -- Iteration 6 --
 
-Warning: file(%sfileVar8.dir\fileVar8Sub\BADDIR\FileGetContentsVar7.tmp): Failed to open stream: No such file or directory in %s on line %d
+Warning: file(%sfileVar8.dir\fileVar8Sub\BADDIR\FileGetContentsVar7.tmp): failed to open stream: No such file or directory in %s on line %d
 bool(false)
 
 -- Iteration 7 --
@@ -133,7 +130,7 @@ array(1) {
 
 -- Iteration 11 --
 
-Warning: file(BADDIR\FileGetContentsVar7.tmp): Failed to open stream: No such file or directory in %s on line %d
+Warning: file(BADDIR\FileGetContentsVar7.tmp): failed to open stream: No such file or directory in %s on line %d
 bool(false)
 
 -- Iteration 12 --

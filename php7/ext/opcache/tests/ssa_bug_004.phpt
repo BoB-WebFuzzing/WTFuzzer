@@ -1,7 +1,7 @@
 --TEST--
 Assign elision exception safety: ICALL
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

@@ -3,8 +3,8 @@ Bug #69159 (Opcache causes problem when passing a variable variable to a functio
 --INI--
 opcache.enable=1
 opcache.optimization_level=-1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $i = 1;
@@ -12,7 +12,7 @@ $x1 = "okey";
 myFunction(${"x$i"});
 
 function myFunction($x) {
-    var_dump($x);
+	var_dump($x);
 }
 
 ?>

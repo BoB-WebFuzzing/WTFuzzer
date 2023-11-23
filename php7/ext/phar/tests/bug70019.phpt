@@ -1,8 +1,7 @@
 --TEST--
 Bug #70019 Files extracted from archive may be placed outside of destination directory
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("phar") || !extension_loaded('zlib')) die("skip"); ?>
 --FILE--
 <?php
 $dir = __DIR__."/bug70019";
@@ -13,6 +12,7 @@ if(!is_dir($dir)) {
 $phar->extractTo($dir);
 var_dump(file_exists("$dir/ThisIsATestFile.txt"));
 ?>
+===DONE===
 --CLEAN--
 <?php
 $dir = __DIR__."/bug70019";
@@ -21,3 +21,4 @@ rmdir($dir);
 ?>
 --EXPECT--
 bool(true)
+===DONE===

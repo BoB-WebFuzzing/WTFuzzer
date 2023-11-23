@@ -3,6 +3,7 @@ Test basic functionality of flush()
 --FILE--
 <?php
 /*
+ * proto void flush(void)
  * Function is implemented in ext/standard/basic_functions.c.
  */
 

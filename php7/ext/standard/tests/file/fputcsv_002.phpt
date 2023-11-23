@@ -20,7 +20,7 @@ $file = __DIR__ .'/fgetcsv-test.csv';
 unlink($file);
 ?>
 --EXPECTF--
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %s on line %d
 array(7) {
   [0]=>
   int(1)

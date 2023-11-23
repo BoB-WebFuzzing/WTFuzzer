@@ -1,7 +1,9 @@
 --TEST--
 DOMDocument::saveHTML() vs DOMDocumet::saveXML()
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once __DIR__ .'/skipif.inc';
+?>
 --FILE--
 <?php
 $d = new DOMDocument();
@@ -19,7 +21,6 @@ $e = $d->getElementsByTagName("p");
 $e = $e->item(0);
 echo $d->saveXml($e),"\n";
 echo $d->saveHtml($e),"\n";
-?>
 --EXPECT--
 <p>Hi.<br/>there</p>
 <p>Hi.<br>there</p>

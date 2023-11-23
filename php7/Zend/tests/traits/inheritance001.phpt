@@ -1,5 +1,5 @@
 --TEST--
-Trait method overwritten by a method defined in the class.
+Trait method overwridden by a method defined in the class.
 --FILE--
 <?php
 error_reporting(E_ALL);

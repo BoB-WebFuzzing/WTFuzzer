@@ -18,6 +18,5 @@ $bar = new Bar();
 $bar->setBar(100);
 
 var_dump($bar->bar);
-?>
 --EXPECT--
 float(100)

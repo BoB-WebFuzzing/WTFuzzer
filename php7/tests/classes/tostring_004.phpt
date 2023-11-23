@@ -2,7 +2,7 @@
 Object to string conversion: error cases and behaviour variations.
 --FILE--
 <?php
-function test_error_handler($err_no, $err_msg, $filename, $linenum) {
+function test_error_handler($err_no, $err_msg, $filename, $linenum, $vars) {
         echo "Error: $err_no - $err_msg\n";
 }
 set_error_handler('test_error_handler');
@@ -28,9 +28,9 @@ try {
 
 echo "\n\nObject with bad __toString():\n";
 class badToString {
-    function __toString() {
-        return [];
-    }
+	function __toString() {
+		return 0;
+	}
 }
 
 $obj = new badToString;
@@ -53,7 +53,7 @@ try {
 --EXPECT--
 Object with no __toString():
 Try 1:
-printf(): Argument #1 ($format) must be of type string, stdClass given
+Object of class stdClass could not be converted to string
 
 
 Try 2:
@@ -62,8 +62,8 @@ Object of class stdClass could not be converted to string
 
 Object with bad __toString():
 Try 1:
-badToString::__toString(): Return value must be of type string, array returned
+Method badToString::__toString() must return a string value
 
 
 Try 2:
-badToString::__toString(): Return value must be of type string, array returned
+Method badToString::__toString() must return a string value

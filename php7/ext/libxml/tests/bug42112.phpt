@@ -1,7 +1,7 @@
 --TEST--
 Bug #42112 (deleting a node produces memory corruption)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php if (!extension_loaded('dom')) die('skip'); ?>
 --FILE--
 <?php
 $xml = <<<EOXML
@@ -21,7 +21,7 @@ remove_node($doc);
 
 $node = $doc->getElementById( 'id1' );
 if ($node) {
-    print 'Found Node: '.$node->nodeName."\n";
+	print 'Found Node: '.$node->nodeName."\n";
 }
 $root = $doc->documentElement;
 print 'Root Node: '.$root->nodeName."\n";

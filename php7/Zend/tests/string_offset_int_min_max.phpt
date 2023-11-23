@@ -9,8 +9,8 @@ var_dump($str[PHP_INT_MIN]);
 
 ?>
 --EXPECTF--
-Warning: Uninitialized string offset %d in %s on line %d
+Notice: Uninitialized string offset: %d in %s on line %d
 string(0) ""
 
-Warning: Uninitialized string offset -%d in %s on line %d
+Notice: Uninitialized string offset: -%d in %s on line %d
 string(0) ""

@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -20,7 +22,7 @@
 #endif
 
 #include "php.h"
-#if defined(HAVE_LIBXML) && defined(HAVE_DOM)
+#if HAVE_LIBXML && HAVE_DOM
 #include "php_dom.h"
 
 /*
@@ -31,6 +33,10 @@
 */
 
 extern zend_class_entry *dom_domexception_class_entry;
+
+const zend_function_entry php_dom_domexception_class_functions[] = {
+	PHP_FE_END
+};
 
 void php_dom_throw_error_with_message(int error_code, char *error_message, int strict_error) /* {{{ */
 {

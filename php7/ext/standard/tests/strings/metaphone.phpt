@@ -3,14 +3,12 @@ metaphone() tests
 --FILE--
 <?php
 
+var_dump(metaphone());
 var_dump(metaphone(""));
 var_dump(metaphone(-1));
+var_dump(metaphone(-1, -1));
 
-try {
-    var_dump(metaphone("valid phrase", -1));
-} catch (ValueError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(metaphone("valid phrase", -1));
 var_dump(metaphone("valid phrase", 0));
 var_dump(metaphone("valid phrase", 10000));
 
@@ -22,15 +20,18 @@ $array = array(
 );
 
 foreach($array as $str) {
-    var_dump(metaphone($str));
+	var_dump(metaphone($str));
 }
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
+Warning: metaphone() expects at least 1 parameter, 0 given in %s on line %d
+NULL
 string(0) ""
 string(0) ""
-metaphone(): Argument #2 ($max_phonemes) must be greater than or equal to 0
+bool(false)
+bool(false)
 string(6) "FLTFRS"
 string(6) "FLTFRS"
 string(26) "0FLFRWRTKRFLNKHTLSLN0KLTR0"

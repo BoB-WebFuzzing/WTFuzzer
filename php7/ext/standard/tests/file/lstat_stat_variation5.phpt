@@ -9,6 +9,13 @@ if (substr(PHP_OS, 0, 3) == 'WIN') {
 ?>
 --FILE--
 <?php
+/* Prototype: array lstat ( string $filename );
+   Description: Gives information about a file or symbolic link
+
+   Prototype: array stat ( string $filename );
+   Description: Gives information about a file
+*/
+
 /* test the effects of touch() on stats of dir */
 
 $file_path = __DIR__;
@@ -26,7 +33,7 @@ echo "*** Testing stat() for directory after using touch() on the directory ***\
 $old_stat = stat($dir_name);
 // clear the cache
 clearstatcache();
-sleep(1);
+sleep(2);
 var_dump( touch($dir_name) );
 $new_stat = stat($dir_name);
 

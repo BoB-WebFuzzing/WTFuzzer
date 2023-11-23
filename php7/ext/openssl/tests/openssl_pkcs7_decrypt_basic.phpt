@@ -1,7 +1,7 @@
 --TEST--
 openssl_pkcs7_decrypt() tests
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 $infile = __DIR__ . "/cert.crt";
@@ -19,9 +19,8 @@ $single_cert = "file://" . __DIR__ . "/cert.crt";
 $headers = array("test@test", "testing openssl_pkcs7_encrypt()");
 $wrong = "wrong";
 $empty = "";
-$cipher = OPENSSL_CIPHER_AES_128_CBC;
 
-openssl_pkcs7_encrypt($infile, $encrypted, $single_cert, $headers, 0, $cipher);
+openssl_pkcs7_encrypt($infile, $encrypted, $single_cert, $headers);
 var_dump(openssl_pkcs7_decrypt($encrypted, $outfile, $single_cert, $privkey));
 var_dump(openssl_pkcs7_decrypt($encrypted, $outfile, openssl_x509_read($single_cert), $privkey));
 var_dump(openssl_pkcs7_decrypt($encrypted, $outfile, $single_cert, $wrong));
@@ -46,22 +45,22 @@ if (file_exists($outfile)) {
 bool(true)
 bool(true)
 
-Warning: openssl_pkcs7_decrypt(): Unable to get private key in %s on line %d
+Warning: openssl_pkcs7_decrypt(): unable to get private key in %s on line %d
 bool(false)
 
-Warning: openssl_pkcs7_decrypt(): X.509 Certificate cannot be retrieved in %s on line %d
+Warning: openssl_pkcs7_decrypt(): unable to coerce parameter 3 to x509 cert in %s on line %d
 bool(false)
 
-Warning: openssl_pkcs7_decrypt(): X.509 Certificate cannot be retrieved in %s on line %d
+Warning: openssl_pkcs7_decrypt(): unable to coerce parameter 3 to x509 cert in %s on line %d
 bool(false)
 bool(false)
 bool(false)
 bool(false)
 
-Warning: openssl_pkcs7_decrypt(): X.509 Certificate cannot be retrieved in %s on line %d
+Warning: openssl_pkcs7_decrypt(): unable to coerce parameter 3 to x509 cert in %s on line %d
 bool(false)
 
-Warning: openssl_pkcs7_decrypt(): Unable to get private key in %s on line %d
+Warning: openssl_pkcs7_decrypt(): unable to get private key in %s on line %d
 bool(false)
 true
 true

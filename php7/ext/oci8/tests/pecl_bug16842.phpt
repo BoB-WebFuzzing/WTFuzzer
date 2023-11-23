@@ -1,19 +1,16 @@
 --TEST--
 PECL Bug #16842 (NO_DATA_FOUND exception is a warning)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --INI--
 error_reporting = E_WARNING
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Run Test
 
@@ -36,6 +33,8 @@ var_dump(oci_error($s));
 oci_close($c);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
 Test 1
 Raises NO_DATA_FOUND
@@ -71,3 +70,4 @@ ORA-06512: at line 1"
   ["sqltext"]=>
   string(29) "begin raise ZERO_DIVIDE; end;"
 }
+===DONE===

@@ -1,15 +1,20 @@
 --TEST--
 Test mail() function : mail.log ini setting
 --INI--
-sendmail_path={MAIL:mail.out}
-mail.log = mail.log
+sendmail_path=tee /tmp/mail.out >/dev/null
+mail.log = /tmp/mail.log
+--SKIPIF--
+<?php
+if(substr(PHP_OS, 0, 3) == "WIN")
+  die("skip Won't run on Windows");
+?>
 --FILE--
 <?php
 date_default_timezone_set("UTC");
 
 $logfile = ini_get("mail.log");
 if (file_exists($logfile)) {
-    unlink($logfile);
+	unlink($logfile);
 }
 touch($logfile);
 clearstatcache();
@@ -32,8 +37,8 @@ echo file_get_contents($logfile);
 Done
 --CLEAN--
 <?php
-unlink("mail.log");
-unlink("mail.out");
+unlink("/tmp/mail.log");
+unlink("/tmp/mail.out");
 ?>
 --EXPECTF--
 bool(true)

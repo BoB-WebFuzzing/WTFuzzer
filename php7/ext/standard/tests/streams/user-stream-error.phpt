@@ -4,7 +4,6 @@ E_ERROR during UserStream Open
 <?php
 
 class FailStream {
-  public $context;
   public function stream_open($path, $mode, $options, &$opened_path) {
     _some_undefined_function();
   }
@@ -12,7 +11,6 @@ class FailStream {
 stream_wrapper_register('mystream', 'FailStream');
 fopen('mystream://foo', 'r');
 echo 'Done';
-?>
 --EXPECTF--
 Fatal error: Uncaught Error: Call to undefined function _some_undefined_function() in %s%euser-stream-error.php:%d
 Stack trace:

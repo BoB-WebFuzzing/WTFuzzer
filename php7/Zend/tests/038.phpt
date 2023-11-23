@@ -3,12 +3,10 @@ Trying to use lambda as array key
 --FILE--
 <?php
 
-try {
-    var_dump(array(function() { } => 1));
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(array(function() { } => 1));
 
 ?>
---EXPECT--
-Cannot access offset of type Closure on array
+--EXPECTF--
+Warning: Illegal offset type in %s on line %d
+array(0) {
+}

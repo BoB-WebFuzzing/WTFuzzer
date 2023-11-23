@@ -16,9 +16,9 @@ echo"\nDone";
 ?>
 --EXPECT--
 array(2) {
-  [-1]=>
-  int(0)
   [0]=>
+  int(0)
+  [1]=>
   int(0)
 }
 

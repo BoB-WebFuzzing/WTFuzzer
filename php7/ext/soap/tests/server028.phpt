@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 28: SoapServer::setObject and __call()
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class Foo {

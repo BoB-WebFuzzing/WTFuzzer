@@ -1,27 +1,29 @@
 --TEST--
 FFI 045: FFI::isNull()
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--
 <?php
-var_dump(FFI::isNull(FFI::cdef()->new("int*")));
-$i = FFI::cdef()->new("int");
+var_dump(FFI::isNull(FFI::new("int*")));
+$i = FFI::new("int");
 var_dump(FFI::isNull(FFI::addr($i)));
 try {
-    var_dump(FFI::isNull(null));
+	var_dump(FFI::isNull(null));
 } catch (Throwable $e) {
-    echo get_class($e) . ": " . $e->getMessage()."\n";
+	echo get_class($e) . ": " . $e->getMessage()."\n";
 }
 try {
-    var_dump(FFI::isNull(FFI::cdef()->new("int[0]")));
+	var_dump(FFI::isNull(FFI::new("int[0]")));
 } catch (Throwable $e) {
-    echo get_class($e) . ": " . $e->getMessage()."\n";
+	echo get_class($e) . ": " . $e->getMessage()."\n";
 }
 ?>
---EXPECT--
+--EXPECTF--
 bool(true)
 bool(false)
-TypeError: FFI::isNull(): Argument #1 ($ptr) must be of type FFI\CData, null given
+
+Warning: FFI::isNull() expects parameter 1 to be FFI\CData, null given in %s045.php on line %d
+NULL
 FFI\Exception: Cannot instantiate FFI\CData of zero size

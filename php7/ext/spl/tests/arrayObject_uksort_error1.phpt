@@ -2,7 +2,9 @@
 Test ArrayObject::uksort() function : wrong arg count
 --FILE--
 <?php
-/* Sort the entries by key using user defined function.
+/* Prototype  : int ArrayObject::uksort(callback cmp_function)
+ * Description: proto int ArrayIterator::uksort(callback cmp_function)
+ Sort the entries by key using user defined function.
  * Source code: ext/spl/spl_array.c
  * Alias to functions:
  */
@@ -10,17 +12,19 @@ Test ArrayObject::uksort() function : wrong arg count
 $ao = new ArrayObject();
 
 try {
-    $ao->uksort();
-} catch (ArgumentCountError $e) {
-    echo $e->getMessage() . "\n";
+	$ao->uksort();
+} catch (BadMethodCallException $e) {
+	echo $e->getMessage() . "\n";
 }
 
 try {
-    $ao->uksort(1,2);
-} catch (ArgumentCountError $e) {
-    echo $e->getMessage() . "\n";
+	$ao->uksort(1,2);
+} catch (BadMethodCallException $e) {
+	echo $e->getMessage() . "\n";
 }
 ?>
+===DONE===
 --EXPECT--
-ArrayObject::uksort() expects exactly 1 argument, 0 given
-ArrayObject::uksort() expects exactly 1 argument, 2 given
+Function expects exactly one argument
+Function expects exactly one argument
+===DONE===

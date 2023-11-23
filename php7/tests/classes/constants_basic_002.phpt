@@ -23,7 +23,7 @@ string(5) "hello"
 
 Fail to read class constant from instance.
 
-Warning: Undefined property: aclass::$myConst in %s on line %d
+Notice: Undefined property: aclass::$myConst in %s on line 12
 NULL
 
 Class constant not visible in object var_dump.

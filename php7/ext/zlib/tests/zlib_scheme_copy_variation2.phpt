@@ -1,7 +1,11 @@
 --TEST--
 Test compress.zlib:// scheme with the copy function: uncompressed to compressed
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+	print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 $org_data = <<<EOT
@@ -43,5 +47,7 @@ else {
 unlink($inputFileName);
 unlink($outputFileName);
 ?>
+===DONE===
 --EXPECT--
 OK: Copy identical
+===DONE===

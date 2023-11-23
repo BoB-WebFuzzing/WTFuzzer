@@ -1,14 +1,14 @@
 --TEST--
 Interface of the class mysqli
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'connect.inc';
+    require('connect.inc');
 
     $mysqli = new mysqli($host, $user, $passwd, $db, $port, $socket);
     $link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket);
@@ -29,7 +29,6 @@ require_once 'skipifconnectfailure.inc';
         'connect'				=> true,
         'dump_debug_info'		=> true,
         'escape_string'			=> true,
-        'execute_query'			=> true,
         'get_charset'			=> true,
         'get_client_info'		=> true,
         'get_server_info'		=> true,
@@ -61,10 +60,13 @@ require_once 'skipifconnectfailure.inc';
         'use_result'			=> true,
     );
 
-    /* $expected_methods['get_client_stats']	= true; */
-    $expected_methods['get_connection_stats']	= true;
-    $expected_methods['reap_async_query']	= true;
-    $expected_methods['poll'] = true;
+    if ($IS_MYSQLND) {
+        // mysqlnd only
+        /* $expected_methods['get_client_stats']	= true; */
+        $expected_methods['get_connection_stats']	= true;
+        $expected_methods['reap_async_query']	= true;
+        $expected_methods['poll'] = true;
+    }
 
     /* we should add ruled when to expect them */
     if (function_exists('mysqli_debug'))
@@ -91,7 +93,7 @@ require_once 'skipifconnectfailure.inc';
 
     printf("\nClass variables:\n");
 
-    $expected_class_variables = [
+    $expected_class_variables = $expected_object_variables = array(
         "affected_rows" 	=> true,
         "client_info"		=> true,
         "client_version"	=> true,
@@ -109,10 +111,10 @@ require_once 'skipifconnectfailure.inc';
         "sqlstate"			=> true,
         "thread_id"			=> true,
         "warning_count"		=> true,
-        "error_list"		=> true,
-    ];
+    );
 
-    $expected_object_variables = [];
+    $expected_class_variables["error_list"] = true;
+    $expected_object_variables["error_list"] = true;
 
     $variables = get_class_vars(get_class($mysqli));
     foreach ($variables as $var => $v) {

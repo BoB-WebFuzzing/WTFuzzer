@@ -9,12 +9,12 @@ $b = array();
 try {
     $c = $a % $b;
     var_dump($c);
-} catch (TypeError $e) {
-    echo "Exception: " . $e->getMessage() . "\n";
+} catch (DivisionByZeroError $e) {
+	echo "Exception: " . $e->getMessage() . "\n";
 }
 
 echo "Done\n";
 ?>
---EXPECTF--
-Exception: Unsupported operand types: array % array
+--EXPECT--
+Exception: Modulo by zero
 Done

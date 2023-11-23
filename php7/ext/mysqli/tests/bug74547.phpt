@@ -1,16 +1,15 @@
 --TEST--
 Bug #74547 mysqli::change_user() doesn't accept null as $database argument w/strict_types
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-  require_once 'skipifconnectfailure.inc';
+  require_once('skipif.inc');
+  require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
     declare(strict_types=1);
 
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket))
         printf("[001] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
@@ -20,5 +19,7 @@ mysqli
 
     mysqli_close($link);
 ?>
+===DONE===
 --EXPECT--
 bool(true)
+===DONE===

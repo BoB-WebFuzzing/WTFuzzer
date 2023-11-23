@@ -175,7 +175,9 @@ Cannot rebind scope of closure created from method
 -------------------
 
 bindTo(null, Cls::class):
-Cannot unbind $this of method
+Unbinding $this of a method is deprecated
+
+Success!
 
 bindTo(new Cls, Cls::class):
 Success!
@@ -208,10 +210,10 @@ bindTo(new ClsUnrelated, SplDoublyLinkedList::class):
 Cannot bind method SplDoublyLinkedList::count() to object of class ClsUnrelated
 
 bindTo(null, null):
-Cannot unbind $this of method
+Cannot unbind $this of internal method
 
 bindTo(null, SplDoublyLinkedList::class):
-Cannot unbind $this of method
+Cannot unbind $this of internal method
 
 bindTo(new SplDoublyLinkedList, null):
 Cannot rebind scope of closure created from method

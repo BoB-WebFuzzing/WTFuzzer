@@ -1,26 +1,15 @@
 --TEST--
 Bug #80223 (imap_mail_compose() leaks envelope on malformed bodies)
---EXTENSIONS--
-imap
+--SKIPIF--
+<?php
+if (!extension_loaded('imap')) die('skip imap extension not available');
+?>
 --FILE--
 <?php
-try {
-    imap_mail_compose([], []);
-} catch (\ValueError $e) {
-    echo $e->getMessage(), \PHP_EOL;
-}
-try {
-    imap_mail_compose([], [1]);
-} catch (\TypeError $e) {
-    echo $e->getMessage(), \PHP_EOL;
-}
-try {
-    imap_mail_compose([], [[]]);
-} catch (\ValueError $e) {
-    echo $e->getMessage(), \PHP_EOL;
-}
+imap_mail_compose([], []);
+imap_mail_compose([], [1]);
 ?>
---EXPECT--
-imap_mail_compose(): Argument #2 ($bodies) cannot be empty
-imap_mail_compose(): Argument #2 ($bodies) individual body must be of type array, int given
-imap_mail_compose(): Argument #2 ($bodies) individual body cannot be empty
+--EXPECTF--
+Warning: imap_mail_compose(): body parameter must be a non-empty array in %s on line %d
+
+Warning: imap_mail_compose(): body parameter must be a non-empty array in %s on line %d

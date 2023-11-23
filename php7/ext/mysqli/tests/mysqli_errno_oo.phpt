@@ -1,14 +1,14 @@
 --TEST--
 $mysqli->errno
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
 
     $tmp    = NULL;
     $link   = NULL;
@@ -36,16 +36,14 @@ require_once 'skipifconnectfailure.inc';
 
     $mysqli->close();
 
-    try {
-        $mysqli->errno;
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    var_dump($mysqli->errno);
 
     print "done!";
 ?>
 --EXPECTF--
 int(0)
 int(%d)
-mysqli object is already closed
+
+Warning: main(): Couldn't fetch mysqli in %s on line %d
+bool(false)
 done!

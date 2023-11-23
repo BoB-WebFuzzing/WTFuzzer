@@ -1,9 +1,14 @@
 --TEST--
 Test ctype_graph() function : usage variations - different strings
---EXTENSIONS--
-ctype
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
+/* Prototype  : bool ctype_graph(mixed $c)
+ * Description: Checks for any printable character(s) except space
+ * Source code: ext/ctype/ctype.c
+ */
+
 /*
  * Pass strings containing different character types to ctype_graph() to test
  * which are considered valid printable character only strings
@@ -53,6 +58,7 @@ foreach($values as $value) {
 
 setlocale(LC_CTYPE, $orig);
 ?>
+===DONE===
 --EXPECT--
 *** Testing ctype_graph() : usage variations ***
 
@@ -139,3 +145,4 @@ bool(false)
 
 -- Iteration 28 --
 bool(false)
+===DONE===

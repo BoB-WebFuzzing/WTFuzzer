@@ -23,6 +23,8 @@ class Test
 
 $test = new Test();
 ?>
+
+===DONE===
 --EXPECT--
 array (
   1 => 'first',
@@ -30,3 +32,4 @@ array (
   3 => 'third',
   4 => 4,
 )
+===DONE===

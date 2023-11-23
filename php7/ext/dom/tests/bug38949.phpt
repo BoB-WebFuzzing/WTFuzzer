@@ -1,7 +1,7 @@
 --TEST--
 Bug #38949 (Cannot get xmlns value attribute)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

@@ -21,9 +21,11 @@ while ($fn=readdir($ds)) {
 
 closedir($ds);
 ?>
+==DONE==
 --EXPECTF--
 resource(%d) of type (stream)
 string(5) "file1"
 string(5) "file1"
 string(3) "fil"
 string(4) "b0rk"
+==DONE==

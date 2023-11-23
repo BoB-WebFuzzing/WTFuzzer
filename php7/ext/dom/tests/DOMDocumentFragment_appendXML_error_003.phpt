@@ -3,8 +3,8 @@ DOMDocumentFragment::appendXML() with unbalanced chunks.
 --CREDITS--
 Eric Lee Stewart <ericleestewart@gmail.com>
 # TestFest Atlanta 2009-05-24
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $document = new DOMDocument;

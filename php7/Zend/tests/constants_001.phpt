@@ -17,7 +17,7 @@ var_dump(constant('1foo'));
 
 ?>
 --EXPECTF--
-Warning: Constant 1 already defined in %s on line %d
+Notice: Constant 1 already defined in %s on line %d
 int(2)
 int(2)
 int(2)

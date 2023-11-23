@@ -1,7 +1,7 @@
 --TEST--
 Bug #28721 (appendChild() and insertBefore() unset DOMText)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function print_node(DomNode $node) {

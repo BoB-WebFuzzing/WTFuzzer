@@ -20,5 +20,7 @@ try {
 }
 
 ?>
+===DONE===
 --EXPECT--
-IteratorIterator::__construct() expects at most 2 arguments, 3 given
+IteratorIterator::__construct() expects at most 2 parameters, 3 given
+===DONE===

@@ -2,8 +2,10 @@
 Bug #81346 (Non-seekable streams don't update position after write)
 --DESCRIPTION--
 The test expectation is due to bug #81345.
---EXTENSIONS--
-bz2
+--SKIPIF--
+<?php
+if (!extension_loaded('bz2')) die("skip bz2 extension not available");
+?>
 --FILE--
 <?php
 $s = fopen("compress.bzip2://" . __DIR__ . "/bug81346.bz2", "w");

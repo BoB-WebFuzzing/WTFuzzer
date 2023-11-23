@@ -22,9 +22,9 @@ include __DIR__ . DIRECTORY_SEPARATOR . "util.inc";
 
 $item = iconv('big5', 'utf-8', "´ú¸Õ¦h¦r¸`¸ô®|"); // BIG5 string
 $prefix = create_data("dir_big5", $item . "5");
-$path = $prefix . DIRECTORY_SEPARATOR . "{$item}5";
+$path = $prefix . DIRECTORY_SEPARATOR . "${item}5";
 
-$subpath = $path . DIRECTORY_SEPARATOR . "{$item}4";
+$subpath = $path . DIRECTORY_SEPARATOR . "${item}4";
 
 /* The mb dirname exists*/
 var_dump(file_exists($path));
@@ -38,6 +38,7 @@ var_dump(rmdir($subpath));
 remove_data("dir_big5");
 
 ?>
+===DONE===
 --EXPECTF--
 bool(true)
 bool(true)
@@ -49,3 +50,4 @@ bool(true)
 string(%d) "%s\æ¸¬è©¦å¤šå­—ç¯€è·¯å¾‘5\æ¸¬è©¦å¤šå­—ç¯€è·¯å¾‘4"
 Active code page: %d
 bool(true)
+===DONE===

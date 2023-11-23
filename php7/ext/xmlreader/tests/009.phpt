@@ -1,7 +1,7 @@
 --TEST--
 XMLReader: libxml2 XML Reader, next
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -21,5 +21,7 @@ echo " ";
 echo $reader->getAttribute('num');
 echo "\n";
 ?>
+===DONE===
 --EXPECT--
 book 2
+===DONE===

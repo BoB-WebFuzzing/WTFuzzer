@@ -1,9 +1,8 @@
 --TEST--
 PDO Common: PDO::quote()
---EXTENSIONS--
-pdo
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo')) die('skip');
 $dir = getenv('REDIR_TEST_DIR');
 if (false == $dir) die('skip no driver');
 if (!strncasecmp(getenv('PDOTEST_DSN'), 'odbc', strlen('odbc'))) die('skip odbc driver doesn\'t have escape API, use prepared statements');
@@ -22,19 +21,18 @@ $quoted = $db->quote($unquoted);
 
 $len = strlen($unquoted);
 
-$db->query("CREATE TABLE test033 (t char($len))");
-$db->query("INSERT INTO test033 (t) VALUES($quoted)");
+@$db->exec("DROP TABLE test");
 
-$stmt = $db->prepare('SELECT * from test033');
+$db->query("CREATE TABLE test (t char($len))");
+$db->query("INSERT INTO test (t) VALUES($quoted)");
+
+$stmt = $db->prepare('SELECT * from test');
 $stmt->execute();
 
 print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
-?>
---CLEAN--
-<?php
-require_once getenv('REDIR_TEST_DIR') . 'pdo_test.inc';
-$db = PDOTest::factory();
-PDOTest::dropTableIfExists($db, "test033");
+
+$db->exec("DROP TABLE test");
+
 ?>
 --EXPECT--
 Array

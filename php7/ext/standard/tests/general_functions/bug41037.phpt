@@ -4,12 +4,8 @@ Bug #41037 (unregister_tick_function() inside the tick function crash PHP)
 <?php
 
 function a() {
-    echo "hello\n";
-    try {
-        unregister_tick_function('a');
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+		echo "hello";
+			unregister_tick_function('a');
 }
 
 declare (ticks=1) {
@@ -18,9 +14,9 @@ declare (ticks=1) {
     echo "Done\n";
 }
 ?>
---EXPECT--
+--EXPECTF--
 hello
-Registered tick function cannot be unregistered while it is being executed
+Warning: unregister_tick_function(): Unable to delete tick function executed at the moment in %s on line %d
 Done
 hello
-Registered tick function cannot be unregistered while it is being executed
+Warning: unregister_tick_function(): Unable to delete tick function executed at the moment in %s on line %d

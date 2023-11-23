@@ -5,7 +5,7 @@ report_memleaks=1
 --FILE--
 <?php
 function foo() {
-    gc_collect_cycles();
+	gc_collect_cycles();
 }
 
 $str = 'a:1:{i:0;R:1;}';
@@ -15,5 +15,5 @@ foo(unserialize($str));
 echo "okey";
 ?>
 --EXPECTF--
-Warning: unserialize(): Error at offset 13 of 14 bytes in %s on line %d
+Notice: unserialize(): Error at offset %d of %d bytes in %sunserialize_mem_leak.php on line 9
 okey

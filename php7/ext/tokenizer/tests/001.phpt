@@ -1,10 +1,8 @@
 --TEST--
 token_name()
---EXTENSIONS--
-tokenizer
 --SKIPIF--
 <?php if (PHP_INT_SIZE != 8) die("skip this test is for 64-bit only");
-?>
+if (!extension_loaded("tokenizer")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -128,10 +126,12 @@ echo token_name(T_HALT_COMPILER), "\n";
 
 echo token_name(-1), "\n";
 echo token_name(0x8000000F), "\n";
+echo token_name("string"), "\n";
+echo token_name(array()), "\n";
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 T_INCLUDE
 T_INCLUDE_ONCE
 T_EVAL
@@ -251,4 +251,10 @@ T_CLONE
 T_HALT_COMPILER
 UNKNOWN
 UNKNOWN
+
+Warning: token_name() expects parameter 1 to be int, string given in %s on line %d
+
+
+Warning: token_name() expects parameter 1 to be int, array given in %s on line %d
+
 Done

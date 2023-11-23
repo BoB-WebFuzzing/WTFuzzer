@@ -1,7 +1,7 @@
 --TEST--
 SQLite3::prepare Bound Variable test
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -24,7 +24,7 @@ $foo = 'a';
 $results = $stmt->execute();
 while ($result = $results->fetchArray(SQLITE3_NUM))
 {
-    var_dump($result);
+	var_dump($result);
 }
 $results->finalize();
 

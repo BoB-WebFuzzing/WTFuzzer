@@ -5,10 +5,19 @@ default_charset=""
 input_encoding="ISO-8859-1"
 output_encoding="ISO-8859-1"
 internal_encoding="ISO-8859-1"
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_internal_encoding') or die("skip mb_internal_encoding() is not available in this build");
+?>
 --FILE--
 <?php
+/* Prototype  : string mb_internal_encoding([string $encoding])
+ * Description: Sets the current internal encoding or Returns
+ * the current internal encoding as a string
+ * Source code: ext/mbstring/mbstring.c
+ */
+
 /*
  * Test basic functionality of mb_internal_encoding
  */

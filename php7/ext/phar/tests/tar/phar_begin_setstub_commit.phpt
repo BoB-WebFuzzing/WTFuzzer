@@ -1,7 +1,9 @@
 --TEST--
 Phar::startBuffering()/setStub()/stopBuffering() tar-based
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.readonly=0
 --FILE--
@@ -27,6 +29,7 @@ include 'phar://phar_begin_setstub_commit.phar/a.php';
 include 'phar://phar_begin_setstub_commit.phar/b.php';
 var_dump($p->getStub());
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/phar_begin_setstub_commit.phar.tar');
@@ -47,3 +50,4 @@ string(5) "Hello"
 string(5) "World"
 string(%d) "<?php var_dump("Second"); Phar::mapPhar("phar_begin_setstub_commit.phar"); __HALT_COMPILER(); ?>
 "
+===DONE===

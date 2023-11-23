@@ -16,7 +16,21 @@ array(3) {
   [0]=>
   int(2)
   [1]=>
-  *RECURSION*
+  &array(3) {
+    [0]=>
+    int(2)
+    [1]=>
+    *RECURSION*
+    [2]=>
+    *RECURSION*
+  }
   [2]=>
-  *RECURSION*
+  &array(3) {
+    [0]=>
+    int(2)
+    [1]=>
+    *RECURSION*
+    [2]=>
+    *RECURSION*
+  }
 }

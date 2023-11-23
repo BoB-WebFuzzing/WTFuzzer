@@ -16,8 +16,9 @@ foreach ($r->getParameters() as $p) {
     }
 }
 ?>
---EXPECTF--
-Deprecated: Optional parameter $b declared before required parameter $c is implicitly treated as a required parameter in %s on line %d
+--EXPECT--
+bool(true)
+bool(true)
 bool(false)
-bool(false)
-bool(false)
+NULL
+int(0)

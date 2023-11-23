@@ -1,7 +1,7 @@
 --TEST--
 Bug #53198 (From: header cannot be changed with ini_set)
 --SKIPIF--
-<?php require 'server.inc'; http_server_skipif(); ?>
+<?php require 'server.inc'; http_server_skipif('tcp://127.0.0.1:12342'); ?>
 --INI--
 allow_url_fopen=1
 from=teste@teste.pt
@@ -11,22 +11,22 @@ require 'server.inc';
 
 function do_test() {
 
-    $responses = array(
-        "data://text/plain,HTTP/1.1 200 OK\r\n\r\n",
-    );
+	$responses = array(
+		"data://text/plain,HTTP/1.0 200 OK\r\n\r\n",
+	);
 
-    ['pid' => $pid, 'uri' => $uri] = http_server($responses, $output);
+	$pid = http_server("tcp://127.0.0.1:12342", $responses, $output);
 
-    foreach($responses as $r) {
+	foreach($responses as $r) {
 
-        $fd = fopen($uri, 'rb', false);
+		$fd = fopen('http://127.0.0.1:12342/', 'rb', false);
 
-        fseek($output, 0, SEEK_SET);
-        var_dump(stream_get_contents($output));
-        fseek($output, 0, SEEK_SET);
-    }
+		fseek($output, 0, SEEK_SET);
+		var_dump(stream_get_contents($output));
+		fseek($output, 0, SEEK_SET);
+	}
 
-    http_server_kill($pid);
+	http_server_kill($pid);
 
 }
 
@@ -43,16 +43,16 @@ do_test();
 ?>
 --EXPECTF--
 -- Test: leave default --
-string(%d) "GET / HTTP/1.1
+string(%d) "GET / HTTP/1.0
 From: teste@teste.pt
-Host: %s:%d
+Host: 127.0.0.1:12342
 Connection: close
 
 "
 -- Test: after ini_set --
-string(%d) "GET / HTTP/1.1
+string(%d) "GET / HTTP/1.0
 From: junk@junk.com
-Host: %s:%d
+Host: 127.0.0.1:12342
 Connection: close
 
 "

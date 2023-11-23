@@ -1,9 +1,9 @@
 --TEST--
-XMLReader: libxml2 XML Reader, read-only element values cannot be modified
+XMLReader: libxml2 XML Reader, read-only element values can not be modified
 --CREDITS--
 Mark Baker mark@lange.demon.co.uk at the PHPNW2017 Conference for PHP Testfest 2017
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 // Set up test data in a new file
@@ -24,24 +24,12 @@ while ($reader->read()) {
         // Find a node to try modifying
         if ($reader->nodeType == XMLREADER::ELEMENT && $reader->name == 'book') {
             // Try to set the value of the element from book1 to movie1
-            try {
-                $reader->value = 'movie1';
-            } catch (Error $exception) {
-                echo $exception->getMessage() . "\n";
-            }
+            $reader->value = 'movie1';
             // Try to set the value of the first "num" attribute from "1" to "num attribute 1"
             $attr = $reader->moveToFirstAttribute();
-            try {
-                $reader->value = 'num attribute 1';
-            } catch (Error $exception) {
-                echo $exception->getMessage() . "\n";
-            }
+            $reader->value = 'num attribute 1';
             // Try to set the name of the first attribute from "num" to "number"
-            try {
-                $reader->name = 'number';
-            } catch (Error $exception) {
-                echo $exception->getMessage() . "\n";
-            }
+            $reader->name = 'number';
         }
     }
 }
@@ -49,11 +37,15 @@ while ($reader->read()) {
 // clean up
 $reader->close();
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__.'/_014.xml');
 ?>
---EXPECT--
-Cannot write to read-only property
-Cannot write to read-only property
-Cannot write to read-only property
+--EXPECTF--
+Warning: main(): Cannot write to read-only property in %s on line %d
+
+Warning: main(): Cannot write to read-only property in %s on line %d
+
+Warning: main(): Cannot write to read-only property in %s on line %d
+===DONE===

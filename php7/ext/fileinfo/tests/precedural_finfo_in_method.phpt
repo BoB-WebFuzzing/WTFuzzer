@@ -1,7 +1,7 @@
 --TEST--
 Using procedural finfo API in a method
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --FILE--
 <?php
 

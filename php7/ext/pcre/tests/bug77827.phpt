@@ -7,6 +7,8 @@ var_dump(
     preg_last_error()
 );
 ?>
+===DONE===
 --EXPECT--
 int(1)
 int(0)
+===DONE===

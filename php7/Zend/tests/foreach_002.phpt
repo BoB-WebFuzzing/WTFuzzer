@@ -8,12 +8,15 @@ zend.enable_gc=1
 error_reporting(E_ALL);
 
 foreach (($a = array('a' => array('a' => &$a))) as $a) {
-    var_dump($a);
+	var_dump($a);
 }
 
 ?>
 --EXPECT--
 array(1) {
   ["a"]=>
-  *RECURSION*
+  &array(1) {
+    ["a"]=>
+    *RECURSION*
+  }
 }

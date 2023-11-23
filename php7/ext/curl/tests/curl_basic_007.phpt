@@ -2,8 +2,8 @@
 Test curl_error() & curl_errno() function without url
 --CREDITS--
 TestFest 2009 - AFUP - Perrick Penet <perrick@noparking.net>
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php if (!extension_loaded("curl")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -20,5 +20,5 @@ curl_close($ch);
 
 ?>
 --EXPECTF--
-string(%d) "No URL set%A"
+string(%d) "No URL set!%w"
 int(3)

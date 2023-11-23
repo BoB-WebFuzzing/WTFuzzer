@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: getting namespaces
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -46,6 +46,8 @@ var_dump($sxe->getNamespaces());
 var_dump($sxe->getDocNamespaces());
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 array(1) {
   ["xhtml"]=>
@@ -87,3 +89,4 @@ array(0) {
 }
 array(0) {
 }
+===DONE===

@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -215,8 +217,9 @@ MYSQLND_METHOD(mysqlnd_res_meta, fetch_field)(MYSQLND_RES_METADATA * const meta)
 		DBG_INF("no more fields");
 		DBG_RETURN(NULL);
 	}
-	DBG_INF_FMT("name=%s",
-		meta->fields[meta->current_field].name? meta->fields[meta->current_field].name:"");
+	DBG_INF_FMT("name=%s max_length=%u",
+		meta->fields[meta->current_field].name? meta->fields[meta->current_field].name:"",
+		meta->fields[meta->current_field].max_length);
 	DBG_RETURN(&meta->fields[meta->current_field++]);
 }
 /* }}} */
@@ -228,8 +231,9 @@ MYSQLND_METHOD(mysqlnd_res_meta, fetch_field_direct)(const MYSQLND_RES_METADATA 
 {
 	DBG_ENTER("mysqlnd_res_meta::fetch_field_direct");
 	DBG_INF_FMT("fieldnr=%u", fieldnr);
-	DBG_INF_FMT("name=%s",
-		meta->fields[meta->current_field].name? meta->fields[meta->current_field].name:"");
+	DBG_INF_FMT("name=%s max_length=%u",
+		meta->fields[meta->current_field].name? meta->fields[meta->current_field].name:"",
+		meta->fields[meta->current_field].max_length);
 	DBG_RETURN(&meta->fields[fieldnr]);
 }
 /* }}} */
@@ -259,7 +263,7 @@ static MYSQLND_FIELD_OFFSET
 MYSQLND_METHOD(mysqlnd_res_meta, field_seek)(MYSQLND_RES_METADATA * const meta, const MYSQLND_FIELD_OFFSET field_offset)
 {
 	MYSQLND_FIELD_OFFSET return_value = 0;
-	DBG_ENTER("mysqlnd_res_meta::field_seek");
+	DBG_ENTER("mysqlnd_res_meta::fetch_fields");
 	return_value = meta->current_field;
 	meta->current_field = field_offset;
 	DBG_RETURN(return_value);
@@ -287,24 +291,27 @@ mysqlnd_result_meta_init(MYSQLND_RES *result, unsigned int field_count)
 	MYSQLND_RES_METADATA *ret;
 	DBG_ENTER("mysqlnd_result_meta_init");
 
-	ret = result->memory_pool->get_chunk(result->memory_pool, alloc_size);
-	memset(ret, 0, alloc_size);
-	ret->m = & mysqlnd_mysqlnd_res_meta_methods;
+	do {
+		ret = result->memory_pool->get_chunk(result->memory_pool, alloc_size);
+		memset(ret, 0, alloc_size);
+		ret->m = & mysqlnd_mysqlnd_res_meta_methods;
 
-	ret->field_count = field_count;
-	/* +1 is to have empty marker at the end */
-	alloc_size = (field_count + 1) * sizeof(MYSQLND_FIELD);
-	ret->fields = result->memory_pool->get_chunk(result->memory_pool, alloc_size);
-	memset(ret->fields, 0, alloc_size);
-	DBG_INF_FMT("meta=%p", ret);
-	DBG_RETURN(ret);
+		ret->field_count = field_count;
+		/* +1 is to have empty marker at the end */
+		alloc_size = (field_count + 1) * sizeof(MYSQLND_FIELD);
+		ret->fields = result->memory_pool->get_chunk(result->memory_pool, alloc_size);
+		memset(ret->fields, 0, alloc_size);
+		DBG_INF_FMT("meta=%p", ret);
+		DBG_RETURN(ret);
+	} while (0);
+	DBG_RETURN(NULL);
 }
 /* }}} */
 
 
 /* {{{ mysqlnd_res_meta_get_methods */
 PHPAPI struct st_mysqlnd_res_meta_methods *
-mysqlnd_result_metadata_get_methods(void)
+mysqlnd_result_metadata_get_methods()
 {
 	return &mysqlnd_mysqlnd_res_meta_methods;
 }

@@ -6,15 +6,15 @@ Covariant return-by-ref constraints
 class A implements ArrayAccess {
     public $foo = array();
 
-    public function &offsetGet($n): mixed {
+    public function &offsetGet($n) {
         return $this->foo[$n];
     }
 
-    public function offsetSet($n, $v): void {
+    public function offsetSet($n, $v) {
     }
-    public function offsetUnset($n): void {
+    public function offsetUnset($n) {
     }
-    public function offsetExists($n): bool {
+    public function offsetExists($n) {
     }
 }
 
@@ -25,6 +25,7 @@ $a['foo']['bar'] = 2;
 var_dump($a);
 
 ?>
+==DONE==
 --EXPECT--
 object(A)#1 (1) {
   ["foo"]=>
@@ -36,3 +37,4 @@ object(A)#1 (1) {
     }
   }
 }
+==DONE==

@@ -11,7 +11,6 @@ print_r($reflObj->getProperties(ReflectionProperty::IS_PUBLIC));
 $x = (object)array("a", "oo" => "b");
 $reflObj = new ReflectionObject($x);
 print_r($reflObj->getProperties(ReflectionProperty::IS_PUBLIC));
-?>
 --EXPECT--
 Array
 (

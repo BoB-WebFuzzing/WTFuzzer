@@ -2,8 +2,8 @@
 XMLReader: libxml2 XML Reader, Move cursor to a named attribute within a namespace
 --CREDITS--
 Mark Baker mark@lange.demon.co.uk at the PHPNW2017 Conference for PHP Testfest 2017
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 // Set up test data in a new file
@@ -52,6 +52,7 @@ while ($reader->read()) {
 // clean up
 $reader->close();
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__.'/015.xml');
@@ -62,3 +63,4 @@ ns2:idx: 2
 ns2:isbn: 4
 Attribute does not exist
 ns2:isbn: 4
+===DONE===

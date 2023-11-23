@@ -1,20 +1,18 @@
 --TEST--
 Bug #68089 (NULL byte injection - cURL lib)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+include 'skipif.inc';
+
+?>
 --FILE--
 <?php
 $url = "file:///etc/passwd\0http://google.com";
 $ch = curl_init();
-
-try {
-    curl_setopt($ch, CURLOPT_URL, $url);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
+var_dump(curl_setopt($ch, CURLOPT_URL, $url));
 ?>
 Done
---EXPECT--
-curl_setopt(): cURL option must not contain any null bytes
+--EXPECTF--
+Warning: curl_setopt(): Curl option contains invalid characters (\0) in %s%ebug68089.php on line 4
+bool(false)
 Done

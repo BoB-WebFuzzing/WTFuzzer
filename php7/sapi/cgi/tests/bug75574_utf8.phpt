@@ -13,7 +13,7 @@ include "skipif.inc";
 
 include "include.inc";
 
-$php = escapeshellarg(get_cgi_path());
+$php = get_cgi_path();
 reset_env_vars();
 
 $fn = __DIR__ . DIRECTORY_SEPARATOR . md5(uniqid());
@@ -24,6 +24,8 @@ echo shell_exec("$php -n -f $fn");
 unlink($fn);
 
 ?>
+===DONE===
 --EXPECT--
 bool(true)
 string(3) "啊"
+===DONE===

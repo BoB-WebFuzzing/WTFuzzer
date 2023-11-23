@@ -4,35 +4,35 @@ ZE2 ArrayAccess and [] assignment
 <?php
 
 class OverloadedArray implements ArrayAccess {
-    public $realArray;
+	public $realArray;
 
-    function __construct() {
-        $this->realArray = array();
-    }
+	function __construct() {
+		$this->realArray = array();
+	}
 
-    function offsetExists($index): bool {
-        return array_key_exists($this->realArray, $index);
-    }
+	function offsetExists($index) {
+		return array_key_exists($this->realArray, $index);
+	}
 
-    function offsetGet($index): mixed {
-        return $this->realArray[$index];
-    }
+	function offsetGet($index) {
+		return $this->realArray[$index];
+	}
 
-    function offsetSet($index, $value): void {
-        if (is_null($index)) {
-            $this->realArray[] = $value;
-        } else {
-            $this->realArray[$index] = $value;
-        }
-    }
+	function offsetSet($index, $value) {
+		if (is_null($index)) {
+			$this->realArray[] = $value;
+		} else {
+			$this->realArray[$index] = $value;
+		}
+	}
 
-    function offsetUnset($index): void {
-        unset($this->realArray[$index]);
-    }
+	function offsetUnset($index) {
+		unset($this->realArray[$index]);
+	}
 
-    function dump() {
-        var_dump($this->realArray);
-    }
+	function dump() {
+		var_dump($this->realArray);
+	}
 }
 
 $a = new OverloadedArray;
@@ -42,6 +42,7 @@ $a[2] = 3;
 $a[] = 4;
 $a->dump();
 ?>
+===DONE===
 --EXPECT--
 array(4) {
   [0]=>
@@ -53,3 +54,4 @@ array(4) {
   [3]=>
   int(4)
 }
+===DONE===

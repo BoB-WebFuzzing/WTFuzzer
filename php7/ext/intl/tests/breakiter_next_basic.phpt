@@ -1,7 +1,9 @@
 --TEST--
 IntlBreakIterator::next(): basic test
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -17,6 +19,7 @@ var_dump($bi->next(-1));
 var_dump($bi->next(0));
 var_dump($bi->next(NULL));
 ?>
+==DONE==
 --EXPECT--
 int(0)
 int(3)
@@ -24,3 +27,4 @@ int(7)
 int(4)
 int(4)
 int(7)
+==DONE==

@@ -1,12 +1,9 @@
 --TEST--
 oci_lob_seek()/rewind()/append()
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -29,8 +26,10 @@ oci_execute($statement, OCI_DEFAULT);
 var_dump($blob);
 
 var_dump(oci_lob_write($blob, "test"));
+var_dump(oci_lob_rewind());
 var_dump(oci_lob_rewind($blob));
 var_dump(oci_lob_write($blob, "str"));
+var_dump(oci_lob_seek(10, OCI_SEEK_SET));
 var_dump(oci_lob_seek($blob, 10, OCI_SEEK_SET));
 
 oci_commit($c);
@@ -40,7 +39,11 @@ $s = oci_parse($c, $select_sql);
 oci_execute($s, OCI_DEFAULT);
 
 var_dump($row = oci_fetch_array($s));
+
+var_dump(oci_lob_append());
+var_dump(oci_lob_append($blob));
 var_dump(oci_lob_append($row[0], $blob));
+var_dump(oci_lob_read(10000));
 var_dump(oci_lob_read($row[0], 10000));
 
 oci_commit($c);
@@ -59,27 +62,42 @@ echo "Done\n";
 
 ?>
 --EXPECTF--
-object(OCILob)#%d (1) {
+object(OCI-Lob)#%d (1) {
   ["descriptor"]=>
   resource(%d) of type (oci8 descriptor)
 }
 int(4)
+
+Warning: oci_lob_rewind() expects exactly 1 parameter, 0 given in %s on line %d
+NULL
 bool(true)
 int(3)
+
+Warning: oci_lob_seek() expects parameter 1 to be OCI-Lob, int%sgiven in %s on line %d
+NULL
 bool(true)
 array(2) {
   [0]=>
-  object(OCILob)#%d (1) {
+  object(OCI-Lob)#%d (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
   ["BLOB"]=>
-  object(OCILob)#%d (1) {
+  object(OCI-Lob)#%d (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
 }
+
+Warning: oci_lob_append() expects exactly 2 parameters, 0 given in %s on line %d
+NULL
+
+Warning: oci_lob_append() expects exactly 2 parameters, 1 given in %s on line %d
+NULL
 bool(true)
+
+Warning: oci_lob_read() expects exactly 2 parameters, 1 given in %s on line %d
+NULL
 string(4) "strt"
 string(8) "strtstrt"
 Done

@@ -1,7 +1,7 @@
 --TEST--
 Test: Canonicalization - C14N()
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $xml = <<<EOXML

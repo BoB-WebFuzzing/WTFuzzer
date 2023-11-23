@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -21,16 +23,17 @@
 #include "sha1.h"
 #include "md5.h"
 
-PHPAPI void make_sha1_digest(char *sha1str, const unsigned char *digest)
+PHPAPI void make_sha1_digest(char *sha1str, unsigned char *digest)
 {
 	make_digest_ex(sha1str, digest, 20);
 }
 
-/* {{{ Calculate the sha1 hash of a string */
+/* {{{ proto string sha1(string str [, bool raw_output])
+   Calculate the sha1 hash of a string */
 PHP_FUNCTION(sha1)
 {
 	zend_string *arg;
-	bool raw_output = 0;
+	zend_bool raw_output = 0;
 	PHP_SHA1_CTX context;
 	unsigned char digest[20];
 
@@ -55,12 +58,13 @@ PHP_FUNCTION(sha1)
 /* }}} */
 
 
-/* {{{ Calculate the sha1 hash of given filename */
+/* {{{ proto string sha1_file(string filename [, bool raw_output])
+   Calculate the sha1 hash of given filename */
 PHP_FUNCTION(sha1_file)
 {
 	char          *arg;
 	size_t           arg_len;
-	bool raw_output = 0;
+	zend_bool raw_output = 0;
 	unsigned char buf[1024];
 	unsigned char digest[20];
 	PHP_SHA1_CTX   context;
@@ -152,7 +156,7 @@ static const unsigned char PADDING[64] =
 /* {{{ PHP_SHA1Init
  * SHA1 initialization. Begins an SHA1 operation, writing a new context.
  */
-PHPAPI void PHP_SHA1InitArgs(PHP_SHA1_CTX * context, ZEND_ATTRIBUTE_UNUSED HashTable *args)
+PHPAPI void PHP_SHA1Init(PHP_SHA1_CTX * context)
 {
 	context->count[0] = context->count[1] = 0;
 	/* Load magic initialization constants.
@@ -247,7 +251,9 @@ PHPAPI void PHP_SHA1Final(unsigned char digest[20], PHP_SHA1_CTX * context)
 /* {{{ SHA1Transform
  * SHA1 basic transformation. Transforms state based on block.
  */
-static void SHA1Transform(uint32_t state[5], const unsigned char block[64])
+static void SHA1Transform(state, block)
+uint32_t state[5];
+const unsigned char block[64];
 {
 	uint32_t a = state[0], b = state[1], c = state[2];
 	uint32_t d = state[3], e = state[4], x[16], tmp;
@@ -357,7 +363,10 @@ static void SHA1Transform(uint32_t state[5], const unsigned char block[64])
    Encodes input (uint32_t) into output (unsigned char). Assumes len is
    a multiple of 4.
  */
-static void SHA1Encode(unsigned char *output, uint32_t *input, unsigned int len)
+static void SHA1Encode(output, input, len)
+unsigned char *output;
+uint32_t *input;
+unsigned int len;
 {
 	unsigned int i, j;
 
@@ -374,7 +383,10 @@ static void SHA1Encode(unsigned char *output, uint32_t *input, unsigned int len)
    Decodes input (unsigned char) into output (uint32_t). Assumes len is
    a multiple of 4.
  */
-static void SHA1Decode(uint32_t *output, const unsigned char *input, unsigned int len)
+static void SHA1Decode(output, input, len)
+uint32_t *output;
+const unsigned char *input;
+unsigned int len;
 {
 	unsigned int i, j;
 

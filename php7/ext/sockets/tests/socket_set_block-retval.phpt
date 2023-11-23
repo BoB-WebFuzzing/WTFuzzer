@@ -1,7 +1,11 @@
 --TEST--
 Test socket_set_block return values
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+if (!extension_loaded('sockets')) {
+    die('SKIP The sockets extension is not loaded.');
+}
+?>
 --FILE--
 <?php
 
@@ -11,13 +15,14 @@ socket_close($socket);
 
 $socket2 = socket_create_listen(0);
 socket_close($socket2);
-try {
-    var_dump(socket_set_block($socket2));
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(socket_set_block($socket2));
 
 ?>
---EXPECT--
+--EXPECTF--
 bool(true)
-socket_set_block(): Argument #1 ($socket) has already been closed
+
+Warning: socket_set_block(): supplied resource is not a valid Socket resource in %s on line %d
+bool(false)
+--CREDITS--
+Robin Mehner, robin@coding-robin.de
+PHP Testfest Berlin 2009-05-09

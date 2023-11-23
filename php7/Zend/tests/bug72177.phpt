@@ -21,6 +21,7 @@ class Parnt
         $this->child = new Child();
 
         $prop = new \ReflectionProperty($this, 'child');
+        $prop->setAccessible(true);
         $prop->setValue($this, null);
     }
 }

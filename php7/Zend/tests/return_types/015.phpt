@@ -17,7 +17,6 @@ class Vector implements Collection {
 
 $v = new Vector;
 var_dump($v->values());
-?>
 --EXPECTF--
 object(Collections\Vector)#%d (%d) {
 }

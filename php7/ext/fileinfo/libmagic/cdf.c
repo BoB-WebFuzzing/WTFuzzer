@@ -35,7 +35,7 @@
 #include "file.h"
 
 #ifndef lint
-FILE_RCSID("@(#)$File: cdf.c,v 1.121 2021/10/20 13:56:15 christos Exp $")
+FILE_RCSID("@(#)$File: cdf.c,v 1.114 2019/02/20 02:35:27 christos Exp $")
 #endif
 
 #include <assert.h>
@@ -43,26 +43,24 @@ FILE_RCSID("@(#)$File: cdf.c,v 1.121 2021/10/20 13:56:15 christos Exp $")
 #include <err.h>
 #endif
 #include <stdlib.h>
-#ifdef HAVE_UNISTD_H
+
+#ifdef PHP_WIN32
+#include "win32/unistd.h"
+#else
 #include <unistd.h>
 #endif
+
+#ifndef UINT32_MAX
+# define UINT32_MAX (0xffffffff)
+#endif
+
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
-#ifdef HAVE_BYTESWAP_H
-#include <byteswap.h>
-#endif
-#ifdef HAVE_SYS_BSWAP_H
-#include <sys/bswap.h>
-#endif
 
 #ifndef EFTYPE
 #define EFTYPE EINVAL
-#endif
-
-#ifndef SIZE_T_MAX
-#define SIZE_T_MAX CAST(size_t, ~0ULL)
 #endif
 
 #include "cdf.h"
@@ -97,15 +95,6 @@ static union {
 #define CDF_REALLOC(p, n) erealloc(p, n)
 #define CDF_CALLOC(n, u) ecalloc(n, u)
 
-#if defined(HAVE_BYTESWAP_H)
-# define _cdf_tole2(x)	bswap_16(x)
-# define _cdf_tole4(x)	bswap_32(x)
-# define _cdf_tole8(x)	bswap_64(x)
-#elif defined(HAVE_SYS_BSWAP_H)
-# define _cdf_tole2(x)	bswap16(x)
-# define _cdf_tole4(x)	bswap32(x)
-# define _cdf_tole8(x)	bswap64(x)
-#else
 /*
  * swap a short
  */
@@ -155,7 +144,6 @@ _cdf_tole8(uint64_t sv)
 	d[7] = s[0];
 	return rv;
 }
-#endif
 
 /*
  * grab a uint32_t from a possibly unaligned address, and return it in
@@ -400,29 +388,17 @@ ssize_t
 cdf_read_sector(const cdf_info_t *info, void *buf, size_t offs, size_t len,
     const cdf_header_t *h, cdf_secid_t id)
 {
-	size_t ss = CDF_SEC_SIZE(h);
-	size_t pos;
-
-	if (SIZE_T_MAX / ss < CAST(size_t, id))
-		return -1;
-
-	pos = CDF_SEC_POS(h, id);
-	assert(ss == len);
-	return cdf_read(info, CAST(off_t, pos), RCAST(char *, buf) + offs, len);
+	size_t pos = CDF_SEC_POS(h, id);
+	assert(CDF_SEC_SIZE(h) == len);
+	return cdf_read(info, CAST(zend_off_t, pos), RCAST(char *, buf) + offs, len);
 }
 
 ssize_t
 cdf_read_short_sector(const cdf_stream_t *sst, void *buf, size_t offs,
     size_t len, const cdf_header_t *h, cdf_secid_t id)
 {
-	size_t ss = CDF_SHORT_SEC_SIZE(h);
-	size_t pos;
-
-	if (SIZE_T_MAX / ss < CAST(size_t, id))
-		return -1;
-
-	pos = CDF_SHORT_SEC_POS(h, id);
-	assert(ss == len);
+	size_t pos = CDF_SHORT_SEC_POS(h, id);
+	assert(CDF_SHORT_SEC_SIZE(h) == len);
 	if (pos + len > CDF_SEC_SIZE(h) * sst->sst_len) {
 		DPRINTF(("Out of bounds read %" SIZE_T_FORMAT "u > %"
 		    SIZE_T_FORMAT "u\n",
@@ -880,29 +856,29 @@ cdf_get_property_info_pos(const cdf_stream_t *sst, const cdf_header_t *h,
 {
 	size_t tail = (i << 1) + 1;
 	size_t ofs;
+	const uint8_t *q;
 
 	if (p >= e) {
 		DPRINTF(("Past end %p < %p\n", e, p));
 		return NULL;
 	}
-
 	if (cdf_check_stream_offset(sst, h, p, (tail + 1) * sizeof(uint32_t),
 	    __LINE__) == -1)
 		return NULL;
-
 	ofs = CDF_GETUINT32(p, tail);
-	if (ofs < 2 * sizeof(uint32_t)) {
-		DPRINTF(("Offset too small %zu\n", ofs));
+	q = CAST(const uint8_t *, cdf_offset(CAST(const void *, p),
+	    ofs - 2 * sizeof(uint32_t)));
+
+	if (q < p) {
+		DPRINTF(("Wrapped around %p < %p\n", q, p));
 		return NULL;
 	}
 
-	ofs -= 2 * sizeof(uint32_t);
-	if (ofs > CAST(size_t, e - p)) {
-		DPRINTF(("Offset too big %zu %td\n", ofs, e - p));
+	if (q >= e) {
+		DPRINTF(("Ran off the end %p >= %p\n", q, e));
 		return NULL;
 	}
-
-	return CAST(const uint8_t *, cdf_offset(CAST(const void *, p), ofs));
+	return q;
 }
 
 static cdf_property_info_t *
@@ -1082,9 +1058,8 @@ cdf_read_property_info(const cdf_stream_t *sst, const cdf_header_t *h,
 
 				DPRINTF(("o=%" SIZE_T_FORMAT "u l=%d(%"
 				    SIZE_T_FORMAT "u), t=%" SIZE_T_FORMAT
-				    "u s=%.*s\n", o4, l,
-				    CDF_ROUND(l, sizeof(l)),
-				    left, (int)l, inp[i].pi_str.s_buf));
+				    "u s=%s\n", o4, l, CDF_ROUND(l, sizeof(l)),
+				    left, inp[i].pi_str.s_buf));
 
 				if (l & 1)
 					l++;

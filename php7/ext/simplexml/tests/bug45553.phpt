@@ -1,7 +1,7 @@
 --TEST--
 Bug #45553 (Using XPath to return values for attributes with a namespace does not work)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $xml =<<<XML
@@ -25,10 +25,12 @@ echo $atts[0] . "\n";
 $atts = $x->xpath("/xml/data/@label");
 echo $atts[0] . "\n";
 ?>
+===DONE===
 --EXPECT--
 I am A
 I am a:Nothing
 I am a:A
 I am a:Nothing
 I am Nothing
+===DONE===
 	

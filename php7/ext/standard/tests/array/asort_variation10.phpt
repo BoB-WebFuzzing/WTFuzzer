@@ -2,9 +2,15 @@
 Test asort() function : usage variations - sort octal values
 --FILE--
 <?php
+/* Prototype  : bool asort ( array &$array [, int $sort_flags] )
+ * Description: Sort an array and maintain index association.
+                Elements will be arranged from lowest to highest when this function has completed.
+ * Source code: ext/standard/array.c
+*/
+
 /*
  * testing asort() by providing different octal array for $array argument with following flag values
- * 1.flag value as default
+ * 1.flag value as defualt
  * 2.SORT_REGULAR - compare items normally
  * 3.SORT_NUMERIC - compare items numerically
 */
@@ -17,7 +23,7 @@ $unsorted_oct_array = array (
    077 => 077, -066 => -066, -0345 => -0345, 0 => 0
 );
 
-echo "\n-- Testing asort() by supplying octal value array, 'flag' value is default  --\n";
+echo "\n-- Testing asort() by supplying octal value array, 'flag' value is defualt  --\n";
 $temp_array = $unsorted_oct_array;
 var_dump( asort($temp_array) ); // expecting : bool(true)
 var_dump($temp_array);
@@ -37,7 +43,7 @@ echo "Done\n";
 --EXPECT--
 *** Testing asort() : usage variations ***
 
--- Testing asort() by supplying octal value array, 'flag' value is default  --
+-- Testing asort() by supplying octal value array, 'flag' value is defualt  --
 bool(true)
 array(9) {
   [-229]=>

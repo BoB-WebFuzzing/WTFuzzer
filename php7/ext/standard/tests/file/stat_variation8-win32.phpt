@@ -9,6 +9,11 @@ if (substr(PHP_OS, 0, 3) != 'WIN') {
 --FILE--
 <?php
 
+/*
+ *  Prototype: array stat ( string $filename );
+ *  Description: Gives information about a file
+ */
+
 /* test the effects of truncate() on stats of file */
 
 
@@ -32,7 +37,7 @@ fclose($file_handle);
 clearstatcache(true, $filename);
 $old_stat = stat($filename);
 // clear the cache
-sleep(1);
+sleep(2);
 
 // opening file in r/w mode
 $file_handle = fopen($filename, "r+");

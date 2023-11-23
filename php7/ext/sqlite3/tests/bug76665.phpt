@@ -1,7 +1,9 @@
 --TEST--
 Bug #76665 (SQLite3Stmt::bindValue() with SQLITE3_FLOAT doesn't juggle)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded('sqlite3')) die('skip sqlite3 extension not available');
+?>
 --FILE--
 <?php
 $db = new SQLite3(':memory:');
@@ -11,5 +13,7 @@ $stmt->bindValue(':bar', 17, SQLITE3_FLOAT);
 $stmt->execute();
 var_dump($db->querySingle("SELECT bar FROM foo LIMIT 1"));
 ?>
+===DONE===
 --EXPECT--
 float(17)
+===DONE===

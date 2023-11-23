@@ -1,24 +1,32 @@
 --TEST--
 mysqli_stmt_close()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_stmt_close()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_stmt_close($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
 
     if (!$stmt = mysqli_stmt_init($link))
         printf("[003] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 
-    // Yes, amazing, eh? AFAIK a workaround of a constructor bug...
-    try {
-        mysqli_stmt_close($stmt);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    // Yes, amazing, eh? AFAIK a work around of a constructor bug...
+    if (false !== ($tmp = mysqli_stmt_close($stmt)))
+        printf("[004] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!mysqli_stmt_prepare($stmt, "SELECT id, label FROM test"))
         printf("[005] [%d] %s\n", mysqli_stmt_errno($stmt), mysqli_stmt_error($stmt));
@@ -26,11 +34,8 @@ require_once 'skipifconnectfailure.inc';
     if (true !== ($tmp = mysqli_stmt_close($stmt)))
         printf("[006] Expecting boolean/true, got %s/%s\n", gettype($tmp), $tmp);
 
-    try {
-        mysqli_stmt_close($stmt);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_stmt_close($stmt)))
+        printf("[007] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!$stmt = mysqli_stmt_init($link))
         printf("[008] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -53,7 +58,7 @@ require_once 'skipifconnectfailure.inc';
 
     mysqli_close($link);
 
-    require 'table.inc';
+    require('table.inc');
     if (!$stmt = mysqli_stmt_init($link))
         printf("[013] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
 
@@ -76,9 +81,11 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
-mysqli_stmt object is not fully initialized
-mysqli_stmt object is already closed
+--EXPECTF--
+Warning: mysqli_stmt_close(): invalid object or resource mysqli_stmt
+ in %s on line %d
+
+Warning: mysqli_stmt_close(): Couldn't fetch mysqli_stmt in %s on line %d
 done!

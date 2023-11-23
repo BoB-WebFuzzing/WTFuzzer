@@ -1,8 +1,8 @@
 --TEST--
 Phar: tar-based phar, make new gzipped tar
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php if (!extension_loaded('phar')) die('skip'); ?>
+<?php if (!extension_loaded("zlib")) die("skip zlib not available"); ?>
 --INI--
 phar.readonly=0
 --FILE--
@@ -25,6 +25,7 @@ var_dump($phar2->isFileFormat(Phar::TAR));
 var_dump($phar2->isCompressed() == Phar::GZ);
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 @unlink(__DIR__ . '/tar_makegz.phar.gz');
@@ -36,3 +37,4 @@ var_dump($phar2->isCompressed() == Phar::GZ);
 bool(true)
 bool(true)
 bool(true)
+===DONE===

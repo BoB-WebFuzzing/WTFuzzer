@@ -159,7 +159,6 @@ echo Obj::__DIR__, PHP_EOL;
 echo Obj::__NAMESPACE__, PHP_EOL;
 
 echo "\nDone\n";
-?>
 --EXPECT--
 empty
 callable

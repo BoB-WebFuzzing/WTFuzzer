@@ -1,13 +1,15 @@
 --TEST--
 ZipArchive Bug #76524 (memory leak with ZipArchive::OVERWRITE flag and empty archive)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 
 $i = 0;
 do {
-    $filename = __DIR__ . "/nonexistent" . ($i++) . ".zip";
+	$filename = __DIR__ . "/nonexistent" . ($i++) . ".zip";
 } while (file_exists($filename));
 
 $zip = new ZipArchive();

@@ -1,7 +1,9 @@
 --TEST--
 openssl key from zval leaks
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php
+if (!extension_loaded("openssl")) die("skip");
+?>
 --FILE--
 <?php
 $cert = false;
@@ -13,31 +15,23 @@ class test {
 $t = new test;
 
 var_dump(openssl_x509_parse("foo"));
-
-try {
-    var_dump(openssl_x509_parse($t));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-
-try {
-    openssl_x509_parse([]);
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-
+var_dump(openssl_x509_parse($t));
+var_dump(openssl_x509_parse(array()));
+var_dump(openssl_x509_parse());
 var_dump(openssl_x509_parse($cert));
-
 try {
-    openssl_x509_parse(new stdClass);
-} catch (TypeError $e) {
+    var_dump(openssl_x509_parse(new stdClass));
+} catch (Error $e) {
     echo $e->getMessage(), "\n";
 }
 
 ?>
---EXPECT--
+--EXPECTF--
 bool(false)
 bool(false)
-openssl_x509_parse(): Argument #1 ($certificate) must be of type OpenSSLCertificate|string, array given
 bool(false)
-openssl_x509_parse(): Argument #1 ($certificate) must be of type OpenSSLCertificate|string, stdClass given
+
+Warning: openssl_x509_parse() expects at least 1 parameter, 0 given in %sbug38261.php on line %d
+NULL
+bool(false)
+Object of class stdClass could not be converted to string

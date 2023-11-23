@@ -1,9 +1,8 @@
 --TEST--
 PDOStatement::fetchColumn() invalid column index
---EXTENSIONS--
-pdo
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo')) die('skip');
 $dir = getenv('REDIR_TEST_DIR');
 if (false == $dir) die('skip no driver');
 require_once $dir . 'pdo_test.inc';
@@ -33,19 +32,14 @@ switch ($conn->getAttribute(PDO::ATTR_DRIVER_NAME)) {
 
 $stmt = $conn->prepare($query);
 
-try {
-    var_dump(fetchColumn($stmt, -1));
-} catch (\ValueError $e) {
-    echo $e->getMessage(), \PHP_EOL;
-}
+var_dump(fetchColumn($stmt, -1));
 var_dump(fetchColumn($stmt, 0));
-try {
-    var_dump(fetchColumn($stmt, 1));
-} catch (\ValueError $e) {
-    echo $e->getMessage(), \PHP_EOL;
-}
+var_dump(fetchColumn($stmt, 1));
 ?>
---EXPECT--
-Column index must be greater than or equal to 0
+--EXPECTF--
+Warning: PDOStatement::fetchColumn(): SQLSTATE[HY000]: General error: Invalid column index in %s
+bool(false)
 string(1) "1"
-Invalid column index
+
+Warning: PDOStatement::fetchColumn(): SQLSTATE[HY000]: General error: Invalid column index in %s
+bool(false)

@@ -4,20 +4,20 @@ execute a file with -f
 <?php
 include "skipif.inc";
 if (substr(PHP_OS, 0, 3) == 'WIN') {
-    die ("skip not for Windows");
+	die ("skip not for Windows");
 }
 ?>
 --FILE--
 <?php
 
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = getenv('TEST_PHP_EXECUTABLE');
 
 $filename = __DIR__.'/008.test.php';
 $code ='
 <?php
 
 class test {
-    private $pri;
+	private $pri;
 }
 
 var_dump(test::$pri);
@@ -41,6 +41,6 @@ Stack trace:
 #0 {main}
   thrown in %s on line %d
 "
-Could not open input file: wrong
-NULL
+string(33) "Could not open input file: wrong
+"
 Done

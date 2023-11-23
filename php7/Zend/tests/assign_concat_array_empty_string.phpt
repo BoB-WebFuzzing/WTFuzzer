@@ -9,5 +9,5 @@ var_dump($a);
 
 ?>
 --EXPECTF--
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %s on line %d
 string(5) "Array"

@@ -1,7 +1,7 @@
 --TEST--
 PDO_sqlite: Testing PDOStatement::getAttribute()
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php if (!extension_loaded('pdo_sqlite')) print 'skip not loaded'; ?>
 --FILE--
 <?php
 
@@ -11,7 +11,7 @@ $st = $db->prepare('SELECT 1;');
 
 var_dump($st->getAttribute(PDO::SQLITE_ATTR_READONLY_STATEMENT));
 
-$st = $db->prepare('CREATE TABLE test_sqlite_stmt_getattribute (a TEXT);');
+$st = $db->prepare('CREATE TABLE test (a TEXT);');
 
 var_dump($st->getAttribute(PDO::SQLITE_ATTR_READONLY_STATEMENT));
 ?>

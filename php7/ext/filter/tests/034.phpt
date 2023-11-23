@@ -1,7 +1,7 @@
 --TEST--
 Logical filter: boolean
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 $booleans = array(
@@ -23,7 +23,7 @@ $booleans = array(
 
 foreach($booleans as $val=>$exp) {
     $res =filter_var($val, FILTER_VALIDATE_BOOLEAN);
-        if ($res !== $exp) {
+	    if ($res !== $exp) {
         echo "$val failed,'$exp' expect, '$res' received.\n";
     }
 }

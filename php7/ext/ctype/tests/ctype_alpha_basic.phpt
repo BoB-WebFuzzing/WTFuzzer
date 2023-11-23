@@ -1,9 +1,14 @@
 --TEST--
 Test ctype_alpha() function : basic functionality
---EXTENSIONS--
-ctype
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
+/* Prototype  : bool ctype_alpha(mixed $c)
+ * Description: Checks for alphabetic character(s)
+ * Source code: ext/ctype/ctype.c
+ */
+
 echo "*** Testing ctype_alpha() : basic functionality ***\n";
 
 $orig = setlocale(LC_CTYPE, "C");
@@ -16,7 +21,9 @@ var_dump(ctype_alpha($c2));
 
 setlocale(LC_CTYPE, $orig);
 ?>
+===DONE===
 --EXPECT--
 *** Testing ctype_alpha() : basic functionality ***
 bool(true)
 bool(false)
+===DONE===

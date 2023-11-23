@@ -1,7 +1,13 @@
 --TEST--
-Test array_chunk() function : basic functionality - default 'preserve_keys'
+Test array_chunk() function : basic functionality - defualt 'preserve_keys'
 --FILE--
 <?php
+/* Prototype  : array array_chunk(array $array, int $size [, bool $preserve_keys])
+ * Description: Split array into chunks
+ *              Chunks an array into size  large chunks.
+ * Source code: ext/standard/array.c
+*/
+
 echo "*** Testing array_chunk() : basic functionality ***\n";
 $size = 2;
 
@@ -18,7 +24,7 @@ $input_arrays = array (
   // associative arrays - key as numeric
   array(1 => 'one', 2 => "two", 3 => "three"),
 
-  // array containing elements with/without keys
+  // array containing elements with/witout keys
   array(1 => 'one','two', 3 => 'three', 4, "five" => 5)
 
 );

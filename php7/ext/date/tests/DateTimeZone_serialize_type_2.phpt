@@ -16,6 +16,7 @@ var_dump($tz2);
 var_dump( $tz2->getName() );
 
 ?>
+===DONE===
 --EXPECTF--
 object(DateTimeZone)#%d (2) {
   ["timezone_type"]=>
@@ -31,3 +32,4 @@ object(DateTimeZone)#%d (2) {
   string(3) "EST"
 }
 string(3) "EST"
+===DONE===

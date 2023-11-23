@@ -2,13 +2,9 @@
 Function snmp_getvalue
 --CREDITS--
 Boris Lytochkin
---EXTENSIONS--
-snmp
 --SKIPIF--
 <?php
 require_once(__DIR__.'/skipif.inc');
-if (PHP_OS_FAMILY === "Windows") die("xfail fails on Windows for unknown reasons");
-if (getenv('SKIP_ASAN')) die('skip Timeouts under ASAN');
 ?>
 --FILE--
 <?php
@@ -76,7 +72,7 @@ string(%d) "%s"
 Get with SNMP_VALUE_OBJECT for BITS OID
 object
 int(4)
-string(%d) "%s: %d %S"
+string(25) "BITS: %d %s"
 Get with SNMP_VALUE_OBJECT | SNMP_VALUE_PLAIN for BITS OID
 object
 int(4)

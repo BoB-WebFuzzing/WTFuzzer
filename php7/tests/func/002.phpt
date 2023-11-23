@@ -15,7 +15,6 @@ blah();
 if (isset($hey) || isset($yo)) {
   echo "Local variables became global :(\n";
 }
-?>
 --EXPECT--
 hey=0, 0
 hey=1, -1

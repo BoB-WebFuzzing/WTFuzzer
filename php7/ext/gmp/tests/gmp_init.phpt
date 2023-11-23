@@ -1,44 +1,49 @@
 --TEST--
 gmp_init() basic tests
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 
 var_dump(gmp_init("98765678"));
 var_dump(gmp_strval(gmp_init("98765678")));
-try {
-    var_dump(gmp_init(1,-1));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-
-try {
-    var_dump(gmp_init("",36));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(gmp_init("foo",3));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(gmp_strval(gmp_init("993247326237679187178",3)));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gmp_strval(gmp_init()));
+var_dump(gmp_init());
+var_dump(gmp_init(1,2,3,4));
+var_dump(gmp_init(1,-1));
+var_dump(gmp_init("",36));
+var_dump(gmp_init("foo",3));
+var_dump(gmp_strval(gmp_init("993247326237679187178",3)));
 
 echo "Done\n";
 ?>
---EXPECT--
-object(GMP)#1 (1) {
+--EXPECTF--
+object(GMP)#%d (1) {
   ["num"]=>
   string(8) "98765678"
 }
 string(8) "98765678"
-gmp_init(): Argument #2 ($base) must be between 2 and 62
-gmp_init(): Argument #1 ($num) is not an integer string
-gmp_init(): Argument #1 ($num) is not an integer string
-gmp_init(): Argument #1 ($num) is not an integer string
+
+Warning: gmp_init() expects at least 1 parameter, 0 given in %s on line %d
+
+Warning: gmp_strval(): Unable to convert variable to GMP - wrong type in %s on line %d
+bool(false)
+
+Warning: gmp_init() expects at least 1 parameter, 0 given in %s on line %d
+NULL
+
+Warning: gmp_init() expects at most 2 parameters, 4 given in %s on line %d
+NULL
+
+Warning: gmp_init(): Bad base for conversion: -1 (should be between 2 and %d) in %s on line %d
+bool(false)
+
+Warning: gmp_init(): Unable to convert variable to GMP - string is not an integer in %s on line %d
+bool(false)
+
+Warning: gmp_init(): Unable to convert variable to GMP - string is not an integer in %s on line %d
+bool(false)
+
+Warning: gmp_init(): Unable to convert variable to GMP - string is not an integer in %s on line %d
+string(1) "0"
 Done

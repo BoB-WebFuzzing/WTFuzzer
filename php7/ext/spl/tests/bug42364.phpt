@@ -20,6 +20,7 @@ if ($count > 0) {
     echo "Found $count entries!\n";
 }
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/bug42364/test');
@@ -27,3 +28,4 @@ rmdir(__DIR__ . '/bug42364');
 ?>
 --EXPECTF--
 Found %i entries!
+===DONE===

@@ -3,10 +3,16 @@ Test curl_opt() function with CURLOPT_RETURNTRANSFER parameter set to 1
 --CREDITS--
 Sebastian Deutsch <sebastian.deutsch@9elements.com>
 TestFest 2009 - AFUP - Jean-Marc Fontaine <jmf@durcommefaire.net>
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
+/* Prototype  : bool curl_setopt(resource ch, int option, mixed value)
+ * Description: Set an option for a cURL transfer
+ * Source code: ext/curl/interface.c
+ * Alias to functions:
+ */
+
   include 'server.inc';
   $host = curl_cli_server_start();
 
@@ -25,7 +31,9 @@ curl
 
   var_dump( $curl_content );
 ?>
+===DONE===
 --EXPECT--
 *** Testing curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); ***
 string(25) "Hello World!
 Hello World!"
+===DONE===

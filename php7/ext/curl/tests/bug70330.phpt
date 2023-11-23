@@ -1,7 +1,7 @@
 --TEST--
 Bug #70330 (Segmentation Fault with multiple "curl_copy_handle")
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 $t2 = curl_init();

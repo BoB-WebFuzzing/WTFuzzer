@@ -1,5 +1,5 @@
 --TEST--
-Bug #61225 (Lexing 0b0*+<NUM> incorrectly)
+Bug #61225 (Lexing 0b0*+<NUM> incorectly)
 --FILE--
 <?php
 echo 0b00+1;

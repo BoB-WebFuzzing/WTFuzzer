@@ -24,7 +24,7 @@ class C extends B {
 (new C)->test();
 
 class D {
-    private function method(&$x) {
+    private final function method(&$x) {
         ++$x;
     }
 }
@@ -43,4 +43,4 @@ class E extends D {
 --EXPECTF--
 int(2)
 
-Warning: Undefined variable $x in %s on line %d
+Notice: Undefined variable: x in %s on line %d

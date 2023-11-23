@@ -6,7 +6,8 @@
         }
     }
 
-    function check_local_infile_allowed_by_server($link) {
+    function check_local_infile_support($link, $engine, $table_name = 'test') {
+
         if (!$res = mysqli_query($link, 'SHOW VARIABLES LIKE "local_infile"'))
             return "Cannot check if Server variable 'local_infile' is set to 'ON'";
 
@@ -14,15 +15,6 @@
         mysqli_free_result($res);
         if ('ON' != $row['Value'])
             return sprintf("Server variable 'local_infile' seems not set to 'ON', found '%s'", $row['Value']);
-
-        return "";
-    }
-
-    function check_local_infile_support($link, $engine, $table_name = 'test') {
-        $res = check_local_infile_allowed_by_server($link);
-        if ($res) {
-            return $res;
-        }
 
         if (!mysqli_query($link, sprintf('DROP TABLE IF EXISTS %s', $table_name))) {
             return "Failed to drop old test table";

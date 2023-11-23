@@ -1,12 +1,9 @@
 --TEST--
 lob buffering - 2
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -51,6 +48,6 @@ bool(true)
 bool(true)
 bool(true)
 
-Warning: OCILob::flush(): Invalid flag value: -1 in %s on line %d
+Warning: OCI-Lob::flush(): Invalid flag value: -1 in %s on line %d
 bool(false)
 Done

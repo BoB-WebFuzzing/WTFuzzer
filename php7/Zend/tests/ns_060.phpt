@@ -16,7 +16,6 @@ $b = new A;
 echo get_class($a)."\n";
 echo get_class($b)."\n";
 class A {}
-?>
 --EXPECT--
 Bar\A
 Foo\A

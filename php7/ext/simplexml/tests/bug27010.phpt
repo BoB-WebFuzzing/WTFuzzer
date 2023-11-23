@@ -1,7 +1,7 @@
 --TEST--
 Bug #27010 (segfault and node text not displayed when returned from children())
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -25,8 +25,10 @@ foreach ($sxe->children('http://www.example.com/hot') as $element_name => $eleme
 }
 
 ?>
+===DONE===
 --EXPECT--
 drink is Cola
 drink is Juice
 drink is Coffee
 drink is Tea
+===DONE===

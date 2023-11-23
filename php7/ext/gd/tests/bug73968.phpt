@@ -1,12 +1,15 @@
 --TEST--
 Bug #73968 (Premature failing of XBM reading)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $im = imagecreatefromxbm(__DIR__ . DIRECTORY_SEPARATOR . 'bug73968.xbm');
 var_dump($im);
 ?>
---EXPECT--
-object(GdImage)#1 (0) {
-}
+===DONE===
+--EXPECTF--
+resource(%d) of type (gd)
+===DONE===

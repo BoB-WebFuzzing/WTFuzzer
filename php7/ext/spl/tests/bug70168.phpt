@@ -13,13 +13,14 @@ for($i = 0; $i < 5; $i++) {
 
 var_dump($data);
 ?>
+===DONE===
 --EXPECTF--
 array(2) {
   [0]=>
   object(SplObjectStorage)#%d (1) {
     ["storage":"SplObjectStorage":private]=>
     array(1) {
-      [0]=>
+      ["%s"]=>
       array(2) {
         ["obj"]=>
         object(stdClass)#2 (0) {
@@ -32,3 +33,4 @@ array(2) {
   [1]=>
   int(1)
 }
+===DONE===

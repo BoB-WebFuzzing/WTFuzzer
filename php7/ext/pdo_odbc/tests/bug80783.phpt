@@ -1,9 +1,8 @@
 --TEST--
 Bug #80783 (PDO ODBC truncates BLOB records at every 256th byte)
---EXTENSIONS--
-pdo_odbc
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo_odbc')) die('skip pdo_odbc extension not available');
 require 'ext/pdo/tests/pdo_test.inc';
 PDOTest::skip();
 ?>
@@ -27,7 +26,7 @@ var_dump($data === bin2hex($string));
 <?php
 require 'ext/pdo/tests/pdo_test.inc';
 $db = PDOTest::test_factory(dirname(__FILE__) . '/common.phpt');
-$db->exec("DROP TABLE IF EXISTS bug80783");
+$db->exec("DROP TABLE bug80783");
 ?>
 --EXPECT--
 bool(true)

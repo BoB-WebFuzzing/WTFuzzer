@@ -1,7 +1,11 @@
 --TEST--
 Test function gzseek() by calling it with SEEK_SET when writing
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+	print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 $f = "gzseek_variation4.gz";
@@ -25,6 +29,7 @@ echo gzread($h, strlen($str2))."\n";
 gzclose($h);
 unlink($f);
 ?>
+===DONE===
 --EXPECT--
 tell=23
 tell=43
@@ -34,3 +39,4 @@ reading the output file
 This is the first line.
 string(40) "0000000000000000000000000000000000000000"
 This is the second line.
+===DONE===

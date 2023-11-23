@@ -2,10 +2,15 @@
 Test krsort() function : usage variations - sort heredoc strings
 --FILE--
 <?php
+/* Prototype  : bool krsort ( array &$array [, int $sort_flags] )
+ * Description: Sort an array by key in reverse order, maintaining key to data correlation
+ * Source code: ext/standard/array.c
+*/
+
 /*
  * testing krsort() by providing array of heredoc strings for $array argument with
  * following flag values:
- *  1.flag value as default
+ *  1.flag value as defualt
  *  2.SORT_REGULAR - compare items normally
  *  3.SORT_STRING  - compare items as strings
 */
@@ -32,7 +37,7 @@ $array = array (
   $multiline_heredoc => "heredoc string\twith!@# and 123\nTest this!!!"
 );
 
-echo "\n-- Testing krsort() by supplying heredoc string array, 'flag' value is default --\n";
+echo "\n-- Testing krsort() by supplying heredoc string array, 'flag' value is defualt --\n";
 $temp_array = $array;
 var_dump(krsort($temp_array) ); // expecting : bool(true)
 var_dump($temp_array);
@@ -52,7 +57,7 @@ echo "Done\n";
 --EXPECT--
 *** Testing krsort() : usage variations ***
 
--- Testing krsort() by supplying heredoc string array, 'flag' value is default --
+-- Testing krsort() by supplying heredoc string array, 'flag' value is defualt --
 bool(true)
 array(3) {
   ["heredoc string	with!@# and 123

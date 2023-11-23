@@ -1,7 +1,9 @@
 --TEST--
 Bug #75111 (Memory disclosure or DoS via crafted .bmp image)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 // craft BMP image
@@ -14,8 +16,10 @@ $str .= hex2bin("01001800000000000000000000000000000000000000000000000000");
 
 var_dump(imagecreatefromstring($str));
 ?>
+===DONE===
 --EXPECTF--
-Warning: imagecreatefromstring(): Passed data is not in "BMP" format in %s on line %d
+Warning: imagecreatefromstring(): Passed data is not in 'BMP' format in %s on line %d
 
 Warning: imagecreatefromstring(): Couldn't create GD Image Stream out of Data in %s on line %d
 bool(false)
+===DONE===

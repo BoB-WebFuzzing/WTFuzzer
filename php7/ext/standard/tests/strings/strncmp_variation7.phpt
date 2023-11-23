@@ -2,6 +2,11 @@
 Test strncmp() function : usage variations - binary safe(null terminated strings)
 --FILE--
 <?php
+/* Prototype  : int strncmp ( string $str1, string $str2, int $len );
+ * Description: Binary safe case-sensitive string comparison of the first n characters
+ * Source code: Zend/zend_builtin_functions.c
+*/
+
 /* Test strncmp() function with binary values passed to 'str1' & 'str2' and with the null terminated strings */
 
 echo "*** Test strncmp() function: Checking with the null terminated strings ***\n";
@@ -15,5 +20,5 @@ echo "*** Done ***\n";
 ?>
 --EXPECT--
 *** Test strncmp() function: Checking with the null terminated strings ***
-int(1)
+int(5)
 *** Done ***

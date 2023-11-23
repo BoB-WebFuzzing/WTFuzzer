@@ -1,13 +1,13 @@
 --TEST--
 Bug #76074 (opcache corrupts variable in for-loop)
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
 function test(int $nr) {
-    for ($i = $nr; $i <= $nr + 1; $i++)
-        var_dump($i);
+	for ($i = $nr; $i <= $nr + 1; $i++)
+		var_dump($i);
 }
 
 test(1);

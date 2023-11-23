@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -25,7 +27,8 @@ struct st_mysqlnd_plugin__plugin_area_getters
 	void ** (*get_connection_data_area)(const MYSQLND_CONN_DATA * conn, const unsigned int plugin_id);
 	void ** (*get_result_area)(const MYSQLND_RES * result, const unsigned int plugin_id);
 	void ** (*get_unbuffered_area)(const MYSQLND_RES_UNBUFFERED * result, const unsigned int plugin_id);
-	void ** (*get_result_buffered_aread)(const MYSQLND_RES_BUFFERED * result, const unsigned int plugin_id);
+	void ** (*get_result_buffered_area)(const MYSQLND_RES_BUFFERED_ZVAL * result, const unsigned int plugin_id);
+	void ** (*get_result_buffered_aread_c)(const MYSQLND_RES_BUFFERED_C * result, const unsigned int plugin_id);
 	void ** (*get_stmt_area)(const MYSQLND_STMT * stmt, const unsigned int plugin_id);
 	void ** (*get_protocol_decoder_area)(const MYSQLND_PROTOCOL_PAYLOAD_DECODER_FACTORY * factory, const unsigned int plugin_id);
 	void ** (*get_pfc_area)(const MYSQLND_PFC * pfc, const unsigned int plugin_id);
@@ -38,7 +41,8 @@ PHPAPI extern struct st_mysqlnd_plugin__plugin_area_getters mysqlnd_plugin_area_
 #define mysqlnd_plugin_get_plugin_connection_data_data(c, p_id)			mysqlnd_plugin_area_getters.get_connection_data_area((c), (p_id))
 #define mysqlnd_plugin_get_plugin_result_data(res, p_id)				mysqlnd_plugin_area_getters.get_result_area((res), (p_id))
 #define mysqlnd_plugin_get_plugin_result_unbuffered_data(res, p_id)		mysqlnd_plugin_area_getters.get_unbuffered_area((res), (p_id))
-#define mysqlnd_plugin_get_plugin_result_buffered_data_c(res, p_id)		mysqlnd_plugin_area_getters.get_result_buffered_aread((res), (p_id))
+#define mysqlnd_plugin_get_plugin_result_buffered_data_zval(res, p_id)	mysqlnd_plugin_area_getters.get_result_buffered_area((res), (p_id))
+#define mysqlnd_plugin_get_plugin_result_buffered_data_c(res, p_id)		mysqlnd_plugin_area_getters.get_result_buffered_aread_c((res), (p_id))
 #define mysqlnd_plugin_get_plugin_stmt_data(stmt, p_id)					mysqlnd_plugin_area_getters.get_stmt_area((stmt), (p_id))
 #define mysqlnd_plugin_get_plugin_protocol_data(proto, p_id)			mysqlnd_plugin_area_getters.get_protocol_decoder_area((proto), (p_id))
 #define mysqlnd_plugin_get_plugin_pfc_data(pfc, p_id)					mysqlnd_plugin_area_getters.get_pfc_area((pfc), (p_id))
@@ -49,73 +53,73 @@ struct st_mysqlnd_plugin_methods_xetters
 {
 	struct st_mnd_object_factory_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_object_factory) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_object_factory) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_object_factory) *methods);
 	} object_factory;
 
 	struct st_mnd_connection_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_conn) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_conn) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_conn) *methods);
 	} connection;
 
 	struct st_mnd_connection_data_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_conn_data) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_conn_data) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_conn_data) *methods);
 	} connection_data;
 
 	struct st_mnd_result_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_res) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_res) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_res) *methods);
 	} result;
 
 	struct st_mnd_unbuffered_result_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_result_unbuffered) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_result_unbuffered) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_result_unbuffered) *methods);
 	} unbuffered_result;
 
 	struct st_mnd_buffered_result_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_result_buffered)* (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_result_buffered)* (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_result_buffered) *methods);
 	} buffered_result;
 
 	struct st_mnd_stmt_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_stmt) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_stmt) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_stmt) * methods);
 	} statement;
 
 	struct st_mnd_protocol_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_protocol_payload_decoder_factory)* (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_protocol_payload_decoder_factory)* (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_protocol_payload_decoder_factory) *methods);
 	} protocol;
 
 	struct st_mnd_pfc_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_protocol_packet_frame_codec) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_protocol_packet_frame_codec) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_protocol_packet_frame_codec) * methods);
 	} pfc;
 
 	struct st_mnd_vio_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_vio) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_vio) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_vio) * methods);
 	} vio;
 
 	struct st_mnd_error_info_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_error_info) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_error_info) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_error_info) * methods);
 	} error_info;
 
 	struct st_mnd_command_xetters
 	{
-		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_command) * (*get)(void);
+		MYSQLND_CLASS_METHODS_TYPE(mysqlnd_command) * (*get)();
 		void (*set)(MYSQLND_CLASS_METHODS_TYPE(mysqlnd_command) * methods);
 	} command;
 };

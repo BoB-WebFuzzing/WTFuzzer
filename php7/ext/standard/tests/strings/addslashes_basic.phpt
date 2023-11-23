@@ -2,6 +2,12 @@
 Test addslashes() function : basic functionality
 --FILE--
 <?php
+/* Prototype  : string addslashes ( string $str )
+ * Description: Returns a string with backslashes before characters (single quotes, double quote,
+ *              backslash and nul character) that need to be quoted in database queries etc.
+ * Source code: ext/standard/string.c
+*/
+
 /*
  * Testing addslashes() with strings containing characters that can be prefixed with backslash
  * by the function

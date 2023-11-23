@@ -2,6 +2,14 @@
 Test str_split() function : basic functionality
 --FILE--
 <?php
+/* Prototype  : array str_split(string $str [, int $split_length])
+ * Description: Convert a string to an array. If split_length is
+                specified, break the string down into chunks each
+                split_length characters long.
+ * Source code: ext/standard/string.c
+ * Alias to functions: none
+*/
+
 echo "*** Testing str_split() : basic functionality ***\n";
 
 // Initialise all required variables
@@ -16,11 +24,7 @@ var_dump( str_split($str,$split_length) );
 echo "-- With split_length as default argument --\n";
 var_dump( str_split($str) );
 
-echo "-- Empty string must always return empty array --\n";
-var_dump( str_split('') );
-var_dump( str_split('', 1) );
-var_dump( str_split('', 100) );
-
+echo "Done"
 ?>
 --EXPECT--
 *** Testing str_split() : basic functionality ***
@@ -84,10 +88,4 @@ array(22) {
   [21]=>
   string(1) "e"
 }
--- Empty string must always return empty array --
-array(0) {
-}
-array(0) {
-}
-array(0) {
-}
+Done

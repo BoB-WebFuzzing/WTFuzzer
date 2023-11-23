@@ -2,20 +2,10 @@
 Bug #44827 (define() allows :: in constant names)
 --FILE--
 <?php
-
-try {
-    define('foo::bar', 1);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
-try {
-    define('::', 1);
-} catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-}
-
+define('foo::bar', 1);
+define('::', 1);
 ?>
---EXPECT--
-define(): Argument #1 ($constant_name) cannot be a class constant
-define(): Argument #1 ($constant_name) cannot be a class constant
+--EXPECTF--
+Warning: Class constants cannot be defined or redefined in %sbug44827.php on line %d
+
+Warning: Class constants cannot be defined or redefined in %sbug44827.php on line %d

@@ -1,7 +1,7 @@
 --TEST--
 Phar::mapPhar truncated manifest (manifest length truncated)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip");?>
 --FILE--
 <?php
 try {

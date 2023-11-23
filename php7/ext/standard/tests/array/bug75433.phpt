@@ -8,7 +8,6 @@ unset($a[2]);
 $b = array_values($a);
 $b[] = 4;
 print_r($b);
-?>
 --EXPECT--
 Array
 (

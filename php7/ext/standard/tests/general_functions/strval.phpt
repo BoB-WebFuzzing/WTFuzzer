@@ -4,6 +4,10 @@ Test strval() function
 precision=14
 --FILE--
 <?php
+/* Prototype: string strval ( mixed $var );
+ * Description: Returns the string value of var
+ */
+
 echo "*** Testing str_val() with scalar values***\n";
 $heredoc_string = <<<EOD
 This is a multiline heredoc
@@ -136,6 +140,13 @@ foreach ($not_scalars as $value ) {
    echo "-- Iteration $loop_counter --\n"; $loop_counter++;
    var_dump( strval($value) );
 }
+
+echo "\n*** Testing error conditions ***\n";
+//Zero argument
+var_dump( strval() );
+
+//arguments more than expected
+var_dump( strval( $scalars[0], $scalars[1]) );
 
 echo "Done\n";
 
@@ -273,19 +284,19 @@ string(14) "Resource id #%d"
 string(14) "Resource id #%d"
 -- Iteration 4 --
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sstrval.php on line %d
 string(5) "Array"
 -- Iteration 5 --
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sstrval.php on line %d
 string(5) "Array"
 -- Iteration 6 --
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sstrval.php on line %d
 string(5) "Array"
 -- Iteration 7 --
 
-Warning: Array to string conversion in %s on line %d
+Notice: Array to string conversion in %sstrval.php on line %d
 string(5) "Array"
 -- Iteration 8 --
 string(0) ""
@@ -295,4 +306,12 @@ string(0) ""
 string(0) ""
 -- Iteration 11 --
 string(0) ""
+
+*** Testing error conditions ***
+
+Warning: strval() expects exactly 1 parameter, 0 given in %s on line %d
+NULL
+
+Warning: strval() expects exactly 1 parameter, 2 given in %s on line %d
+NULL
 Done

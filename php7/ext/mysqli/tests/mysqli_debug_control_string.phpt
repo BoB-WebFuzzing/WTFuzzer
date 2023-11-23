@@ -1,10 +1,10 @@
 --TEST--
 mysqli_debug() - invalid debug control strings
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 
 if (!function_exists('mysqli_debug'))
     die("skip: mysqli_debug() not available");
@@ -14,11 +14,14 @@ if (!defined('MYSQLI_DEBUG_TRACE_ENABLED'))
 
 if (defined('MYSQLI_DEBUG_TRACE_ENABLED') && !MYSQLI_DEBUG_TRACE_ENABLED)
     die("skip: debug functionality not enabled");
+
+if (!$IS_MYSQLND)
+    die("SKIP Libmysql feature not sufficiently spec'd in MySQL C API documentation");
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
-    require_once 'table.inc';
+    require_once('connect.inc');
+    require_once('table.inc');
 
     function try_control_string($link, $control_string, $trace_file, $offset) {
 
@@ -66,65 +69,9 @@ if (defined('MYSQLI_DEBUG_TRACE_ENABLED') && !MYSQLI_DEBUG_TRACE_ENABLED)
 
     mysqli_close($link);
     print "done";
-    print "libmysql/DBUG package prints some debug info here."
+    if ($IS_MYSQLND)
+        print "libmysql/DBUG package prints some debug info here."
 ?>
 --EXPECTF--
-Warning: mysqli_debug(): Unrecognized format ',' in %s on line %d
-
-Warning: mysqli_debug(): Consecutive semicolons at position 0 in %s on line %d
 [023][control string '%s'] Trace file has not been written.
-
-Warning: mysqli_debug(): Colon expected, 'b' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, 'c' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, 'B' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, 'C' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, ',' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, '1' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, '2' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, '3' found in %s on line %d
-
-Warning: mysqli_debug(): Unrecognized format 'b' in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, 'B' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, 'C' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, ',' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, '1' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, '2' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, '3' found in %s on line %d
-
-Warning: mysqli_debug(): Unrecognized format 'b' in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, ';' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, ';' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, 'B' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, 'C' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, ',' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, '1' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, '2' found in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, '3' found in %s on line %d
-
-Warning: mysqli_debug(): Unrecognized format 'b' in %s on line %d
-
-Warning: mysqli_debug(): Colon expected, ';' found in %s on line %d
-
-Warning: mysqli_debug(): Unrecognized format 'z' in %s on line %d
 done%s

@@ -8,6 +8,13 @@ if (PHP_INT_SIZE != 4) die("skip this test is for 32bit platform only");
 precision=14
 --FILE--
 <?php
+/* Prototype: string gettype ( mixed $var );
+   Description: Returns the type of the PHP variable var
+
+   Prototype: bool settype ( mixed &$var, string $type );
+   Description: Set the type of variable var to type
+*/
+
 /* Test usage variation of gettype() and settype() functions:
          settype() to resource type.
    Set type of the data to "resource" and verify using gettype
@@ -17,8 +24,23 @@ precision=14
      dump the variable to see its new data
      get the new type of the variable
 */
+
+/* function to handle catchable errors */
+function foo($errno, $errstr, $errfile, $errline) {
+//	var_dump($errstr);
+   // print error no and error string
+   echo "$errno: $errstr\n";
+}
+//set the error handler, this is required as
+// settype() would fail with catachable fatal error
+set_error_handler("foo");
+
 $var1 = "another string";
 $var2 = array(2,3,4);
+
+// a variable which is unset
+$unset_var = 10.5;
+unset( $unset_var );
 
 class point
 {
@@ -45,7 +67,7 @@ $var_values = array (
   true,
 
   /* strings */
-  "\$",
+  "\xFF",
   "\x66",
   "\0123",
   "",
@@ -127,6 +149,10 @@ $var_values = array (
   new point(NULL, NULL),
   new point(2.5, 40.5),
   new point(0, 0),
+
+  /* undefined/unset vars */
+  $unset_var,
+  $undef_var
 );
 
 /* test conversion to resource type */
@@ -141,246 +167,289 @@ foreach ($var_values as $var) {
   // get the current data type
   var_dump( gettype($var) );
 
-  // convert it to resource
-  try {
-    var_dump(settype($var, $type));
-  } catch (ValueError $exception) {
-    echo $exception->getMessage() . "\n";
-  }
+  // convert it to null
+  var_dump( settype($var, $type) );
 
   // dump the converted data
-  var_dump($var);
+  var_dump( $var );
 
   // check the new type after conversion
-  var_dump(gettype($var));
+  var_dump( gettype($var) );
 }
 
 echo "Done\n";
 ?>
 --EXPECT--
+8: Undefined variable: unset_var
+8: Undefined variable: undef_var
+
 *** Testing gettype() & settype() functions : usage variations ***
 
 -- Setting type of data to resource --
 -- Iteration 1 --
 string(4) "NULL"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 NULL
 string(4) "NULL"
 -- Iteration 2 --
 string(7) "boolean"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 bool(false)
 string(7) "boolean"
 -- Iteration 3 --
 string(7) "boolean"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 bool(true)
 string(7) "boolean"
 -- Iteration 4 --
 string(7) "boolean"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 bool(true)
 string(7) "boolean"
 -- Iteration 5 --
 string(6) "string"
-Cannot convert to resource type
-string(1) "$"
+2: settype(): Cannot convert to resource type
+bool(false)
+string(1) "ÿ"
 string(6) "string"
 -- Iteration 6 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(1) "f"
 string(6) "string"
 -- Iteration 7 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(2) "
 3"
 string(6) "string"
 -- Iteration 8 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(0) ""
 string(6) "string"
 -- Iteration 9 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(0) ""
 string(6) "string"
 -- Iteration 10 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(1) " "
 string(6) "string"
 -- Iteration 11 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(1) " "
 string(6) "string"
 -- Iteration 12 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(2) "10"
 string(6) "string"
 -- Iteration 13 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(2) "10"
 string(6) "string"
 -- Iteration 14 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(8) "10string"
 string(6) "string"
 -- Iteration 15 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(8) "10string"
 string(6) "string"
 -- Iteration 16 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(1) "1"
 string(6) "string"
 -- Iteration 17 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(2) "-1"
 string(6) "string"
 -- Iteration 18 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(3) "1e2"
 string(6) "string"
 -- Iteration 19 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(2) " 1"
 string(6) "string"
 -- Iteration 20 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(22) "2974394749328742328432"
 string(6) "string"
 -- Iteration 21 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(5) "-1e-2"
 string(6) "string"
 -- Iteration 22 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(1) "1"
 string(6) "string"
 -- Iteration 23 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(2) "-1"
 string(6) "string"
 -- Iteration 24 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(3) "1e2"
 string(6) "string"
 -- Iteration 25 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(2) " 1"
 string(6) "string"
 -- Iteration 26 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(22) "2974394749328742328432"
 string(6) "string"
 -- Iteration 27 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(5) "-1e-2"
 string(6) "string"
 -- Iteration 28 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(4) "0xff"
 string(6) "string"
 -- Iteration 29 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(4) "0x55"
 string(6) "string"
 -- Iteration 30 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(5) "0XA55"
 string(6) "string"
 -- Iteration 31 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(5) "0X123"
 string(6) "string"
 -- Iteration 32 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(4) "0123"
 string(6) "string"
 -- Iteration 33 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(4) "0123"
 string(6) "string"
 -- Iteration 34 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(5) "-0123"
 string(6) "string"
 -- Iteration 35 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(5) "+0123"
 string(6) "string"
 -- Iteration 36 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(5) "-0123"
 string(6) "string"
 -- Iteration 37 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(5) "+0123"
 string(6) "string"
 -- Iteration 38 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(8) "-0x80001"
 string(6) "string"
 -- Iteration 39 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(8) "+0x80001"
 string(6) "string"
 -- Iteration 40 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(10) "-0x80001.5"
 string(6) "string"
 -- Iteration 41 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(9) "0x80001.5"
 string(6) "string"
 -- Iteration 42 --
 string(6) "string"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 string(12) "@$%#$%^$%^&^"
 string(6) "string"
 -- Iteration 43 --
 string(5) "array"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 array(0) {
 }
 string(5) "array"
 -- Iteration 44 --
 string(5) "array"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 array(1) {
   [0]=>
   NULL
@@ -388,7 +457,8 @@ array(1) {
 string(5) "array"
 -- Iteration 45 --
 string(5) "array"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 array(4) {
   [0]=>
   int(1)
@@ -402,7 +472,8 @@ array(4) {
 string(5) "array"
 -- Iteration 46 --
 string(5) "array"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 array(4) {
   [1]=>
   string(3) "one"
@@ -416,7 +487,8 @@ array(4) {
 string(5) "array"
 -- Iteration 47 --
 string(5) "array"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 array(3) {
   [0]=>
   float(1.5)
@@ -428,147 +500,176 @@ array(3) {
 string(5) "array"
 -- Iteration 48 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-2147483648)
 string(6) "double"
 -- Iteration 49 --
 string(7) "integer"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 int(2147483647)
 string(7) "integer"
 -- Iteration 50 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(2147483649)
 string(6) "double"
 -- Iteration 51 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(1232147483649)
 string(6) "double"
 -- Iteration 52 --
 string(7) "integer"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 int(85)
 string(7) "integer"
 -- Iteration 53 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(1058513956921)
 string(6) "double"
 -- Iteration 54 --
 string(7) "integer"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 int(-21903)
 string(7) "integer"
 -- Iteration 55 --
 string(7) "integer"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 int(365)
 string(7) "integer"
 -- Iteration 56 --
 string(7) "integer"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 int(-365)
 string(7) "integer"
 -- Iteration 57 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(80561044571754)
 string(6) "double"
 -- Iteration 58 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(100000)
 string(6) "double"
 -- Iteration 59 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-100000)
 string(6) "double"
 -- Iteration 60 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(100000)
 string(6) "double"
 -- Iteration 61 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-100000)
 string(6) "double"
 -- Iteration 62 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-1.5)
 string(6) "double"
 -- Iteration 63 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(0.5)
 string(6) "double"
 -- Iteration 64 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-0.5)
 string(6) "double"
 -- Iteration 65 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(500000)
 string(6) "double"
 -- Iteration 66 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-500000)
 string(6) "double"
 -- Iteration 67 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-5.0E-7)
 string(6) "double"
 -- Iteration 68 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(500000)
 string(6) "double"
 -- Iteration 69 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-500000)
 string(6) "double"
 -- Iteration 70 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(512000)
 string(6) "double"
 -- Iteration 71 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-512000)
 string(6) "double"
 -- Iteration 72 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(5.12E-7)
 string(6) "double"
 -- Iteration 73 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(5.12E-7)
 string(6) "double"
 -- Iteration 74 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(512000)
 string(6) "double"
 -- Iteration 75 --
 string(6) "double"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 float(-512000)
 string(6) "double"
 -- Iteration 76 --
 string(6) "object"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 object(point)#1 (2) {
   ["x"]=>
   NULL
@@ -578,7 +679,8 @@ object(point)#1 (2) {
 string(6) "object"
 -- Iteration 77 --
 string(6) "object"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 object(point)#2 (2) {
   ["x"]=>
   float(2.5)
@@ -588,7 +690,8 @@ object(point)#2 (2) {
 string(6) "object"
 -- Iteration 78 --
 string(6) "object"
-Cannot convert to resource type
+2: settype(): Cannot convert to resource type
+bool(false)
 object(point)#3 (2) {
   ["x"]=>
   int(0)
@@ -596,4 +699,16 @@ object(point)#3 (2) {
   int(0)
 }
 string(6) "object"
+-- Iteration 79 --
+string(4) "NULL"
+2: settype(): Cannot convert to resource type
+bool(false)
+NULL
+string(4) "NULL"
+-- Iteration 80 --
+string(4) "NULL"
+2: settype(): Cannot convert to resource type
+bool(false)
+NULL
+string(4) "NULL"
 Done

@@ -6,8 +6,10 @@ class_exists() tests
 class foo {
 }
 
+var_dump(class_exists());
 var_dump(class_exists("qwerty"));
 var_dump(class_exists(""));
+var_dump(class_exists(array()));
 var_dump(class_exists("test", false));
 var_dump(class_exists("foo", false));
 var_dump(class_exists("foo"));
@@ -16,9 +18,14 @@ var_dump(class_exists("stdClass"));
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
+Warning: class_exists() expects at least 1 parameter, 0 given in %s on line %d
+NULL
 bool(false)
 bool(false)
+
+Warning: class_exists() expects parameter 1 to be string, array given in %s on line %d
+NULL
 bool(false)
 bool(true)
 bool(true)

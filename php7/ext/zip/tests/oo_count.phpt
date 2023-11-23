@@ -1,7 +1,9 @@
 --TEST--
 ziparchive::count()
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 
@@ -10,7 +12,7 @@ $file = $dirname . 'test.zip';
 
 $zip = new ZipArchive;
 if (!$zip->open($file)) {
-    exit('failed');
+	exit('failed');
 }
 
 var_dump($zip->numFiles, count($zip), $zip->numFiles == count($zip));

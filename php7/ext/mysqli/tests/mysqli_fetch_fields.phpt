@@ -1,16 +1,26 @@
 --TEST--
 mysqli_fetch_fields()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    // Note: no SQL type tests, internally the same function gets used as for mysqli_fetch_array() which does a lot of SQL type test
+    require_once("connect.inc");
 
-    require 'table.inc';
+    $tmp    = NULL;
+    $link   = NULL;
+
+    // Note: no SQL type tests, internally the same function gets used as for mysqli_fetch_array() which does a lot of SQL type test
+    if (!is_null($tmp = @mysqli_fetch_fields()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_fetch_fields($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
 
     // Make sure that client, connection and result charsets are all the
     // same. Not sure whether this is strictly necessary.
@@ -34,24 +44,26 @@ require_once 'skipifconnectfailure.inc';
                         $charsetInfo->charset,
                         $charsetInfo->number, $field->charsetnr);
                 }
+                if ($field->length != $charsetInfo->max_length) {
+                    printf("[005] Expecting length %d got %d\n",
+                        $charsetInfo->max_length,
+                        $field->max_length);
+                }
                 break;
         }
     }
 
     mysqli_free_result($res);
 
-    try {
-        mysqli_fetch_fields($res);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_fetch_fields($res)))
+        printf("[006] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     mysqli_close($link);
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
 object(stdClass)#%d (13) {
@@ -70,7 +82,7 @@ object(stdClass)#%d (13) {
   ["catalog"]=>
   string(%d) "%s"
   ["max_length"]=>
-  int(0)
+  int(1)
   ["length"]=>
   int(11)
   ["charsetnr"]=>
@@ -98,7 +110,7 @@ object(stdClass)#%d (13) {
   ["catalog"]=>
   string(%d) "%s"
   ["max_length"]=>
-  int(0)
+  int(1)
   ["length"]=>
   int(%d)
   ["charsetnr"]=>
@@ -110,5 +122,6 @@ object(stdClass)#%d (13) {
   ["decimals"]=>
   int(0)
 }
-mysqli_result object is already closed
+
+Warning: mysqli_fetch_fields(): Couldn't fetch mysqli_result in %s on line %d
 done!

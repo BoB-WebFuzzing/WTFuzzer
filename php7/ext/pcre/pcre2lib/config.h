@@ -20,12 +20,12 @@
 #endif
 
 /* Define to any value for valgrind support to find invalid memory reads. */
-#ifdef HAVE_PCRE_VALGRIND_SUPPORT
+#if HAVE_PCRE_VALGRIND_SUPPORT
 #define SUPPORT_VALGRIND 1
 #endif
 
 /* Define to any value to enable support for Just-In-Time compiling. */
-#ifdef HAVE_PCRE_JIT_SUPPORT
+#if HAVE_PCRE_JIT_SUPPORT
 #define SUPPORT_JIT
 #endif
 

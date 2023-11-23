@@ -2,6 +2,12 @@
 Test array_diff_assoc() function : variation - array containing different data types
 --FILE--
 <?php
+/* Prototype  : array array_diff_assoc(array $arr1, array $arr2 [, array ...])
+ * Description: Returns the entries of arr1 that have values which are not present
+ * in any of the others arguments but do additional checks whether the keys are equal
+ * Source code: ext/standard/array.c
+ */
+
 /*
  * Test how array_diff_assoc() compares indexed arrays containing different data types
  */
@@ -33,7 +39,7 @@ $inputs = array(
        // int data
 /*1*/
 'int' => array(
-       0,
+	   0,
        1,
        12345,
        -2345),
@@ -78,7 +84,7 @@ $inputs = array(
 /*7*/
 'binary' => array(
        b"binary",
-       (binary)"binary"),
+	   (binary)"binary"),
 
        // object data
 /*8*/

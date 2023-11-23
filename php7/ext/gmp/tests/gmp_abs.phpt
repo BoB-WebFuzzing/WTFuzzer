@@ -1,57 +1,50 @@
 --TEST--
 gmp_abs() basic tests
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 
-try {
-    var_dump(gmp_strval(gmp_abs("")));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gmp_strval(gmp_abs("")));
 var_dump(gmp_strval(gmp_abs("0")));
 var_dump(gmp_strval(gmp_abs(0)));
-try {
-    var_dump(gmp_strval(gmp_abs(-111111111111111111111))); // This is a float
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gmp_strval(gmp_abs(-111111111111111111111)));
 var_dump(gmp_strval(gmp_abs("111111111111111111111")));
 var_dump(gmp_strval(gmp_abs("-111111111111111111111")));
 var_dump(gmp_strval(gmp_abs("0000")));
+var_dump(gmp_strval(gmp_abs("09876543")));
+var_dump(gmp_strval(gmp_abs("-099987654")));
 
-try {
-    // Base 8
-    var_dump(gmp_strval(gmp_abs("09876543")));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    // Base 8
-    var_dump(gmp_strval(gmp_abs("-099987654")));
-} catch (\ValueError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-
-
-try {
-    var_dump(gmp_abs(array()));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(gmp_abs());
+var_dump(gmp_abs(1,2));
+var_dump(gmp_abs(array()));
 
 echo "Done\n";
 ?>
---EXPECT--
-gmp_abs(): Argument #1 ($num) is not an integer string
+--EXPECTF--
+Warning: gmp_abs(): Unable to convert variable to GMP - string is not an integer in %s on line %d
 string(1) "0"
 string(1) "0"
-gmp_abs(): Argument #1 ($num) must be of type GMP|string|int, float given
+string(1) "0"
+
+Warning: gmp_abs(): Unable to convert variable to GMP - wrong type in %s on line %d
+string(1) "0"
 string(21) "111111111111111111111"
 string(21) "111111111111111111111"
 string(1) "0"
-gmp_abs(): Argument #1 ($num) is not an integer string
-gmp_abs(): Argument #1 ($num) is not an integer string
-gmp_abs(): Argument #1 ($num) must be of type GMP|string|int, array given
+
+Warning: gmp_abs(): Unable to convert variable to GMP - string is not an integer in %s on line %d
+string(1) "0"
+
+Warning: gmp_abs(): Unable to convert variable to GMP - string is not an integer in %s on line %d
+string(1) "0"
+
+Warning: gmp_abs() expects exactly 1 parameter, 0 given in %s on line %d
+NULL
+
+Warning: gmp_abs() expects exactly 1 parameter, 2 given in %s on line %d
+NULL
+
+Warning: gmp_abs(): Unable to convert variable to GMP - wrong type in %s on line %d
+bool(false)
 Done

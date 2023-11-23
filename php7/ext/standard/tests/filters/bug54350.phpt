@@ -7,11 +7,7 @@ class user_filter extends php_user_filter {
     function filter($in, $out, &$consumed, $closing): int {
         while ($bucket = stream_bucket_make_writeable($in)) {
         }
-        try {
-            fclose($this->stream);
-        } catch (TypeError $e) {
-            echo $e->getMessage(), "\n";
-        }
+        fclose($this->stream);
         return 0;
     }
 }
@@ -23,4 +19,5 @@ fwrite($fd, "foo");
 ?>
 --EXPECTF--
 Warning: fclose(): 5 is not a valid stream resource in %s on line %d
-fclose(): supplied resource is not a valid stream resource
+
+Warning: fclose(): supplied resource is not a valid stream resource in %s on line %d

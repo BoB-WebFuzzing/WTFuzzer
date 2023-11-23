@@ -1,7 +1,9 @@
 --TEST--
 Bug #79615 (Wrong GIF header written in GD GIFEncode)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $im = imagecreate(3, 3); // 3x3, 9 colors, 4 bits per pixel

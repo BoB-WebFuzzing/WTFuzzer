@@ -1,21 +1,17 @@
 --TEST--
 Bug #45923 (mb_st[r]ripos() offset not handled correctly)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 
 function section($func, $haystack, $needle)
 {
-    echo "\n------- $func -----------\n\n";
-    foreach([0, 3, 6, 9, 11, 12, -1, -3, -6, -20] as $offset) {
-        echo "> Offset: $offset\n";
-        try {
-            var_dump($func($haystack, $needle, $offset));
-        } catch (\ValueError $e) {
-            echo $e->getMessage() . \PHP_EOL;
-        }
-    }
+	echo "\n------- $func -----------\n\n";
+	foreach(array(0, 3, 6, 9, 11, 12, -1, -3, -6, -20) as $offset) {
+		echo "> Offset: $offset\n";
+		var_dump($func($haystack,$needle,$offset));
+	}
 }
 
 section('strpos'     , "abc abc abc"  , "abc");
@@ -30,7 +26,7 @@ section('mb_strrpos' , "●○◆ ●○◆ ●○◆", "●○◆");
 section('strripos'   , "abc abc abc"  , "abc");
 section('mb_strripos', "●○◆ ●○◆ ●○◆", "●○◆");
 ?>
---EXPECT--
+--EXPECTF--
 ------- strpos -----------
 
 > Offset: 0
@@ -44,7 +40,9 @@ bool(false)
 > Offset: 11
 bool(false)
 > Offset: 12
-strpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: strpos(): Offset not contained in string in %s on line %d
+bool(false)
 > Offset: -1
 bool(false)
 > Offset: -3
@@ -52,7 +50,9 @@ int(8)
 > Offset: -6
 int(8)
 > Offset: -20
-strpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: strpos(): Offset not contained in string in %s on line %d
+bool(false)
 
 ------- mb_strpos -----------
 
@@ -67,7 +67,9 @@ bool(false)
 > Offset: 11
 bool(false)
 > Offset: 12
-mb_strpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: mb_strpos(): Offset not contained in string in %s on line %d
+bool(false)
 > Offset: -1
 bool(false)
 > Offset: -3
@@ -75,7 +77,9 @@ int(8)
 > Offset: -6
 int(8)
 > Offset: -20
-mb_strpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: mb_strpos(): Offset not contained in string in %s on line %d
+bool(false)
 
 ------- stripos -----------
 
@@ -90,7 +94,9 @@ bool(false)
 > Offset: 11
 bool(false)
 > Offset: 12
-stripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: stripos(): Offset not contained in string in %s on line %d
+bool(false)
 > Offset: -1
 bool(false)
 > Offset: -3
@@ -98,7 +104,9 @@ int(8)
 > Offset: -6
 int(8)
 > Offset: -20
-stripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: stripos(): Offset not contained in string in %s on line %d
+bool(false)
 
 ------- mb_stripos -----------
 
@@ -113,7 +121,9 @@ bool(false)
 > Offset: 11
 bool(false)
 > Offset: 12
-mb_stripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: mb_stripos(): Offset not contained in string in %s on line %d
+bool(false)
 > Offset: -1
 bool(false)
 > Offset: -3
@@ -121,7 +131,9 @@ int(8)
 > Offset: -6
 int(8)
 > Offset: -20
-mb_stripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: mb_stripos(): Offset not contained in string in %s on line %d
+bool(false)
 
 ------- strrpos -----------
 
@@ -136,7 +148,9 @@ bool(false)
 > Offset: 11
 bool(false)
 > Offset: 12
-strrpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: strrpos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
 > Offset: -1
 int(8)
 > Offset: -3
@@ -144,7 +158,9 @@ int(8)
 > Offset: -6
 int(4)
 > Offset: -20
-strrpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: strrpos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
 
 ------- mb_strrpos -----------
 
@@ -159,7 +175,9 @@ bool(false)
 > Offset: 11
 bool(false)
 > Offset: 12
-mb_strrpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: mb_strrpos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
 > Offset: -1
 int(8)
 > Offset: -3
@@ -167,7 +185,9 @@ int(8)
 > Offset: -6
 int(4)
 > Offset: -20
-mb_strrpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: mb_strrpos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
 
 ------- strripos -----------
 
@@ -182,7 +202,9 @@ bool(false)
 > Offset: 11
 bool(false)
 > Offset: 12
-strripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: strripos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
 > Offset: -1
 int(8)
 > Offset: -3
@@ -190,7 +212,9 @@ int(8)
 > Offset: -6
 int(4)
 > Offset: -20
-strripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: strripos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
 
 ------- mb_strripos -----------
 
@@ -205,7 +229,9 @@ bool(false)
 > Offset: 11
 bool(false)
 > Offset: 12
-mb_strripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: mb_strripos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)
 > Offset: -1
 int(8)
 > Offset: -3
@@ -213,4 +239,6 @@ int(8)
 > Offset: -6
 int(4)
 > Offset: -20
-mb_strripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+
+Warning: mb_strripos(): Offset is greater than the length of haystack string in %s on line %d
+bool(false)

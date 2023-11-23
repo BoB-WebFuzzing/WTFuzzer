@@ -1,7 +1,7 @@
 --TEST--
 Phar::loadPhar
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 --FILE--
@@ -29,6 +29,7 @@ echo "======\n";
 include $pname . '/a.php';
 
 ?>
+===DONE===
 --CLEAN--
 <?php unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.php'); ?>
 --EXPECT--
@@ -43,3 +44,4 @@ This is b
 This is b/c
 This is b/d
 This is e
+===DONE===

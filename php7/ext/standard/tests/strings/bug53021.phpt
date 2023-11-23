@@ -18,7 +18,6 @@ echo html_entity_decode("&#39;", ENT_NOQUOTES, 'UTF-8'), "\n";
 echo html_entity_decode("&#39;", ENT_QUOTES, 'UTF-8'), "\n";
 echo html_entity_decode("&#39;", ENT_COMPAT, 'UTF-8'), "\n";
 echo html_entity_decode("&#39;"), "\n";
-?>
 --EXPECT--
 array(1) {
   [1]=>
@@ -38,4 +37,4 @@ single quotes variations:
 &#39;
 '
 &#39;
-'
+&#39;

@@ -1,15 +1,19 @@
 --TEST--
 mysqli_result->lengths
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
-    $mysqli = $link;
+    require_once("connect.inc");
+
+    if (!$mysqli = new my_mysqli($host, $user, $passwd, $db, $port, $socket))
+        printf("[001] Cannot connect\n");
+
+    require('table.inc');
     if (!$res = $mysqli->query("SELECT id, label FROM test ORDER BY id LIMIT 1")) {
         printf("[002] [%d] %s\n", $mysqli->errno, $mysqli->error);
     }
@@ -20,22 +24,18 @@ require_once 'skipifconnectfailure.inc';
     var_dump($res->lengths);
 
     $res->free_result();
-    try {
-        $res->lengths;
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    var_dump($res->lengths);
     $mysqli->close();
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
+--EXPECTF--
 NULL
 array(2) {
   [0]=>
@@ -44,5 +44,7 @@ array(2) {
   int(1)
 }
 NULL
-Property access is not allowed yet
+
+Warning: main(): Property access is not allowed yet in %s on line %d
+bool(false)
 done!

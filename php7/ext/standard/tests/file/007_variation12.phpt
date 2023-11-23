@@ -7,6 +7,17 @@ if( substr(PHP_OS, 0, 3) == "WIN" )
 ?>
 --FILE--
 <?php
+/*
+ fopen() function:
+ Prototype: resource fopen(string $filename, string $mode
+                            [, bool $use_include_path [, resource $context]] );
+ Description: Opens file or URL.
+*/
+/*
+ fclose() function:
+ Prototype: bool fclose ( resource $handle );
+ Description: Closes an open file pointer
+*/
 
 /* Test fopen() and fclose(): Opening the file in "w+t" mode,
    checking for the file creation, write & read operations,
@@ -44,7 +55,6 @@ unlink($file);  //Deleting the file
 fclose( fopen($file, "w+t") );  //Opening the non-existing file in "w+t" mode, which will be created
 var_dump( file_exists($file) );  //Check for the existence of file
 echo "*** Done ***\n";
-?>
 --CLEAN--
 <?php
 unlink(__DIR__."/007_variation12.tmp");

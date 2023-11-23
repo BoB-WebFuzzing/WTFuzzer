@@ -8,7 +8,7 @@ include_path=.
 class MyAutoLoader {
 
         static function autoLoad($className) {
-            echo __METHOD__ . "($className)\n";
+        	echo __METHOD__ . "($className)\n";
         }
 }
 
@@ -20,6 +20,8 @@ var_dump(spl_autoload_functions());
 var_dump(class_exists("TestClass", true));
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 array(1) {
   [0]=>
@@ -32,3 +34,4 @@ array(1) {
 }
 MyAutoLoader::autoLoad(TestClass)
 bool(false)
+===DONE===

@@ -3,19 +3,18 @@ ZE2 foreach and property visibility
 --FILE--
 <?php
 
-#[AllowDynamicProperties]
 class base
 {
-    public $a=1;
-    protected $b=2;
-    private $c=3;
+	public $a=1;
+	protected $b=2;
+	private $c=3;
 
-    function f()
-    {
-        foreach($this as $k=>$v) {
-            echo "$k=>$v\n";
-        }
-    }
+	function f()
+	{
+		foreach($this as $k=>$v) {
+			echo "$k=>$v\n";
+		}
+	}
 }
 
 class derived extends base
@@ -28,7 +27,7 @@ echo "===base::function===\n";
 $o->f();
 echo "===base,foreach===\n";
 foreach($o as $k=>$v) {
-    echo "$k=>$v\n";
+	echo "$k=>$v\n";
 }
 
 $o = new derived;
@@ -37,7 +36,7 @@ echo "===derived::function===\n";
 $o->f();
 echo "===derived,foreach===\n";
 foreach($o as $k=>$v) {
-    echo "$k=>$v\n";
+	echo "$k=>$v\n";
 }
 
 ?>

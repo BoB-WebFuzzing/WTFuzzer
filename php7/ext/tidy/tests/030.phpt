@@ -2,8 +2,10 @@
 getConfig() method - basic test for getConfig()
 --CREDITS--
 Christian Wenz <wenz@php.net>
---EXTENSIONS--
-tidy
+--SKIPIF--
+<?php
+  if (!extension_loaded('tidy')) die ('skip tidy not present');
+?>
 --FILE--
 <?php
 $buffer = '<html></html>';

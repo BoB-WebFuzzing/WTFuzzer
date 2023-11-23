@@ -2,12 +2,14 @@
 <?php
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -18,14 +20,16 @@
 
 /* $Id$ */
 
-/* {{{ error */
+/* {{{ error
+ */
 function error($message) {
     printf('Error: %s%s', $message, PHP_EOL);
     exit;
 }
 /* }}} */
 
-/* {{{ print_help */
+/* {{{ print_help
+ */
 function print_help() {
     if (PHP_OS_FAMILY != 'Windows') {
         $file_prefix = './';
@@ -116,7 +120,8 @@ HELP;
 }
 /* }}} */
 
-/* {{{ task */
+/* {{{ task
+ */
 function task($label, $callback) {
     printf('%s... ', $label);
 
@@ -126,7 +131,8 @@ function task($label, $callback) {
 }
 /* }}} */
 
-/* {{{ print_success */
+/* {{{ print_success
+ */
 function print_success() {
     global $options;
 
@@ -140,7 +146,7 @@ function print_success() {
 
     printf('%1$sSuccess. The extension is now ready to be compiled. To do so, use the%s', PHP_EOL);
     printf('following steps:%1$s%1$s', PHP_EOL);
-    printf('cd %s%s%s', $options['dir'], $options['ext'], PHP_EOL);
+    printf('cd /path/to/php-src/%s%s', $options['ext'], PHP_EOL);
     printf('phpize%s', PHP_EOL);
     printf('%sconfigure%s', $file_prefix, PHP_EOL);
     printf('%smake%2$s%2$s', $make_prefix, PHP_EOL);
@@ -150,7 +156,8 @@ function print_success() {
 }
 /* }}} */
 
-/* {{{ process_args */
+/* {{{ process_args
+ */
 function process_args($argv, $argc) {
     $options = [
             'unix'		=> true,
@@ -232,7 +239,8 @@ function process_args($argv, $argc) {
 }
 /* }}} */
 
-/* {{{ process_source_tags */
+/* {{{ process_source_tags
+ */
 function process_source_tags($file, $short_name) {
     global $options;
 
@@ -256,12 +264,14 @@ function process_source_tags($file, $short_name) {
                 $header = <<<"HEADER"
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -288,7 +298,8 @@ HEADER;
 }
 /* }}} */
 
-/* {{{ copy_config_scripts */
+/* {{{ copy_config_scripts
+ */
 function copy_config_scripts() {
     global $options;
 
@@ -316,15 +327,14 @@ function copy_config_scripts() {
 }
 /* }}} */
 
-/* {{{ copy_sources */
+/* {{{ copy_sources
+ */
 function copy_sources() {
     global $options;
 
     $files = [
             'skeleton.c'		=> $options['ext'] . '.c',
-            'skeleton.stub.php'	=> $options['ext'] . '.stub.php',
-            'php_skeleton.h'	=> 'php_' . $options['ext'] . '.h',
-            'skeleton_arginfo.h' => $options['ext'] . '_arginfo.h'
+            'php_skeleton.h'	=> 'php_' . $options['ext'] . '.h'
             ];
 
     foreach ($files as $src_file => $dst_file) {
@@ -337,7 +347,8 @@ function copy_sources() {
 }
 /* }}} */
 
-/* {{{ copy_tests */
+/* {{{ copy_tests
+ */
 function copy_tests() {
     global $options;
 

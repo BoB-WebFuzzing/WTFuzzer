@@ -24,7 +24,6 @@ Interface [ <internal%s> interface Countable ] {
 
       - Parameters [0] {
       }
-      - Tentative return [ int ]
     }
   }
 }

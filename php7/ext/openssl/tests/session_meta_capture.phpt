@@ -1,9 +1,8 @@
 --TEST--
 Capture SSL session meta array in stream context
---EXTENSIONS--
-openssl
 --SKIPIF--
 <?php
+if (!extension_loaded("openssl")) die("skip openssl not loaded");
 if (!function_exists("proc_open")) die("skip no proc_open");
 ?>
 --FILE--
@@ -16,7 +15,7 @@ $serverCode = <<<'CODE'
     $serverFlags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
     $serverCtx = stream_context_create(['ssl' => [
         'local_cert' => '%s',
-        'security_level' => 0,
+        'security_level' => 1,
     ]]);
 
     $server = stream_socket_server($serverUri, $errno, $errstr, $serverFlags, $serverCtx);
@@ -37,22 +36,26 @@ $clientCode = <<<'CODE'
         'verify_peer' => true,
         'cafile' => '%s',
         'peer_name' => '%s',
-        'security_level' => 0,
+        'capture_session_meta' => true,
+        'security_level' => 1,
     ]]);
 
     phpt_wait();
 
     stream_context_set_option($clientCtx, 'ssl', 'crypto_method', STREAM_CRYPTO_METHOD_TLSv1_0_CLIENT);
-    $stream = stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx);
-    var_dump(stream_get_meta_data($stream)['crypto']['protocol']);
+    @stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx);
+    $meta = stream_context_get_options($clientCtx)['ssl']['session_meta'];
+    var_dump($meta['protocol']);
 
     stream_context_set_option($clientCtx, 'ssl', 'crypto_method', STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT);
-    $stream = stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx);
-    var_dump(stream_get_meta_data($stream)['crypto']['protocol']);
+    @stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx);
+    $meta = stream_context_get_options($clientCtx)['ssl']['session_meta'];
+    var_dump($meta['protocol']);
 
     stream_context_set_option($clientCtx, 'ssl', 'crypto_method', STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
-    $stream = stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx);
-    var_dump(stream_get_meta_data($stream)['crypto']['protocol']);
+    @stream_socket_client($serverUri, $errno, $errstr, 2, $clientFlags, $clientCtx);
+    $meta = stream_context_get_options($clientCtx)['ssl']['session_meta'];
+    var_dump($meta['protocol']);
 CODE;
 $clientCode = sprintf($clientCode, $cacertFile, $peerName);
 

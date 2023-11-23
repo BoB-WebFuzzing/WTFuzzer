@@ -27,6 +27,10 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stddef.h>
 
 #include "mbfilter.h"
@@ -38,25 +42,20 @@ const mbfl_encoding mbfl_encoding_pass = {
 	mbfl_no_encoding_pass,
 	"pass",
 	NULL,
-	mbfl_encoding_pass_aliases,
+	(const char *(*)[])&mbfl_encoding_pass_aliases,
 	NULL,
 	0,
 	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	NULL
 };
 
 const struct mbfl_convert_vtbl vtbl_pass = {
 	mbfl_no_encoding_pass,
 	mbfl_no_encoding_pass,
 	mbfl_filt_conv_common_ctor,
-	NULL,
+	mbfl_filt_conv_common_dtor,
 	mbfl_filt_conv_pass,
-	mbfl_filt_conv_common_flush,
-	NULL,
+	mbfl_filt_conv_common_flush
 };
 
 int mbfl_filt_conv_pass(int c, mbfl_convert_filter *filter)

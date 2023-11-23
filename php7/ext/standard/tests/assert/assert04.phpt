@@ -5,15 +5,24 @@ assert.active = 1
 assert.warning = 1
 assert.callback =
 assert.bail = 0
-assert.exception=0
+assert.quiet_eval = 0
 --FILE--
 <?php
 /* Assert not active */
 assert_options(ASSERT_ACTIVE, 0);
 assert(1);
 
+
 /* Wrong parameter count in assert */
 assert_options(ASSERT_ACTIVE, 1);
+assert(2, "failure", 3);
+
+/* Wrong parameter count in assert_options */
+assert_options(ASSERT_ACTIVE, 0, 2);
+
+/* Wrong parameter name in assert_options */
+$test="ASSERT_FRED";
+assert_options($test, 1);
 
 /* Assert false */
 assert(0);
@@ -27,20 +36,12 @@ echo "not reached\n";
 
 ?>
 --EXPECTF--
-Deprecated: PHP Startup: assert.exception INI setting is deprecated in Unknown on line 0
+Warning: assert() expects at most 2 parameters, 3 given in %s on line %d
 
-Deprecated: Constant ASSERT_ACTIVE is deprecated in %s on line %d
+Warning: assert_options() expects at most 2 parameters, 3 given in %s on line %d
 
-Deprecated: Function assert_options() is deprecated in %s on line %d
-
-Deprecated: Constant ASSERT_ACTIVE is deprecated in %s on line %d
-
-Deprecated: Function assert_options() is deprecated in %s on line %d
+Warning: assert_options() expects parameter 1 to be int, string given in %s on line %d
 
 Warning: assert(): assert(0) failed in %s on line %d
-
-Deprecated: Constant ASSERT_BAIL is deprecated in %s on line %d
-
-Deprecated: Function assert_options() is deprecated in %s on line %d
 
 Warning: assert(): assert(0) failed in %s on line %d

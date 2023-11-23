@@ -1,7 +1,9 @@
 --TEST--
 IntlRuleBasedBreakIterator::getRuleStatus(): basic test
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -24,11 +26,12 @@ $rbbi = new IntlRuleBasedBreakIterator($rules);
 $rbbi->setText('sdfkjsdf88á.... ,;');
 
 do {
-    echo "pos        : {$rbbi->current()}\n",
-         "rule status: {$rbbi->getRuleStatus()}\n";
+	echo "pos        : {$rbbi->current()}\n",
+		 "rule status: {$rbbi->getRuleStatus()}\n";
 } while ($rbbi->next() != IntlBreakIterator::DONE);
 
 ?>
+==DONE==
 --EXPECT--
 pos        : 0
 rule status: 0
@@ -40,3 +43,4 @@ pos        : 17
 rule status: 0
 pos        : 19
 rule status: 42
+==DONE==

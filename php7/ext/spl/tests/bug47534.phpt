@@ -9,7 +9,6 @@ echo gettype($it1->current())."\n";
 $it2 = new RecursiveDirectoryIterator(__DIR__);
 $it2->rewind();
 echo gettype($it2->current())."\n";
-?>
 --EXPECT--
 string
 object

@@ -1,12 +1,9 @@
 --TEST--
 oci_lob_read() tests
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -38,7 +35,10 @@ oci_execute($s, OCI_DEFAULT);
 var_dump($row = oci_fetch_array($s));
 
 var_dump(oci_lob_read($row[0], 2));
+var_dump(oci_lob_read($row[0]));
+var_dump(oci_lob_read());
 var_dump(oci_lob_eof($row[0]));
+var_dump(oci_lob_eof());
 
 unset($row[0]->descriptor);
 var_dump(oci_lob_read($row[0],1));
@@ -55,18 +55,27 @@ int(7000)
 int(7000)
 array(2) {
   [0]=>
-  object(OCILob)#%d (1) {
+  object(OCI-Lob)#%d (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
   ["BLOB"]=>
-  object(OCILob)#%d (1) {
+  object(OCI-Lob)#%d (1) {
     ["descriptor"]=>
     resource(%d) of type (oci8 descriptor)
   }
 }
 string(2) "st"
+
+Warning: oci_lob_read() expects exactly 2 parameters, 1 given in %s on line %d
+NULL
+
+Warning: oci_lob_read() expects exactly 2 parameters, 0 given in %s on line %d
+NULL
 bool(false)
+
+Warning: oci_lob_eof() expects exactly 1 parameter, 0 given in %s on line %d
+NULL
 
 Warning: oci_lob_read(): Unable to find descriptor property in %s on line %d
 bool(false)

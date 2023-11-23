@@ -1,19 +1,25 @@
 --TEST--
 mysqli_thread_id()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
-    if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
-        printf("Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
-            $host, $user, $db, $port, $socket);
-        exit(1);
-    }
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_thread_id()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_thread_id($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
 
     if (!is_int($tmp = mysqli_thread_id($link)) || (0 === $tmp))
         printf("[003] Expecting int/any but zero, got %s/%s. [%d] %s\n",
@@ -24,14 +30,15 @@ require_once 'skipifconnectfailure.inc';
 
     mysqli_close($link);
 
-    try {
-        mysqli_thread_id($link);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_thread_id($link)))
+        printf("[005] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
 ?>
---EXPECT--
-mysqli object is already closed
+--CLEAN--
+<?php
+    require_once("clean_table.inc");
+?>
+--EXPECTF--
+Warning: mysqli_thread_id(): Couldn't fetch mysqli in %s on line %d
 done!

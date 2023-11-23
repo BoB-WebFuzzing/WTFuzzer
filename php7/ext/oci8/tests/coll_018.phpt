@@ -1,12 +1,9 @@
 --TEST--
 Collection trim tests
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
@@ -15,6 +12,9 @@ require __DIR__."/connect.inc";
 require __DIR__."/create_type.inc";
 
 $coll1 = oci_new_collection($c, $type_name);
+
+echo "Test 1.\n";
+var_dump($coll1->trim());
 
 echo "\nTest 2.\n";
 var_dump($coll1->trim(0));
@@ -55,7 +55,12 @@ echo "Done\n";
 require __DIR__."/drop_type.inc";
 
 ?>
---EXPECT--
+--EXPECTF--
+Test 1.
+
+Warning: OCI-Collection::trim() expects exactly 1 parameter, 0 given in %s on line 9
+NULL
+
 Test 2.
 bool(true)
 

@@ -5,6 +5,7 @@ obscure_filename
 --FILE--
 <?php
 /*
+Prototype: bool flock(resource $handle, int $operation [, int &$wouldblock]);
 Description: PHP supports a portable way of locking complete files
   in an advisory way
 */
@@ -14,11 +15,12 @@ echo "*** Testing error conditions ***\n";
 $file = preg_replace("~\.phpt?$~", '.tmp', __FILE__);
 $fp = fopen($file, "w");
 
-/* array of operations */
+/* array of operatons */
 $operations = array(
   0,
   LOCK_NB,
   FALSE,
+  NULL,
   array(1,2,3),
   array(),
   "string",
@@ -28,46 +30,81 @@ $operations = array(
 
 $i = 0;
 foreach($operations as $operation) {
-    echo "--- Iteration $i ---" . \PHP_EOL;
-    try {
-        var_dump(flock($fp, $operation));
-    } catch (\TypeError|\ValueError $e) {
-        echo $e->getMessage() . \PHP_EOL;
-    }
-    $i++;
+  echo "\n--- Iteration $i ---";
+  var_dump(flock($fp, $operation));
+  $i++;
 }
 
 
 /* Invalid arguments */
 $fp = fopen($file, "w");
 fclose($fp);
-try {
-    var_dump(flock($fp, LOCK_SH|LOCK_NB));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(flock($fp, LOCK_SH|LOCK_NB));
+
+var_dump(flock("", "", $var));
+
+/* No.of args leass than expected */
+var_dump(flock());
+var_dump(flock($fp));
+
+/* No.of args greater than expected */
+var_dump(flock($fp, "", $var, ""));
 ?>
 --CLEAN--
 <?php
 $file = __DIR__."/flock_error.tmp";
 unlink($file);
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing error conditions ***
+
 --- Iteration 0 ---
-flock(): Argument #2 ($operation) must be one of LOCK_SH, LOCK_EX, or LOCK_UN
+Warning: flock(): Illegal operation argument in %s on line %d
+bool(false)
+
 --- Iteration 1 ---
-flock(): Argument #2 ($operation) must be one of LOCK_SH, LOCK_EX, or LOCK_UN
+Warning: flock(): Illegal operation argument in %s on line %d
+bool(false)
+
 --- Iteration 2 ---
-flock(): Argument #2 ($operation) must be one of LOCK_SH, LOCK_EX, or LOCK_UN
+Warning: flock(): Illegal operation argument in %s on line %d
+bool(false)
+
 --- Iteration 3 ---
-flock(): Argument #2 ($operation) must be of type int, array given
+Warning: flock(): Illegal operation argument in %s on line %d
+bool(false)
+
 --- Iteration 4 ---
-flock(): Argument #2 ($operation) must be of type int, array given
+Warning: flock() expects parameter 2 to be int, array given in %s on line %d
+NULL
+
 --- Iteration 5 ---
-flock(): Argument #2 ($operation) must be of type int, string given
+Warning: flock() expects parameter 2 to be int, array given in %s on line %d
+NULL
+
 --- Iteration 6 ---
-flock(): Argument #2 ($operation) must be of type int, string given
+Warning: flock() expects parameter 2 to be int, string given in %s on line %d
+NULL
+
 --- Iteration 7 ---
-flock(): Argument #2 ($operation) must be of type int, string given
-flock(): supplied resource is not a valid stream resource
+Warning: flock() expects parameter 2 to be int, string given in %s on line %d
+NULL
+
+--- Iteration 8 ---
+Warning: flock() expects parameter 2 to be int, string given in %s on line %d
+NULL
+
+Warning: flock(): supplied resource is not a valid stream resource in %s on line %d
+bool(false)
+
+Warning: flock() expects parameter 1 to be resource, string given in %s on line %d
+NULL
+
+Warning: flock() expects at least 2 parameters, 0 given in %s on line %d
+NULL
+
+Warning: flock() expects at least 2 parameters, 1 given in %s on line %d
+NULL
+
+Warning: flock() expects at most 3 parameters, 4 given in %s on line %d
+NULL

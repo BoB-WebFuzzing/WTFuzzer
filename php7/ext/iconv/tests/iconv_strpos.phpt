@@ -1,34 +1,30 @@
 --TEST--
 iconv_strpos()
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php extension_loaded('iconv') or die('skip iconv extension is not available'); ?>
 --INI--
 iconv.internal_charset=ISO-8859-1
 --FILE--
 <?php
+function my_error_handler($errno, $errmsg, $filename, $linenum, $vars)
+{
+	echo "$errno: $errmsg\n";
+}
+set_error_handler('my_error_handler');
 function foo($haystk, $needle, $offset, $to_charset = false, $from_charset = false)
 {
-    if ($from_charset !== false) {
-        $haystk = iconv($from_charset, $to_charset, $haystk);
-    }
-    try {
-        var_dump(strpos($haystk, $needle, $offset));
-    } catch (ValueError $exception) {
-        echo $exception->getMessage() . "\n";
-    }
-    try {
-        if ($to_charset !== false) {
-            var_dump(iconv_strpos($haystk, $needle, $offset, $to_charset));
-        } else {
-            var_dump(iconv_strpos($haystk, $needle, $offset));
-        }
-    } catch (ValueError $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+	if ($from_charset !== false) {
+		$haystk = iconv($from_charset, $to_charset, $haystk);
+	}
+	var_dump(strpos($haystk, $needle, $offset));
+	if ($to_charset !== false) {
+		var_dump(iconv_strpos($haystk, $needle, $offset, $to_charset));
+	} else {
+		var_dump(iconv_strpos($haystk, $needle, $offset));
+	}
 }
 foo("abecdbcdabef", "bcd", -1);
 foo("abecdbcdabef", "bcd", -7);
-foo("abecdbcdabef", "bcd", 12);
 foo("abecdbcdabef", "bcd", 100000);
 foo("abcabcabcdabcababcdabc", "bcd", 0);
 foo("abcabcabcdabcababcdabc", "bcd", 10);
@@ -41,15 +37,14 @@ var_dump(iconv_strpos("string", ""));
 var_dump(iconv_strpos("", "string"));
 
 ?>
---EXPECT--
+--EXPECTF--
 bool(false)
 bool(false)
 int(5)
 int(5)
+2: %s
 bool(false)
 bool(false)
-strpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
-iconv_strpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
 int(7)
 int(7)
 int(16)

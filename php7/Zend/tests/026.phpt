@@ -4,8 +4,8 @@ Trying assign value to property when an object is not returned in a function
 <?php
 
 class foo {
-    public function a() {
-    }
+	public function a() {
+	}
 }
 
 $test = new foo;
@@ -13,16 +13,13 @@ $test = new foo;
 $test->a()->a;
 print "ok\n";
 
-try {
-    $test->a()->a = 1;
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
+$test->a()->a = 1;
 print "ok\n";
 
 ?>
 --EXPECTF--
-Warning: Attempt to read property "a" on null in %s on line %d
+Notice: Trying to get property 'a' of non-object in %s on line %d
 ok
-Attempt to assign property "a" on null
+
+Warning: Creating default object from empty value in %s on line %d
 ok

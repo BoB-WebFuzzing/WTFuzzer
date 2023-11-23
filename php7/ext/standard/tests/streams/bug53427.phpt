@@ -12,7 +12,6 @@ var_dump($read);
 stream_select($read, $write, $except, 0);
 
 var_dump($read);
-?>
 --EXPECTF--
 array(2) {
   [1]=>

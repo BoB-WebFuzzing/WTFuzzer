@@ -4,18 +4,9 @@ set_error_handler(function($_, $msg) {
     throw new Exception($msg);
 });
 
-if ($argc > 1) {
-    $dir = $argv[1];
-} else {
-    $dir = __DIR__ . '/../..';
-}
-if (!is_dir($dir)) {
-    echo "Directory $dir does not exist.\n";
-    exit(1);
-}
-
+$rootDir = __DIR__ . '/../..';
 $it = new RecursiveIteratorIterator(
-    new RecursiveDirectoryIterator($dir),
+    new RecursiveDirectoryIterator($rootDir),
     RecursiveIteratorIterator::LEAVES_ONLY
 );
 
@@ -31,11 +22,9 @@ $excludes = [
     'ext/hash/php_hash_whirlpool_tables.h',
     'ext/mbstring/libmbfl/',
     'ext/mbstring/unicode_data.h',
-    'ext/opcache/jit/dynasm',
-    'ext/opcache/jit/libudis86',
-    'ext/opcache/jit/vtune',
     'ext/pcre/pcre2lib/',
     'ext/standard/html_tables/html_table_gen.php',
+    'ext/xmlrpc/libxmlrpc/',
     'sapi/cli/php_http_parser.c',
     'sapi/cli/php_http_parser.h',
     'sapi/litespeed/',
@@ -73,11 +62,12 @@ foreach ($it as $file) {
         $code = stripTrailingWhitespace($code);
         $code = reindentToSpaces($code);
     } else if ($lang === 'phpt') {
-        $code = transformTestCode($code, function(string $code) {
+        // TODO: Don't reformat .phpt on PHP-7.4.
+        /*$code = transformTestCode($code, function(string $code) {
             $code = stripTrailingWhitespace($code);
             $code = reindentToSpaces($code);
             return $code;
-        });
+        });*/
     }
 
     if ($origCode !== $code) {
@@ -126,9 +116,9 @@ function transformTestCode(string $code, callable $transformer): string {
     }
 
     return preg_replace_callback(
-        '/(--(?:FILE|SKIPIF|CLEAN)--)(.+?)(?=--[A-Z_]+--)/s',
+        '/(--FILE--)(.+?)(--[A-Z_]+--)/s',
         function(array $matches) use($transformer) {
-            return $matches[1] . $transformer($matches[2]);
+            return $matches[1] . $transformer($matches[2]) . $matches[3];
         },
         $code
     );
@@ -144,7 +134,8 @@ function getLanguageFromExtension(string $ext): ?string {
     case 're':
         return 'c';
     case 'php':
-    case 'inc':
+    // TODO: Reformat .inc files.
+    //case 'inc':
         return 'php';
     case 'phpt':
         return 'phpt';

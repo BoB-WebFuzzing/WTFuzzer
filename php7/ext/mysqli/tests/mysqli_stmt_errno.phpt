@@ -1,14 +1,25 @@
 --TEST--
 mysqli_stmt_errno()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require 'table.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_stmt_errno()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_stmt_errno($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require('table.inc');
 
     if (!$stmt = mysqli_stmt_init($link))
         printf("[003] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -38,23 +49,20 @@ require_once 'skipifconnectfailure.inc';
 
     // set after client error
     if (0 === ($tmp = mysqli_stmt_errno($stmt)))
-        printf("[010] Expecting int/any non zero, got %s/%s\n", gettype($tmp), $tmp);
+        printf("[010] Execting int/any non zero, got %s/%s\n", gettype($tmp), $tmp);
 
     mysqli_stmt_close($stmt);
 
-    try {
-        mysqli_stmt_errno($stmt);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_stmt_errno($stmt)))
+        printf("[011] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     mysqli_close($link);
     print "done!";
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
---EXPECT--
-mysqli_stmt object is already closed
+--EXPECTF--
+Warning: mysqli_stmt_errno(): Couldn't fetch mysqli_stmt in %s on line %d
 done!

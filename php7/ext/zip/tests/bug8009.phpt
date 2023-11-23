@@ -1,7 +1,9 @@
 --TEST--
 Bug #8009 (cannot add again same entry to an archive)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 $thisdir = __DIR__;
@@ -19,6 +21,5 @@ $zip->close();
 unlink($filename);
 echo "status: " . $zip->status . "\n";
 echo "\n";
-?>
 --EXPECT--
 status: 0

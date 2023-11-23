@@ -4,13 +4,13 @@ strip comments and whitespace with -w
 <?php
 include "skipif.inc";
 if (substr(PHP_OS, 0, 3) == 'WIN') {
-    die ("skip not for Windows");
+	die ("skip not for Windows");
 }
 ?>
 --FILE--
 <?php
 
-$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+$php = getenv('TEST_PHP_EXECUTABLE');
 
 $filename = __DIR__.'/007.test.php';
 $code ='
@@ -18,12 +18,12 @@ $code ='
 /* some test script */
 
 class test { /* {{{ */
-    public $var = "test"; //test var
-#perl style comment
-    private $pri; /* private attr */
+	public $var = "test"; //test var
+#perl style comment 
+	private $pri; /* private attr */
 
-    function foo(/* void */) {
-    }
+	function foo(/* void */) {
+	}
 }
 /* }}} */
 
@@ -45,8 +45,8 @@ string(81) "
 <?php
  class test { public $var = "test"; private $pri; function foo() { } } ?>
 "
-Could not open input file: wrong
-NULL
+string(33) "Could not open input file: wrong
+"
 string(43) "<?php  class test { function foo() {} } ?>
 "
 Done

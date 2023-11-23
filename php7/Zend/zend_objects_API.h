@@ -20,21 +20,19 @@
 #ifndef ZEND_OBJECTS_API_H
 #define ZEND_OBJECTS_API_H
 
-#include "zend_types.h"
-#include "zend_gc.h"
-#include "zend_alloc.h"
-#include "zend_compile.h" /* For zend_property_info */
+#include "zend.h"
+#include "zend_compile.h"
 
 #define OBJ_BUCKET_INVALID			(1<<0)
 
-#define IS_OBJ_VALID(o)				(!(((uintptr_t)(o)) & OBJ_BUCKET_INVALID))
+#define IS_OBJ_VALID(o)				(!(((zend_uintptr_t)(o)) & OBJ_BUCKET_INVALID))
 
-#define SET_OBJ_INVALID(o)			((zend_object*)((((uintptr_t)(o)) | OBJ_BUCKET_INVALID)))
+#define SET_OBJ_INVALID(o)			((zend_object*)((((zend_uintptr_t)(o)) | OBJ_BUCKET_INVALID)))
 
-#define GET_OBJ_BUCKET_NUMBER(o)	(((intptr_t)(o)) >> 1)
+#define GET_OBJ_BUCKET_NUMBER(o)	(((zend_intptr_t)(o)) >> 1)
 
 #define SET_OBJ_BUCKET_NUMBER(o, n)	do { \
-		(o) = (zend_object*)((((uintptr_t)(n)) << 1) | OBJ_BUCKET_INVALID); \
+		(o) = (zend_object*)((((zend_uintptr_t)(n)) << 1) | OBJ_BUCKET_INVALID); \
 	} while (0)
 
 #define ZEND_OBJECTS_STORE_ADD_TO_FREE_LIST(h) do { \
@@ -56,7 +54,7 @@ BEGIN_EXTERN_C()
 ZEND_API void ZEND_FASTCALL zend_objects_store_init(zend_objects_store *objects, uint32_t init_size);
 ZEND_API void ZEND_FASTCALL zend_objects_store_call_destructors(zend_objects_store *objects);
 ZEND_API void ZEND_FASTCALL zend_objects_store_mark_destructed(zend_objects_store *objects);
-ZEND_API void ZEND_FASTCALL zend_objects_store_free_object_storage(zend_objects_store *objects, bool fast_shutdown);
+ZEND_API void ZEND_FASTCALL zend_objects_store_free_object_storage(zend_objects_store *objects, zend_bool fast_shutdown);
 ZEND_API void ZEND_FASTCALL zend_objects_store_destroy(zend_objects_store *objects);
 
 /* Store API functions */
@@ -87,12 +85,13 @@ static zend_always_inline size_t zend_object_properties_size(zend_class_entry *c
 			((ce->ce_flags & ZEND_ACC_USE_GUARDS) ? 0 : 1));
 }
 
-/* Allocates object type and zeros it, but not the standard zend_object and properties.
- * Standard object MUST be initialized using zend_object_std_init().
+/* Allocates object type and zeros it, but not the properties.
  * Properties MUST be initialized using object_properties_init(). */
 static zend_always_inline void *zend_object_alloc(size_t obj_size, zend_class_entry *ce) {
 	void *obj = emalloc(obj_size + zend_object_properties_size(ce));
-	memset(obj, 0, obj_size - sizeof(zend_object));
+	/* Subtraction of sizeof(zval) is necessary, because zend_object_properties_size() may be
+	 * -sizeof(zval), if the object has no properties. */
+	memset(obj, 0, obj_size - sizeof(zval));
 	return obj;
 }
 
@@ -108,7 +107,7 @@ static inline zend_property_info *zend_get_property_info_for_slot(zend_object *o
 static inline zend_property_info *zend_get_typed_property_info_for_slot(zend_object *obj, zval *slot)
 {
 	zend_property_info *prop_info = zend_get_property_info_for_slot(obj, slot);
-	if (prop_info && ZEND_TYPE_IS_SET(prop_info->type)) {
+	if (prop_info && prop_info->type) {
 		return prop_info;
 	}
 	return NULL;

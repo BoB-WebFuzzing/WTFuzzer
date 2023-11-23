@@ -1,7 +1,7 @@
 --TEST--
 Bug #52656 (DOMCdataSection does not work with splitText).
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $CData = new DOMCdataSection('splithere!');

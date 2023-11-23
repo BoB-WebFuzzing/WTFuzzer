@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 1: new/addfunction/handle
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test() {

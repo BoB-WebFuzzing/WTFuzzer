@@ -1,9 +1,8 @@
 --TEST--
 PDO_DBLIB: driver supports multiple queries in a single \PDO::query() call that doesn't return any rowsets
---EXTENSIONS--
-pdo_dblib
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo_dblib')) die('skip not loaded');
 require __DIR__ . '/config.inc';
 
 if (!driver_supports_batch_statements_without_select($db)) die('xfail test will fail with this version of FreeTDS');
@@ -13,11 +12,11 @@ if (!driver_supports_batch_statements_without_select($db)) die('xfail test will 
 require __DIR__ . '/config.inc';
 
 $stmt = $db->query(
-"create table #test_batch_stmt_ins_up(id int);" .
-"insert into #test_batch_stmt_ins_up values(1), (2), (3);" .
-"update #test_batch_stmt_ins_up set id = 1;" .
-"insert into #test_batch_stmt_ins_up values(2);" .
-"drop table #test_batch_stmt_ins_up;"
+"create table #php_pdo(id int);" .
+"insert into #php_pdo values(1), (2), (3);" .
+"update #php_pdo set id = 1;" .
+"insert into #php_pdo values(2);" .
+"drop table #php_pdo;"
 );
 
 // check results from the create table

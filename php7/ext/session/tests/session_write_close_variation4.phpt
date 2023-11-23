@@ -1,7 +1,5 @@
 --TEST--
 Test session_write_close() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -10,6 +8,12 @@ session.use_strict_mode=0
 <?php
 
 ob_start();
+
+/*
+ * Prototype : bool session_write_close(void)
+ * Description : Write session data and end session
+ * Source code : ext/session/session.c
+ */
 
 echo "*** Testing session_write_close() : variation ***\n";
 

@@ -1,13 +1,15 @@
 --TEST--
 Overloaded function 001
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php
+if (!extension_loaded('zend-test')) die('skip zend-test extension not loaded');
+?>
 --FILE--
 <?php
-$o = new _ZendTestChildClass();
-var_dump($o->test());
 var_dump(_ZendTestClass::test());
 ?>
---EXPECT--
-string(4) "test"
-string(4) "test"
+--EXPECTF--
+Fatal error: Uncaught Error: Cannot call overloaded function for non-object in %soverloaded_func_001.php:%d
+Stack trace:
+#0 {main}
+  thrown in %soverloaded_func_001.php on line %d

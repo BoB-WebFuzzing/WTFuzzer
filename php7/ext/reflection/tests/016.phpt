@@ -1,7 +1,11 @@
 --TEST--
 ReflectionExtension::getDependencies()
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+if (!extension_loaded("xml")) {
+  die('skip xml extension not available');
+}
+?>
 --FILE--
 <?php
 $ext = new ReflectionExtension("xml");

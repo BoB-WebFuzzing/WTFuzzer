@@ -1,9 +1,17 @@
 --TEST--
 Test mb_convert_encoding() function : array functionality
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_convert_encoding') or die("skip mb_convert_encoding() is not available in this build");
+?>
 --FILE--
 <?php
+/* Prototype  : string mb_convert_encoding(string $str, string $to_encoding [, mixed $from_encoding])
+ * Description: Returns converted string in desired encoding
+ * Source code: ext/mbstring/mbstring.c
+ */
+
 /*
  * Test basic functionality of mb_convert_encoding()
  */
@@ -22,10 +30,10 @@ $utf8_string[] = base64_decode('5pel5pys6Kqe44OG44Kt44K544OI44Gn44GZ44CCMDEyMzTv
 
 
 function base64_encode_array($input) {
-    foreach ($input as $var) {
-        $ret[] = base64_encode($var);
-    }
-    return $ret;
+	foreach ($input as $var) {
+		$ret[] = base64_encode($var);
+	}
+	return $ret;
 }
 
 echo "\n-- Convert to JIS --\n";

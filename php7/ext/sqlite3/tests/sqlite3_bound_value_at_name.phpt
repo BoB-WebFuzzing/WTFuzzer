@@ -1,7 +1,7 @@
 --TEST--
 SQLite3::prepare Bound Value test
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -23,7 +23,7 @@ var_dump($stmt->bindValue('@id', $foo, SQLITE3_TEXT));
 $results = $stmt->execute();
 while ($result = $results->fetchArray(SQLITE3_NUM))
 {
-    var_dump($result);
+	var_dump($result);
 }
 $results->finalize();
 

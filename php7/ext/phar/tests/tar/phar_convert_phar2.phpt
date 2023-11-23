@@ -1,8 +1,8 @@
 --TEST--
 Phar::convertToPhar() gzipped
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
+<?php if (!extension_loaded("zlib")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -37,11 +37,13 @@ var_dump($phar->isCompressed() == Phar::GZ);
 var_dump(strlen($phar->getStub()));
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar');
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.gz');
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.tar');
+unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.tar.gz');
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '2.phar');
 __HALT_COMPILER();
 ?>
@@ -57,3 +59,4 @@ int(6641)
 bool(true)
 bool(true)
 int(6641)
+===DONE===

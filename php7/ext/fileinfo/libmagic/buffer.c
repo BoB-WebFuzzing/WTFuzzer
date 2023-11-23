@@ -27,11 +27,13 @@
 #include "file.h"
 
 #ifndef	lint
-FILE_RCSID("@(#)$File: buffer.c,v 1.8 2020/02/16 15:52:49 christos Exp $")
+FILE_RCSID("@(#)$File: buffer.c,v 1.6 2019/05/07 02:27:11 christos Exp $")
 #endif	/* lint */
 
 #include "magic.h"
-#ifdef HAVE_UNISTD_H
+#ifdef PHP_WIN32
+#include "win32/unistd.h"
+#else
 #include <unistd.h>
 #endif
 #include <string.h>
@@ -66,7 +68,7 @@ buffer_fill(const struct buffer *bb)
 	struct buffer *b = CCAST(struct buffer *, bb);
 
 	if (b->elen != 0)
-		return b->elen == FILE_BADSIZE ? -1 : 0;
+		return b->elen == CAST(size_t, ~0) ? -1 : 0;
 
 	if (!S_ISREG(b->st.st_mode))
 		goto out;
@@ -87,6 +89,6 @@ buffer_fill(const struct buffer *bb)
 
 	return 0;
 out:
-	b->elen = FILE_BADSIZE;
+	b->elen = CAST(size_t, ~0);
 	return -1;
 }

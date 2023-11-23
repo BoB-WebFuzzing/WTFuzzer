@@ -1,13 +1,14 @@
 --TEST--
 SimpleXML: Simple document
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 
 var_dump(simplexml_load_file(__DIR__.'/sxe.xml'));
 
 ?>
+===DONE===
 --EXPECTF--
 object(SimpleXMLElement)#%d (2) {
   ["@attributes"]=>
@@ -39,3 +40,4 @@ object(SimpleXMLElement)#%d (2) {
     }
   }
 }
+===DONE===

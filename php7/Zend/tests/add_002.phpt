@@ -9,9 +9,9 @@ $o = new stdclass;
 $o->prop = "value";
 
 try {
-    var_dump($a + $o);
+	var_dump($a + $o);
 } catch (Error $e) {
-    echo "\nException: " . $e->getMessage() . "\n";
+	echo "\nException: " . $e->getMessage() . "\n";
 }
 
 $c = $a + $o;
@@ -20,9 +20,13 @@ var_dump($c);
 echo "Done\n";
 ?>
 --EXPECTF--
-Exception: Unsupported operand types: array + stdClass
+Notice: Object of class stdClass could not be converted to number in %sadd_002.php on line %d
 
-Fatal error: Uncaught TypeError: Unsupported operand types: array + stdClass in %s:%d
+Exception: Unsupported operand types
+
+Notice: Object of class stdClass could not be converted to number in %s on line %d
+
+Fatal error: Uncaught Error: Unsupported operand types in %s:%d
 Stack trace:
 #0 {main}
   thrown in %s on line %d

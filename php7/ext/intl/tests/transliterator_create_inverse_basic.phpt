@@ -1,7 +1,7 @@
 --TEST--
 Transliterator::createInverse (basic)
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 
@@ -25,7 +25,6 @@ var_dump($orstr === $recovstr);
 var_dump($orstr === $recovstr2);
 
 echo "Done.\n";
-?>
 --EXPECT--
 オーシャンビュー
 ōshanbyū

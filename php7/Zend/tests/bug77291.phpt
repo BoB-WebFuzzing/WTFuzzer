@@ -35,6 +35,8 @@ var_dump(isset($foo->a));
 $foo = new Foo45;
 var_dump($foo->a);
 ?>
+===DONE===
 --EXPECT--
 bool(true)
 string(10) "Some value"
+===DONE===

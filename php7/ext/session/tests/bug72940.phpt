@@ -5,8 +5,6 @@ error_reporting=-1
 session.save_path=
 session.name=PHPSESSID
 session.save_handler=files
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --COOKIE--

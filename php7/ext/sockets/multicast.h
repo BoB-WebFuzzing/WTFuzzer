@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -51,17 +53,17 @@ int php_do_setsockopt_ipv6_mcast(php_socket *php_sock,
 								 int optname,
 								 zval *arg4);
 
-zend_result php_if_index_to_addr4(
+int php_if_index_to_addr4(
         unsigned if_index,
         php_socket *php_sock,
         struct in_addr *out_addr);
 
-zend_result php_add4_to_if_index(
+int php_add4_to_if_index(
         struct in_addr *addr,
         php_socket *php_sock,
         unsigned *if_index);
 
-zend_result php_string_to_if_index(const char *val, unsigned *out);
+int php_string_to_if_index(const char *val, unsigned *out);
 
 int php_mcast_join(
 	php_socket *sock,

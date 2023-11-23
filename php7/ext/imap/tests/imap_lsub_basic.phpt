@@ -2,47 +2,59 @@
 imap_lsub() function : basic functionality
 --CREDITS--
 Olivier Doucet
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
-require_once(__DIR__.'/setup/skipif.inc');
-if (getenv("SKIP_ASAN")) die("xleak leak sanitizer crashes");
+require_once(__DIR__.'/skipif.inc');
 ?>
---CONFLICTS--
-defaultmailbox
 --FILE--
 <?php
+echo "Checking with no parameters\n";
+imap_lsub();
 
-require_once(__DIR__.'/setup/imap_include.inc');
-$stream_id = imap_open(IMAP_DEFAULT_MAILBOX, IMAP_MAILBOX_USERNAME, IMAP_MAILBOX_PASSWORD) or
-    die("Cannot connect to mailbox " .IMAP_DEFAULT_MAILBOX. ": " . imap_last_error());
+echo  "Checking with incorrect parameter type\n";
+imap_lsub('');
+imap_lsub(false);
 
-var_dump(imap_lsub($stream_id, IMAP_DEFAULT_MAILBOX, 'ezDvfXvbvcxSerz'));
+require_once(__DIR__.'/imap_include.inc');
+$stream_id = imap_open($default_mailbox, $username, $password) or
+	die("Cannot connect to mailbox $default_mailbox: " . imap_last_error());
+
+imap_lsub($stream_id);
+imap_lsub($stream_id,$default_mailbox);
+var_dump(imap_lsub($stream_id,$default_mailbox,'ezDvfXvbvcxSerz'));
 
 
 echo "Checking OK\n";
 
-$newbox = IMAP_DEFAULT_MAILBOX . "." . IMAP_MAILBOX_PHPT_PREFIX;
+$newbox = $default_mailbox . "." . $mailbox_prefix;
 
 imap_createmailbox($stream_id, $newbox);
 imap_subscribe($stream_id, $newbox);
 
-$z = imap_lsub($stream_id, IMAP_DEFAULT_MAILBOX, '*');
+$z = imap_lsub($stream_id,$default_mailbox,'*');
 
 var_dump(is_array($z));
-
-// e.g. "{127.0.0.1:143/norsh}INBOX.phpttest"
 var_dump($z[0]);
 
 imap_close($stream_id);
 ?>
 --CLEAN--
 <?php
-$mailbox_suffix = '';
-require_once(__DIR__.'/setup/clean.inc');
+require_once('clean.inc');
 ?>
 --EXPECTF--
+Checking with no parameters
+
+Warning: imap_lsub() expects exactly 3 parameters, 0 given in %s on line %d
+Checking with incorrect parameter type
+
+Warning: imap_lsub() expects exactly 3 parameters, 1 given in %s on line %d
+
+Warning: imap_lsub() expects exactly 3 parameters, 1 given in %s on line %d
+
+Warning: imap_lsub() expects exactly 3 parameters, 1 given in %s on line %d
+
+Warning: imap_lsub() expects exactly 3 parameters, 2 given in %s on line %d
 bool(false)
 Checking OK
 bool(true)

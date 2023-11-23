@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -2569,7 +2571,7 @@ static int parse_enumerator(int sym, zend_ffi_dcl *enum_dcl, int64_t *min, int64
 
 static int parse_declarator(int sym, zend_ffi_dcl *dcl, const char **name, size_t *name_len) {
 	zend_ffi_dcl nested_dcl = {ZEND_FFI_DCL_CHAR, 0, 0, 0, NULL};
-	bool nested = 0;
+	zend_bool nested = 0;
 	if (sym == YY__STAR) {
 		sym = parse_pointer(sym, dcl);
 	}
@@ -2598,7 +2600,7 @@ static int parse_declarator(int sym, zend_ffi_dcl *dcl, const char **name, size_
 
 static int parse_abstract_declarator(int sym, zend_ffi_dcl *dcl) {
 	zend_ffi_dcl nested_dcl = {ZEND_FFI_DCL_CHAR, 0, 0, 0, NULL};
-	bool nested = 0;
+	zend_bool nested = 0;
 	if (sym == YY__STAR) {
 		sym = parse_pointer(sym, dcl);
 	}
@@ -2623,7 +2625,7 @@ static int parse_abstract_declarator(int sym, zend_ffi_dcl *dcl) {
 
 static int parse_parameter_declarator(int sym, zend_ffi_dcl *dcl, const char **name, size_t *name_len) {
 	zend_ffi_dcl nested_dcl = {ZEND_FFI_DCL_CHAR, 0, 0, 0, NULL};
-	bool nested = 0;
+	zend_bool nested = 0;
 	if (sym == YY__STAR) {
 		sym = parse_pointer(sym, dcl);
 	}
@@ -2863,7 +2865,7 @@ _yy_state_119:
 static int parse_parameter_declaration(int sym, HashTable **args) {
 	const char *name = NULL;
 	size_t name_len = 0;
-	bool old_allow_vla = FFI_G(allow_vla);
+	zend_bool old_allow_vla = FFI_G(allow_vla);
 	FFI_G(allow_vla) = 1;
 	zend_ffi_dcl param_dcl = ZEND_FFI_ATTR_INIT;
 	sym = parse_specifier_qualifier_list(sym, &param_dcl);
@@ -2965,7 +2967,7 @@ static int parse_attrib(int sym, zend_ffi_dcl *dcl) {
 	size_t name_len;
 	int n;
 	zend_ffi_val val;
-	bool orig_attribute_parsing;
+	zend_bool orig_attribute_parsing;
 	if (sym == YY_ID || sym == YY_CONST || sym == YY___CONST || sym == YY___CONST__) {
 		if (sym == YY_ID) {
 			sym = parse_ID(sym, &name, &name_len);
@@ -3552,7 +3554,7 @@ static void parse(void) {
 	}
 }
 
-zend_result zend_ffi_parse_decl(const char *str, size_t len) {
+int zend_ffi_parse_decl(const char *str, size_t len) {
 	if (SETJMP(FFI_G(bailout))==0) {
 		FFI_G(allow_vla) = 0;
 		FFI_G(attribute_parsing) = 0;
@@ -3565,7 +3567,7 @@ zend_result zend_ffi_parse_decl(const char *str, size_t len) {
 	}
 }
 
-zend_result zend_ffi_parse_type(const char *str, size_t len, zend_ffi_dcl *dcl) {
+int zend_ffi_parse_type(const char *str, size_t len, zend_ffi_dcl *dcl) {
 	int sym;
 
 	if (SETJMP(FFI_G(bailout))==0) {

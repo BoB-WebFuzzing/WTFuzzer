@@ -9,19 +9,14 @@ function foobar($errno, $errstr, $errfile, $errline) { }
 set_error_handler('foobar');
 
 function test($x) {
-    global $foo;
+	global $foo;
 
-    $x->invokeArgs(array(0));
+	$x->invokeArgs(array(0));
 }
 
 $x = new ReflectionFunction('str_pad');
-try {
-    test($x);
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+test($x);
 ?>
 DONE
 --EXPECT--
-str_pad() expects at least 2 arguments, 1 given
 DONE

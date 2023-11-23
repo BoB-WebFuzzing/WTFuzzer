@@ -1,10 +1,9 @@
 --TEST--
 libgd #100 (spurious horizontal line drawn by gdImageFilledPolygon)
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
-    if (!GD_BUNDLED) die("skip requires bundled GD library\n");
+	if (!extension_loaded('gd')) die("skip gd extension not available\n");
+	if (!GD_BUNDLED) die("skip requires bundled GD library\n");
 ?>
 --FILE--
 <?php
@@ -31,10 +30,10 @@ $points = array(
   $x,      $top,
   $x+2*$d, $top,
   $x+2*$d, $bot,
-  $x+$d,   (int) (($top+$bot)/2),
+  $x+$d,   ($top+$bot)/2,
   $x,      $bot
 );
-imagefilledpolygon($im, $points, $yellow);
+imagefilledpolygon($im, $points, 5, $yellow);
 
 // left-facing M not on baseline
 $top = 40;
@@ -48,7 +47,7 @@ $points = array(
   $left,  $bot,
   ($left+$right)/2, ($top+$bot)/2
 );
-imagefilledpolygon($im, $points, $purple);
+imagefilledpolygon($im, $points, 5, $purple);
 
 // left-facing M on baseline
 $top = 240;
@@ -62,7 +61,7 @@ $points = array(
   $left,  $bot,
   ($left+$right)/2, ($top+$bot)/2
 );
-imagefilledpolygon($im, $points, $magenta);
+imagefilledpolygon($im, $points, 5, $magenta);
 
 // left-facing M on ceiling
 $top = -15;
@@ -76,23 +75,23 @@ $points = array(
   $left,  $bot,
   ($left+$right)/2, ($top+$bot)/2
 );
-imagefilledpolygon($im, $points, $blue);
+imagefilledpolygon($im, $points, 5, $blue);
 
 $d = 30;
 $x = 150;
 $y = 150;
 $diamond = array($x-$d, $y, $x, $y+$d, $x+$d, $y, $x, $y-$d);
-imagefilledpolygon($im, $diamond, $green);
+imagefilledpolygon($im, $diamond, 4, $green);
 
 $x = 180;
 $y = 225;
 $diamond = array($x-$d, $y, $x, $y+$d, $x+$d, $y, $x, $y-$d);
-imagefilledpolygon($im, $diamond, $red);
+imagefilledpolygon($im, $diamond, 4, $red);
 
 $x = 225;
 $y = 255;
 $diamond = array($x-$d, $y, $x, $y+$d, $x+$d, $y, $x, $y-$d);
-imagefilledpolygon($im, $diamond, $cyan);
+imagefilledpolygon($im, $diamond, 4, $cyan);
 
 // M (bridge) not touching bottom boundary
 $top = 100;
@@ -105,7 +104,7 @@ $points = array(
   $x+$d,   ($top+$bot)/2,
   $x,      $bot
 );
-imagefilledpolygon($im, $points, $black);
+imagefilledpolygon($im, $points, 5, $black);
 
 include_once __DIR__ . '/func.inc';
 test_image_equals_file(__DIR__ . '/libgd00100.png', $im);

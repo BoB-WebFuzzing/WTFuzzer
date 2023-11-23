@@ -50,11 +50,17 @@ for ($interval = 0; $interval < $max_interval; $interval += $step) {
     usleep($interval);
 }
 echo "Reached interval $interval us with $step us steps\n";
-$tester->readAllLogNotices('Reloading in progress ...');
+$tester->expectLogNotice('Reloading in progress ...');
+/* Consume mix of 'Reloading in progress ...' and 'reloading: .*' */
+$tester->getLogLines(2000);
 
-$tester->reload();
-$tester->expectLogReloadingNotices();
+$tester->signal('USR2');
+$tester->expectLogNotice('Reloading in progress ...');
+$tester->expectLogNotice('reloading: .*');
+$tester->expectLogNotice('using inherited socket fd=\d+, "127.0.0.1:\d+"');
+$tester->expectLogStartNotices();
 $tester->ping('{{ADDR}}');
+
 $tester->terminate();
 $tester->expectLogTerminatingNotices();
 $tester->close();

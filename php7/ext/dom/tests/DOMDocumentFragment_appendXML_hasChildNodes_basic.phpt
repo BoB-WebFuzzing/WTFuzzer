@@ -1,7 +1,7 @@
 --TEST--
 Testing DOMDocumentFragment::appendXML and DOMDocumentFragment::hasChildNodes
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $doc = new DOMDocument();
@@ -18,7 +18,6 @@ if ($fragment->hasChildNodes()) {
 } else {
   echo "has no child nodes\n";
 }
-?>
 --EXPECT--
 has no child nodes
 has child nodes

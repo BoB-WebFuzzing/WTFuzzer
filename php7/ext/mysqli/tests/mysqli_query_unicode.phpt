@@ -1,11 +1,12 @@
 --TEST--
 mysqli_query() - unicode (cyrillic)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
-require_once 'table.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
+require_once('connect.inc');
+require_once('table.inc');
 if (!$res = mysqli_query($link, "SHOW CHARACTER SET LIKE 'utf8'"))
     die("skip UTF8 chatset seems not available");
 mysqli_free_result($res);
@@ -13,10 +14,24 @@ mysqli_close($link);
 ?>
 --FILE--
 <?php
-    require_once 'table.inc';
+    include_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_query()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_query($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    require_once('table.inc');
 
     if (TRUE !== ($tmp = @mysqli_query($link, "set names utf8")))
         printf("[002.5] Expecting TRUE, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (NULL !== ($tmp = @mysqli_query($link, "SELECT 1 AS колона", MYSQLI_USE_RESULT, "foo")))
+        printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     if (false !== ($tmp = mysqli_query($link, 'това не е ескюел')))
         printf("[004] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
@@ -72,26 +87,16 @@ mysqli_close($link);
 
     mysqli_close($link);
 
-    try {
-        mysqli_query($link, "SELECT id FROM test");
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_query($link, "SELECT id FROM test")))
+        printf("[014] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     print "done!";
-?>
---CLEAN--
-<?php
-require_once 'connect.inc';
-$link = new mysqli($host, $user, $passwd, $db, $port, $socket);
-$link->query('DROP PROCEDURE IF EXISTS процедурка');
-$link->query('DROP FUNCTION IF EXISTS функцийка');
-$link->close();
 ?>
 --EXPECTF--
 array(1) {
   ["правилен"]=>
   string(%d) "това ескюел, но с точка и запетая"
 }
-mysqli object is already closed
+
+Warning: mysqli_query(): Couldn't fetch mysqli in %s on line %d
 done!

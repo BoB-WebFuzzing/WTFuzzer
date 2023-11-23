@@ -1,8 +1,10 @@
 --TEST--
 Test 9: Stream Wrapper XPath-Document()
---EXTENSIONS--
-zlib
-xsl
+--SKIPIF--
+<?php
+	require_once __DIR__ .'/skipif.inc';
+	if (!extension_loaded('zlib')) die('skip zlib extension not available');
+?>
 --FILE--
 <?php
 echo "Test 9: Stream Wrapper XPath-Document()";
@@ -18,7 +20,6 @@ if(!$xsl) {
 $proc->importStylesheet($xsl);
 print "\n";
 print $proc->transformToXML($dom);
-?>
 --EXPECT--
 Test 9: Stream Wrapper XPath-Document()
 <?xml version="1.0" encoding="iso-8859-1"?>

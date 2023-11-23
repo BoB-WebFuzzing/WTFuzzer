@@ -2,6 +2,10 @@
 Test isset() function : basic functionality
 --FILE--
 <?php
+/* Prototype  : bool isset  ( mixed $var  [, mixed $var  [,  $...  ]] )
+ * Description:  Determine if a variable is set and is not NULL
+ */
+
 class foo {}
 
 echo "*** Testing isset() : basic functionality ***\n";
@@ -34,6 +38,7 @@ var_dump(isset($var[1]));
 var_dump(isset($var, $var[1]));
 
 ?>
+===DONE===
 --EXPECT--
 *** Testing isset() : basic functionality ***
 Test multiple scalar variables in a group
@@ -52,3 +57,4 @@ bool(false)
 bool(true)
 bool(true)
 bool(true)
+===DONE===

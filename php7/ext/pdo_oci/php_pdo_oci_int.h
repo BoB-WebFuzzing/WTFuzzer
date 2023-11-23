@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -14,14 +16,7 @@
   +----------------------------------------------------------------------+
 */
 
-#ifndef PHP_PDO_OCI_INT_H
-#define PHP_PDO_OCI_INT_H
-
-#include "zend_portability.h"
-
-ZEND_DIAGNOSTIC_IGNORED_START("-Wstrict-prototypes")
 #include <oci.h>
-ZEND_DIAGNOSTIC_IGNORED_END
 
 typedef struct {
 	const char *file;
@@ -109,8 +104,5 @@ enum {
 	PDO_OCI_ATTR_ACTION = PDO_ATTR_DRIVER_SPECIFIC,
 	PDO_OCI_ATTR_CLIENT_INFO,
 	PDO_OCI_ATTR_CLIENT_IDENTIFIER,
-	PDO_OCI_ATTR_MODULE,
-	PDO_OCI_ATTR_CALL_TIMEOUT
+	PDO_OCI_ATTR_MODULE
 };
-
-#endif	/* PHP_PDO_OCI_INT_H */

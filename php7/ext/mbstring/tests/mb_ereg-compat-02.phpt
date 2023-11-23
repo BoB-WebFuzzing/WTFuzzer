@@ -1,9 +1,8 @@
 --TEST--
 mb_ereg() compat test 2
---EXTENSIONS--
-mbstring
 --SKIPIF--
 <?php
+extension_loaded('mbstring') or die('skip');
 function_exists('mb_ereg') or die("skip mb_ereg() is not available in this build");
 ?>
 --FILE--
@@ -20,7 +19,7 @@ function_exists('mb_ereg') or die("skip mb_ereg() is not available in this build
   echo "\n";
 ?>
 --EXPECT--
-1
+32
 This is a nice and simple string
 is
 is

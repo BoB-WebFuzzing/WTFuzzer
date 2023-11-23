@@ -1,7 +1,9 @@
 --TEST--
 Test pcntl_get_last_error()
---EXTENSIONS--
-pcntl
+--SKIPIF--
+<?php
+	if (!extension_loaded("pcntl")) print "skip";
+?>
 --FILE--
 <?php
 var_dump(pcntl_get_last_error());

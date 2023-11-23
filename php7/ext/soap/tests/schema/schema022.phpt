@@ -1,21 +1,20 @@
 --TEST--
 SOAP XML Schema 22: list of unions
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--
 <?php
 include "test_schema.inc";
 $schema = <<<EOF
-    <simpleType name="testType">
-        <list>
-            <simpleType>
-                <union memberTypes="int float str"/>
-            </simpleType>
-        </list>
-    </simpleType>
+	<simpleType name="testType">
+		<list>
+			<simpleType>
+				<union memberTypes="int float str"/>
+			</simpleType>
+		</list>
+	</simpleType>
 EOF;
 test_schema($schema,'type="tns:testType"',array(123,123.5,'str'));
 echo "ok";

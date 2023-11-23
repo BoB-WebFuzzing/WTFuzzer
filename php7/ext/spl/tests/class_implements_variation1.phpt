@@ -2,15 +2,21 @@
 SPL: Test class_implements() function : variation
 --FILE--
 <?php
+/* Prototype  : array class_implements(mixed what [, bool autoload ])
+ * Description: Return all classes and interfaces implemented by SPL
+ * Source code: ext/spl/php_spl.c
+ * Alias to functions:
+ */
+
 echo "*** Testing class_implements() : variation ***\n";
 
 
 // Define error handler
-function test_error_handler($err_no, $err_msg, $filename, $linenum) {
-    if (error_reporting() & $err_no) {
-        // report non-silenced errors
-        echo "Error: $err_no - $err_msg, $filename($linenum)\n";
-    }
+function test_error_handler($err_no, $err_msg, $filename, $linenum, $vars) {
+	if (error_reporting() != 0) {
+		// report non-silenced errors
+		echo "Error: $err_no - $err_msg, $filename($linenum)\n";
+	}
 }
 set_error_handler('test_error_handler');
 
@@ -27,9 +33,9 @@ unset ($unset_var);
 // define some classes
 class classWithToString
 {
-    public function __toString() {
-        return "Class A object";
-    }
+	public function __toString() {
+		return "Class A object";
+	}
 }
 
 class classWithoutToString
@@ -99,75 +105,91 @@ $inputs = array(
 
 foreach($inputs as $key =>$value) {
       echo "\n--$key--\n";
-      try {
-        var_dump( class_implements($value, $autoload) );
-      } catch (\TypeError $e) {
-          echo $e->getMessage() . \PHP_EOL;
-      }
+      var_dump( class_implements($value, $autoload) );
 };
 
 fclose($res);
 
 ?>
+===DONE===
 --EXPECTF--
 *** Testing class_implements() : variation ***
 
 --int 0--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, int given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --int 1--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, int given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --int 12345--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, int given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --int -12345--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, int given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --float 10.5--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --float -10.5--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --float 12.3456789000e10--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --float -12.3456789000e10--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --float .5--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, float given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --empty array--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, array given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --int indexed array--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, array given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --associative array--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, array given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --nested arrays--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, array given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --uppercase NULL--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, null given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --lowercase null--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, null given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --lowercase true--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, true given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --lowercase false--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, false given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --uppercase TRUE--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, true given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --uppercase FALSE--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, false given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --empty string DQ--
 Error: 2 - class_implements(): Class  does not exist and could not be loaded, %s(%d)
@@ -178,9 +200,7 @@ Error: 2 - class_implements(): Class  does not exist and could not be loaded, %s
 bool(false)
 
 --instance of classWithToString--
-array(1) {
-  ["Stringable"]=>
-  string(10) "Stringable"
+array(0) {
 }
 
 --instance of classWithoutToString--
@@ -188,10 +208,14 @@ array(0) {
 }
 
 --undefined var--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, null given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --unset var--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, null given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
 
 --resource--
-class_implements(): Argument #1 ($object_or_class) must be of type object|string, resource given
+Error: 2 - class_implements(): object or string expected, %s(%d)
+bool(false)
+===DONE===

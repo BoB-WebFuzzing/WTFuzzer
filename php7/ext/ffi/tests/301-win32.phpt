@@ -1,8 +1,7 @@
 --TEST--
 FFI 301: FFI loading on Windows
---EXTENSIONS--
-ffi
 --SKIPIF--
+<?php require_once('skipif.inc'); ?>
 <?php if (substr(PHP_OS, 0, 3) != 'WIN') die('skip for Windows only'); ?>
 --INI--
 ffi.enable=1
@@ -11,10 +10,10 @@ ffi.enable=1
 require_once('utils.inc');
 $fn = __DIR__ . "/300-win32.h";
 $cont = str_replace(
-        "PHP_DLL_NAME",
-        ffi_get_php_dll_name(),
-        file_get_contents("$fn.in")
-    );
+		"PHP_DLL_NAME",
+		ffi_get_php_dll_name(),
+		file_get_contents("$fn.in")
+	);
 file_put_contents($fn, $cont);
 
 $ffi = FFI::load($fn);

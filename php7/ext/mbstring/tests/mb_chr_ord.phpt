@@ -1,22 +1,21 @@
 --TEST--
 mb_chr() and mb_ord()
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 ini_set('internal_encoding', 'utf-8');
 for($ch = 1; $ch < 80000; $ch++) {
-    $str = mb_chr($ch);
-    if (false === $str) {
-        echo "ERROR($ch)\n";
-        continue;
-    }
-    if ($ch != mb_ord($str)) {
-        echo "REAL ERROR($ch)\n";
-    }
+	$str = mb_chr($ch);
+	if (false === $str) {
+		echo "ERROR($ch)\n";
+		continue;
+	}
+	if ($ch != mb_ord($str)) {
+		echo "REAL ERROR($ch)\n";
+	}
 }
 echo 'OK';
-?>
 --EXPECT--
 ERROR(55296)
 ERROR(55297)

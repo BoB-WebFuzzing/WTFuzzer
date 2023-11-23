@@ -60,7 +60,6 @@ TODO:
 
 #include "gd.h"
 #include "gdhelpers.h"
-#include "gd_intern.h"
 
 #ifdef _MSC_VER
 # pragma optimize("t", on)
@@ -85,6 +84,8 @@ TODO:
 #define MAX(a,b) ((a)<(b)?(b):(a))
 #endif
 #define MAX3(a,b,c) ((a)<(b)?(MAX(b,c)):(MAX(a,c)))
+
+#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 /* only used here, let do a generic fixed point integers later if required by other
    part of GD */
@@ -1770,8 +1771,8 @@ gdImagePtr gdImageRotateBilinear(gdImagePtr src, const float degrees, const int 
 			const gdFixed f_j = gd_itofx((int)j - (int)new_width/2);
 			const gdFixed f_m = gd_mulfx(f_j,f_sin) + gd_mulfx(f_i,f_cos) + f_0_5 + f_H;
 			const gdFixed f_n = gd_mulfx(f_j,f_cos) - gd_mulfx(f_i,f_sin) + f_0_5 + f_W;
-			const int m = gd_fxtoi(f_m);
-			const int n = gd_fxtoi(f_n);
+			const unsigned int m = gd_fxtoi(f_m);
+			const unsigned int n = gd_fxtoi(f_n);
 
 			if ((m >= 0) && (m < src_h - 1) && (n >= 0) && (n < src_w - 1)) {
 				const gdFixed f_f = f_m - gd_itofx(m);
@@ -2301,6 +2302,7 @@ int gdTransformAffineCopy(gdImagePtr dst,
 	int backup_clipx1, backup_clipy1, backup_clipx2, backup_clipy2;
 	register int x, y, src_offset_x, src_offset_y;
 	double inv[6];
+	int *dst_p;
 	gdPointF pt, src_pt;
 	gdRect bbox;
 	int end_x, end_y;
@@ -2363,18 +2365,11 @@ int gdTransformAffineCopy(gdImagePtr dst,
 		}
 	} else {
 		for (y = 0; y <= end_y; y++) {
-			unsigned char *dst_p = NULL;
-			int *tdst_p = NULL;
-
 			pt.y = y + 0.5 + bbox.y;
 			if ((dst_y + y) < 0 || ((dst_y + y) > gdImageSY(dst) -1)) {
 				continue;
 			}
-			if (dst->trueColor) {
-				tdst_p = dst->tpixels[dst_y + y] + dst_x;
-			} else {
-				dst_p = dst->pixels[dst_y + y] + dst_x;
-			}
+			dst_p = dst->tpixels[dst_y + y] + dst_x;
 
 			for (x = 0; x <= end_x; x++) {
 				pt.x = x + 0.5 + bbox.x;
@@ -2383,11 +2378,7 @@ int gdTransformAffineCopy(gdImagePtr dst,
 				if ((dst_x + x) < 0 || (dst_x + x) > (gdImageSX(dst) - 1)) {
 					break;
 				}
-				if (dst->trueColor) {
-					*(tdst_p++) = getPixelInterpolated(src, src_offset_x + src_pt.x, src_offset_y + src_pt.y, -1);
-				} else {
-					*(dst_p++) = getPixelInterpolated(src, src_offset_x + src_pt.x, src_offset_y + src_pt.y, -1);
-				}
+				*(dst_p++) = getPixelInterpolated(src, src_offset_x + src_pt.x, src_offset_y + src_pt.y, -1);
 			}
 		}
 	}
@@ -2464,7 +2455,6 @@ int gdImageSetInterpolationMethod(gdImagePtr im, gdInterpolationMethod id)
 	switch (id) {
 		case GD_DEFAULT:
 			id = GD_BILINEAR_FIXED;
-			ZEND_FALLTHROUGH;
 		/* Optimized versions */
 		case GD_BILINEAR_FIXED:
 		case GD_BICUBIC_FIXED:
@@ -2532,29 +2522,6 @@ int gdImageSetInterpolationMethod(gdImagePtr im, gdInterpolationMethod id)
 	}
 	im->interpolation_id = id;
 	return 1;
-}
-
-/**
- * Function: gdImageGetInterpolationMethod
- *
- * Get the current interpolation method
- *
- * This is here so that the value can be read via a language or VM with an FFI
- * but no (portable) way to extract the value from the struct.
- *
- * Parameters:
- *   im - The image.
- *
- * Returns:
- *   The current interpolation method.
- *
- * See also:
- *   - <gdInterpolationMethod>
- *   - <gdImageSetInterpolationMethod>
- */
-gdInterpolationMethod gdImageGetInterpolationMethod(gdImagePtr im)
-{
-    return im->interpolation_id;
 }
 
 #ifdef _MSC_VER

@@ -1,17 +1,15 @@
 --TEST--
 Bug #71475: openssl_seal() uninitialized memory usage
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php
+if (!extension_loaded("openssl")) die("skip openssl not loaded");
+?>
 --FILE--
 <?php
 $_ = str_repeat("A", 512);
-try {
-    openssl_seal($_, $_, $_, array_fill(0,64,0));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+openssl_seal($_, $_, $_, array_fill(0,64,0));
 ?>
 DONE
---EXPECT--
-openssl_seal() expects at least 5 arguments, 4 given
+--EXPECTF--
+Warning: openssl_seal(): not a public key (1th member of pubkeys) in %s%ebug71475.php on line %d
 DONE

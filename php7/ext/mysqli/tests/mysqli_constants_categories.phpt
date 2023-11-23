@@ -1,7 +1,10 @@
 --TEST--
 Constants exported by ext/mysqli - checking category - PHP bug not mysqli bug (check from time to time)
---EXTENSIONS--
-mysqli
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+?>
 --FILE--
 <?php
     $constants = get_defined_constants(true);

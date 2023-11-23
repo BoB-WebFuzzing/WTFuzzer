@@ -9,10 +9,10 @@ class myRecursiveIteratorIterator extends RecursiveIteratorIterator {
 }
 
 try {
-    $it = new myRecursiveIteratorIterator();
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
+	$it = new myRecursiveIteratorIterator();
+} catch (InvalidArgumentException $e) {
+	echo 'InvalidArgumentException thrown';
 }
 ?>
 --EXPECT--
-RecursiveIteratorIterator::__construct() expects at least 1 argument, 0 given
+InvalidArgumentException thrown

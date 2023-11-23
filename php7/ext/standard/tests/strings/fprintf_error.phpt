@@ -7,31 +7,25 @@ Test fprintf() function (errors)
 echo "*** Testing Error Conditions ***\n";
 
 /* zero argument */
-try {
-    var_dump( fprintf() );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump( fprintf() );
 
 /* scalar argument */
-try {
-    var_dump( fprintf(3) );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump( fprintf(3) );
 
 /* NULL argument */
-try {
-    var_dump( fprintf(NULL) );
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump( fprintf(NULL) );
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing Error Conditions ***
-fprintf() expects at least 2 arguments, 0 given
-fprintf() expects at least 2 arguments, 1 given
-fprintf() expects at least 2 arguments, 1 given
+
+Warning: Wrong parameter count for fprintf() in %sfprintf_error.php on line %d
+NULL
+
+Warning: Wrong parameter count for fprintf() in %sfprintf_error.php on line %d
+NULL
+
+Warning: Wrong parameter count for fprintf() in %sfprintf_error.php on line %d
+NULL
 Done

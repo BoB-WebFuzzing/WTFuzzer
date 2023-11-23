@@ -2,6 +2,10 @@
 Test rename() function: basic functionality
 --FILE--
 <?php
+/* Prototype: bool rename ( string $oldname, string $newname [, resource $context] );
+   Description: Renames a file or directory
+*/
+
 echo "*** Testing rename() on non-existing file ***\n";
 $file_path = __DIR__;
 require "$file_path/file.inc";
@@ -27,6 +31,7 @@ $keys_to_compare = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12,
 var_dump( compare_stats($old_stat, $new_stat, $keys_to_compare) );
 
 ?>
+===Done===
 --CLEAN--
 <?php
 unlink(__DIR__."/rename_basic_new.tmp");
@@ -37,3 +42,4 @@ bool(true)
 bool(false)
 bool(true)
 bool(true)
+===Done===

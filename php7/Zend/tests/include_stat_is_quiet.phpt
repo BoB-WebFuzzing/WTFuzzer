@@ -4,7 +4,6 @@ Stats executed during include path resolution should be silent
 <?php
 
 class StreamWrapper {
-    public $context;
     public function url_stat($path, $flags) {
         $path = str_replace('test://', 'file://', $path);
         if ($flags & STREAM_URL_STAT_QUIET) {
@@ -26,9 +25,6 @@ try {
 
 ?>
 --EXPECTF--
-Warning: require_once(doesnt_exist.php): Failed to open stream: No such file or directory in %s on line %d
+Warning: require_once(doesnt_exist.php): failed to open stream: No such file or directory in %s on line %d
 
-Fatal error: Uncaught Error: Failed opening required 'doesnt_exist.php' (include_path='test://foo:test://bar') in %s:%d
-Stack trace:
-#0 {main}
-  thrown in %s on line %d
+Fatal error: require_once(): Failed opening required 'doesnt_exist.php' (include_path='test://foo:test://bar') in %s on line %d

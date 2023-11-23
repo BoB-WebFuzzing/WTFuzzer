@@ -1,7 +1,7 @@
 --TEST--
 Phar object: iterating via SplFileObject
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 --FILE--
@@ -18,7 +18,7 @@ $f = $phar['a.csv'];
 echo "===1===\n";
 foreach($f as $k => $v)
 {
-    echo "$k=>$v\n";
+	echo "$k=>$v\n";
 }
 
 $f->setFlags(SplFileObject::DROP_NEW_LINE);
@@ -26,61 +26,60 @@ $f->setFlags(SplFileObject::DROP_NEW_LINE);
 echo "===2===\n";
 foreach($f as $k => $v)
 {
-    echo "$k=>$v\n";
+	echo "$k=>$v\n";
 }
 
 class MyCSVFile extends SplFileObject
 {
-    function current(): array|false
-    {
-        return parent::fgetcsv(',', '"');
-    }
+	function current()
+	{
+		return parent::fgetcsv(',', '"');
+	}
 }
 
 $phar->setInfoClass('MyCSVFile');
-/** @var MyCSVFile $v */
 $v = $phar['a.csv'];
 
 echo "===3===\n";
 while(!$v->eof())
 {
-    echo $v->key() . "=>" . join('|', $v->fgetcsv()) . "\n";
+	echo $v->key() . "=>" . join('|',$v->fgetcsv()) . "\n";
 }
 
 echo "===4===\n";
 $v->rewind();
 while(!$v->eof())
 {
-    $l = $v->fgetcsv();
-    echo $v->key() . "=>" . join('|', $l) . "\n";
+	$l = $v->fgetcsv();
+	echo $v->key() . "=>" . join('|',$l) . "\n";
 }
 
 echo "===5===\n";
 foreach($v as $k => $d)
 {
-    echo "$k=>" . join('|', $d) . "\n";
+	echo "$k=>" . join('|',$d) . "\n";
 }
 
 class MyCSVFile2 extends SplFileObject
 {
-    function getCurrentLine(): string
-    {
-        echo __METHOD__ . "\n";
-        return implode('|', parent::fgetcsv(',', '"'));
-    }
+	function getCurrentLine()
+	{
+		echo __METHOD__ . "\n";
+		return parent::fgetcsv(',', '"');
+	}
 }
 
 $phar->setInfoClass('MyCSVFile2');
-/** @var MyCSVFile2 $v */
 $v = $phar['a.csv'];
 
 echo "===6===\n";
 foreach($v as $k => $d)
 {
-    echo "$k=>" . $d . "\n";
+	echo "$k=>" . join('|',$d) . "\n";
 }
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/files/phar_oo_008.phar.php');
@@ -116,3 +115,4 @@ MyCSVFile2::getCurrentLine
 3=>2|a|b
 MyCSVFile2::getCurrentLine
 5=>3|c|'e'
+===DONE===

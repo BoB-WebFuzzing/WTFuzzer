@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: Attributes with entities
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 
@@ -20,6 +20,7 @@ $sxe = simplexml_load_string($xml);
 var_dump($sxe);
 var_dump($sxe['attr']);
 ?>
+===DONE===
 --EXPECTF--
 object(SimpleXMLElement)#%d (1) {
   ["@attributes"]=>
@@ -32,3 +33,4 @@ object(SimpleXMLElement)#%d (1) {
   [0]=>
   string(%d) "foo%sbar%sbaz"
 }
+===DONE===

@@ -4,25 +4,27 @@ property_exists() tests
 <?php
 
 class foo {
-    public $pp1 = 1;
-    private $pp2 = 2;
-    protected $pp3 = 3;
+	public $pp1 = 1;
+	private $pp2 = 2;
+	protected $pp3 = 3;
 
-    function bar() {
-        var_dump(property_exists("foo","pp1"));
-        var_dump(property_exists("foo","pp2"));
-        var_dump(property_exists("foo","pp3"));
-    }
+	function bar() {
+		var_dump(property_exists("foo","pp1"));
+		var_dump(property_exists("foo","pp2"));
+		var_dump(property_exists("foo","pp3"));
+	}
 }
 
 class bar extends foo {
-    function test() {
-        var_dump(property_exists("foo","pp1"));
-        var_dump(property_exists("foo","pp2"));
-        var_dump(property_exists("foo","pp3"));
-    }
+	function test() {
+		var_dump(property_exists("foo","pp1"));
+		var_dump(property_exists("foo","pp2"));
+		var_dump(property_exists("foo","pp3"));
+	}
 }
 
+var_dump(property_exists());
+var_dump(property_exists(""));
 var_dump(property_exists("foo","pp1"));
 var_dump(property_exists("foo","pp2"));
 var_dump(property_exists("foo","pp3"));
@@ -39,40 +41,23 @@ var_dump(property_exists($foo,"pp2"));
 var_dump(property_exists($foo,"pp3"));
 var_dump(property_exists($foo,"nonexistent"));
 var_dump(property_exists($foo,""));
-
-try {
-    var_dump(property_exists(array(), "test"));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(property_exists(1, "test"));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(property_exists(3.14, "test"));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(property_exists(true, "test"));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
-try {
-    var_dump(property_exists(null, "test"));
-} catch (\TypeError $e) {
-    echo $e->getMessage() . \PHP_EOL;
-}
+var_dump(property_exists(array(),"test"));
+var_dump(property_exists(1,"test"));
+var_dump(property_exists(true,"test"));
 
 $foo->bar();
 
 $bar = new bar;
 $bar->test();
 
+echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
+Warning: property_exists() expects exactly 2 parameters, 0 given in %s on line %d
+NULL
+
+Warning: property_exists() expects exactly 2 parameters, 1 given in %s on line %d
+NULL
 bool(true)
 bool(true)
 bool(true)
@@ -86,14 +71,19 @@ bool(true)
 bool(true)
 bool(false)
 bool(false)
-property_exists(): Argument #1 ($object_or_class) must be of type object|string, array given
-property_exists(): Argument #1 ($object_or_class) must be of type object|string, int given
-property_exists(): Argument #1 ($object_or_class) must be of type object|string, float given
-property_exists(): Argument #1 ($object_or_class) must be of type object|string, true given
-property_exists(): Argument #1 ($object_or_class) must be of type object|string, null given
+
+Warning: First parameter must either be an object or the name of an existing class in %s on line %d
+NULL
+
+Warning: First parameter must either be an object or the name of an existing class in %s on line %d
+NULL
+
+Warning: First parameter must either be an object or the name of an existing class in %s on line %d
+NULL
 bool(true)
 bool(true)
 bool(true)
 bool(true)
 bool(true)
 bool(true)
+Done

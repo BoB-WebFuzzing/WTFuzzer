@@ -6,9 +6,9 @@ Bug #64438 proc_open hangs with stdin/out with 4097+ bytes
 error_reporting(E_ALL);
 
 if (substr(PHP_OS, 0, 3) == 'WIN') {
-    $cmd = getenv('TEST_PHP_EXECUTABLE_ESCAPED') . ' -n -r "fwrite(STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(STDERR, $in);"';
+	$cmd = PHP_BINARY . ' -n -r "fwrite(STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(STDERR, $in);"';
 } else {
-    $cmd = getenv('TEST_PHP_EXECUTABLE_ESCAPED') . ' -n -r \'fwrite(STDOUT, $in = file_get_contents("php://stdin")); fwrite(STDERR, $in);\'';
+	$cmd = PHP_BINARY . ' -n -r \'fwrite(STDOUT, $in = file_get_contents("php://stdin")); fwrite(STDERR, $in);\'';
 }
 $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
 $stdin = str_repeat('*', 4097);
@@ -65,6 +65,7 @@ while ($pipes || $writePipes) {
 var_dump($pipeEvents);
 
 ?>
+===DONE===
 --EXPECTF--
 array(2) {
   [%d]=>
@@ -82,3 +83,4 @@ array(2) {
     string(12) "Closing pipe"
   }
 }
+===DONE===

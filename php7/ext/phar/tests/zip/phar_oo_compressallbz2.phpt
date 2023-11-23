@@ -1,8 +1,8 @@
 --TEST--
 Phar::compressFiles(Phar::BZ2) zip format
---EXTENSIONS--
-phar
-bz2
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
+<?php if (!extension_loaded("bz2")) die("skip bz2 not present"); ?>
 --INI--
 phar.readonly=0
 --FILE--
@@ -42,6 +42,7 @@ var_dump($c['a']->isCompressed(Phar::GZ));
 var_dump($c['a']->isCompressed(Phar::BZ2));
 
 ?>
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.zip.php');
@@ -66,3 +67,4 @@ bool(true)
 string(1) "a"
 bool(false)
 bool(true)
+===DONE===

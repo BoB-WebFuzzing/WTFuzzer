@@ -28,5 +28,7 @@ var_dump(strlen($ret) > 0);
 stream_socket_shutdown($fd, STREAM_SHUT_RDWR);
 stream_socket_shutdown($server, STREAM_SHUT_RDWR);
 ?>
+==DONE==
 --EXPECT--
 bool(true)
+==DONE==

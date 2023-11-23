@@ -1,9 +1,8 @@
 --TEST--
 PDO_DBLIB: driver supports a batch of queries containing SELECT, INSERT, UPDATE statements
---EXTENSIONS--
-pdo_dblib
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo_dblib')) die('skip not loaded');
 require __DIR__ . '/config.inc';
 
 if (!driver_supports_batch_statements_without_select($db)) die('xfail test will fail with this version of FreeTDS');
@@ -13,15 +12,15 @@ if (!driver_supports_batch_statements_without_select($db)) die('xfail test will 
 require __DIR__ . '/config.inc';
 
 $stmt = $db->query(
-"create table #test_batch_stmt_transaction(id int);" .
-"insert into #test_batch_stmt_transaction values(1), (2), (3);" .
-"select * from #test_batch_stmt_transaction;" .
+"create table #php_pdo(id int);" .
+"insert into #php_pdo values(1), (2), (3);" .
+"select * from #php_pdo;" .
 "begin transaction;" .
-"update #test_batch_stmt_transaction set id = 4;" .
+"update #php_pdo set id = 4;" .
 "rollback transaction;" .
-"select * from #test_batch_stmt_transaction;" .
-"delete from #test_batch_stmt_transaction;" .
-"drop table #test_batch_stmt_transaction;"
+"select * from #php_pdo;" .
+"delete from #php_pdo;" .
+"drop table #php_pdo;"
 );
 
 // check results from the create table

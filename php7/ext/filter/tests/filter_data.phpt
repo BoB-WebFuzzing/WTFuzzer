@@ -1,7 +1,7 @@
 --TEST--
 Simple filter_var() tests
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --INI--
 precision=14
 --FILE--

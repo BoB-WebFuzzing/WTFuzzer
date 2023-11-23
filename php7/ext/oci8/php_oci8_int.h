@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -23,7 +25,7 @@
    +----------------------------------------------------------------------+
 */
 
-#ifdef HAVE_OCI8
+#if HAVE_OCI8
 # ifndef PHP_OCI8_INT_H
 #  define PHP_OCI8_INT_H
 
@@ -53,13 +55,7 @@
 /* }}} */
 
 #include "ext/standard/php_string.h"
-ZEND_DIAGNOSTIC_IGNORED_START("-Wstrict-prototypes")
 #include <oci.h>
-ZEND_DIAGNOSTIC_IGNORED_END
-
-#if !defined(OCI_MAJOR_VERSION) || OCI_MAJOR_VERSION < 11 || ((OCI_MAJOR_VERSION == 11) && (OCI_MINOR_VERSION < 2))
-#error This version of PHP OCI8 requires Oracle Client libraries from 11.2 or later.
-#endif
 
 extern int le_connection;
 extern int le_pconnection;
@@ -109,7 +105,7 @@ extern zend_class_entry *oci_coll_class_entry_ptr;
  * PHP_OCI_CRED_EXT must be distinct from the OCI_xxx privilege
  * values.
  */
-#define PHP_OCI_CRED_EXT                    (1u<<31)
+#define PHP_OCI_CRED_EXT                    (1<<31)
 #if ((PHP_OCI_CRED_EXT == OCI_DEFAULT) || (PHP_OCI_CRED_EXT & (OCI_SYSOPER | OCI_SYSDBA)))
 #error Invalid value for PHP_OCI_CRED_EXT
 #endif
@@ -241,8 +237,7 @@ typedef struct {
 	unsigned			 has_data:1;			/* statement has more data flag */
 	unsigned			 has_descr:1;			/* statement has at least one descriptor or cursor column */
 	ub2					 stmttype;				/* statement type */
-	ub4                  prefetch_count;        /* row prefetch count */
-	ub4                  prefetch_lob_size;     /* LOB prefetch size */
+	ub4                  prefetch_count;        /* current prefetch count */
 } php_oci_statement;
 /* }}} */
 
@@ -376,22 +371,22 @@ typedef struct {
 
 #define PHP_OCI_ZVAL_TO_CONNECTION(zval, connection) \
 	if ((connection = (php_oci_connection *)zend_fetch_resource2(Z_RES_P(zval), "oci8 connection", le_connection, le_pconnection)) == NULL) { \
-		RETURN_THROWS(); \
+		RETURN_FALSE; \
 	}
 
 #define PHP_OCI_ZVAL_TO_STATEMENT(zval, statement) \
 	if ((statement = (php_oci_statement *)zend_fetch_resource(Z_RES_P(zval), "oci8 statement", le_statement)) == NULL) { \
-		RETURN_THROWS(); \
+		RETURN_FALSE; \
 	}
 
 #define PHP_OCI_ZVAL_TO_DESCRIPTOR(zval, descriptor) \
 	if ((descriptor = (php_oci_descriptor *)zend_fetch_resource(Z_RES_P(zval), "oci8 descriptor", le_descriptor)) == NULL) { \
-		RETURN_THROWS(); \
+		RETURN_FALSE; \
 	}
 
 #define PHP_OCI_ZVAL_TO_COLLECTION(zval, collection) \
 	if ((collection = (php_oci_collection *)zend_fetch_resource(Z_RES_P(zval), "oci8 collection", le_collection)) == NULL) { \
-		RETURN_THROWS(); \
+		RETURN_FALSE; \
 	}
 
 #define PHP_OCI_FETCH_RESOURCE_EX(zval, var, type, name, resource_type)						 \
@@ -526,16 +521,16 @@ ZEND_BEGIN_MODULE_GLOBALS(oci) /* {{{ Module globals */
 	zend_long		 persistent_timeout;			/* time period after which idle persistent connection is considered expired */
 	zend_long		 statement_cache_size;			/* statement cache size. used with 9i+ clients only*/
 	zend_long		 default_prefetch;				/* default prefetch setting */
-	zend_long	 	 prefetch_lob_size;				/* amount of LOB data to read when initially getting a LOB locator */
-	bool	 privileged_connect;			/* privileged connect flag (On/Off) */
-	bool	 old_oci_close_semantics;		/* old_oci_close_semantics flag (to determine the way oci_close() should behave) */
+	zend_bool	 privileged_connect;			/* privileged connect flag (On/Off) */
+	zend_bool	 old_oci_close_semantics;		/* old_oci_close_semantics flag (to determine the way oci_close() should behave) */
+
 	int			 shutdown;						/* in shutdown flag */
 
 	OCIEnv		*env;							/* global environment handle */
 
-	bool	 in_call;
+	zend_bool	 in_call;
 	char		*connection_class;
-	bool	 events;
+	zend_bool	 events;
 	char		*edition;
 ZEND_END_MODULE_GLOBALS(oci) /* }}} */
 

@@ -1,14 +1,23 @@
 --TEST--
 mysqli_stmt_affected_rows()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifemb.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-    require_once 'connect.inc';
+    require_once("connect.inc");
+
+    $tmp    = NULL;
+    $link   = NULL;
+
+    if (!is_null($tmp = @mysqli_stmt_affected_rows()))
+        printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+    if (!is_null($tmp = @mysqli_stmt_affected_rows($link)))
+        printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 
     if (!$link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
         printf("Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
@@ -197,13 +206,18 @@ require_once 'skipifconnectfailure.inc';
     /* stmt_affected_rows is not really meant for SELECT! */
     if (mysqli_stmt_prepare($stmt, 'SELECT unknown_column FROM this_table_does_not_exist') ||
         mysqli_stmt_execute($stmt))
-        printf("[041] Expecting SELECT statement to fail on purpose\n");
+        printf("[041] The invalid SELECT statement is issued on purpose\n");
 
     if (-1 !== ($tmp = mysqli_stmt_affected_rows($stmt)))
         printf("[042] Expecting int/-1, got %s/%s\n", gettype($tmp), $tmp);
 
-    if (true !== ($tmp = mysqli_stmt_store_result($stmt)))
-        printf("[043] Expecting boolean/true, got %s/%s\n", gettype($tmp), $tmp);
+    if ($IS_MYSQLND) {
+        if (false !== ($tmp = mysqli_stmt_store_result($stmt)))
+            printf("[043] Expecting boolean/false, got %s\%s\n", gettype($tmp), $tmp);
+    } else {
+        if (true !== ($tmp = mysqli_stmt_store_result($stmt)))
+            printf("[043] Libmysql does not care if the previous statement was bogus, expecting boolean/true, got %s\%s\n", gettype($tmp), $tmp);
+    }
 
     if (0 !== ($tmp = mysqli_stmt_num_rows($stmt)))
         printf("[044] Expecting int/0, got %s/%s\n", gettype($tmp), $tmp);
@@ -220,11 +234,8 @@ require_once 'skipifconnectfailure.inc';
 
     mysqli_stmt_close($stmt);
 
-    try {
-        mysqli_stmt_affected_rows($stmt);
-    } catch (Error $exception) {
-        echo $exception->getMessage() . "\n";
-    }
+    if (false !== ($tmp = mysqli_stmt_affected_rows($stmt)))
+        printf("[047] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
 
     mysqli_close($link);
 
@@ -232,9 +243,10 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-    require_once 'clean_table.inc';
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
 [009] [%d] (error message varies with the MySQL Server version, check the error code)
-mysqli_stmt object is already closed
+
+Warning: mysqli_stmt_affected_rows(): Couldn't fetch mysqli_stmt in %s on line %d
 done!

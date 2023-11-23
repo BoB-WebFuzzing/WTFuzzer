@@ -1,7 +1,7 @@
 --TEST--
 Wrong assertion
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function foo($parts, $a, $b) {

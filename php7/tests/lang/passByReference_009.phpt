@@ -1,5 +1,5 @@
 --TEST--
-Assignment as argument
+Assignement as argument
 --FILE--
 <?php
     function foo(&$x, &$y) { $x = 1; echo $y ; }

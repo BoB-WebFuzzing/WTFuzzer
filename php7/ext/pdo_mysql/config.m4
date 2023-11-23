@@ -4,6 +4,15 @@ PHP_ARG_WITH([pdo-mysql],
     [PDO: MySQL support. DIR is the MySQL base directory. If no value or mysqlnd
     is passed as DIR, the MySQL native driver will be used])])
 
+if test -z "$PHP_ZLIB_DIR"; then
+  PHP_ARG_WITH([zlib-dir],
+    [for the location of libz],
+    [AS_HELP_STRING([[--with-zlib-dir[=DIR]]],
+      [PDO_MySQL: Set the path to libz install prefix])],
+    [no],
+    [no])
+fi
+
 if test "$PHP_PDO_MYSQL" != "no"; then
   dnl This depends on ext/mysqli/config.m4 providing the PHP_MYSQL_SOCKET_SEARCH
   dnl macro and --with-mysql-sock configure option.
@@ -49,6 +58,7 @@ if test "$PHP_PDO_MYSQL" != "no"; then
       if test "x$SED" = "x"; then
         AC_PATH_PROG(SED, sed)
       fi
+      PDO_MYSQL_LIBNAME=mysqlclient
       PDO_MYSQL_LIBS=`$PDO_MYSQL_CONFIG --libs | $SED -e "s/'//g"`
       PDO_MYSQL_INCLUDE=`$PDO_MYSQL_CONFIG --cflags | $SED -e "s/'//g"`
     elif test -n "$PDO_MYSQL_DIR"; then
@@ -79,8 +89,34 @@ if test "$PHP_PDO_MYSQL" != "no"; then
       AC_MSG_ERROR([Unable to find your mysql installation])
     fi
 
-    PHP_EVAL_INCLINE($PDO_MYSQL_INCLUDE)
-    PHP_EVAL_LIBLINE($PDO_MYSQL_LIBS, PDO_MYSQL_SHARED_LIBADD)
+    PHP_CHECK_LIBRARY($PDO_MYSQL_LIBNAME, mysql_commit,
+    [
+      PHP_EVAL_INCLINE($PDO_MYSQL_INCLUDE)
+      PHP_EVAL_LIBLINE($PDO_MYSQL_LIBS, PDO_MYSQL_SHARED_LIBADD)
+    ],[
+      if test "$PHP_ZLIB_DIR" != "no"; then
+        PHP_ADD_LIBRARY_WITH_PATH(z, $PHP_ZLIB_DIR, PDO_MYSQL_SHARED_LIBADD)
+        PHP_CHECK_LIBRARY($PDO_MYSQL_LIBNAME, mysql_commit, [], [
+          AC_MSG_ERROR([PDO_MYSQL configure failed, MySQL 4.1 needed. Please check config.log for more information.])
+        ], [
+          -L$PHP_ZLIB_DIR/$PHP_LIBDIR -L$PDO_MYSQL_LIB_DIR
+        ])
+        PDO_MYSQL_LIBS="$PDO_MYSQL_LIBS -L$PHP_ZLIB_DIR/$PHP_LIBDIR -lz"
+      else
+        PHP_ADD_LIBRARY(z,, PDO_MYSQL_SHARED_LIBADD)
+        PHP_CHECK_LIBRARY($PDO_MYSQL_LIBNAME, mysql_query, [], [
+          AC_MSG_ERROR([Try adding --with-zlib-dir=<DIR>. Please check config.log for more information.])
+        ], [
+          -L$PDO_MYSQL_LIB_DIR
+        ])
+        PDO_MYSQL_LIBS="$PDO_MYSQL_LIBS -lz"
+      fi
+
+      PHP_EVAL_INCLINE($PDO_MYSQL_INCLUDE)
+      PHP_EVAL_LIBLINE($PDO_MYSQL_LIBS, PDO_MYSQL_SHARED_LIBADD)
+    ],[
+      $PDO_MYSQL_LIBS
+    ])
   fi
 
   PHP_CHECK_PDO_INCLUDES
@@ -98,5 +134,8 @@ if test "$PHP_PDO_MYSQL" != "no"; then
     PHP_ADD_EXTENSION_DEP(pdo_mysql, mysqlnd)
   fi
 
+  PDO_MYSQL_MODULE_TYPE=external
+
   PHP_SUBST(PDO_MYSQL_SHARED_LIBADD)
+  PHP_SUBST_OLD(PDO_MYSQL_MODULE_TYPE)
 fi

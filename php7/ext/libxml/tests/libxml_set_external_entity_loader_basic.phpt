@@ -1,7 +1,7 @@
 --TEST--
 libxml_set_external_entity_loader() basic test
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php if (!extension_loaded('dom')) die('skip'); ?>
 --FILE--
 <?php
 $xml = <<<XML
@@ -14,15 +14,15 @@ $dtd = <<<DTD
 DTD;
 
 libxml_set_external_entity_loader(
-    function ($public, $system, $context) use($dtd){
-        var_dump($public);
-        var_dump($system);
-        var_dump($context);
-        $f = fopen("php://temp", "r+");
-        fwrite($f, $dtd);
-        rewind($f);
-        return $f;
-    }
+	function ($public, $system, $context) use($dtd){
+		var_dump($public);
+		var_dump($system);
+		var_dump($context);
+		$f = fopen("php://temp", "r+");
+		fwrite($f, $dtd);
+		rewind($f);
+		return $f;
+	}
 );
 
 $dd = new DOMDocument;

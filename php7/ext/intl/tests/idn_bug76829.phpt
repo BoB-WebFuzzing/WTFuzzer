@@ -1,7 +1,7 @@
 --TEST--
 Bug #76829 Incorrect validation of domain on idn_to_utf8() function
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

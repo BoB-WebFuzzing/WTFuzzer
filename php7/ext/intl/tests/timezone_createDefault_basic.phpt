@@ -1,7 +1,9 @@
 --TEST--
 IntlTimeZone::createDefault(): basic test
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+	die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -10,6 +12,7 @@ print_r($tz);
 $tz = intltz_create_default();
 print_r($tz);
 ?>
+==DONE==
 --EXPECTF--
 IntlTimeZone Object
 (
@@ -25,3 +28,4 @@ IntlTimeZone Object
     [rawOffset] => %i
     [currentOffset] => %i
 )
+==DONE==

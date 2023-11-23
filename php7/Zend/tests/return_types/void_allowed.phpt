@@ -16,6 +16,5 @@ function bar(): void {
 bar();
 
 echo "OK!", PHP_EOL;
-?>
 --EXPECT--
 OK!

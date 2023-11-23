@@ -7,6 +7,9 @@ if( substr(PHP_OS, 0, 3) == "WIN" )
 ?>
 --FILE--
 <?php
+/*  Prototype: bool fflush ( resource $handle );
+    Description: Flushes the output to a file
+*/
 
 /* test fflush() with handle of files opened in different modes */
 

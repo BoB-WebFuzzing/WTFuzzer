@@ -5,13 +5,12 @@ opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
 opcache.file_update_protection=0
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 if(constant('PHP_BINARY')) {
-    echo "OK\n";
+	echo "OK\n";
 }
-?>
 --EXPECT--
 OK

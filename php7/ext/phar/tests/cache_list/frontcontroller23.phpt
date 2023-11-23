@@ -3,12 +3,8 @@ Phar front controller with generic action router test [cache_list]
 --INI--
 default_charset=UTF-8
 phar.cache_list={PWD}/frontcontroller23.php
---EXTENSIONS--
-phar
 --SKIPIF--
-<?php
-if (getenv('SKIP_ASAN')) die('xleak LSan crashes for this test');
-?>
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller23.php
 REQUEST_URI=/frontcontroller23.php/hi/there

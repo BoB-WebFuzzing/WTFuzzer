@@ -18,6 +18,5 @@ function foo() {
 foreach (foo() as $x) {
     echo $x;
 }
-?>
 --EXPECT--
 1234567

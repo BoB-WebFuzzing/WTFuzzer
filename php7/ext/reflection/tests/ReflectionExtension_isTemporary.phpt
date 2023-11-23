@@ -5,5 +5,7 @@ ReflectionExtension::isTemporary()
 $obj = new ReflectionExtension('reflection');
 var_dump($obj->isTemporary());
 ?>
+==DONE==
 --EXPECT--
 bool(false)
+==DONE==

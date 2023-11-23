@@ -1,23 +1,20 @@
 --TEST--
 oci_lob_write() and friends (with errors)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
-require __DIR__.'/skipif.inc';
+require(__DIR__.'/skipif.inc');
 ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__.'/connect.inc');
 
 // Initialization
 
 $stmtarray = array(
-    "drop table lob_002_tab",
-    "create table lob_002_tab (id number, b1 BLOB)",
+	"drop table lob_002_tab",
+	"create table lob_002_tab (id number, b1 BLOB)",
 );
 
 oci8_test_sql_execute($c, $stmtarray);
@@ -30,9 +27,11 @@ oci_execute($statement, OCI_DEFAULT);
 var_dump($blob);
 
 var_dump($blob->write("test", -1));
+var_dump($blob->write("test", "str"));
 var_dump($blob->write("test", 1000000));
 var_dump($blob->write(str_repeat("test", 10000), 1000000));
 var_dump($blob->tell());
+var_dump($blob->seek("str", -5));
 var_dump($blob->flush());
 
 oci_commit($c);
@@ -48,20 +47,29 @@ var_dump(strlen($row[0]));
 // Cleanup
 
 $stmtarray = array(
-    "drop table lob_002_tab"
+	"drop table lob_002_tab"
 );
 
 oci8_test_sql_execute($c, $stmtarray);
 
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECTF--
-object(OCILob)#%d (1) {
+object(OCI-Lob)#%d (1) {
   ["descriptor"]=>
   resource(%d) of type (oci8 descriptor)
 }
 int(0)
+
+Warning: OCI-Lob::write() expects parameter 2 to be int%s string given in %slob_002.php on line %d
+NULL
 int(4)
 int(40000)
 int(40004)
+
+Warning: OCI-Lob::seek() expects parameter 1 to be int%s string given in %slob_002.php on line %d
+NULL
 bool(false)
 int(40004)
+===DONE===

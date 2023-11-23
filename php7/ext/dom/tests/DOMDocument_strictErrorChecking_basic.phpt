@@ -3,8 +3,8 @@ DomDocument::$strictErrorChecking - basic test
 --CREDITS--
 Vincent Tsao <notes4vincent@gmail.com>
 # TestFest 2009 NYPHP
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

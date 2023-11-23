@@ -1,11 +1,13 @@
 /*
   +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
   | Copyright (c) The PHP Group                                          |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -45,10 +47,8 @@ zend_object_iterator *php_mysqli_result_get_iterator(zend_class_entry *ce, zval 
 	php_mysqli_result_iterator *iterator;
 
 	if (by_ref) {
-		zend_throw_error(NULL, "An iterator cannot be used with foreach by reference");
-		return NULL;
+		zend_error(E_ERROR, "An iterator cannot be used with foreach by reference");
 	}
-
 	iterator = ecalloc(1, sizeof(php_mysqli_result_iterator));
 	zend_iterator_init(&iterator->intern);
 
@@ -119,8 +119,12 @@ static void php_mysqli_result_iterator_rewind(zend_object_iterator *iter)
 	MYSQLI_FETCH_RESOURCE_BY_OBJ(result, MYSQL_RES *, intern, "mysqli_result", MYSQLI_STATUS_VALID);
 
 	if (mysqli_result_is_unbuffered(result)) {
+#if MYSQLI_USE_MYSQLND
 		if (result->unbuf->eof_reached) {
-			zend_error(E_WARNING, "Data fetched with MYSQLI_USE_RESULT can be iterated only once");
+#else
+		if (result->eof) {
+#endif
+			php_error_docref(NULL, E_WARNING, "Data fetched with MYSQLI_USE_RESULT can be iterated only once");
 			return;
 		}
 	} else {
@@ -148,7 +152,6 @@ const zend_object_iterator_funcs php_mysqli_result_iterator_funcs = {
 	php_mysqli_result_iterator_current_key,
 	php_mysqli_result_iterator_move_forward,
 	php_mysqli_result_iterator_rewind,
-	NULL,
-	NULL, /* get_gc */
+	NULL
 };
 /* }}} */

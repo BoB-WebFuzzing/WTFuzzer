@@ -2,6 +2,11 @@
 Test array_values() function : usage variations - multi-dimensional arrays
 --FILE--
 <?php
+/* Prototype  : array array_values(array $input)
+ * Description: Return just the values from the input array
+ * Source code: ext/standard/array.c
+ */
+
 /*
  * Test array_values when:
  * 1. Passed a two-dimensional array as $input argument

@@ -1,7 +1,9 @@
 --TEST--
 test_image_equals_file(): comparing palette images
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'func.inc';
@@ -29,9 +31,11 @@ imagefilledrectangle($im, 3,3, 7,7, $red);
 
 test_image_equals_file($filename, $im);
 ?>
+===DONE===
 --EXPECT--
 The images differ in 25 pixels.
 The images are equal.
+===DONE===
 --CLEAN--
 <?php
 unlink(__DIR__ . DIRECTORY_SEPARATOR . 'test_image_equals_file_palette.png');

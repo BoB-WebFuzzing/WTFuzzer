@@ -1,15 +1,11 @@
 --TEST--
 oci_fetch_all() - all combinations of flags
---EXTENSIONS--
-oci8
 --SKIPIF--
-<?php
-require_once 'skipifconnectfailure.inc';
-?>
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --FILE--
 <?php
 
-require __DIR__.'/connect.inc';
+require(__DIR__."/connect.inc");
 
 // Initialize
 

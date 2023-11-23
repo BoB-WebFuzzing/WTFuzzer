@@ -1,11 +1,13 @@
 /*
    +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -43,7 +45,8 @@
  * ret = 1  key already exists - nothing done
  */
 
-/* {{{ flatfile_store */
+/* {{{ flatfile_store
+ */
 int flatfile_store(flatfile *dba, datum key_datum, datum value_datum, int mode) {
 	if (mode == FLATFILE_INSERT) {
 		if (flatfile_findkey(dba, key_datum)) {
@@ -78,7 +81,8 @@ int flatfile_store(flatfile *dba, datum key_datum, datum value_datum, int mode) 
 }
 /* }}} */
 
-/* {{{ flatfile_fetch */
+/* {{{ flatfile_fetch
+ */
 datum flatfile_fetch(flatfile *dba, datum key_datum) {
 	datum value_datum = {NULL, 0};
 	char buf[16];
@@ -97,7 +101,8 @@ datum flatfile_fetch(flatfile *dba, datum key_datum) {
 }
 /* }}} */
 
-/* {{{ flatfile_delete */
+/* {{{ flatfile_delete
+ */
 int flatfile_delete(flatfile *dba, datum key_datum) {
 	char *key = key_datum.dptr;
 	size_t size = key_datum.dsize;
@@ -148,7 +153,8 @@ int flatfile_delete(flatfile *dba, datum key_datum) {
 }
 /* }}} */
 
-/* {{{ flatfile_findkey */
+/* {{{ flatfile_findkey
+ */
 int flatfile_findkey(flatfile *dba, datum key_datum) {
 	size_t buf_size = FLATFILE_BLOCK_SIZE;
 	char *buf = emalloc(buf_size);
@@ -190,7 +196,8 @@ int flatfile_findkey(flatfile *dba, datum key_datum) {
 }
 /* }}} */
 
-/* {{{ flatfile_firstkey */
+/* {{{ flatfile_firstkey
+ */
 datum flatfile_firstkey(flatfile *dba) {
 	datum res;
 	size_t num;
@@ -232,7 +239,8 @@ datum flatfile_firstkey(flatfile *dba) {
 }
 /* }}} */
 
-/* {{{ flatfile_nextkey */
+/* {{{ flatfile_nextkey
+ */
 datum flatfile_nextkey(flatfile *dba) {
 	datum res;
 	size_t num;
@@ -276,7 +284,7 @@ datum flatfile_nextkey(flatfile *dba) {
 /* }}} */
 
 /* {{{ flatfile_version */
-const char *flatfile_version(void)
+char *flatfile_version()
 {
 	return "1.0, $Id$";
 }
