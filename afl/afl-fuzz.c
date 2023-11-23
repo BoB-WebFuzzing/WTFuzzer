@@ -468,7 +468,7 @@ void mutateSQLI(char* value) {
 }
 
 void mutateSSRF(char* value) {
-    char* mutateSet[3] = {"http://localhost", "http://127.0.0.1", "file:///etc/passwd"};
+    char* mutateSet[3] = {"http://localhost:5000", "http://127.0.0.1:5000", "file:///etc/passwd"};
     // strcpy(value, insertString(value, mutateSet[rand() % 3], targetIndex));
     strcpy(value, mutateSet[rand() % 3]);
 }
@@ -3315,6 +3315,30 @@ static void perform_dry_run(char** argv) {
           q->cal_failed = CAL_CHANCES;
           cal_failures++;
           break;
+        }else{
+
+          FILE* qfn = fopen(q->fname,"rb");
+          char * buffer = ck_alloc(1*1024*1024);
+          u8 * save_fn;
+          s32 save_fd;
+
+          save_fn = alloc_printf("%s/crashes/%s", out_dir, fn);
+          save_fd = open(save_fn, O_WRONLY | O_CREAT | O_EXCL, 0600);
+          if (save_fd < 0) PFATAL("Unable to create Seed crash file '%s'", fn);
+
+          if (qfn != NULL){
+
+            int buf_size = fread(buffer, 1, (1 * 1024 * 1024), qfn);
+
+
+            ck_write(save_fd, buffer, buf_size, save_fn);
+
+          }
+
+          close(save_fd);
+          fclose(qfn);
+          ck_free(buffer);
+          ck_free(save_fn);
         }
 
         if (mem_limit) {
@@ -3789,12 +3813,12 @@ keep_as_crash:
 
 #ifndef SIMPLE_FILES
 
-      fn = alloc_printf("%s/crashes/id:%06llu,sig:%02u,%s", out_dir,
+      fn = alloc_printf("%s/crashes/vuln:%s,id:%06llu,sig:%02u,%s", out_dir,stage_name,
                         unique_crashes, kill_signal, describe_op(0));
 
 #else
       
-      fn = alloc_printf("%s/crashes/id_%06llu_%02u", out_dir, unique_crashes,
+      fn = alloc_printf("%s/crashes/vuln:%s,id_%06llu_%02u", out_dir,stage_name, unique_crashes,
                         kill_signal);
 
 #endif /* ^!SIMPLE_FILES */
@@ -5942,6 +5966,7 @@ skip_interest:
     i++;
   }
   const char* svuln = randomSelection(vulnsMap);
+  stage_name = svuln;
 
   char buffer[1 * 1024 * 1024];
   char * mutatedSeed;
