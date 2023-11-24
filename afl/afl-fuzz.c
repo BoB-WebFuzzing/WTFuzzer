@@ -563,6 +563,34 @@ void freeMap(Map* map) {
     free(map->data);
 }
 
+#define MAX_LINES 100
+#define MAX_LENGTH 64
+char lines[MAX_LINES][MAX_LENGTH];
+
+int setFilter() {
+    FILE *file;
+    int line_count = 0;
+
+    file = fopen("/tmp/filter.txt", "r");
+
+    while (fgets(lines[line_count], MAX_LENGTH, file) != NULL) {
+        lines[line_count][strcspn(lines[line_count], "\n")] = '\0';
+        line_count++;
+
+        if (line_count >= MAX_LINES) {
+            break;
+        }
+    }
+
+    fclose(file);
+
+    // for (int i = 0; i < line_count; i++) {
+    //     printf("Line %d: %s\n", i + 1, lines[i]);
+    // }
+
+    return 0;
+}
+
 int mutate(char* ret, const char* vuln, char* seed, int length) {
     char* get = NULL;
     char* post = NULL;
@@ -687,11 +715,33 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         case 0:
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateSQLI(getValue[i]);
                 }
             }
             if (postCount) {
                 for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateSQLI(postValue[i]);
                 }
             }
@@ -700,11 +750,33 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         case 1:
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateSSRF(getValue[i]);
                 }
             }
             if (postCount) {
                 for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateSSRF(postValue[i]);
                 }
             }
@@ -713,11 +785,33 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         case 2:
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateFILE(getValue[i]);
                 }
             }
             if (postCount) {
                 for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateFILE(postValue[i]);
                 }
             }
@@ -726,11 +820,33 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         case 3:
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateFILE(getValue[i]);
                 }
             }
             if (postCount) {
                 for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateFILE(postValue[i]);
                 }
             }
@@ -739,11 +855,33 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         case 4:
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateFILE(getValue[i]);
                 }
             }
             if (postCount) {
                 for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateFILE(postValue[i]);
                 }
             }
@@ -7171,6 +7309,7 @@ static void save_cmdline(u32 argc, char** argv) {
 /* Main entry point */
 
 int main(int argc, char** argv) {
+  setFilter();
 
   s32 opt;
   u64 prev_queued = 0;
