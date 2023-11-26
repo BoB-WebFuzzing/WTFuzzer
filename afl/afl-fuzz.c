@@ -1794,21 +1794,6 @@ struct test_process_info {
 
 static void remove_shm(void) {
 
-  if (getenv("AFL_META_INFO_ID")){
-        // clean up last shared memory area
-        int mem_key = atoi(getenv("AFL_META_INFO_ID"));
-        int witch_shm_id = shmget(mem_key , sizeof(struct test_process_info), 0666);
-
-        if (witch_shm_id  >= 0 ) {
-            struct test_process_info *afl_info = (struct test_process_info *) shmat(witch_shm_id, NULL, 0);  /* attach */
-            afl_info->afl_id = 0;
-            afl_info->capture = false;
-            fprintf(stderr, "\033[36m [Witcher] init completed afl_shm_id=%d : afl_ifo %d %d %d %d !!!\033[0m\n",
-                    shm_id, mem_key, witch_shm_id, afl_info->afl_id, afl_info->capture);
-        }
-        fprintf(stderr, "\n");
-  }
-
   shmctl(shm_id, IPC_RMID, NULL);
 
 }
@@ -1957,39 +1942,28 @@ EXP_ST void setup_shm(void) {
   memset(virgin_tmout, 255, MAP_SIZE);
   memset(virgin_crash, 255, MAP_SIZE);
 
-
-  char *port = getenv("TARGET_PORT");
   shm_id = shmget(IPC_PRIVATE, MAP_SIZE, IPC_CREAT | IPC_EXCL | 0600);
-  if (port){
-  	  printf("target port: %s \n", port);
-      int port_id = atoi(port);
-      shm_id = shmget(port_id , MAP_SIZE, IPC_CREAT | 0666);
-  } else {
-      shm_id = shmget(shm_id, MAP_SIZE, IPC_CREAT | IPC_EXCL | 0666);
-  }
 
   if (shm_id < 0) PFATAL("shmget() failed");
 
   atexit(remove_shm);
 
   shm_str = alloc_printf("%d", shm_id);
-  ACTF("Using SHMID of '%s'...", shm_str );
-
+ACTF("Using SHMID of '%s'...", shm_str );
   /* If somebody is asking us to fuzz instrumented binaries in dumb mode,
      we don't want them to detect instrumentation, since we won't be sending
      fork server commands. This should be replaced with better auto-detection
      later on, perhaps? */
 
   if (!dumb_mode) setenv(SHM_ENV_VAR, shm_str, 1);
+
   setenv(SHM_ENV_VAR, shm_str, 1);
 
   ck_free(shm_str);
 
   trace_bits = shmat(shm_id, NULL, 0);
-  trace_bits[0] = 6;
-  printf("shm_id=%d , tb[0]=%d  %p\n", shm_id, trace_bits[0], trace_bits);
-
-  if (!trace_bits) PFATAL("shmat() failed");
+  
+  if (trace_bits == (void *)-1) PFATAL("shmat() failed");
 
 }
 
