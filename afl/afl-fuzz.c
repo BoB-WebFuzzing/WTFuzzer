@@ -685,14 +685,31 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 // Parsing by =
     for (int i = 0; i < getCount; i++) {
         if (getArray[i]) {
-            getKey[i] = strdup(strtok(getArray[i], "="));
-            getValue[i] = strdup(strtok(NULL, "="));
+            char* tempKey = strdup(strtok(getArray[i], "="));
+            char* tempValue = (strtok(NULL, "="));
+            if(tempValue != NULL) tempValue = strdup(tempValue);
+            char blank[100] = "  ";
+            if ((tempKey != NULL) && (tempValue != NULL)) {
+                getKey[i] = tempKey;
+                getValue[i] = tempValue;
+            } else if ((tempKey != NULL) && (tempValue == NULL)) {
+                getKey[i] = tempKey;
+                getValue[i] = blank;
+            } else if ((tempKey == NULL) && (tempValue != NULL)) {
+                getKey[i] = blank;
+                getValue[i] = tempValue;
+            } else if ((tempKey == NULL) && (tempValue == NULL)) {
+                getKey[i] = blank;
+                getValue[i] = blank;
+            }
+
         }
-    }
+    } 
     for (int i = 0; i < postCount; i++) {
         if (postArray[i]) {
             char* tempKey = strdup(strtok(postArray[i], "="));
             char* tempValue = (strtok(NULL, "="));
+            if(tempValue != NULL) tempValue = strdup(tempValue);
             char blank[100] = "  ";
             if ((tempKey != NULL) && (tempValue != NULL)) {
                 postKey[i] = tempKey;
@@ -707,6 +724,7 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
                 postKey[i] = blank;
                 postValue[i] = blank;
             }
+
         }
     }
 
@@ -7676,4 +7694,3 @@ stop_fuzzing:
 }
 
 #endif /* !AFL_LIB */
-
