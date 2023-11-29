@@ -26,7 +26,7 @@ RUN apt-fast install -y git build-essential  \
                         manpages-dev ninja-build capnproto  software-properties-common zip unzip pwgen \
                         openssh-server mysql-server \
                         vim qemu gdb patchelf apache2 apache2-dev supervisor \
-                        autoconf bison
+                        autoconf bison libjpeg-dev libfreetype6-dev
 
 RUN rm -rf /var/lib/mysql
 RUN  /usr/sbin/mysqld --initialize-insecure
@@ -89,6 +89,8 @@ RUN cd /phpsrc &&         \
         --enable-exif \
         --enable-intl \
 		--enable-gd         \
+        --with-jpeg \
+        --with-freetype \
 		--with-gettext \
 		--with-openssl \
 		--with-curl \
