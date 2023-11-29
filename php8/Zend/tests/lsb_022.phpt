@@ -24,24 +24,9 @@ class B extends A {
 }
 B::foo();
 ?>
---EXPECTF--
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
+--EXPECT--
 B
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
-
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
 B
-
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
 B
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
-
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
 B
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
-
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
 B

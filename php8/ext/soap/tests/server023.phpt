@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 23: Send SOAP headers those were not received
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test() {

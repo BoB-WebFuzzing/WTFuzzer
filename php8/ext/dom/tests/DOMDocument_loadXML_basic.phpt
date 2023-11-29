@@ -10,8 +10,8 @@ Environment variables used in the test:
 Antonio Diaz Ruiz <dejalatele@gmail.com>
 --INI--
 assert.bail=true
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --ENV--
 XML_FILE=/book.xml
 LOAD_OPTIONS=0

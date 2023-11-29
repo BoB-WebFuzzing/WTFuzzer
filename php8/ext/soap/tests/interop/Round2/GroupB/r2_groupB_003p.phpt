@@ -1,7 +1,7 @@
 --TEST--
 SOAP Interop Round2 groupB 003 (php/direct): echo2DStringArray
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $param = array(

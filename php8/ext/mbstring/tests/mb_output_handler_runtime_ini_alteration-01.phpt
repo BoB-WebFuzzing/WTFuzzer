@@ -1,7 +1,7 @@
 --TEST--
 mb_output_handler() and mbstring.http_output_conv_mimetypes alteration in runtime (1)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --INI--
 internal_encoding=UTF-8
 mbstring.http_output_conv_mimetypes=plain

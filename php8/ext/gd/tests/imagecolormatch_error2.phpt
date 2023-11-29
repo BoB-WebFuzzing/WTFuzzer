@@ -3,8 +3,10 @@ Send not TrueColor to Image 1 parameter imagecolormatch() of GD library
 --CREDITS--
 Paulo Alves de Sousa Filho <pspalves [at] gmail [dot] com>
 #testfest PHPSP on 2009-06-20
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded("gd")) die("skip GD not present");
+?>
 --FILE--
 <?php
 $ima = imagecreate(110, 20);

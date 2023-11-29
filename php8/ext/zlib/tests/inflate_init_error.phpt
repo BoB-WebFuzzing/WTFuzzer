@@ -1,7 +1,11 @@
 --TEST--
 Test inflate_init() error
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 

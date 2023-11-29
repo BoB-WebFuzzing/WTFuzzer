@@ -1,7 +1,5 @@
 --TEST--
 PostgreSQL pg_select()
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
 include("skipif.inc");

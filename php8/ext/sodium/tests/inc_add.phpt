@@ -1,7 +1,7 @@
 --TEST--
 increment and add edge cases
---EXTENSIONS--
-sodium
+--SKIPIF--
+<?php if (!extension_loaded("sodium")) print "skip"; ?>
 --FILE--
 <?php
 

@@ -23,6 +23,7 @@ $names_arr = array(
   -1,
   TRUE,
   FALSE,
+  NULL,
   "",
   " ",
 
@@ -62,6 +63,13 @@ bool(false)
 bool(true)
 
 Warning: rename(1,%s/renameVar13/afile.tmp): No such file or directory in %s on line %d
+bool(false)
+-- testing '' --
+
+Warning: rename(%s/renameVar13/afile.tmp,): %s in %s on line %d
+bool(false)
+
+Warning: rename(,%s/renameVar13/afile.tmp): %s in %s on line %d
 bool(false)
 -- testing '' --
 

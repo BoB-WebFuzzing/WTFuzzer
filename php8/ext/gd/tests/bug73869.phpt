@@ -1,12 +1,8 @@
 --TEST--
 Bug #73869 (Signed Integer Overflow gd_io.c)
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
-    if (!GD_BUNDLED && version_compare(GD_VERSION, '2.3.3', '>=')) {
-        die("skip test requires GD 2.3.2 or older");
-    }
+if (!extension_loaded('gd')) die('skip gd extension not available');
 ?>
 --FILE--
 <?php

@@ -6,8 +6,8 @@ Verifies that an warning message is showed if an empty document is loaded
 Antonio Diaz Ruiz <dejalatele@gmail.com>
 --INI--
 assert.bail=true
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --FILE--
 <?php
 $doc = new DOMDocument();

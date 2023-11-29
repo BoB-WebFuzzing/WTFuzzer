@@ -1,7 +1,7 @@
 --TEST--
 libxml_set_external_entity_loader() variation: resolve externals and entities
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php if (!extension_loaded('dom')) die('skip dom extension not available'); ?>
 --FILE--
 <?php
 chdir(__DIR__);

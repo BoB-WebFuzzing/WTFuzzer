@@ -1,7 +1,7 @@
 --TEST--
 Basic UConverter::getStandards() usage
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 function assertTrue($assertion, $msg) {

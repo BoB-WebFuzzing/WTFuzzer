@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 80: Element form qualified/unqualified (elementFormDefault - default)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";

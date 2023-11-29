@@ -1,7 +1,7 @@
 --TEST--
 Phar: create a completely new phar
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly=0
 phar.require_hash=1
@@ -20,7 +20,7 @@ var_dump($phar->getSignature());
 --EXPECTF--
 array(2) {
   ["hash"]=>
-  string(64) "%s"
+  string(40) "%s"
   ["hash_type"]=>
-  string(7) "SHA-256"
+  string(5) "SHA-1"
 }

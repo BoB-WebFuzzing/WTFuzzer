@@ -1,7 +1,7 @@
 --TEST--
 Test curl_getinfo() function with CURLINFO_COOKIELIST parameter
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php if (!extension_loaded("curl")) print "skip"; ?>
 --FILE--
 <?php
 

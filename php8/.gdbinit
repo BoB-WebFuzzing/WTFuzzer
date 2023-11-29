@@ -318,8 +318,7 @@ define ____print_ht
 		set $n = $n - 1
 	end
 
-	set $packed = $ht->u.v.flags & 4
-	if $packed
+	if $ht->u.v.flags & 4
 		printf "Packed"
 	else
 		printf "Hash"
@@ -330,45 +329,36 @@ define ____print_ht
 	set $i = 0
 	set $ind = $ind + 1
 	while $i < $num
-		if $packed
-			set $val = (zval*)($ht->arPacked + $i)
-			set $key = (zend_string*)0
-			set $h = $i
-		else
-			set $bucket = (Bucket*)($ht->arData + $i)
-			set $val = &$bucket->val
-			set $key = $bucket->key
-			set $h = $bucket->h
-		end
+		set $p = (Bucket*)($ht->arData + $i)
 		set $n = $ind
-		if $val->u1.v.type > 0
+		if $p->val.u1.v.type > 0
 			while $n > 0
 				printf "  "
 				set $n = $n - 1
 			end
 			printf "[%d] ", $i
-			if $key
-				____print_str $key->val $key->len
+			if $p->key
+				____print_str $p->key->val $p->key->len
 				printf " => "
 			else
-				printf "%d => ", $h
+				printf "%d => ", $p->h
 			end
 			if $arg1 == 0
-				printf "%p\n", $val
+				printf "%p\n", (zval *)&$p->val
 			end
 			if $arg1 == 1
-				set $zval = $val
+				set $zval = (zval *)&$p->val
 				____printzv $zval 1
 			end
 			if $arg1 == 2
-				printf "%s\n", (char*)$val->value.ptr
+				printf "%s\n", (char*)$p->val.value.ptr
 			end
 			if $arg1 == 3
-				set $func = (zend_function*)$val->value.ptr
+				set $func = (zend_function*)$p->val.value.ptr
 				printf "\"%s\"\n", $func->common.function_name->val
 			end
 			if $arg1 == 4
-				set $const = (zend_constant *)$val->value.ptr
+				set $const = (zend_constant *)$p->val.value.ptr
 				____printzv $const 1
 			end
 		end

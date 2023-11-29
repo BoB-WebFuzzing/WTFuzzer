@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: accessing singular subnode as array
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $xml =<<<EOF

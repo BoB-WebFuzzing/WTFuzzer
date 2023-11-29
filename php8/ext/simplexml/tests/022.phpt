@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: Attributes inside foreach
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 

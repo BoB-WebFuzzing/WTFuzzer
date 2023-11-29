@@ -5,7 +5,7 @@ SPL: RecursiveFilterIterator
 
 class MyRecursiveFilterIterator extends RecursiveFilterIterator
 {
-    function accept(): bool
+    function accept()
     {
         return true;
     }

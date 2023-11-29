@@ -1,7 +1,7 @@
 --TEST--
 Phar: corrupted zip (no end of zip record)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 try {

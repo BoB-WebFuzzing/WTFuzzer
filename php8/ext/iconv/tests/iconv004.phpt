@@ -1,7 +1,7 @@
 --TEST--
 iconv_mime_encode() sanity cheeck.
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php extension_loaded('iconv') or die('skip iconv extension is not available'); ?>
 --INI--
 input_encoding = ISO-8859-1
 internal_encoding = ISO-8859-1

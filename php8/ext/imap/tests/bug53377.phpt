@@ -1,7 +1,9 @@
 --TEST--
 Bug #53377 (imap_mime_header_decode() doesn't ignore \t during long MIME header unfolding)
---EXTENSIONS--
-imap
+--SKIPIF--
+<?php
+extension_loaded('imap') or die('skip imap extension not available in this build');
+?>
 --FILE--
 <?php
 $s = "=?UTF-8?Q?=E2=82=AC?=";

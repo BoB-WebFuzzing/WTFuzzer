@@ -11,8 +11,8 @@ Environment variables used in the test:
 Antonio Diaz Ruiz <dejalatele@gmail.com>
 --INI--
 assert.bail=true
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --ENV--
 XML_FILE=/wrong_book_with_dtd.xml
 LOAD_OPTIONS=LIBXML_DTDVALID | LIBXML_NOERROR

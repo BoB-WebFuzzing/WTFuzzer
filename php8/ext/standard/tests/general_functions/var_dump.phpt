@@ -134,7 +134,6 @@ $arrays = array (
 check_vardump($arrays);
 
 echo "\n*** Testing var_dump() on object variables ***\n";
-#[AllowDynamicProperties]
 class object_class
 {
   var       $value;
@@ -167,7 +166,6 @@ class no_member_class {
 }
 
 /* class with member as object of other class */
-#[AllowDynamicProperties]
 class contains_object_class
 {
    var       $p = 30;
@@ -429,7 +427,7 @@ string(1) " "
 -- Iteration 5 --
 string(1) "0"
 -- Iteration 6 --
-string(1) "%0"
+string(1) " "
 -- Iteration 7 --
 string(2) "\0"
 -- Iteration 8 --
@@ -441,9 +439,9 @@ string(3) "PHP"
 -- Iteration 11 --
 string(3) "PHP"
 -- Iteration 12 --
-string(29) "abcd%0n1234%005678%000efgh\xijkl"
+string(29) "abcd n1234 05678 00efgh\xijkl"
 -- Iteration 13 --
-string(34) "abcd%0efgh%0ijkl%0mnop%00qrst%0uvwx%00yz"
+string(34) "abcd efgh ijkl mnop 0qrst uvwx 0yz"
 -- Iteration 14 --
 string(22) "1234	
 5678
@@ -1083,7 +1081,7 @@ array(14) {
   [4]=>
   string(1) "0"
   [5]=>
-  string(1) "%0"
+  string(1) " "
   [6]=>
   string(2) "\0"
   [7]=>
@@ -1095,9 +1093,9 @@ array(14) {
   [10]=>
   string(3) "PHP"
   [11]=>
-  string(29) "abcd%0n1234%005678%000efgh\xijkl"
+  string(29) "abcd n1234 05678 00efgh\xijkl"
   [12]=>
-  string(34) "abcd%0efgh%0ijkl%0mnop%00qrst%0uvwx%00yz"
+  string(34) "abcd efgh ijkl mnop 0qrst uvwx 0yz"
   [13]=>
   string(22) "1234	
 5678

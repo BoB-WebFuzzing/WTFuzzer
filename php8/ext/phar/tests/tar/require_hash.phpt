@@ -1,7 +1,7 @@
 --TEST--
 Phar: tar-based phar, require_hash=1, no signature
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded('phar')) die('skip'); ?>
 --INI--
 phar.readonly=1
 phar.require_hash=0

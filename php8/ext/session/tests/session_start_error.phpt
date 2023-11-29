@@ -1,7 +1,5 @@
 --TEST--
 Test session_start() errors
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

@@ -1,9 +1,8 @@
 --TEST--
 mysqli thread_id & kill
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -16,8 +15,22 @@ require_once('skipifconnectfailure.inc');
     var_dump($mysql->ping());
 
     $ret = $mysql->kill($mysql->thread_id);
-    if ($ret !== true){
-        printf("[001] Expecting boolean/true got %s/%s\n", gettype($ret), var_export($ret, true));
+    if ($IS_MYSQLND) {
+        if ($ret !== true){
+            printf("[001] Expecting boolean/true got %s/%s\n", gettype($ret), var_export($ret, true));
+        }
+    } else {
+        /* libmysql return value seems to depend on server version */
+        if ((($version >= 50123) || ($version <= 40200)) && $version != 50200) {
+            /* TODO: find exact version */
+            if ($ret !== true){
+                printf("[001] Expecting boolean/true got %s/%s @\n", gettype($ret), var_export($ret, true), $version);
+            }
+        } else {
+            if ($ret !== false){
+                printf("[001] Expecting boolean/false got %s/%s @\n", gettype($ret), var_export($ret, true), $version);
+            }
+        }
     }
 
     var_dump($mysql->ping());
@@ -29,8 +42,22 @@ require_once('skipifconnectfailure.inc');
     var_dump(mysqli_ping($mysql));
 
     $ret = $mysql->kill($mysql->thread_id);
-    if ($ret !== true){
-        printf("[002] Expecting boolean/true got %s/%s\n", gettype($ret), var_export($ret, true));
+    if ($IS_MYSQLND) {
+        if ($ret !== true){
+            printf("[002] Expecting boolean/true got %s/%s\n", gettype($ret), var_export($ret, true));
+        }
+    } else {
+        /* libmysql return value seems to depend on server version */
+        if ((($version >= 50123) || ($version <= 40200)) && $version != 50200) {
+            /* TODO: find exact version */
+            if ($ret !== true){
+                printf("[002] Expecting boolean/true got %s/%s @\n", gettype($ret), var_export($ret, true), $version);
+            }
+        } else {
+            if ($ret !== false){
+            printf("[002] Expecting boolean/false got %s/%s @\n", gettype($ret), var_export($ret, true), $version);
+            }
+        }
     }
 
     var_dump(mysqli_ping($mysql));

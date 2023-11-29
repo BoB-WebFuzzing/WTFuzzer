@@ -1,8 +1,6 @@
 	/* (c) 2007,2008 Andrei Nigmatulin */
 
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
+#define _GNU_SOURCE
 #define _FILE_OFFSET_BITS 64
 
 #include "fpm_config.h"

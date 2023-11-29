@@ -1,9 +1,8 @@
 --TEST--
 mysqli connect
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -93,7 +92,7 @@ array(7) {
   [2]=>
   string(19) "2002-01-02 17:46:59"
   [3]=>
-  string(4) "2010"
+  int(2010)
   [4]=>
   string(19) "2010-07-10 00:00:00"
   [5]=>

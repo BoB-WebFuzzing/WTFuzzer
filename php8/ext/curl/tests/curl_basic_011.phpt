@@ -2,8 +2,8 @@
 Test curl_opt() function with COOKIE
 --CREDITS--
 TestFest 2009 - AFUP - Xavier Gorse <xgorse@elao.com>
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
   include 'server.inc';

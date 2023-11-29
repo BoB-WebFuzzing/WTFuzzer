@@ -1,7 +1,11 @@
 --TEST--
 Test gzuncompress() function : basic functionality
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 include(__DIR__ . '/data.inc');

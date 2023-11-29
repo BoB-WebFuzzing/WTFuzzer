@@ -1,7 +1,7 @@
 --TEST--
 Test internal weakmap API
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip: zend-test extension required'); ?>
 --FILE--
 <?php
 

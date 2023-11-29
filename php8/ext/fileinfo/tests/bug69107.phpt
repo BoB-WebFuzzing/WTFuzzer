@@ -1,7 +1,9 @@
 --TEST--
 Bug #69107 (finfo no longer detects PHP files)
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php
+if (!extension_loaded('fileinfo')) die('skip fileinfo extension not available');
+?>
 --FILE--
 <?php
 $finfo = new finfo(FILEINFO_MIME_TYPE);

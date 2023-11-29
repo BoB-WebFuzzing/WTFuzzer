@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -25,7 +25,7 @@
 #include "basic_functions.h"
 #include "dir_arginfo.h"
 
-#ifdef HAVE_UNISTD_H
+#if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -58,9 +58,6 @@ php_dir_globals dir_globals;
 
 static zend_class_entry *dir_class_entry_ptr;
 
-#define Z_DIRECTORY_PATH_P(zv) OBJ_PROP_NUM(Z_OBJ_P(zv), 0)
-#define Z_DIRECTORY_HANDLE_P(zv) OBJ_PROP_NUM(Z_OBJ_P(zv), 1)
-
 #define FETCH_DIRP() \
 	myself = getThis(); \
 	if (!myself) { \
@@ -83,12 +80,11 @@ static zend_class_entry *dir_class_entry_ptr;
 		} \
 	} else { \
 		ZEND_PARSE_PARAMETERS_NONE(); \
-		zval *handle_zv = Z_DIRECTORY_HANDLE_P(myself); \
-		if (Z_TYPE_P(handle_zv) != IS_RESOURCE) { \
+		if ((tmp = zend_hash_str_find(Z_OBJPROP_P(myself), "handle", sizeof("handle")-1)) == NULL) { \
 			zend_throw_error(NULL, "Unable to find my handle property"); \
 			RETURN_THROWS(); \
 		} \
-		if ((dirp = (php_stream *)zend_fetch_resource_ex(handle_zv, "Directory", php_file_le_stream())) == NULL) { \
+		if ((dirp = (php_stream *)zend_fetch_resource_ex(tmp, "Directory", php_file_le_stream())) == NULL) { \
 			RETURN_THROWS(); \
 		} \
 	}
@@ -116,8 +112,10 @@ PHP_RINIT_FUNCTION(dir)
 PHP_MINIT_FUNCTION(dir)
 {
 	static char dirsep_str[2], pathsep_str[2];
+	zend_class_entry dir_class_entry;
 
-	dir_class_entry_ptr = register_class_Directory();
+	INIT_CLASS_ENTRY(dir_class_entry, "Directory", class_Directory_methods);
+	dir_class_entry_ptr = zend_register_internal_class(&dir_class_entry);
 
 #ifdef ZTS
 	ts_allocate_id(&dir_globals_id, sizeof(php_dir_globals), NULL, NULL);
@@ -222,8 +220,8 @@ static void _php_do_opendir(INTERNAL_FUNCTION_PARAMETERS, int createobject)
 
 	if (createobject) {
 		object_init_ex(return_value, dir_class_entry_ptr);
-		ZVAL_STRINGL(Z_DIRECTORY_PATH_P(return_value), dirname, dir_len);
-		ZVAL_RES(Z_DIRECTORY_HANDLE_P(return_value), dirp->res);
+		add_property_stringl(return_value, "path", dirname, dir_len);
+		add_property_resource(return_value, "handle", dirp->res);
 		php_stream_auto_cleanup(dirp); /* so we don't get warnings under debug */
 	} else {
 		php_stream_to_zval(dirp, return_value);
@@ -248,7 +246,7 @@ PHP_FUNCTION(dir)
 /* {{{ Close directory connection identified by the dir_handle */
 PHP_FUNCTION(closedir)
 {
-	zval *id = NULL, *myself;
+	zval *id = NULL, *tmp, *myself;
 	php_stream *dirp;
 	zend_resource *res;
 
@@ -268,7 +266,7 @@ PHP_FUNCTION(closedir)
 }
 /* }}} */
 
-#if defined(HAVE_CHROOT) && !defined(ZTS) && defined(ENABLE_CHROOT_FUNC)
+#if defined(HAVE_CHROOT) && !defined(ZTS) && ENABLE_CHROOT_FUNC
 /* {{{ Change root directory */
 PHP_FUNCTION(chroot)
 {
@@ -321,12 +319,12 @@ PHP_FUNCTION(chdir)
 		RETURN_FALSE;
 	}
 
-	if (BG(CurrentStatFile) && !IS_ABSOLUTE_PATH(ZSTR_VAL(BG(CurrentStatFile)), ZSTR_LEN(BG(CurrentStatFile)))) {
-		zend_string_release(BG(CurrentStatFile));
+	if (BG(CurrentStatFile) && !IS_ABSOLUTE_PATH(BG(CurrentStatFile), strlen(BG(CurrentStatFile)))) {
+		efree(BG(CurrentStatFile));
 		BG(CurrentStatFile) = NULL;
 	}
-	if (BG(CurrentLStatFile) && !IS_ABSOLUTE_PATH(ZSTR_VAL(BG(CurrentLStatFile)), ZSTR_LEN(BG(CurrentLStatFile)))) {
-		zend_string_release(BG(CurrentLStatFile));
+	if (BG(CurrentLStatFile) && !IS_ABSOLUTE_PATH(BG(CurrentLStatFile), strlen(BG(CurrentLStatFile)))) {
+		efree(BG(CurrentLStatFile));
 		BG(CurrentLStatFile) = NULL;
 	}
 
@@ -342,9 +340,9 @@ PHP_FUNCTION(getcwd)
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
-#ifdef HAVE_GETCWD
+#if HAVE_GETCWD
 	ret = VCWD_GETCWD(path, MAXPATHLEN);
-#elif defined(HAVE_GETWD)
+#elif HAVE_GETWD
 	ret = VCWD_GETWD(path);
 #endif
 
@@ -359,7 +357,7 @@ PHP_FUNCTION(getcwd)
 /* {{{ Rewind dir_handle back to the start */
 PHP_FUNCTION(rewinddir)
 {
-	zval *id = NULL, *myself;
+	zval *id = NULL, *tmp, *myself;
 	php_stream *dirp;
 
 	FETCH_DIRP();
@@ -376,7 +374,7 @@ PHP_FUNCTION(rewinddir)
 /* {{{ Read directory entry from dir_handle */
 PHP_FUNCTION(readdir)
 {
-	zval *id = NULL, *myself;
+	zval *id = NULL, *tmp, *myself;
 	php_stream *dirp;
 	php_stream_dirent entry;
 
@@ -410,8 +408,7 @@ PHP_FUNCTION(glob)
 	glob_t globbuf;
 	size_t n;
 	int ret;
-	bool basedir_limit = 0;
-	zval tmp;
+	zend_bool basedir_limit = 0;
 
 	ZEND_PARSE_PARAMETERS_START(1, 2)
 		Z_PARAM_PATH(pattern, pattern_len)
@@ -472,6 +469,18 @@ PHP_FUNCTION(glob)
 #ifdef GLOB_NOMATCH
 no_results:
 #endif
+#ifndef PHP_WIN32
+		/* Paths containing '*', '?' and some other chars are
+		illegal on Windows but legit on other platforms. For
+		this reason the direct basedir check against the glob
+		query is senseless on windows. For instance while *.txt
+		is a pretty valid filename on EXT3, it's invalid on NTFS. */
+		if (PG(open_basedir) && *PG(open_basedir)) {
+			if (php_check_open_basedir_ex(pattern, 0)) {
+				RETURN_FALSE;
+			}
+		}
+#endif
 		array_init(return_value);
 		return;
 	}
@@ -493,7 +502,7 @@ no_results:
 		 * able to filter directories out.
 		 */
 		if (flags & GLOB_ONLYDIR) {
-			zend_stat_t s = {0};
+			zend_stat_t s;
 
 			if (0 != VCWD_STAT(globbuf.gl_pathv[n], &s)) {
 				continue;
@@ -503,8 +512,7 @@ no_results:
 				continue;
 			}
 		}
-		ZVAL_STRING(&tmp, globbuf.gl_pathv[n]+cwd_skip);
-		zend_hash_next_index_insert_new(Z_ARRVAL_P(return_value), &tmp);
+		add_next_index_string(return_value, globbuf.gl_pathv[n]+cwd_skip);
 	}
 
 	globfree(&globbuf);

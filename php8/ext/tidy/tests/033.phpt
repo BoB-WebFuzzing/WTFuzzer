@@ -2,8 +2,10 @@
 tidy_warning_count() function - basic test for tidy_warning_count()
 --CREDITS--
 Christian Wenz <wenz@php.net>
---EXTENSIONS--
-tidy
+--SKIPIF--
+<?php
+  if (!extension_loaded('tidy')) die ('skip tidy not present');
+?>
 --FILE--
 <?php
 $buffer = '<img src="file.png" /><php>';

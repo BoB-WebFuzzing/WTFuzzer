@@ -2,13 +2,12 @@
 Test curl_error() & curl_errno() function with problematic protocol
 --CREDITS--
 TestFest 2009 - AFUP - Perrick Penet <perrick@noparking.net>
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php if (!extension_loaded("curl")) print "skip"; ?>
 --FILE--
 <?php
 
-// Make sure the scheme always starts with an alphabetic character.
-$url = 'a' . substr(uniqid(),0,6)."://www.example.com";
+$url = substr(uniqid(),0,7)."://www.".uniqid().".".uniqid();
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 

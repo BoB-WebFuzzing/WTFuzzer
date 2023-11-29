@@ -20,7 +20,7 @@
 #ifndef ZEND_H
 #define ZEND_H
 
-#define ZEND_VERSION "4.2.14-dev"
+#define ZEND_VERSION "4.0.31-dev"
 
 #define ZEND_ENGINE_3
 
@@ -39,7 +39,6 @@
 #include "zend_smart_str_public.h"
 #include "zend_smart_string_public.h"
 #include "zend_signal.h"
-#include "zend_max_execution_timer.h"
 
 #define zend_sprintf sprintf
 
@@ -70,11 +69,7 @@
 #define ZEND_TSRMLS_CACHE
 #endif
 
-#ifndef ZEND_COMPILE_DL_EXT
-TSRMLS_MAIN_CACHE_EXTERN()
-#else
 ZEND_TSRMLS_CACHE_EXTERN()
-#endif
 
 struct _zend_serialize_data;
 struct _zend_unserialize_data;
@@ -112,38 +107,6 @@ typedef struct _zend_trait_alias {
 	uint32_t modifiers;
 } zend_trait_alias;
 
-typedef struct _zend_class_mutable_data {
-	zval      *default_properties_table;
-	HashTable *constants_table;
-	uint32_t   ce_flags;
-	HashTable *backed_enum_table;
-} zend_class_mutable_data;
-
-typedef struct _zend_class_dependency {
-	zend_string      *name;
-	zend_class_entry *ce;
-} zend_class_dependency;
-
-typedef struct _zend_inheritance_cache_entry zend_inheritance_cache_entry;
-
-typedef struct _zend_error_info {
-	int type;
-	uint32_t lineno;
-	zend_string *filename;
-	zend_string *message;
-} zend_error_info;
-
-struct _zend_inheritance_cache_entry {
-	zend_inheritance_cache_entry *next;
-	zend_class_entry             *ce;
-	zend_class_entry             *parent;
-	zend_class_dependency        *dependencies;
-	uint32_t                      dependencies_count;
-	uint32_t                      num_warnings;
-	zend_error_info             **warnings;
-	zend_class_entry             *traits_and_interfaces[1];
-};
-
 struct _zend_class_entry {
 	char type;
 	zend_string *name;
@@ -164,9 +127,6 @@ struct _zend_class_entry {
 	HashTable properties_info;
 	HashTable constants_table;
 
-	ZEND_MAP_PTR_DEF(zend_class_mutable_data*, mutable_data);
-	zend_inheritance_cache_entry *inheritance_cache;
-
 	struct _zend_property_info **properties_info_table;
 
 	zend_function *constructor;
@@ -185,8 +145,6 @@ struct _zend_class_entry {
 
 	/* allocated only if class implements Iterator or IteratorAggregate interface */
 	zend_class_iterator_funcs *iterator_funcs_ptr;
-	/* allocated only if class implements ArrayAccess interface */
-	zend_class_arrayaccess_funcs *arrayaccess_funcs_ptr;
 
 	/* handlers */
 	union {
@@ -214,9 +172,6 @@ struct _zend_class_entry {
 	zend_trait_precedence **trait_precedences;
 	HashTable *attributes;
 
-	uint32_t enum_backing_type;
-	HashTable *backed_enum_table;
-
 	union {
 		struct {
 			zend_string *filename;
@@ -232,23 +187,23 @@ struct _zend_class_entry {
 };
 
 typedef struct _zend_utility_functions {
-	void (*error_function)(int type, zend_string *error_filename, const uint32_t error_lineno, zend_string *message);
+	void (*error_function)(int type, const char *error_filename, const uint32_t error_lineno, zend_string *message);
 	size_t (*printf_function)(const char *format, ...) ZEND_ATTRIBUTE_PTR_FORMAT(printf, 1, 2);
 	size_t (*write_function)(const char *str, size_t str_length);
-	FILE *(*fopen_function)(zend_string *filename, zend_string **opened_path);
+	FILE *(*fopen_function)(const char *filename, zend_string **opened_path);
 	void (*message_handler)(zend_long message, const void *data);
 	zval *(*get_configuration_directive)(zend_string *name);
 	void (*ticks_function)(int ticks);
 	void (*on_timeout)(int seconds);
-	zend_result (*stream_open_function)(zend_file_handle *handle);
+	zend_result (*stream_open_function)(const char *filename, zend_file_handle *handle);
 	void (*printf_to_smart_string_function)(smart_string *buf, const char *format, va_list ap);
 	void (*printf_to_smart_str_function)(smart_str *buf, const char *format, va_list ap);
 	char *(*getenv_function)(const char *name, size_t name_len);
-	zend_string *(*resolve_path_function)(zend_string *filename);
+	zend_string *(*resolve_path_function)(const char *filename, size_t filename_len);
 } zend_utility_functions;
 
 typedef struct _zend_utility_values {
-	bool html_errors;
+	zend_bool html_errors;
 } zend_utility_values;
 
 typedef size_t (*zend_write_func_t)(const char *str, size_t str_length);
@@ -279,7 +234,6 @@ zend_result zend_post_startup(void);
 void zend_set_utility_values(zend_utility_values *utility_values);
 
 ZEND_API ZEND_COLD ZEND_NORETURN void _zend_bailout(const char *filename, uint32_t lineno);
-ZEND_API size_t zend_get_page_size(void);
 
 ZEND_API size_t zend_vspprintf(char **pbuf, size_t max_len, const char *format, va_list ap);
 ZEND_API size_t zend_spprintf(char **message, size_t max_len, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 3, 4);
@@ -297,13 +251,11 @@ ZEND_API size_t zend_print_zval(zval *expr, int indent);
 ZEND_API void zend_print_zval_r(zval *expr, int indent);
 ZEND_API zend_string *zend_print_zval_r_to_str(zval *expr, int indent);
 ZEND_API void zend_print_flat_zval_r(zval *expr);
-void zend_print_flat_zval_r_to_buf(smart_str *str, zval *expr);
 
-static zend_always_inline size_t zend_print_variable(zval *var) {
-	return zend_print_zval(var, 0);
-}
+#define zend_print_variable(var) \
+	zend_print_zval((var), 0)
 
-ZEND_API ZEND_COLD void zend_output_debug_string(bool trigger_break, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 2, 3);
+ZEND_API ZEND_COLD void zend_output_debug_string(zend_bool trigger_break, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 2, 3);
 
 ZEND_API void zend_activate(void);
 ZEND_API void zend_deactivate(void);
@@ -326,30 +278,30 @@ END_EXTERN_C()
 BEGIN_EXTERN_C()
 extern ZEND_API size_t (*zend_printf)(const char *format, ...) ZEND_ATTRIBUTE_PTR_FORMAT(printf, 1, 2);
 extern ZEND_API zend_write_func_t zend_write;
-extern ZEND_API FILE *(*zend_fopen)(zend_string *filename, zend_string **opened_path);
+extern ZEND_API FILE *(*zend_fopen)(const char *filename, zend_string **opened_path);
 extern ZEND_API void (*zend_ticks_function)(int ticks);
 extern ZEND_API void (*zend_interrupt_function)(zend_execute_data *execute_data);
-extern ZEND_API void (*zend_error_cb)(int type, zend_string *error_filename, const uint32_t error_lineno, zend_string *message);
+extern ZEND_API void (*zend_error_cb)(int type, const char *error_filename, const uint32_t error_lineno, zend_string *message);
 extern ZEND_API void (*zend_on_timeout)(int seconds);
-extern ZEND_API zend_result (*zend_stream_open_function)(zend_file_handle *handle);
+extern ZEND_API zend_result (*zend_stream_open_function)(const char *filename, zend_file_handle *handle);
 extern void (*zend_printf_to_smart_string)(smart_string *buf, const char *format, va_list ap);
 extern void (*zend_printf_to_smart_str)(smart_str *buf, const char *format, va_list ap);
 extern ZEND_API char *(*zend_getenv)(const char *name, size_t name_len);
-extern ZEND_API zend_string *(*zend_resolve_path)(zend_string *filename);
+extern ZEND_API zend_string *(*zend_resolve_path)(const char *filename, size_t filename_len);
 
 /* These two callbacks are especially for opcache */
 extern ZEND_API zend_result (*zend_post_startup_cb)(void);
 extern ZEND_API void (*zend_post_shutdown_cb)(void);
 
+/* Callback for loading of not preloaded part of the script */
+extern ZEND_API zend_result (*zend_preload_autoload)(zend_string *filename);
+
 ZEND_API ZEND_COLD void zend_error(int type, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 2, 3);
 ZEND_API ZEND_COLD ZEND_NORETURN void zend_error_noreturn(int type, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 2, 3);
-/* For custom format specifiers like H */
-ZEND_API ZEND_COLD void zend_error_unchecked(int type, const char *format, ...);
 /* If filename is NULL the default filename is used. */
-ZEND_API ZEND_COLD void zend_error_at(int type, zend_string *filename, uint32_t lineno, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 4, 5);
-ZEND_API ZEND_COLD ZEND_NORETURN void zend_error_at_noreturn(int type, zend_string *filename, uint32_t lineno, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 4, 5);
+ZEND_API ZEND_COLD void zend_error_at(int type, const char *filename, uint32_t lineno, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 4, 5);
+ZEND_API ZEND_COLD ZEND_NORETURN void zend_error_at_noreturn(int type, const char *filename, uint32_t lineno, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 4, 5);
 ZEND_API ZEND_COLD void zend_error_zstr(int type, zend_string *message);
-ZEND_API ZEND_COLD void zend_error_zstr_at(int type, zend_string *filename, uint32_t lineno, zend_string *message);
 
 ZEND_API ZEND_COLD void zend_throw_error(zend_class_entry *exception_ce, const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 2, 3);
 ZEND_API ZEND_COLD void zend_type_error(const char *format, ...) ZEND_ATTRIBUTE_FORMAT(printf, 1, 2);
@@ -358,16 +310,13 @@ ZEND_API ZEND_COLD void zend_value_error(const char *format, ...) ZEND_ATTRIBUTE
 
 ZEND_COLD void zenderror(const char *error);
 
-/* For internal C errors */
-ZEND_API ZEND_COLD ZEND_NORETURN void zend_strerror_noreturn(int type, int errn, const char *message);
-
 /* The following #define is used for code duality in PHP for Engine 1 & 2 */
 #define ZEND_STANDARD_CLASS_DEF_PTR zend_standard_class_def
 extern ZEND_API zend_class_entry *zend_standard_class_def;
 extern ZEND_API zend_utility_values zend_uv;
 
 /* If DTrace is available and enabled */
-extern ZEND_API bool zend_dtrace_enabled;
+extern ZEND_API zend_bool zend_dtrace_enabled;
 END_EXTERN_C()
 
 #define ZEND_UV(name) (zend_uv.name)
@@ -397,14 +346,9 @@ typedef struct {
 	zend_class_entry       *exception;
 } zend_error_handling;
 
-BEGIN_EXTERN_C()
 ZEND_API void zend_save_error_handling(zend_error_handling *current);
 ZEND_API void zend_replace_error_handling(zend_error_handling_t error_handling, zend_class_entry *exception_class, zend_error_handling *current);
 ZEND_API void zend_restore_error_handling(zend_error_handling *saved);
-ZEND_API void zend_begin_record_errors(void);
-ZEND_API void zend_emit_recorded_errors(void);
-ZEND_API void zend_free_recorded_errors(void);
-END_EXTERN_C()
 
 #define DEBUG_BACKTRACE_PROVIDE_OBJECT (1<<0)
 #define DEBUG_BACKTRACE_IGNORE_ARGS    (1<<1)

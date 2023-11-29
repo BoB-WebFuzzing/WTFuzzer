@@ -1,9 +1,8 @@
 --TEST--
 imagecreatefromstring() - PNG format
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
+if (!extension_loaded('gd')) die('skip ext/gd required');
 if (!(imagetypes() & IMG_PNG)) die('skip PNG support required');
 ?>
 --FILE--

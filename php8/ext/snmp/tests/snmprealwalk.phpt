@@ -2,8 +2,6 @@
 Function snmprealwalk
 --CREDITS--
 Olivier Doucet Olivier Doucet Boris Lytochkin
---EXTENSIONS--
-snmp
 --SKIPIF--
 <?php
 require_once(__DIR__.'/skipif.inc');

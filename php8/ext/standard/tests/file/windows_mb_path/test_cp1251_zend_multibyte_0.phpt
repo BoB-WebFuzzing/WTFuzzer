@@ -1,7 +1,5 @@
 --TEST--
 Test fopen() for reading CP1251 with zend.multibyte
---EXTENSIONS--
-mbstring
 --INI--
 zend.multibyte=1
 zend.script_encoding=cp1251
@@ -11,7 +9,7 @@ include __DIR__ . DIRECTORY_SEPARATOR . "util.inc";
 
 skip_if_not_win();
 if (getenv("SKIP_SLOW_TESTS")) die("skip slow test");
-skip_if_no_required_exts();
+skip_if_no_required_exts("mbstring");
 
 ?>
 --CONFLICTS--

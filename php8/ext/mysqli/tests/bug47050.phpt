@@ -1,9 +1,8 @@
 --TEST--
 Bug #47050 (mysqli_poll() modifies improper variables)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 if (!defined("MYSQLI_ASYNC")) {
     die("skip mysqlnd only");

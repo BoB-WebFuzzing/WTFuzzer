@@ -1,7 +1,5 @@
 --TEST--
 socket_accept() failure
---EXTENSIONS--
-sockets
 --FILE--
 <?php
 

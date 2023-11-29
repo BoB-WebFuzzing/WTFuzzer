@@ -1,7 +1,5 @@
 --TEST--
 Bind with various bind types not supported by TimesTen
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
 $target_dbs = array('oracledb' => false, 'timesten' => true);  // test runs on these DBs

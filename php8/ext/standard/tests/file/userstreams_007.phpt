@@ -3,7 +3,6 @@ User-space streams: test metadata option
 --FILE--
 <?php
 class test_wrapper {
-    public $context;
     function stream_open($path, $mode, $openedpath) {
         return true;
     }

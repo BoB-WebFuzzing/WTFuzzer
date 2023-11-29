@@ -1,7 +1,7 @@
 --TEST--
 Bug #32776 (SOAP doesn't support one-way operations)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--
@@ -15,7 +15,6 @@ function test($x) {
 }
 
 class LocalSoapClient extends SoapClient {
-  private $server;
 
   function __construct($wsdl, $options) {
     parent::__construct($wsdl, $options);
@@ -23,7 +22,7 @@ class LocalSoapClient extends SoapClient {
     $this->server->addFunction('test');
   }
 
-  function __doRequest($request, $location, $action, $version, $one_way = 0): ?string {
+  function __doRequest($request, $location, $action, $version, $one_way = 0) {
     ob_start();
     $this->server->handle($request);
     $response = ob_get_contents();

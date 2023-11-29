@@ -18,7 +18,7 @@ class InvertedRegexIterator extends RegexIterator
 {
     /** @return !RegexIterator::accept()
      */
-    function accept(): bool
+    function accept()
     {
         return !RegexIterator::accept();
     }

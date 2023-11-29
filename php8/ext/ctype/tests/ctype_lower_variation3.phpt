@@ -1,7 +1,7 @@
 --TEST--
 Test ctype_lower() function : usage variations - different strings
---EXTENSIONS--
-ctype
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 /*

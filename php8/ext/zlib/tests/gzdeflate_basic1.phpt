@@ -1,9 +1,11 @@
 --TEST--
 Test gzdeflate() function : basic functionality
---EXTENSIONS--
-zlib
 --SKIPIF--
-<?php if (getenv('TRAVIS')) die('skip Currently fails on Travis'); ?>
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 /*

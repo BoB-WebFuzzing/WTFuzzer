@@ -1,9 +1,8 @@
 --TEST--
 Bug #34810 (mysqli::init() and others use wrong $this pointer without checks)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -13,14 +12,13 @@ class DbConnection {
     public function connect() {
         require_once("connect.inc");
 
-        /* Pass false as $connect_flags cannot be accessed via globals. */
-        $link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket, false);
+        $link = my_mysqli_connect($host, $user, $passwd, $db, $port, $socket);
         var_dump($link);
 
         $link = mysqli_init();
         var_dump($link);
 
-        $mysql = new my_mysqli($host, $user, $passwd, $db, $port, $socket, false);
+        $mysql = new my_mysqli($host, $user, $passwd, $db, $port, $socket);
         $mysql->query("DROP TABLE IF EXISTS test_warnings");
         $mysql->query("CREATE TABLE test_warnings (a int not null)");
         $mysql->query("SET sql_mode=''");

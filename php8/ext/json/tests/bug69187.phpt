@@ -2,6 +2,8 @@
 Bug #69187 json_last_error return BC in PHP7
 --FILE--
 <?php
+var_dump(json_decode(NULL));
+var_dump(json_last_error());
 var_dump(json_decode(FALSE));
 var_dump(json_last_error());
 var_dump(json_decode(""));
@@ -27,6 +29,8 @@ json_decode("\"\x00\"");
 var_dump(json_last_error());
 ?>
 --EXPECT--
+NULL
+int(4)
 NULL
 int(4)
 NULL

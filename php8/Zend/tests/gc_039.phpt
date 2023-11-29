@@ -1,7 +1,7 @@
 --TEST--
 GC 039: Garbage created by replacing argument send by reference
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --INI--
 zend.enable_gc = 1
 --FILE--

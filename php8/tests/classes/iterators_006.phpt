@@ -6,31 +6,29 @@ ZE2 iterators and array wrapping
 class ai implements Iterator {
 
     private $array;
-    private $key;
-    private $current;
 
     function __construct() {
         $this->array = array('foo', 'bar', 'baz');
     }
 
-    function rewind(): void {
+    function rewind() {
         reset($this->array);
         $this->next();
     }
 
-    function valid(): bool {
+    function valid() {
         return $this->key !== NULL;
     }
 
-    function key(): mixed {
+    function key() {
         return $this->key;
     }
 
-    function current(): mixed {
+    function current() {
         return $this->current;
     }
 
-    function next(): void {
+    function next() {
         $this->key = key($this->array);
         $this->current = current($this->array);
         next($this->array);
@@ -39,7 +37,7 @@ class ai implements Iterator {
 
 class a implements IteratorAggregate {
 
-    public function getIterator(): Traversable {
+    public function getIterator() {
         return new ai();
     }
 }

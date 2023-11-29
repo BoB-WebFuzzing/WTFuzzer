@@ -1,7 +1,8 @@
 --TEST--
 Unexposed/leaked stream encloses another stream
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php
+if (!function_exists('zend_leak_variable')) die("skip only debug builds");
 --FILE--
 <?php
 $s = fopen('php://temp/maxmemory=1024','wb+');

@@ -4,7 +4,6 @@ Bug #38779 (engine crashes when require()'ing file with syntax error through use
 <?php
 
 class Loader {
-    public $context;
     private $position;
     private $data;
     public function stream_open($path, $mode, $options, &$opened_path)  {

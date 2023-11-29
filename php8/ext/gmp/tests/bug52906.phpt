@@ -1,7 +1,7 @@
 --TEST--
 Bug #52906 gmp_mod returns negative result when non-negative is expected
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 

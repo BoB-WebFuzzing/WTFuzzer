@@ -1,8 +1,9 @@
 --TEST--
 Bug #79100 (Wrong FTP error messages)
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php
+require 'skipif.inc';
+?>
 --FILE--
 <?php
 $bug79100 = true;

@@ -1,7 +1,7 @@
 --TEST--
 imap_mutf7_to_utf8
---EXTENSIONS--
-imap
+--SKIPIF--
+<?php if (!extension_loaded("imap")) print "skip"; ?>
 --FILE--
 <?php
 

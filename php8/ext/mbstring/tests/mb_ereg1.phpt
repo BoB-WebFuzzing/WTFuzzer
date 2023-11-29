@@ -1,7 +1,5 @@
 --TEST--
 mb_ereg() and invalid arguments
---EXTENSIONS--
-mbstring
 --SKIPIF--
 <?php if (!function_exists("mb_ereg")) print "skip"; ?>
 --FILE--

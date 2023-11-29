@@ -1,7 +1,5 @@
 --TEST--
 $session_array = explode(";", session_encode()); should not segfault
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--

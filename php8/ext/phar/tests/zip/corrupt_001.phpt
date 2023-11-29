@@ -1,7 +1,7 @@
 --TEST--
 Phar: corrupted zip (count mismatch)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 try {

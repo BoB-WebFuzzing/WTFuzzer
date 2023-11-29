@@ -31,6 +31,13 @@ $inputs = array(
        12345 => 'positive',
        -2345 => 'negative'),
 
+       // float data
+/*2*/
+'float' => array(
+       10.5 => 'float 1',
+       -10.5 => 'float 2',
+       .5 => 'float 3'),
+
        // null data
 /*3*/
 'null' => array(
@@ -102,12 +109,22 @@ array(4) {
 }
 
 -- Iteration 2 --
+array(3) {
+  [10]=>
+  string(7) "float 1"
+  [-10]=>
+  string(7) "float 2"
+  [0]=>
+  string(7) "float 3"
+}
+
+-- Iteration 3 --
 array(1) {
   [""]=>
   string(6) "null 2"
 }
 
--- Iteration 3 --
+-- Iteration 4 --
 array(2) {
   [1]=>
   string(5) "boolT"
@@ -115,13 +132,13 @@ array(2) {
   string(5) "boolF"
 }
 
--- Iteration 4 --
+-- Iteration 5 --
 array(1) {
   [""]=>
   string(6) "emptys"
 }
 
--- Iteration 5 --
+-- Iteration 6 --
 array(2) {
   ["string"]=>
   string(7) "strings"
@@ -129,7 +146,7 @@ array(2) {
   string(7) "stringh"
 }
 
--- Iteration 6 --
+-- Iteration 7 --
 array(2) {
   ["binary1"]=>
   string(8) "binary 1"
@@ -137,13 +154,13 @@ array(2) {
   string(8) "binary 2"
 }
 
--- Iteration 7 --
+-- Iteration 8 --
 array(1) {
   [""]=>
   string(9) "undefined"
 }
 
--- Iteration 8 --
+-- Iteration 9 --
 array(1) {
   [""]=>
   string(5) "unset"

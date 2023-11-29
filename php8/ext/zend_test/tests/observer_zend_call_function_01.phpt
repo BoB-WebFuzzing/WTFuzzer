@@ -1,7 +1,7 @@
 --TEST--
 Observer: Calls that go through zend_call_function are observed
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip: zend-test extension required'); ?>
 --INI--
 zend_test.observer.enabled=1
 zend_test.observer.observe_all=1
@@ -18,25 +18,19 @@ var_dump(array_reduce($a, 'sum'));
 echo 'Done' . PHP_EOL;
 ?>
 --EXPECTF--
-<!-- init '%s' -->
-<file '%s'>
-  <!-- init array_reduce() -->
-  <array_reduce>
-    <!-- init sum() -->
-    <sum>
-    </sum>
-    <sum>
-    </sum>
-    <sum>
-    </sum>
-    <sum>
-    </sum>
-    <sum>
-    </sum>
-  </array_reduce>
-  <!-- init var_dump() -->
-  <var_dump>
+<!-- init '%s%eobserver_zend_call_function_%d.php' -->
+<file '%s%eobserver_zend_call_function_%d.php'>
+  <!-- init sum() -->
+  <sum>
+  </sum>
+  <sum>
+  </sum>
+  <sum>
+  </sum>
+  <sum>
+  </sum>
+  <sum>
+  </sum>
 int(15)
-  </var_dump>
 Done
-</file '%s'>
+</file '%s%eobserver_zend_call_function_%d.php'>

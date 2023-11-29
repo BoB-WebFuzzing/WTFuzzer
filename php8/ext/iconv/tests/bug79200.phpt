@@ -1,7 +1,9 @@
 --TEST--
 Bug #79200 (Some iconv functions cut Windows-1258)
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+if (!extension_loaded('iconv')) die('skip iconv extension not available');
+?>
 --FILE--
 <?php
 var_dump(iconv_mime_decode('=?windows-1258?Q?test=20test?=', 0, 'UTF-8'));

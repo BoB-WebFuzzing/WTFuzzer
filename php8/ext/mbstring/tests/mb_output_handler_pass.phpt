@@ -1,7 +1,7 @@
 --TEST--
 mb_output_handler() with output_encoding=pass
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --INI--
 output_handler=mb_output_handler
 output_encoding=pass

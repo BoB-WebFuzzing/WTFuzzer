@@ -2,9 +2,8 @@
 ldap_parse_result() - Test the parsing of controls from result object
 --CREDITS--
 Côme Chilliet <mcmic@php.net>
---EXTENSIONS--
-ldap
 --SKIPIF--
+<?php require_once('skipif.inc'); ?>
 <?php require_once('skipifbindfailure.inc'); ?>
 <?php
 require_once('skipifcontrol.inc');
@@ -37,8 +36,7 @@ $link = ldap_connect_and_bind($host, $port, $user, $passwd, $protocol_version);
 remove_dummy_data($link, $base);
 ?>
 --EXPECTF--
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 bool(true)
 string(22) "1.2.840.113556.1.4.319"
 int(%d)

@@ -1,13 +1,10 @@
 --TEST--
 Bind limits
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
---CONFLICTS--
-all
 --FILE--
 <?php
     require_once("connect.inc");

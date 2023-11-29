@@ -1,7 +1,7 @@
 --TEST--
 openssl_cms_decrypt() tests
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 $infile = __DIR__ . "/plain.txt";
@@ -15,9 +15,8 @@ $single_cert = "file://" . __DIR__ . "/cert.crt";
 $headers = array("test@test", "testing openssl_cms_encrypt()");
 $wrong = "wrong";
 $empty = "";
-$cipher = OPENSSL_CIPHER_AES_128_CBC;
 
-openssl_cms_encrypt($infile, $encrypted, $single_cert, $headers, cipher_algo: $cipher);
+openssl_cms_encrypt($infile, $encrypted, $single_cert, $headers);
 
 var_dump(openssl_cms_decrypt($encrypted, $outfile, $single_cert, $privkey));
 print("\nDecrypted text:\n");

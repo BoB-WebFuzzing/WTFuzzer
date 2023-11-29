@@ -12,12 +12,12 @@ class Obj {
 
 class Arr implements ArrayAccess {
     public $values = [];
-    public function offsetSet($name, $value): void {
+    public function offsetSet($name, $value) {
         $this->values[$name] = $value;
     }
-    public function offsetGet($name): mixed {}
-    public function offsetExists($name): bool {}
-    public function offsetUnset($name): void {}
+    public function offsetGet($name) {}
+    public function offsetExists($name) {}
+    public function offsetUnset($name) {}
 }
 
 $str = 'ab';

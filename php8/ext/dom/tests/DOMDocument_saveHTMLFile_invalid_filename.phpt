@@ -3,11 +3,13 @@ DOMDocument::saveHTMLFile() should fail with invalid filename
 --CREDITS--
 Knut Urdalen <knut@php.net>
 #PHPTestFest2009 Norway 2009-06-09 \o/
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once __DIR__ .'/skipif.inc';
+?>
 --FILE--
 <?php
-$filename = '';
+$filename = null;
 $doc = new DOMDocument('1.0');
 $root = $doc->createElement('html');
 $root = $doc->appendChild($root);

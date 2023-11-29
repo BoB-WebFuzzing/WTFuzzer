@@ -3,8 +3,8 @@ DomDocument::createProcessingInstruction() - error test for DomDocument::createP
 --CREDITS--
 Muhammad Khalid Adnan
 # TestFest 2008
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

@@ -1,7 +1,5 @@
 --TEST--
 Test descriptor types for oci_new_descriptor()
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs

@@ -24,5 +24,5 @@ print_r($a, true);
 var_dump($a < $b);
 ?>
 --EXPECT--
-bool(true)
-bool(true)
+bool(false)
+bool(false)

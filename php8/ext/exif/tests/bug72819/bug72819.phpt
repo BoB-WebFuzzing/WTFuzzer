@@ -1,7 +1,7 @@
 --TEST--
 Bug #72819 (EXIF thumbnails not read anymore)
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
 --INI--
 output_handler=
 zlib.output_compression=0

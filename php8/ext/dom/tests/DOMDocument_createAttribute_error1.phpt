@@ -3,8 +3,8 @@ DomDocument::createAttribute() - error test for DomDocument::createAttribute()
 --CREDITS--
 Muhammad Khalid Adnan
 # TestFest 2008
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

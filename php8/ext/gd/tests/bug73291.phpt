@@ -1,7 +1,9 @@
 --TEST--
 Bug #73291 (imagecropauto() $threshold differs from external libgd)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 

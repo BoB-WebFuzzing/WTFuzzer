@@ -1,18 +1,11 @@
 --TEST--
-Bug #31755 (Cannot create SOAP header in no namespace)
---EXTENSIONS--
-soap
+Bug #31422 (No Error-Logging on SoapServer-Side)
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
-class MySoapClient extends SoapClient {
-    public function __doRequest($request, $location, $action, $version, $one_way = 0): string {
-        echo $request, "\n";
-        return '';
-    }
-}
-$client = new MySoapClient(null, array(
-    'location' => 'http://localhost', 'uri' => 'myNS', 'exceptions' => false
-));
+$client=new SOAPClient(null, array('location' => 'http://localhost',
+'uri' => 'myNS', 'exceptions' => false, 'trace' => true));
 
 try {
     new SOAPHeader('', 'foo', 'bar');

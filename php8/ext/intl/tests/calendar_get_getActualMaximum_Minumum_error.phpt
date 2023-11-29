@@ -2,8 +2,10 @@
 IntlCalendar::get/getActualMaximum/getActualMinimum(): bad arguments
 --INI--
 date.timezone=Atlantic/Azores
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 

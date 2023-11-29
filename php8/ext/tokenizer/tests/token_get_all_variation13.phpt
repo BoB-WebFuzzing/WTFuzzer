@@ -1,7 +1,7 @@
 --TEST--
 Test token_get_all() function : usage variations - with class/object constructs
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip"; ?>
 --FILE--
 <?php
 /*

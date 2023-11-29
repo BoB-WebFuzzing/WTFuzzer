@@ -1,7 +1,5 @@
 --TEST--
 fetching the same lob several times
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
@@ -71,7 +69,7 @@ $statement = oci_parse($c, $drop);
 echo "Done\n";
 
 ?>
---EXPECT--
+--EXPECTF--
 
 OCILob::save(): Argument #2 ($offset) must be greater than or equal to 0
 string(4) "data"

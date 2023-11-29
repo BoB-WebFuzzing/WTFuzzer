@@ -6,8 +6,8 @@ Verifies that an error message is showed if the file doesn't exist
 Antonio Diaz Ruiz <dejalatele@gmail.com>
 --INI--
 assert.bail=true
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --FILE--
 <?php
 $doc = new DOMDocument();

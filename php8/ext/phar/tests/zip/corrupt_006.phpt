@@ -1,7 +1,7 @@
 --TEST--
 Phar: zip with file created from stdin
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 try {

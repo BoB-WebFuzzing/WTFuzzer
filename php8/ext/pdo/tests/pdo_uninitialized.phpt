@@ -1,7 +1,7 @@
 --TEST--
 Uninitialized PDO objects
---EXTENSIONS--
-pdo
+--SKIPIF--
+<?php if (!extension_loaded('pdo')) die('skip'); ?>
 --FILE--
 <?php
 

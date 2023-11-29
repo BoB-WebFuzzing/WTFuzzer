@@ -1,7 +1,10 @@
 --TEST--
 Test if bindtextdomain() returns false if path does not exist.
---EXTENSIONS--
-gettext
+--SKIPIF--
+<?php
+if (!extension_loaded("gettext")) {
+    die("skip gettext extension is not loaded.\n");
+}
 --FILE--
 <?php
 chdir(__DIR__);

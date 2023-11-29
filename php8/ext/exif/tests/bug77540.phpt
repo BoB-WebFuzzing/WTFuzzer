@@ -1,7 +1,7 @@
 --TEST--
 Bug 77540 (Invalid Read on exif_process_SOFn)
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
 --FILE--
 <?php
 $width = $height = 42;

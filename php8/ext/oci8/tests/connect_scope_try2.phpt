@@ -1,7 +1,7 @@
 --TEST--
 Check oci_connect try/catch end-of-scope with old_oci_close_semantics On
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --INI--
 oci8.old_oci_close_semantics=1
 --FILE--
@@ -76,7 +76,6 @@ echo "Done\n";
 
 ?>
 --EXPECTF--
-Deprecated: Directive oci8.old_oci_close_semantics is deprecated%s
 Test 1
 Caught Exception: oci_execute(): ORA-%r(00984|57000: TT2957)%r: %s
 resource(%d) of type (oci8 connection)

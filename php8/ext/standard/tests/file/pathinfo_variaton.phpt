@@ -4,6 +4,9 @@ Test pathinfo() function: usage variations
 <?php
 echo "*** Testing pathinfo() with miscellaneous input arguments ***\n";
 
+$fp = fopen(__FILE__, "r");
+unset($fp);
+
 class object_temp {
   public $url_var = "www.foo.com";
   var $html_var = "/var/html/testdir/example.html";
@@ -44,6 +47,13 @@ $paths = array (
   "",
   '',
 
+  /* pathname as NULL */
+  NULL,
+  null,
+
+  /* filename as resource */
+  $fp,
+
   /* pathname as members of object */
   $obj->url_var,
   $obj->html_var,
@@ -73,8 +83,10 @@ foreach($paths as $path) {
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing pathinfo() with miscellaneous input arguments ***
+
+Warning: Undefined variable $fp in %s on line %d
 -- Iteration 1 --
 array(3) {
   ["dirname"]=>
@@ -228,6 +240,39 @@ string(0) ""
 string(0) ""
 string(0) ""
 -- Iteration 13 --
+array(2) {
+  ["basename"]=>
+  string(0) ""
+  ["filename"]=>
+  string(0) ""
+}
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+-- Iteration 14 --
+array(2) {
+  ["basename"]=>
+  string(0) ""
+  ["filename"]=>
+  string(0) ""
+}
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+-- Iteration 15 --
+array(2) {
+  ["basename"]=>
+  string(0) ""
+  ["filename"]=>
+  string(0) ""
+}
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+-- Iteration 16 --
 array(4) {
   ["dirname"]=>
   string(1) "."
@@ -242,7 +287,7 @@ string(1) "."
 string(11) "www.foo.com"
 string(3) "com"
 string(7) "www.foo"
--- Iteration 14 --
+-- Iteration 17 --
 array(4) {
   ["dirname"]=>
   string(17) "/var/html/testdir"
@@ -257,7 +302,7 @@ string(17) "/var/html/testdir"
 string(12) "example.html"
 string(4) "html"
 string(7) "example"
--- Iteration 15 --
+-- Iteration 18 --
 array(3) {
   ["dirname"]=>
   string(12) "/testdir/foo"
@@ -270,7 +315,7 @@ string(12) "/testdir/foo"
 string(4) "test"
 string(0) ""
 string(4) "test"
--- Iteration 16 --
+-- Iteration 19 --
 array(4) {
   ["dirname"]=>
   string(4) "/foo"
@@ -285,7 +330,7 @@ string(4) "/foo"
 string(12) "symlink.link"
 string(4) "link"
 string(7) "symlink"
--- Iteration 17 --
+-- Iteration 20 --
 array(3) {
   ["dirname"]=>
   string(1) "."
@@ -298,7 +343,7 @@ string(1) "."
 string(5) "12345"
 string(0) ""
 string(5) "12345"
--- Iteration 18 --
+-- Iteration 21 --
 array(4) {
   ["dirname"]=>
   string(1) "."
@@ -313,7 +358,7 @@ string(1) "."
 string(15) "www.example.com"
 string(3) "com"
 string(11) "www.example"
--- Iteration 19 --
+-- Iteration 22 --
 array(3) {
   ["dirname"]=>
   string(12) "/testdir/foo"
@@ -326,7 +371,7 @@ string(12) "/testdir/foo"
 string(4) "test"
 string(0) ""
 string(4) "test"
--- Iteration 20 --
+-- Iteration 23 --
 array(4) {
   ["dirname"]=>
   string(6) "../foo"
@@ -341,7 +386,7 @@ string(6) "../foo"
 string(9) "test.link"
 string(4) "link"
 string(4) "test"
--- Iteration 21 --
+-- Iteration 24 --
 array(4) {
   ["dirname"]=>
   string(76) "./test/work/scratch/mydir/yourdir/ourdir/test1/test2/test3/test4/test5/test6"
@@ -356,7 +401,7 @@ string(76) "./test/work/scratch/mydir/yourdir/ourdir/test1/test2/test3/test4/tes
 string(8) "test.tmp"
 string(3) "tmp"
 string(4) "test"
--- Iteration 22 --
+-- Iteration 25 --
 array(4) {
   ["dirname"]=>
   string(1) "."

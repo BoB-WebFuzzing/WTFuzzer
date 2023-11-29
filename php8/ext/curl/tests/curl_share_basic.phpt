@@ -1,7 +1,5 @@
 --TEST--
 Basic curl_share test
---EXTENSIONS--
-curl
 --FILE--
 <?php
 

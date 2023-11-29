@@ -1,7 +1,9 @@
 --TEST--
 BUg #76712 (Assignment of empty string creates extraneous text node)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php
+if (!extension_loaded('simplexml')) die('skip simplexml not available');
+?>
 --FILE--
 <?php
 $sxe = new SimpleXMLElement('<foo></foo>');

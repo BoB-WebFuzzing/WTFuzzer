@@ -1,7 +1,7 @@
 --TEST--
 juliantojd()
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 echo juliantojd( 0, 0,    0). "\n";

@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 8: setclass and getfunctions
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class Foo {

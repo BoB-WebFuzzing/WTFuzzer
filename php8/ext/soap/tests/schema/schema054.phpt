@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 54: Apache Map
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--

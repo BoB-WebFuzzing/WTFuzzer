@@ -1,7 +1,9 @@
 --TEST--
 XMLWriter: libxml2 XML Writer DTD Element & Attlist
---EXTENSIONS--
-xmlwriter
+--SKIPIF--
+<?php
+if (!extension_loaded("xmlwriter")) die("skip");
+?>
 --FILE--
 <?php
 

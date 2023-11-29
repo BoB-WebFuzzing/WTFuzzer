@@ -286,8 +286,14 @@ static zlog_bool zlog_stream_buf_alloc_ex(struct zlog_stream *stream, size_t nee
 {
 	char *buf;
 	size_t size = stream->buf.size ?: stream->buf_init_size;
-	size = MIN(zlog_limit, MAX((stream->buf.data ? (size << 1) : size), needed));
-	buf = realloc(stream->buf.data, size);
+
+	if (stream->buf.data) {
+		size = MIN(zlog_limit, MAX(size * 2, needed));
+		buf = realloc(stream->buf.data, size);
+	} else {
+		size = MIN(zlog_limit, MAX(size, needed));
+		buf = malloc(size);
+	}
 
 	if (buf == NULL) {
 		return 0;

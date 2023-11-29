@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -21,14 +21,14 @@
 
 #include "php.h"
 
-#ifdef HAVE_UNISTD_H
+#if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 #if PHP_USE_PHP_CRYPT_R
 # include "php_crypt_r.h"
 # include "crypt_freesec.h"
 #else
-# ifdef HAVE_CRYPT_H
+# if HAVE_CRYPT_H
 #  if defined(CRYPT_R_GNU_SOURCE) && !defined(_GNU_SOURCE)
 #   define _GNU_SOURCE
 #  endif
@@ -43,7 +43,7 @@
 #endif
 
 #include "php_crypt.h"
-#include "ext/random/php_random.h"
+#include "php_random.h"
 
 /* sha512 crypt has the maximal salt length of 123 characters */
 #define PHP_MAX_SALT_LEN 123
@@ -79,7 +79,7 @@ PHP_MSHUTDOWN_FUNCTION(crypt) /* {{{ */
 }
 /* }}} */
 
-PHPAPI zend_string *php_crypt(const char *password, const int pass_len, const char *salt, int salt_len, bool quiet)
+PHPAPI zend_string *php_crypt(const char *password, const int pass_len, const char *salt, int salt_len, zend_bool quiet)
 {
 	char *crypt_res;
 	zend_string *result;

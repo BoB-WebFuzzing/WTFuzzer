@@ -1,7 +1,5 @@
 --TEST--
 PDO_Firebird: bug 73087 segfault binding blob parameter
---EXTENSIONS--
-pdo_firebird
 --SKIPIF--
 <?php require('skipif.inc'); ?>
 --ENV--
@@ -10,7 +8,8 @@ LSAN_OPTIONS=detect_leaks=0
 <?php
 require 'testdb.inc';
 
-$dbh->exec('recreate table atable (id integer not null, content blob sub_type 1 segment size 80)');
+@$dbh->exec('drop table atable');
+$dbh->exec('create table atable (id integer not null, content blob sub_type 1 segment size 80)');
 $S = $dbh->prepare('insert into atable (id, content) values (:id, :content)');
 for ($I = 1; $I < 10; $I++) {
     $Params = [

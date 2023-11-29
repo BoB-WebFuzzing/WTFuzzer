@@ -1,7 +1,7 @@
 --TEST--
 Bug #54440: libxml extension ignores default context
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded('simplexml')) die('skip simplexml required for this test'); ?>
 --FILE--
 <?php
 

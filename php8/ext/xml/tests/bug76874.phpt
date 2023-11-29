@@ -1,7 +1,7 @@
 --TEST--
 Bug #76874: xml_parser_free() should never leak memory
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php include("skipif.inc"); ?>
 --FILE--
 <?php
 

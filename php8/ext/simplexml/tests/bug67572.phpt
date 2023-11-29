@@ -1,7 +1,9 @@
 --TEST--
 Bug #67572 - SimpleXMLElement not parsing \n correctly
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php
+if (!extension_loaded("simplexml")) die("skip SimpleXML not available");
+?>
 --FILE--
 <?php
 $foo = 'bar';

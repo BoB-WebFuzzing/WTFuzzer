@@ -32,6 +32,18 @@ $inputs = array(
        -2345 => 'negative',
        ),
 
+       // float data
+/*2*/  'float' => array(
+       10.5 => 'positive',
+       -10.5 => 'negative',
+       .5 => 'half',
+       ),
+
+/*3*/  'extreme floats' => array(
+       12.3456789000e10 => 'large',
+       12.3456789000E-10 => 'small',
+       ),
+
        // null data
 /*4*/  'null uppercase' => array(
        NULL => 'null 1',
@@ -123,7 +135,55 @@ array(6) {
   string(8) "negative"
 }
 
--- Iteration 2: null uppercase data --
+-- Iteration 2: float data --
+array(5) {
+  [0]=>
+  string(8) "positive"
+  [1]=>
+  string(8) "negative"
+  [2]=>
+  string(4) "half"
+  ["one"]=>
+  int(1)
+  ["two"]=>
+  int(2)
+}
+array(5) {
+  ["one"]=>
+  int(1)
+  ["two"]=>
+  int(2)
+  [0]=>
+  string(8) "positive"
+  [1]=>
+  string(8) "negative"
+  [2]=>
+  string(4) "half"
+}
+
+-- Iteration 3: extreme floats data --
+array(4) {
+  [0]=>
+  string(5) "large"
+  [1]=>
+  string(5) "small"
+  ["one"]=>
+  int(1)
+  ["two"]=>
+  int(2)
+}
+array(4) {
+  ["one"]=>
+  int(1)
+  ["two"]=>
+  int(2)
+  [0]=>
+  string(5) "large"
+  [1]=>
+  string(5) "small"
+}
+
+-- Iteration 4: null uppercase data --
 array(3) {
   [""]=>
   string(6) "null 1"
@@ -141,7 +201,7 @@ array(3) {
   string(6) "null 1"
 }
 
--- Iteration 3: null lowercase data --
+-- Iteration 5: null lowercase data --
 array(3) {
   [""]=>
   string(6) "null 2"
@@ -159,7 +219,7 @@ array(3) {
   string(6) "null 2"
 }
 
--- Iteration 4: bool lowercase data --
+-- Iteration 6: bool lowercase data --
 array(4) {
   [0]=>
   string(6) "lowert"
@@ -181,7 +241,7 @@ array(4) {
   string(6) "lowerf"
 }
 
--- Iteration 5: bool uppercase data --
+-- Iteration 7: bool uppercase data --
 array(4) {
   [0]=>
   string(6) "uppert"
@@ -203,7 +263,7 @@ array(4) {
   string(6) "upperf"
 }
 
--- Iteration 6: empty double quotes data --
+-- Iteration 8: empty double quotes data --
 array(3) {
   [""]=>
   string(6) "emptyd"
@@ -221,7 +281,7 @@ array(3) {
   string(6) "emptyd"
 }
 
--- Iteration 7: empty single quotes data --
+-- Iteration 9: empty single quotes data --
 array(3) {
   [""]=>
   string(6) "emptys"
@@ -239,7 +299,7 @@ array(3) {
   string(6) "emptys"
 }
 
--- Iteration 8: string data --
+-- Iteration 10: string data --
 array(5) {
   ["stringd"]=>
   string(7) "stringd"
@@ -265,7 +325,7 @@ array(5) {
   string(7) "stringh"
 }
 
--- Iteration 9: undefined data --
+-- Iteration 11: undefined data --
 array(3) {
   [""]=>
   string(9) "undefined"
@@ -283,7 +343,7 @@ array(3) {
   string(9) "undefined"
 }
 
--- Iteration 10: unset data --
+-- Iteration 12: unset data --
 array(3) {
   [""]=>
   string(5) "unset"

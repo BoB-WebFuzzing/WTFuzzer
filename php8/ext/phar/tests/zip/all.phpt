@@ -1,9 +1,11 @@
 --TEST--
 Phar: test that creation of zip-based phar generates valid zip with all bells/whistles
---EXTENSIONS--
-phar
-zlib
-bz2
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+if (!extension_loaded("zlib")) die("skip zlib not available");
+if (!extension_loaded("bz2")) die("skip bz2 not available");
+?>
 --INI--
 phar.readonly=0
 --FILE--
@@ -41,10 +43,8 @@ var_dump($phar->getMetadata());
 var_dump($phar['a']->getMetadata());
 ?>
 --CLEAN--
-<?php
-@unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.zip.php');
-unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.2.phar.zip.php');
-?>
+<?php unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.zip.php'); ?>
+<?php unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.2.phar.zip.php'); ?>
 --EXPECT--
 bool(false)
 bool(false)

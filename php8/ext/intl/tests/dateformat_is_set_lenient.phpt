@@ -1,7 +1,7 @@
 --TEST--
 datefmt_set_lenient and datefmt_set_lenient()
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

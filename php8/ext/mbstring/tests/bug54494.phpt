@@ -1,7 +1,7 @@
 --TEST--
 Bug #54494: mb_substr() mishandles UTF-32LE and UCS-2LE
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 

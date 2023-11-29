@@ -1,7 +1,7 @@
 --TEST--
 Bug #42663 (gzinflate() try to allocate all memory with truncated $data)
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) print "skip"; ?>
 --FILE--
 <?php
 // build a predictable string

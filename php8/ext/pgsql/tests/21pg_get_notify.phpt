@@ -1,7 +1,5 @@
 --TEST--
 PostgreSQL pg_get_notify() functions
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--

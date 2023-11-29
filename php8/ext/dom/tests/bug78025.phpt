@@ -1,7 +1,9 @@
 --TEST--
 Bug #78025 (segfault when accessing properties of DOMDocumentType)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+if (!extension_loaded('dom')) die('skip dom extension not available');
+?>
 --FILE--
 <?php
 $htm = "<!DOCTYPE><html></html>";

@@ -1,7 +1,5 @@
 --TEST--
 Bug #71062 pg_convert() doesn't accept ISO 8601 for datatype timestamp
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--

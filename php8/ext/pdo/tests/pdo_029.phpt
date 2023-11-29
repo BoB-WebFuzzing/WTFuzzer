@@ -1,9 +1,8 @@
 --TEST--
 PDO Common: extending PDO (3)
---EXTENSIONS--
-pdo
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo')) die('skip');
 $dir = getenv('REDIR_TEST_DIR');
 if (false == $dir) die('skip no driver');
 require_once $dir . 'pdo_test.inc';
@@ -35,10 +34,10 @@ class PDOStatementX extends PDOStatement
         echo __METHOD__ . "()\n";
     }
 
-    function execute($params = array()): bool
+    function execute($params = array())
     {
         echo __METHOD__ . "()\n";
-        return parent::execute();
+        parent::execute();
     }
 }
 
@@ -49,7 +48,7 @@ class PDODatabase extends PDO
         echo __METHOD__ . "()\n";
     }
 
-    function query($sql, ...$rest): PDOStatement|false
+    function query($sql, ...$rest)
     {
         echo __METHOD__ . "()\n";
         $stmt = $this->prepare($sql, array(PDO::ATTR_STATEMENT_CLASS=>array('PDOStatementx', array($this))));

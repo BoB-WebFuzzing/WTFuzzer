@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 85: Extension of complex type (elements order)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";

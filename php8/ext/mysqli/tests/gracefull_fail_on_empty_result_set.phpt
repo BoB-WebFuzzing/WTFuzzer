@@ -1,9 +1,8 @@
 --TEST--
 Fail gracefully on empty result set
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

@@ -1,7 +1,7 @@
 --TEST--
 bug #61287 - inflate needs the terminating null byte
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php extension_loaded("zlib") or die("SKIP need zlib");
 --FILE--
 <?php
 $array = array(

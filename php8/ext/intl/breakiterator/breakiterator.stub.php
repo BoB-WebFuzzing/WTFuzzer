@@ -1,195 +1,99 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
-/** @not-serializable */
 class IntlBreakIterator implements IteratorAggregate
 {
-    /**
-     * @var int
-     * @cvalue BreakIterator::DONE
-     */
-    public const DONE = UNKNOWN;
+    /** @return IntlBreakIterator|null */
+    public static function createCharacterInstance(?string $locale = null) {}
 
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_NONE
-     */
-    public const WORD_NONE = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_NONE_LIMIT
-     */
-    public const WORD_NONE_LIMIT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_NUMBER
-     */
-    public const WORD_NUMBER = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_NUMBER_LIMIT
-     */
-    public const WORD_NUMBER_LIMIT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_LETTER
-     */
-    public const WORD_LETTER = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_LETTER_LIMIT
-     */
-    public const WORD_LETTER_LIMIT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_KANA
-     */
-    public const WORD_KANA = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_KANA_LIMIT
-     */
-    public const WORD_KANA_LIMIT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_IDEO
-     */
-    public const WORD_IDEO = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_WORD_IDEO_LIMIT
-     */
-    public const WORD_IDEO_LIMIT = UNKNOWN;
+    /** @return IntlCodePointBreakIterator */
+    public static function createCodePointInstance() {}
 
-    /**
-     * @var int
-     * @cvalue UBRK_LINE_SOFT
-     */
-    public const LINE_SOFT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_LINE_SOFT_LIMIT
-     */
-    public const LINE_SOFT_LIMIT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_LINE_HARD
-     */
-    public const LINE_HARD = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_LINE_HARD_LIMIT
-     */
-    public const LINE_HARD_LIMIT = UNKNOWN;
+    /** @return IntlBreakIterator|null */
+    public static function createLineInstance(?string $locale = null) {}
 
-    /**
-     * @var int
-     * @cvalue UBRK_SENTENCE_TERM
-     */
-    public const SENTENCE_TERM = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_SENTENCE_TERM_LIMIT
-     */
-    public const SENTENCE_TERM_LIMIT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_SENTENCE_SEP
-     */
-    public const SENTENCE_SEP = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UBRK_SENTENCE_SEP_LIMIT
-     */
-    public const SENTENCE_SEP_LIMIT = UNKNOWN;
+    /** @return IntlBreakIterator|null */
+    public static function createSentenceInstance(?string $locale = null) {}
 
-    /** @tentative-return-type */
-    public static function createCharacterInstance(?string $locale = null): ?IntlBreakIterator {}
+    /** @return IntlBreakIterator|null */
+    public static function createTitleInstance(?string $locale = null) {}
 
-    /** @tentative-return-type */
-    public static function createCodePointInstance(): IntlCodePointBreakIterator {}
-
-    /** @tentative-return-type */
-    public static function createLineInstance(?string $locale = null): ?IntlBreakIterator {}
-
-    /** @tentative-return-type */
-    public static function createSentenceInstance(?string $locale = null): ?IntlBreakIterator {}
-
-    /** @tentative-return-type */
-    public static function createTitleInstance(?string $locale = null): ?IntlBreakIterator {}
-
-    /** @tentative-return-type */
-    public static function createWordInstance(?string $locale = null): ?IntlBreakIterator {}
+    /** @return IntlBreakIterator|null */
+    public static function createWordInstance(?string $locale = null) {}
 
     private function __construct() {}
 
-    /** @tentative-return-type */
-    public function current(): int {}
+    /** @return int */
+    public function current() {}
 
-    /** @tentative-return-type */
-    public function first(): int {}
+    /** @return int */
+    public function first() {}
 
-    /** @tentative-return-type */
-    public function following(int $offset): int {}
+    /** @return int */
+    public function following(int $offset) {}
 
-    /** @tentative-return-type */
-    public function getErrorCode(): int {}
+    /** @return int */
+    public function getErrorCode() {}
 
-    /** @tentative-return-type */
-    public function getErrorMessage(): string {}
+    /** @return string|false */
+    public function getErrorMessage() {}
 
-    /** @tentative-return-type */
-    public function getLocale(int $type): string|false {}
+    /** @return string */
+    public function getLocale(int $type) {}
 
-    /** @tentative-return-type */
-    public function getPartsIterator(string $type = IntlPartsIterator::KEY_SEQUENTIAL): IntlPartsIterator {}
+    /** @return IntlPartsIterator */
+    public function getPartsIterator(string $type = IntlPartsIterator::KEY_SEQUENTIAL) {}
 
-    /** @tentative-return-type */
-    public function getText(): ?string {}
+    /** @return string|null */
+    public function getText() {}
 
-    /** @tentative-return-type */
-    public function isBoundary(int $offset): bool {}
+    /** @return bool */
+    public function isBoundary(int $offset) {}
 
-    /** @tentative-return-type */
-    public function last(): int {}
+    /** @return int */
+    public function last() {}
 
-    /** @tentative-return-type */
-    public function next(?int $offset = null): int {}
+    /** @return int */
+    public function next(?int $offset = null) {}
 
-    /** @tentative-return-type */
-    public function preceding(int $offset): int {}
+    /** @return int */
+    public function preceding(int $offset) {}
 
-    /** @tentative-return-type */
-    public function previous(): int {}
+    /** @return int */
+    public function previous() {}
 
-    /** @tentative-return-type */
-    public function setText(string $text): ?bool {} // TODO return false instead of null in case of failure
+    /** @return bool|null */
+    public function setText(string $text) {}
 
     public function getIterator(): Iterator {}
 }
 
-/** @not-serializable */
 class IntlRuleBasedBreakIterator extends IntlBreakIterator
 {
     public function __construct(string $rules, bool $compiled = false) {}
 
-    /** @tentative-return-type */
-    public function getBinaryRules(): string|false {}
+    /** @return string|false */
+    public function getBinaryRules() {}
 
-    /** @tentative-return-type */
-    public function getRules(): string|false {}
+    /** @return string|false */
+    public function getRules() {}
 
-    /** @tentative-return-type */
-    public function getRuleStatus(): int {}
+    /** @return int */
+    public function getRuleStatus() {}
 
-    /** @tentative-return-type */
-    public function getRuleStatusVec(): array|false {}
+    /** @return array|false */
+    public function getRuleStatusVec() {}
 }
 
-/** @not-serializable */
+class IntlPartsIterator extends IntlIterator
+{
+    /** @return IntlBreakIterator */
+    public function getBreakIterator() {}
+}
+
 class IntlCodePointBreakIterator extends IntlBreakIterator
 {
-    /** @tentative-return-type */
-    public function getLastCodePoint(): int {}
+    /** @return int */
+    public function getLastCodePoint() {}
 }

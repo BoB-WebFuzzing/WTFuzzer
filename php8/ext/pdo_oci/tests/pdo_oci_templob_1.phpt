@@ -1,10 +1,8 @@
 --TEST--
 PDO OCI: Test to verify all implicitly created temporary LOB are cleaned up
---EXTENSIONS--
-pdo
-pdo_oci
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo') || !extension_loaded('pdo_oci')) die('skip not loaded');
 require(__DIR__.'/../../pdo/tests/pdo_test.inc');
 PDOTest::skip();
 ?>

@@ -1,7 +1,7 @@
 --TEST--
 get/set_attribute()
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

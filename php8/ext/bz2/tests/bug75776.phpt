@@ -1,7 +1,9 @@
 --TEST--
 Bug #75776 (Flushing streams with compression filter is broken)
---EXTENSIONS--
-bz2
+--SKIPIF--
+<?php
+if (!extension_loaded('bz2')) die('skip bz2 extension not available');
+?>
 --FILE--
 <?php
 $text = str_repeat('0123456789abcdef', 1000);

@@ -40,10 +40,8 @@ if (is_uploaded_file($_FILES["file3"]["tmp_name"])) {
 --EXPECTF--
 array(3) {
   ["file1"]=>
-  array(6) {
+  array(5) {
     ["name"]=>
-    string(9) "file1.txt"
-    ["full_path"]=>
     string(9) "file1.txt"
     ["type"]=>
     string(16) "text/plain-file1"
@@ -55,10 +53,8 @@ array(3) {
     int(1)
   }
   ["file2"]=>
-  array(6) {
+  array(5) {
     ["name"]=>
-    string(9) "file2.txt"
-    ["full_path"]=>
     string(9) "file2.txt"
     ["type"]=>
     string(0) ""
@@ -70,11 +66,9 @@ array(3) {
     int(0)
   }
   ["file3"]=>
-  array(6) {
+  array(5) {
     ["name"]=>
     string(9) "file3.txt"
-    ["full_path"]=>
-    string(20) "C:\foo\bar/file3.txt"
     ["type"]=>
     string(16) "text/plain-file3"
     ["tmp_name"]=>

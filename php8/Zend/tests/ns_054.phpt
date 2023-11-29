@@ -5,18 +5,18 @@
 namespace test\ns1;
 
 class Foo implements \SplObserver {
-    function update(\SplSubject $x): void {
+    function update(\SplSubject $x) {
         echo "ok\n";
     }
 }
 
 class Bar implements \SplSubject {
-    function attach(\SplObserver $x): void {
+    function attach(\SplObserver $x) {
         echo "ok\n";
     }
-    function notify(): void {
+    function notify() {
     }
-    function detach(\SplObserver $x): void {
+    function detach(\SplObserver $x) {
     }
 }
 $foo = new Foo();

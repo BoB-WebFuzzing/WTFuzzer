@@ -1,7 +1,7 @@
 --TEST--
 Bug #41374 (wholetext concats values of wrong nodes)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $xml = <<<EOXML

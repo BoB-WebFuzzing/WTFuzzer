@@ -8,8 +8,8 @@ opcache.jit_buffer_size=1M
 opcache.protect_memory=1
 opcache.jit=tracing
 opcache.jit_hot_func=1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function createTree($depth) {

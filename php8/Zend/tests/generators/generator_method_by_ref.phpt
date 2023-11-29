@@ -14,7 +14,7 @@ class Test implements IteratorAggregate {
         return $this->data;
     }
 
-    public function &getIterator(): Traversable {
+    public function &getIterator() {
         foreach ($this->data as $key => &$value) {
             yield $key => $value;
         }

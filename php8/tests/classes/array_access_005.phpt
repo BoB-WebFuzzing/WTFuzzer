@@ -10,19 +10,19 @@ class Peoples implements ArrayAccess {
         $this->person = array(array('name'=>'Joe'));
     }
 
-    function offsetExists($index): bool {
+    function offsetExists($index) {
         return array_key_exists($this->person, $index);
     }
 
-    function offsetGet($index): mixed {
+    function offsetGet($index) {
         return $this->person[$index];
     }
 
-    function offsetSet($index, $value): void {
+    function offsetSet($index, $value) {
         $this->person[$index] = $value;
     }
 
-    function offsetUnset($index): void {
+    function offsetUnset($index) {
         unset($this->person[$index]);
     }
 }

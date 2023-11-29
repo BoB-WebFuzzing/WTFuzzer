@@ -5,12 +5,12 @@ SPL: Iterator using getInnerIterator
 
 class RecursiceArrayIterator extends ArrayIterator implements RecursiveIterator
 {
-    function hasChildren(): bool
+    function hasChildren()
     {
         return is_array($this->current());
     }
 
-    function getChildren(): RecursiceArrayIterator
+    function getChildren()
     {
         return new RecursiceArrayIterator($this->current());
     }
@@ -18,17 +18,17 @@ class RecursiceArrayIterator extends ArrayIterator implements RecursiveIterator
 
 class CrashIterator extends FilterIterator implements RecursiveIterator
 {
-    function accept(): bool
+    function accept()
     {
         return true;
     }
 
-    function hasChildren(): bool
+    function hasChildren()
     {
         return $this->getInnerIterator()->hasChildren();
     }
 
-    function getChildren(): RecursiceArrayIterator
+    function getChildren()
     {
         return new RecursiceArrayIterator($this->getInnerIterator()->current());
     }

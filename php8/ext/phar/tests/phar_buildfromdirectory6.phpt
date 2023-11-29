@@ -1,7 +1,7 @@
 --TEST--
 Phar::buildFromDirectory() with non-matching regex
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -26,6 +26,7 @@ var_dump(file_exists(__DIR__ . '/buildfromdirectory6.phar'));
 ?>
 --CLEAN--
 <?php
+unlink(__DIR__ . '/buildfromdirectory6.phar');
 foreach(range(1, 4) as $i) {
     unlink(__DIR__ . "/testdir6/file$i.txt");
 }

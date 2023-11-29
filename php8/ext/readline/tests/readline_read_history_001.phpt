@@ -1,12 +1,7 @@
 --TEST--
 readline_read_history(): Basic test
---EXTENSIONS--
-readline
 --SKIPIF--
-<?php
-if (!function_exists('readline_list_history')) die("skip");
-if (getenv('SKIP_REPEAT')) die("skip readline has global state");
-?>
+<?php if (!extension_loaded("readline") || !function_exists('readline_list_history')) die("skip"); ?>
 --FILE--
 <?php
 

@@ -1,7 +1,9 @@
 --TEST--
 Bug #78641 (addGlob can modify given remove_path value)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if (!extension_loaded('zip')) die('skip zip extension not available');
+?>
 --FILE--
 <?php
 define("TMPDIR", __DIR__ . "/");

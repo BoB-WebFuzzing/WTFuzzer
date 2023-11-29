@@ -3,8 +3,9 @@ htmlentities() test 8 (mbstring / EUC-JP)
 --INI--
 output_handler=
 internal_encoding=EUC-JP
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+    extension_loaded("mbstring") or die("skip mbstring not available\n");
 --FILE--
 <?php
     mb_internal_encoding('EUC-JP');

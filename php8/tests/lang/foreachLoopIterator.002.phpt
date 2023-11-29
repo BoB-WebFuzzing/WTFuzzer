@@ -4,11 +4,11 @@ foreach with iterator and &$value reference
 <?php
 
 class MyIterator implements Iterator {
-    public function valid(): bool { return true; }
-    public function next(): void {}
-    public function rewind(): void {}
-    public function current(): mixed { return null; }
-    public function key(): mixed {return ""; }
+    public function valid() { return true; }
+    public function next() {	}
+    public function rewind() {	}
+    public function current() {	}
+    public function key() {	}
 }
 
 $f = new MyIterator;

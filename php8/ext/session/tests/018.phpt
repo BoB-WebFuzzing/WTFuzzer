@@ -1,7 +1,5 @@
 --TEST--
 rewriter correctly handles attribute names which contain dashes
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -18,7 +16,7 @@ session.save_handler=files
 
 error_reporting(E_ALL);
 
-session_id("test018");
+session_id("abtest");
 session_start();
 ?>
 <form accept-charset="ISO-8859-15, ISO-8859-1" action=url.php>
@@ -26,4 +24,4 @@ session_start();
 session_destroy();
 ?>
 --EXPECT--
-<form accept-charset="ISO-8859-15, ISO-8859-1" action=url.php><input type="hidden" name="PHPSESSID" value="test018" />
+<form accept-charset="ISO-8859-15, ISO-8859-1" action=url.php><input type="hidden" name="PHPSESSID" value="abtest" />

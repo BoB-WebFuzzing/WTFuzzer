@@ -1,7 +1,9 @@
 --TEST--
 Bug #66828 (iconv_mime_encode Q-encoding longer than it should be)
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+if (!extension_loaded('iconv')) die('skip iconv extension not available');
+?>
 --FILE--
 <?php
 $preferences = array(

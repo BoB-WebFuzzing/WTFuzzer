@@ -1,7 +1,7 @@
 --TEST--
 DOMChildNode::after(), before, replaceWith with DOMNode from wrong document throws exception
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require_once("dom_test.inc");

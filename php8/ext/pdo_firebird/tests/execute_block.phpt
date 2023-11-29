@@ -1,7 +1,5 @@
 --TEST--
 PDO_Firebird: support EXECUTE BLOCK
---EXTENSIONS--
-pdo_firebird
 --SKIPIF--
 <?php require('skipif.inc'); 	
 ?>

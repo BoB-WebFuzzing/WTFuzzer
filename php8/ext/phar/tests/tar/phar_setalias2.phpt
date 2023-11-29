@@ -1,7 +1,7 @@
 --TEST--
 Phar::setAlias() error tar-based
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -42,6 +42,8 @@ try {
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.tar');
+unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phartmp.tar');
+__HALT_COMPILER();
 ?>
 --EXPECTF--
 hio

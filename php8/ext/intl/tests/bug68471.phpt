@@ -1,7 +1,9 @@
 --TEST--
 Bug #68471 (IntlDateFormatter fails for "GMT+00:00" timezone)
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl')) die("sikp intl extension not available");
+?>
 --FILE--
 <?php
 $formatter = new IntlDateFormatter(

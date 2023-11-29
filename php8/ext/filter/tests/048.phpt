@@ -1,7 +1,7 @@
 --TEST--
 Hex integer overflow
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 function hex_inc($s) {

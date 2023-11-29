@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 08e29f02953f23bfce6ce04f435227b4e5e61545 */
+ * Stub hash: 3fd1a8c30695df2089655b1785905381734ac1c1 */
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phpdbg_break_next, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
@@ -71,11 +71,3 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(phpdbg_get_executable, arginfo_phpdbg_get_executable)
 	ZEND_FE_END
 };
-
-static void register_phpdbg_symbols(int module_number)
-{
-	REGISTER_STRING_CONSTANT("PHPDBG_VERSION", PHPDBG_VERSION, CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("PHPDBG_COLOR_PROMPT", PHPDBG_COLOR_PROMPT, CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("PHPDBG_COLOR_NOTICE", PHPDBG_COLOR_NOTICE, CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("PHPDBG_COLOR_ERROR", PHPDBG_COLOR_ERROR, CONST_PERSISTENT);
-}

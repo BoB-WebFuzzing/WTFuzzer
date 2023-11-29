@@ -1,7 +1,5 @@
 --TEST--
 odbc_exec(): Getting accurate unicode data from query
---EXTENSIONS--
-odbc
 --SKIPIF--
 <?php include 'skipif.inc'; ?>
 <?php

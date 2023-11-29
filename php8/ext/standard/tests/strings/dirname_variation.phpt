@@ -43,6 +43,8 @@ $file_path_variations = array (
   /* empty path */
   "",
   '',
+  NULL,
+  null
 );
 
 function check_dirname( $paths ) {
@@ -128,5 +130,11 @@ string\(1\) "."
 string\(0\) ""
 
 --Iteration 22 --
+string\(0\) ""
+
+--Iteration 23 --
+string\(0\) ""
+
+--Iteration 24 --
 string\(0\) ""
 Done

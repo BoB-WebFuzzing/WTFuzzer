@@ -1,7 +1,7 @@
 --TEST--
 Check for zip presence
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php if (!extension_loaded("zip")) print "skip"; ?>
 --FILE--
 <?php
 echo "zip extension is available";

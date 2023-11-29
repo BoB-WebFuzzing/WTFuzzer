@@ -1,7 +1,7 @@
 --TEST--
 Bug #70469 (SoapClient should not generate E_ERROR if exceptions enabled)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 try {

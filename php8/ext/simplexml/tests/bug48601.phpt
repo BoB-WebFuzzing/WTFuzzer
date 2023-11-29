@@ -1,7 +1,7 @@
 --TEST--
 Bug #48601 (xpath() returns FALSE for legitimate query)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 

@@ -82,6 +82,10 @@ NULL
 
 Warning: Undefined array key "b" in %s on line %d
 NULL
+
+Warning: Undefined array key 7 in %s on line %d
+
+Warning: Undefined array key "c" in %s on line %d
 object(ArrayObject)#%d (1) {
   ["storage":"ArrayObject":private]=>
   array(2) {

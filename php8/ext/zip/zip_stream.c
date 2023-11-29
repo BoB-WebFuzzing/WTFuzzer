@@ -5,7 +5,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt.                                 |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -197,35 +197,6 @@ static int php_zip_ops_stat(php_stream *stream, php_stream_statbuf *ssb) /* {{{ 
 }
 /* }}} */
 
-#if LIBZIP_ATLEAST(1,9,1)
-/* {{{ php_zip_ops_seek */
-static int php_zip_ops_seek(php_stream *stream, zend_off_t offset, int whence, zend_off_t *newoffset)
-{
-	int ret = -1;
-	STREAM_DATA_FROM_STREAM();
-
-	if (self->zf) {
-		ret = zip_fseek(self->zf, offset, whence);
-		*newoffset = zip_ftell(self->zf);
-	}
-
-	return ret;
-}
-/* }}} */
-
-/* with seek command */
-const php_stream_ops php_stream_zipio_seek_ops = {
-	php_zip_ops_write, php_zip_ops_read,
-	php_zip_ops_close, php_zip_ops_flush,
-	"zip",
-	php_zip_ops_seek, /* seek */
-	NULL, /* cast */
-	php_zip_ops_stat, /* stat */
-	NULL  /* set_option */
-};
-#endif
-
-/* without seek command */
 const php_stream_ops php_stream_zipio_ops = {
 	php_zip_ops_write, php_zip_ops_read,
 	php_zip_ops_close, php_zip_ops_flush,
@@ -237,7 +208,7 @@ const php_stream_ops php_stream_zipio_ops = {
 };
 
 /* {{{ php_stream_zip_open */
-php_stream *php_stream_zip_open(struct zip *arch, struct zip_stat *sb, const char *mode, zip_flags_t flags STREAMS_DC)
+php_stream *php_stream_zip_open(struct zip *arch, const char *path, const char *mode STREAMS_DC)
 {
 	struct zip_file *zf = NULL;
 
@@ -249,7 +220,7 @@ php_stream *php_stream_zip_open(struct zip *arch, struct zip_stat *sb, const cha
 	}
 
 	if (arch) {
-		zf = zip_fopen_index(arch, sb->index, flags);
+		zf = zip_fopen(arch, path, 0);
 		if (zf) {
 			self = emalloc(sizeof(*self));
 
@@ -257,15 +228,8 @@ php_stream *php_stream_zip_open(struct zip *arch, struct zip_stat *sb, const cha
 			self->zf = zf;
 			self->stream = NULL;
 			self->cursor = 0;
-#if LIBZIP_ATLEAST(1,9,1)
-			if (zip_file_is_seekable(zf) > 0) {
-				stream = php_stream_alloc(&php_stream_zipio_seek_ops, self, NULL, mode);
-			} else
-#endif
-			{
-				stream = php_stream_alloc(&php_stream_zipio_ops, self, NULL, mode);
-			}
-			stream->orig_path = estrdup(sb->name);
+			stream = php_stream_alloc(&php_stream_zipio_ops, self, NULL, mode);
+			stream->orig_path = estrdup(path);
 		}
 	}
 
@@ -343,14 +307,7 @@ php_stream *php_stream_zip_opener(php_stream_wrapper *wrapper,
 			self->zf = zf;
 			self->stream = NULL;
 			self->cursor = 0;
-#if LIBZIP_ATLEAST(1,9,1)
-			if (zip_file_is_seekable(zf) > 0) {
-				stream = php_stream_alloc(&php_stream_zipio_seek_ops, self, NULL, mode);
-			} else
-#endif
-			{
-				stream = php_stream_alloc(&php_stream_zipio_ops, self, NULL, mode);
-			}
+			stream = php_stream_alloc(&php_stream_zipio_ops, self, NULL, mode);
 
 			if (opened_path) {
 				*opened_path = zend_string_init(path, strlen(path), 0);

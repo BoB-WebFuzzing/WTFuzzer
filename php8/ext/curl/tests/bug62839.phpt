@@ -1,7 +1,8 @@
 --TEST--
 Bug #62839 (curl_copy_handle segfault with CURLOPT_FILE)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php if (!extension_loaded("curl")) print "skip";
+?>
 --FILE--
 <?php
 $curl = curl_init();

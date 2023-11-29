@@ -3,7 +3,7 @@ Closure 031: Closure properties with custom error handlers
 --FILE--
 <?php
 function foo($errno, $errstr, $errfile, $errline) {
-    echo "Warning: $errstr\n";
+    echo "Error: $errstr\n";
 }
 set_error_handler('foo');
 $foo = function() {
@@ -15,5 +15,4 @@ try {
 }
 ?>
 --EXPECT--
-Warning: Undefined property: Closure::$a
-NULL
+Error: Closure object cannot have properties

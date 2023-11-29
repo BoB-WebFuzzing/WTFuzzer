@@ -1,7 +1,7 @@
 --TEST--
 Bug #41097 (ext/soap returning associative array as indexed without using WSDL)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test($soap, $array) {

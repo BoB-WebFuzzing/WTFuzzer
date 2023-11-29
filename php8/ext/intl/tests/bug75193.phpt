@@ -1,7 +1,7 @@
 --TEST--
 Bug #75193 segfault in collator_convert_object_to_string
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 $a = new \Collator('en_US');

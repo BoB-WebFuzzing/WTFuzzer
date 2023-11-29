@@ -1,7 +1,7 @@
 --TEST--
 is_soap_fault 1: test against null
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 var_dump(is_soap_fault(null));

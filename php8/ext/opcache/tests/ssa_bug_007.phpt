@@ -1,7 +1,7 @@
 --TEST--
 Incorrect CFG/SSA construction for SWITCH with few identical successors
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function render($properties) {

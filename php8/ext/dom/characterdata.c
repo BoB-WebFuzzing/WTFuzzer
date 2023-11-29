@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -41,7 +41,7 @@ int dom_characterdata_data_read(dom_object *obj, zval *retval)
 	xmlChar *content;
 
 	if (nodep == NULL) {
-		php_dom_throw_error(INVALID_STATE_ERR, 1);
+		php_dom_throw_error(INVALID_STATE_ERR, 0);
 		return FAILURE;
 	}
 
@@ -61,7 +61,7 @@ int dom_characterdata_data_write(dom_object *obj, zval *newval)
 	zend_string *str;
 
 	if (nodep == NULL) {
-		php_dom_throw_error(INVALID_STATE_ERR, 1);
+		php_dom_throw_error(INVALID_STATE_ERR, 0);
 		return FAILURE;
 	}
 
@@ -90,7 +90,7 @@ int dom_characterdata_length_read(dom_object *obj, zval *retval)
 	long length = 0;
 
 	if (nodep == NULL) {
-		php_dom_throw_error(INVALID_STATE_ERR, 1);
+		php_dom_throw_error(INVALID_STATE_ERR, 0);
 		return FAILURE;
 	}
 
@@ -364,12 +364,12 @@ PHP_METHOD(DOMCharacterData, remove)
 
 PHP_METHOD(DOMCharacterData, after)
 {
-	int argc = 0;
+	int argc;
 	zval *args, *id;
 	dom_object *intern;
 	xmlNode *context;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "*", &args, &argc) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "+", &args, &argc) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -381,12 +381,12 @@ PHP_METHOD(DOMCharacterData, after)
 
 PHP_METHOD(DOMCharacterData, before)
 {
-	int argc = 0;
+	int argc;
 	zval *args, *id;
 	dom_object *intern;
 	xmlNode *context;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "*", &args, &argc) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "+", &args, &argc) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -398,19 +398,20 @@ PHP_METHOD(DOMCharacterData, before)
 
 PHP_METHOD(DOMCharacterData, replaceWith)
 {
-	int argc = 0;
+	int argc;
 	zval *args, *id;
 	dom_object *intern;
 	xmlNode *context;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "*", &args, &argc) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "+", &args, &argc) == FAILURE) {
 		RETURN_THROWS();
 	}
 
 	id = ZEND_THIS;
 	DOM_GET_OBJ(context, id, xmlNodePtr, intern);
 
-	dom_child_replace_with(intern, args, argc);
+	dom_parent_node_after(intern, args, argc);
+	dom_child_node_remove(intern);
 }
 
 #endif

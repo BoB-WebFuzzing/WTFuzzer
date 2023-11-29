@@ -1,7 +1,7 @@
 --TEST--
 Phar: corrupted zip (truncated file comment)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 try {

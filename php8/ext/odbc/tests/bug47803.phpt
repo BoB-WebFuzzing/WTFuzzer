@@ -1,7 +1,5 @@
 --TEST--
 Bug #47803 Executing prepared statements is successful only for the first two statements
---EXTENSIONS--
-odbc
 --SKIPIF--
 <?php include 'skipif.inc'; ?>
 --FILE--

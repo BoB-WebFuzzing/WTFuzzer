@@ -3,8 +3,8 @@ DOMText::appendData basic functionality test
 --CREDITS--
 Mike Sullivan <mike@regexia.com>
 #TestFest 2008 (London)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -35,3 +35,4 @@ Text Content: data><&"
 
 <?xml version="1.0"?>
 <root><text>data&gt;&lt;&amp;"</text></root>
+	

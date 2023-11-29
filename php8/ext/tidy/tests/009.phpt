@@ -1,7 +1,7 @@
 --TEST--
 tidy_doc object overloading
---EXTENSIONS--
-tidy
+--SKIPIF--
+<?php if (!extension_loaded("tidy")) print "skip"; ?>
 --FILE--
 <?php
 

@@ -1,7 +1,9 @@
 --TEST--
 curl_multi_close closed by cleanup functions
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+if (!extension_loaded('curl')) print 'skip';
+?>
 --FILE--
 <?php
 $mh = curl_multi_init();

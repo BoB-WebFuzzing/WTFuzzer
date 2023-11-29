@@ -1,7 +1,7 @@
 --TEST--
 FFI 009: memcpy(), memcmp(), memset() and sizeof()
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

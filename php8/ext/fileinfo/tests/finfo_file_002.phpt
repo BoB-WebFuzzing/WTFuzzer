@@ -1,7 +1,7 @@
 --TEST--
 finfo_file(): Testing mime types
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -43,8 +43,4 @@ array(%d) {
   string(11) "image/x-tga"
   ["%s/resources/test.webm"]=>
   string(10) "video/webm"
-  ["%s/resources/test.woff"]=>
-  string(9) "font/woff"
-  ["%s/resources/test.xz"]=>
-  string(16) "application/x-xz"
 }

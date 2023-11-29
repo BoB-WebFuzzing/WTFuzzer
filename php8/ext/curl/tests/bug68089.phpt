@@ -1,7 +1,10 @@
 --TEST--
 Bug #68089 (NULL byte injection - cURL lib)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+include 'skipif.inc';
+
+?>
 --FILE--
 <?php
 $url = "file:///etc/passwd\0http://google.com";

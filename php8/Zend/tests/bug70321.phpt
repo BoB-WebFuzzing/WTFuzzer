@@ -15,15 +15,15 @@ class foo implements arrayAccess
         return $bar;
     }
 
-    public function & offsetGet($key): mixed {
+    public function & offsetGet($key) {
         $bar = $this->bar;
         return $bar;
     }
-    public function offsetSet($key, $val): void {
+    public function offsetSet($key, $val) {
     }
-    public function offsetUnset($key): void {
+    public function offsetUnset($key) {
     }
-    public function offsetExists($key): bool {
+    public function offsetExists($key) {
     }
 }
 class bar { public $onBaz = []; }

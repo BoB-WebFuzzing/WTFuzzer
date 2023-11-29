@@ -9,7 +9,6 @@ $s[$o1] = "some_value\n";
 echo $s->offsetGet($o1);
 
 class MySplObjectStorage extends SplObjectStorage {
-    #[ReturnTypeWillChange]
     public function getHash($obj) {
         return 2;
     }
@@ -19,11 +18,11 @@ try {
     $s1 = new MySplObjectStorage;
     $s1[$o1] = "foo";
 } catch(Exception $e) {
-    echo "caught 1\n";
+    echo "caught\n";
 }
 
 class MySplObjectStorage2 extends SplObjectStorage {
-    public function getHash($obj): string {
+    public function getHash($obj) {
         throw new Exception("foo");
         return "asd";
     }
@@ -33,11 +32,11 @@ try {
     $s2 = new MySplObjectStorage2;
     $s2[$o2] = "foo";
 } catch(Exception $e) {
-    echo "caught 2\n";
+    echo "caught\n";
 }
 
 class MySplObjectStorage3 extends SplObjectStorage {
-    public function getHash($obj): string {
+    public function getHash($obj) {
         return "asd";
     }
 }
@@ -52,8 +51,8 @@ var_dump($s3[$o1] === $s3[$o2]);
 ?>
 --EXPECT--
 some_value
-caught 1
-caught 2
+caught
+caught
 object(stdClass)#2 (0) {
 }
 bool(true)

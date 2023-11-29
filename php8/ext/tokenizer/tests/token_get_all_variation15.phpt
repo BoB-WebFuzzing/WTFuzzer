@@ -1,7 +1,7 @@
 --TEST--
 Test token_get_all() function : usage variations - heredoc string for 'source'
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip"; ?>
 --FILE--
 <?php
 /*

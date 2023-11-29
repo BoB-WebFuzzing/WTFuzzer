@@ -1,7 +1,9 @@
 --TEST--
 Bug #77700 (Writing truecolor images as GIF ignores interlace flag)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $im = imagecreatetruecolor(10, 10);

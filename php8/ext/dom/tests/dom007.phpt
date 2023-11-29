@@ -1,7 +1,9 @@
 --TEST--
 Test 7: DTD tests
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 $xml = <<< EOXML

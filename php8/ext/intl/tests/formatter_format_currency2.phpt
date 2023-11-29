@@ -1,7 +1,7 @@
 --TEST--
 numfmt_format_currency() icu >= 4.8
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip intl extension not loaded'; ?>
 --FILE--
 <?php
 

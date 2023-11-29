@@ -1,7 +1,7 @@
 --TEST--
 IntlRuleBasedBreakIterator::__construct(): arg errors
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

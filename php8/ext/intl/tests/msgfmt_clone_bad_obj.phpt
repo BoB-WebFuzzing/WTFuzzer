@@ -1,7 +1,7 @@
 --TEST--
 Cloning unconstructed MessageFormatter
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

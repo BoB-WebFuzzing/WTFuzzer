@@ -25,16 +25,15 @@ echo PHP_EOL;
 
 class IndexPrinter implements ArrayAccess
 {
-    public function offsetGet($offset): mixed {
+    public function offsetGet($offset) {
         echo "GET ";
         var_dump($offset);
-        return null;
     }
-    public function offsetSet($offset, $value): void {
+    public function offsetSet($offset, $value) {
     }
-    public function offsetExists($offset): bool {
+    public function offsetExists($offset) {
     }
-    public function offsetUnset($offset): void {
+    public function offsetUnset($offset) {
     }
 }
 

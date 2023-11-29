@@ -22,11 +22,7 @@ class A extends B
 };
 
 ?>
---EXPECTF--
+--EXPECT--
 string(3) "foo"
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
 bool(false)
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
 bool(false)

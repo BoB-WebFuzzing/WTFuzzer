@@ -1,7 +1,7 @@
 --TEST--
 Phar object: getContent()
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly=0
 --FILE--

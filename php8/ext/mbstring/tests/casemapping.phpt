@@ -1,7 +1,7 @@
 --TEST--
 Unicode case mapping
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --FILE--
 <?php
 

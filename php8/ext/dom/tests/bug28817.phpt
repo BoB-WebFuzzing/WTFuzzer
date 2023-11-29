@@ -1,7 +1,7 @@
 --TEST--
 Bug #28817 (properties in extended class)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

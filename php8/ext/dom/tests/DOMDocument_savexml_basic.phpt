@@ -3,8 +3,10 @@ DOM Document : save and saveXML
 --CREDITS--
 Sami Greenbury (sami@patabugen.co.uk)
 # TestFest 2008
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 

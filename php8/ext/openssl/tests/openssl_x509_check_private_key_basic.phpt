@@ -1,7 +1,7 @@
 --TEST--
 openssl_x509_check_private_key() tests
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 $fp = fopen(__DIR__ . "/cert.crt","r");

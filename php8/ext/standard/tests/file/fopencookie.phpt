@@ -17,7 +17,6 @@ fopencookie detected and working (or cast mechanism works)
  */
 
 class userstream {
-    public $context;
     public $position = 0;
     public $data = "If you can read this, it worked";
 

@@ -1,7 +1,7 @@
 --TEST--
 Bug #69485 (Double free on zend_list_dtor)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 

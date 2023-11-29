@@ -1,7 +1,7 @@
 --TEST--
 Bug #78335: Static properties containing cycles report as leak (internal class variant)
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded("zend-test")) die("skip requires zend-test"); ?>
 --FILE--
 <?php
 

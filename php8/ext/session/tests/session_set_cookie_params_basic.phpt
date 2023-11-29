@@ -1,7 +1,5 @@
 --TEST--
 Test session_set_cookie_params() function : basic functionality
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

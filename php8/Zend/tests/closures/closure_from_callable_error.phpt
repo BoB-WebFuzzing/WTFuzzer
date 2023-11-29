@@ -193,7 +193,7 @@ catch (\Throwable $t) {
 echo "OK\n";
 
 ?>
---EXPECTF--
+--EXPECT--
 Cannot access privateInstance method statically
 Cannot access privateInstance method statically with colon scheme
 Cannot access privateInstance method
@@ -209,6 +209,4 @@ Subclass cannot closure over parant private static method
 Function scope cannot closure over protected instance method
 Function scope cannot closure over private instance method
 Access private instance method of parent object through "self::" to parent method
-
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
 OK

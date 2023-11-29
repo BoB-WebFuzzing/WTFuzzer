@@ -1,7 +1,9 @@
 --TEST--
 Bug #80216 (imap_mail_compose() does not validate types/encodings)
---EXTENSIONS--
-imap
+--SKIPIF--
+<?php
+if (!extension_loaded('imap')) die('skip imap extension not available');
+?>
 --FILE--
 <?php
 imap_mail_compose([], [['type' => TYPEMULTIPART], []]);

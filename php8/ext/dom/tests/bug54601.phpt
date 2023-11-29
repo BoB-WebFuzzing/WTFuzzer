@@ -1,7 +1,7 @@
 --TEST--
 Segfault when removing the Doctype node
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $xml = <<< XML

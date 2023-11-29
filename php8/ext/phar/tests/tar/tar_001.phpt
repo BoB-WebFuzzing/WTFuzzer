@@ -1,7 +1,7 @@
 --TEST--
 Phar: tar-based phar corrupted
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded('phar')) die('skip'); ?>
 --FILE--
 <?php
 include __DIR__ . '/files/make_invalid_tar.php.inc';

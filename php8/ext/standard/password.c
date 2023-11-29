@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -21,12 +21,13 @@
 
 #include "fcntl.h"
 #include "php_password.h"
+#include "php_rand.h"
 #include "php_crypt.h"
 #include "base64.h"
 #include "zend_interfaces.h"
 #include "info.h"
-#include "ext/random/php_random.h"
-#ifdef HAVE_ARGON2LIB
+#include "php_random.h"
+#if HAVE_ARGON2LIB
 #include "argon2.h"
 #endif
 
@@ -112,7 +113,7 @@ static zend_string* php_password_get_salt(zval *unused_, size_t required_salt_le
 
 /* bcrypt implementation */
 
-static bool php_password_bcrypt_valid(const zend_string *hash) {
+static zend_bool php_password_bcrypt_valid(const zend_string *hash) {
 	const char *h = ZSTR_VAL(hash);
 	return (ZSTR_LEN(hash) == 60) &&
 		(h[0] == '$') && (h[1] == '2') && (h[2] == 'y');
@@ -132,7 +133,7 @@ static int php_password_bcrypt_get_info(zval *return_value, const zend_string *h
 	return SUCCESS;
 }
 
-static bool php_password_bcrypt_needs_rehash(const zend_string *hash, zend_array *options) {
+static zend_bool php_password_bcrypt_needs_rehash(const zend_string *hash, zend_array *options) {
 	zval *znew_cost;
 	zend_long old_cost = PHP_PASSWORD_BCRYPT_COST;
 	zend_long new_cost = PHP_PASSWORD_BCRYPT_COST;
@@ -150,7 +151,8 @@ static bool php_password_bcrypt_needs_rehash(const zend_string *hash, zend_array
 	return old_cost != new_cost;
 }
 
-static bool php_password_bcrypt_verify(const zend_string *password, const zend_string *hash) {
+static zend_bool php_password_bcrypt_verify(const zend_string *password, const zend_string *hash) {
+	size_t i;
 	int status = 0;
 	zend_string *ret = php_crypt(ZSTR_VAL(password), (int)ZSTR_LEN(password), ZSTR_VAL(hash), (int)ZSTR_LEN(hash), 1);
 
@@ -158,7 +160,7 @@ static bool php_password_bcrypt_verify(const zend_string *password, const zend_s
 		return 0;
 	}
 
-	if (ZSTR_LEN(hash) < 13) {
+	if (ZSTR_LEN(ret) != ZSTR_LEN(hash) || ZSTR_LEN(hash) < 13) {
 		zend_string_free(ret);
 		return 0;
 	}
@@ -167,7 +169,9 @@ static bool php_password_bcrypt_verify(const zend_string *password, const zend_s
 	 * resistance towards timing attacks. This is a constant time
 	 * equality check that will always check every byte of both
 	 * values. */
-	status = php_safe_bcmp(ret, hash);
+	for (i = 0; i < ZSTR_LEN(hash); i++) {
+		status |= (ZSTR_VAL(ret)[i] ^ ZSTR_VAL(hash)[i]);
+	}
 
 	zend_string_free(ret);
 	return status == 0;
@@ -227,7 +231,7 @@ const php_password_algo php_password_algo_bcrypt = {
 };
 
 
-#ifdef HAVE_ARGON2LIB
+#if HAVE_ARGON2LIB
 /* argon2i/argon2id shared implementation */
 
 static int extract_argon2_parameters(const zend_string *hash,
@@ -268,7 +272,7 @@ static int php_password_argon2_get_info(zval *return_value, const zend_string *h
 	return SUCCESS;
 }
 
-static bool php_password_argon2_needs_rehash(const zend_string *hash, zend_array *options) {
+static zend_bool php_password_argon2_needs_rehash(const zend_string *hash, zend_array *options) {
 	zend_long v = 0;
 	zend_long new_memory_cost = PHP_PASSWORD_ARGON2_MEMORY_COST, memory_cost = 0;
 	zend_long new_time_cost = PHP_PASSWORD_ARGON2_TIME_COST, time_cost = 0;
@@ -376,7 +380,7 @@ static zend_string *php_password_argon2_hash(const zend_string *password, zend_a
 
 /* argon2i specific methods */
 
-static bool php_password_argon2i_verify(const zend_string *password, const zend_string *hash) {
+static zend_bool php_password_argon2i_verify(const zend_string *password, const zend_string *hash) {
 	return ARGON2_OK == argon2_verify(ZSTR_VAL(hash), ZSTR_VAL(password), ZSTR_LEN(password), Argon2_i);
 }
 
@@ -395,7 +399,7 @@ const php_password_algo php_password_algo_argon2i = {
 
 /* argon2id specific methods */
 
-static bool php_password_argon2id_verify(const zend_string *password, const zend_string *hash) {
+static zend_bool php_password_argon2id_verify(const zend_string *password, const zend_string *hash) {
 	return ARGON2_OK == argon2_verify(ZSTR_VAL(hash), ZSTR_VAL(password), ZSTR_LEN(password), Argon2_id);
 }
 
@@ -423,7 +427,7 @@ PHP_MINIT_FUNCTION(password) /* {{{ */
 	}
 	REGISTER_STRING_CONSTANT("PASSWORD_BCRYPT", "2y", CONST_CS | CONST_PERSISTENT);
 
-#ifdef HAVE_ARGON2LIB
+#if HAVE_ARGON2LIB
 	if (FAILURE == php_password_algo_register("argon2i", &php_password_algo_argon2i)) {
 		return FAILURE;
 	}
@@ -436,7 +440,7 @@ PHP_MINIT_FUNCTION(password) /* {{{ */
 #endif
 
 	REGISTER_LONG_CONSTANT("PASSWORD_BCRYPT_DEFAULT_COST", PHP_PASSWORD_BCRYPT_COST, CONST_CS | CONST_PERSISTENT);
-#ifdef HAVE_ARGON2LIB
+#if HAVE_ARGON2LIB
 	REGISTER_LONG_CONSTANT("PASSWORD_ARGON2_DEFAULT_MEMORY_COST", PHP_PASSWORD_ARGON2_MEMORY_COST, CONST_CS | CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("PASSWORD_ARGON2_DEFAULT_TIME_COST", PHP_PASSWORD_ARGON2_TIME_COST, CONST_CS | CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("PASSWORD_ARGON2_DEFAULT_THREADS", PHP_PASSWORD_ARGON2_THREADS, CONST_CS | CONST_PERSISTENT);
@@ -479,7 +483,7 @@ const php_password_algo* php_password_algo_find(const zend_string *ident) {
 	return Z_PTR_P(tmp);
 }
 
-static const php_password_algo* php_password_algo_find_zval(zend_string *arg_str, zend_long arg_long, bool arg_is_null) {
+static const php_password_algo* php_password_algo_find_zval(zend_string *arg_str, zend_long arg_long, zend_bool arg_is_null) {
 	if (arg_is_null) {
 		return php_password_algo_default();
 	}
@@ -491,7 +495,7 @@ static const php_password_algo* php_password_algo_find_zval(zend_string *arg_str
 	switch (arg_long) {
 		case 0: return php_password_algo_default();
 		case 1: return &php_password_algo_bcrypt;
-#ifdef HAVE_ARGON2LIB
+#if HAVE_ARGON2LIB
 		case 2: return &php_password_algo_argon2i;
 		case 3: return &php_password_algo_argon2id;
 #else
@@ -590,7 +594,7 @@ PHP_FUNCTION(password_needs_rehash)
 	zend_string *hash;
 	zend_string *new_algo_str;
 	zend_long new_algo_long;
-	bool new_algo_is_null;
+	zend_bool new_algo_is_null;
 	zend_array *options = 0;
 
 	ZEND_PARSE_PARAMETERS_START(2, 3)
@@ -638,7 +642,7 @@ PHP_FUNCTION(password_hash)
 	zend_string *password, *digest = NULL;
 	zend_string *algo_str;
 	zend_long algo_long;
-	bool algo_is_null;
+	zend_bool algo_is_null;
 	const php_password_algo *algo;
 	zend_array *options = NULL;
 
@@ -674,7 +678,7 @@ PHP_FUNCTION(password_algos) {
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	array_init(return_value);
-	ZEND_HASH_MAP_FOREACH_STR_KEY(&php_password_algos, algo) {
+	ZEND_HASH_FOREACH_STR_KEY(&php_password_algos, algo) {
 		add_next_index_str(return_value, zend_string_copy(algo));
 	} ZEND_HASH_FOREACH_END();
 }

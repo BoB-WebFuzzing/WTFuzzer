@@ -1,7 +1,11 @@
 --TEST--
 Test function gzpassthru() by calling it with its expected arguments
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 

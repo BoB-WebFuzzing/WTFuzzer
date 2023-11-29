@@ -1,7 +1,7 @@
 --TEST--
 intl.use_exceptions INI setting
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 ini_set("intl.use_exceptions", true);

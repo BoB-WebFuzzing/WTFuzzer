@@ -15,6 +15,7 @@ $values = array(10,
                 "039",
                 true,
                 false,
+                null,
                 );
 
 $iterator = 1;
@@ -57,4 +58,7 @@ float(8.6593400423994E+16)
 float(2.718281828459)
 
 -- Iteration 11 --
+float(1)
+
+-- Iteration 12 --
 float(1)

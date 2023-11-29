@@ -1,7 +1,7 @@
 --TEST--
 FileInfo - Calling the constructor twice
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 

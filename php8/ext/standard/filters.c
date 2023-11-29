@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -951,7 +951,7 @@ static php_conv_err_t php_conv_qprint_decode_convert(php_conv_qprint_decode *ins
 					ps++, icnt--;
 					break;
 				}
-			} ZEND_FALLTHROUGH;
+			} /* break is missing intentionally */
 
 			case 2: {
 				if (icnt == 0) {
@@ -968,7 +968,7 @@ static php_conv_err_t php_conv_qprint_decode_convert(php_conv_qprint_decode *ins
 				if (scan_stat != 3) {
 					break;
 				}
-			} ZEND_FALLTHROUGH;
+			} /* break is missing intentionally */
 
 			case 3: {
 				if (ocnt < 1) {
@@ -1763,8 +1763,6 @@ static size_t php_dechunk(char *buf, size_t len, php_chunked_filter_data *data)
 				if (p == end) {
 					return out_len;
 				}
-				/* TODO: Check if Intentional? */
-				ZEND_FALLTHROUGH;
 			case CHUNK_SIZE_CR:
 				if (*p == '\r') {
 					p++;
@@ -1773,8 +1771,6 @@ static size_t php_dechunk(char *buf, size_t len, php_chunked_filter_data *data)
 						return out_len;
 					}
 				}
-				/* TODO: Check if Intentional? */
-				ZEND_FALLTHROUGH;
 			case CHUNK_SIZE_LF:
 				if (*p == '\n') {
 					p++;
@@ -1790,8 +1786,6 @@ static size_t php_dechunk(char *buf, size_t len, php_chunked_filter_data *data)
 					data->state = CHUNK_ERROR;
 					continue;
 				}
-				/* TODO: Check if Intentional? */
-				ZEND_FALLTHROUGH;
 			case CHUNK_BODY:
 				if ((size_t) (end - p) >= data->chunk_size) {
 					if (p != out) {
@@ -1813,8 +1807,6 @@ static size_t php_dechunk(char *buf, size_t len, php_chunked_filter_data *data)
 					out_len += end - p;
 					return out_len;
 				}
-				/* TODO: Check if Intentional? */
-				ZEND_FALLTHROUGH;
 			case CHUNK_BODY_CR:
 				if (*p == '\r') {
 					p++;
@@ -1823,8 +1815,6 @@ static size_t php_dechunk(char *buf, size_t len, php_chunked_filter_data *data)
 						return out_len;
 					}
 				}
-				/* TODO: Check if Intentional? */
-				ZEND_FALLTHROUGH;
 			case CHUNK_BODY_LF:
 				if (*p == '\n') {
 					p++;

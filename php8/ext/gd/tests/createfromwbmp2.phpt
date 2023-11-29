@@ -1,9 +1,8 @@
 --TEST--
 imagecreatefromwbmp with invalid wbmp
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
+    if (!function_exists('imagecreatefromwbmp')) die("skip gd extension not available\n");
     if (!GD_BUNDLED) die("skip requires bundled GD library\n");
 ?>
 --FILE--

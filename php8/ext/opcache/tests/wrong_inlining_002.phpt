@@ -4,8 +4,8 @@ $this not in object context
 opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class Foo {

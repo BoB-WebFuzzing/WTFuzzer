@@ -188,11 +188,11 @@ NULL
 -- Iteration 4 --
 NULL
 -- Iteration 5 --
-string(7) "TRUE123" interned
+string(7) "TRUE123" refcount(%d)
 -- Iteration 6 --
-string(9) "123string" interned
+string(9) "123string" refcount(%d)
 -- Iteration 7 --
-string(9) "string123" interned
+string(9) "string123" refcount(%d)
 -- Iteration 8 --
-string(10) "NULLstring" interned
+string(10) "NULLstring" refcount(%d)
 Done

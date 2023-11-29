@@ -1,7 +1,9 @@
 --TEST--
 Bug #81294 (Segfault when removing a filter)
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded('zlib')) die("skip zlib extension not available");
+?>
 --FILE--
 <?php
 $f = fopen(__DIR__ . "/bug81294.txt", "wb+");

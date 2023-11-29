@@ -1,7 +1,9 @@
 --TEST--
 Request #72189 (Add missing CURL_VERSION_* constants)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+include 'skipif.inc';
+?>
 --FILE--
 <?php
 

@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 22: list of unions
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--

@@ -1,7 +1,7 @@
 --TEST--
 curl_copy_handle() allows to post CURLFile multiple times if postfields change
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 include 'server.inc';

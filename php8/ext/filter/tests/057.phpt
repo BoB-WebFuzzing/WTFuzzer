@@ -1,7 +1,7 @@
 --TEST--
 filter_input_array() and filter_var_array() with invalid $definition arguments
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 foreach (array(null, true, false, 1, "", new stdClass) as $invalid) {
@@ -19,12 +19,8 @@ foreach (array(null, true, false, 1, "", new stdClass) as $invalid) {
 }
 ?>
 --EXPECTF--
-Deprecated: filter_input_array(): Passing null to parameter #2 ($options) of type array|int is deprecated in %s on line %d
-
 Warning: filter_input_array(): Unknown filter with ID 0 in %s on line %d
 bool(false)
-
-Deprecated: filter_var_array(): Passing null to parameter #2 ($options) of type array|int is deprecated in %s on line %d
 
 Warning: filter_var_array(): Unknown filter with ID 0 in %s on line %d
 bool(false)

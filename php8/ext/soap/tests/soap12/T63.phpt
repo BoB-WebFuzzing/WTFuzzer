@@ -1,7 +1,7 @@
 --TEST--
 SOAP 1.2: T63 validateCountryCode
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $HTTP_RAW_POST_DATA = <<<EOF

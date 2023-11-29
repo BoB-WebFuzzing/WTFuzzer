@@ -1,7 +1,9 @@
 --TEST--
 output buffering - error message nirvana bug #37714
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) die("skip need ext/zlib");
+?>
 --ENV--
 HTTP_ACCEPT_ENCODING=gzip,deflate
 --INI--

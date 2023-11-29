@@ -1,7 +1,9 @@
 --TEST--
 Bug #72227: imagescale out-of-bounds read
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+    if (!extension_loaded('gd')) die("skip gd extension not available\n");
+?>
 --FILE--
 <?php
 

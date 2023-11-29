@@ -1,7 +1,7 @@
 --TEST--
 Phar::apiVersion
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 var_dump(Phar::apiVersion());

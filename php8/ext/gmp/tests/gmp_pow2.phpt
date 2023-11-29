@@ -1,7 +1,7 @@
 --TEST--
 Test pow() with gmp object
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 

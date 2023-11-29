@@ -26,4 +26,4 @@ int(3)
 
 Warning: Undefined property: Crasher::$2 in %s on line %d
 NULL
-string(28) "Unknown or bad format (blah)"
+string(%s) "DateInterval::__construct(): Unknown or bad format (blah)"

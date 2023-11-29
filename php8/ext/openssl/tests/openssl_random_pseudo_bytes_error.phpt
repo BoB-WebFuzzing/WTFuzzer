@@ -1,7 +1,7 @@
 --TEST--
 Test error operation of openssl_random_pseudo_bytes()
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 try {

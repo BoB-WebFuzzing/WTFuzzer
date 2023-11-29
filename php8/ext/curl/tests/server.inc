@@ -1,7 +1,11 @@
 <?php declare(strict_types=1);
 
 function curl_cli_server_start() {
-    $php_executable = getenv('TEST_PHP_EXECUTABLE') ?: PHP_BINARY;
+    if(getenv('PHP_CURL_HTTP_REMOTE_SERVER')) {
+        return getenv('PHP_CURL_HTTP_REMOTE_SERVER');
+    }
+
+    $php_executable = getenv('TEST_PHP_EXECUTABLE');
     $doc_root = __DIR__;
     $router = "responder/get.inc";
     $cmd = [$php_executable, '-t', $doc_root, '-n', '-S', 'localhost:0', $router];

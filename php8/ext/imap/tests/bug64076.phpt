@@ -1,7 +1,5 @@
 --TEST--
 Bug #64076 (imap_sort() does not return FALSE on failure)
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once __DIR__ . '/setup/skipif.inc';

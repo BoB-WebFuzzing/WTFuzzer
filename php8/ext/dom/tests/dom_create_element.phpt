@@ -1,7 +1,7 @@
 --TEST--
 Test 1: Creating Elements with and without Namespaces
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

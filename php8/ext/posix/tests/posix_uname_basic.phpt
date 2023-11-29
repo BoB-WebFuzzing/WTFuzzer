@@ -1,7 +1,9 @@
 --TEST--
 Test posix_uname() function : basic functionality
---EXTENSIONS--
-posix
+--SKIPIF--
+<?php
+    if (!extension_loaded('posix')) die('skip - POSIX extension not loaded');
+?>
 --FILE--
 <?php
   echo "Basic test of POSIX uname function\n";

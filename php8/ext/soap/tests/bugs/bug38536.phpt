@@ -1,13 +1,13 @@
 --TEST--
 Bug #38536 (SOAP returns an array of values instead of an object)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--
 <?php
 class LocalSoapClient extends SoapClient {
-  function __doRequest($request, $location, $action, $version, $one_way = 0): ?string {
+  function __doRequest($request, $location, $action, $version, $one_way = 0) {
     return <<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope

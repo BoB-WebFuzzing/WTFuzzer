@@ -1,7 +1,7 @@
 --TEST--
 Reconstructing a script using token_get_all()
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip"; ?>
 --FILE--
 <?php
 

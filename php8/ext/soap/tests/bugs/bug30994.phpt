@@ -1,7 +1,7 @@
 --TEST--
 Bug #30994 (SOAP server unable to handle request with references)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $HTTP_RAW_POST_DATA = <<<EOF

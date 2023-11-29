@@ -1,5 +1,7 @@
 --TEST--
 method overloading with different method signature
+--INI--
+error_reporting=8191
 --FILE--
 <?php
 

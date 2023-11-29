@@ -4,7 +4,10 @@ ZE2 errors caught as exceptions
 <?php
 
 class MyException extends Exception {
-    function __construct(public $errno, public $errmsg) {}
+    function __construct($_errno, $_errmsg) {
+        $this->errno = $_errno;
+        $this->errmsg = $_errmsg;
+    }
 
     function getErrno() {
         return $this->errno;

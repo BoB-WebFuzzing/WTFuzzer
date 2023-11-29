@@ -88,7 +88,7 @@ array(26) {
   ["gid"]=>
   int(%d)
   ["rdev"]=>
-  int(%i)
+  int(%d)
   ["size"]=>
   int(%d)
   ["atime"]=>
@@ -144,7 +144,7 @@ array(26) {
   ["gid"]=>
   int(%d)
   ["rdev"]=>
-  int(%i)
+  int(%d)
   ["size"]=>
   int(%d)
   ["atime"]=>

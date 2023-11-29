@@ -271,8 +271,6 @@ int(2)
 
 -- Iteration 8 --
 
-Deprecated: str_replace(): Passing null to parameter #1 ($search) of type array|string is deprecated in %s on line %d
-
 Warning: Array to string conversion in %s on line %d
 array(12) {
   [0]=>

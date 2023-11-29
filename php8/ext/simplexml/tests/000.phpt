@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: var_dump()
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 

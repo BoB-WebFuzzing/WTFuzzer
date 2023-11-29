@@ -1,7 +1,9 @@
 --TEST--
 Phar: fopen a .phar for writing (existing file) tar-based
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.readonly=0
 phar.require_hash=0

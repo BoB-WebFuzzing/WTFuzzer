@@ -134,6 +134,10 @@ RUN chmod 777 -R /home/tmp
 
 COPY hook.php /lib/hook.php
 
+COPY config/httpreqr /tmp/httpreqr
+
+RUN cd /tmp/httpreqr && make && mv httpreqr /
+
 RUN printf '\nauto_prepend_file=/lib/hook.php\nextension=uopz\nuopz.exit=1\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
 
 ######## WORDPRESS INSTALL ######

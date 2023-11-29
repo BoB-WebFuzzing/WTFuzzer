@@ -1,9 +1,8 @@
 --TEST--
 PDO_DBLIB: Quoted field names
---EXTENSIONS--
-pdo_dblib
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo_dblib')) die('skip not loaded');
 require __DIR__ . '/config.inc';
 ?>
 --FILE--

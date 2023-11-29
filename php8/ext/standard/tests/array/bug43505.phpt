@@ -5,7 +5,6 @@ error_reporting=0
 --FILE--
 <?php
 class Test implements Countable {
-    #[ReturnTypeWillChange]
     public function count() {
         return $some;
     }

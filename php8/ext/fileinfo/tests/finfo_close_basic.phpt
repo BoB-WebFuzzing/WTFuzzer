@@ -1,7 +1,7 @@
 --TEST--
 Test finfo_close() function : basic functionality
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 echo "*** Testing finfo_close() : basic functionality ***\n";
@@ -21,8 +21,7 @@ unset( $finfo );
 ?>
 --EXPECTF--
 *** Testing finfo_close() : basic functionality ***
-object(finfo)#%d (0) {
-}
+resource(%d) of type (file_info)
 bool(true)
 object(finfo)#%d (%d) {
 }

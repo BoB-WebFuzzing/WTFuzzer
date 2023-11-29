@@ -1,7 +1,7 @@
 --TEST--
 Bug #46335 (DOMText::splitText doesn't handle multibyte characters).
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $textascii = 'This is an "example" of using DOM splitText';

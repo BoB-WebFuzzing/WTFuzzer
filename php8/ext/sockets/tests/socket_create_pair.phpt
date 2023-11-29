@@ -1,7 +1,10 @@
 --TEST--
 Test for socket_create_pair()
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+if (!extension_loaded('sockets')) {
+    die('SKIP The sockets extension is not loaded.');
+}
 --FILE--
 <?php
 $sockets = array();

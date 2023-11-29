@@ -1,8 +1,7 @@
 --TEST--
 collator_get_sort_key() icu >= 62.1
---EXTENSIONS--
-intl
 --SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 <?php if (version_compare(INTL_ICU_VERSION, '62.1') < 0) die('skip for ICU >= 62.1'); ?>
 --FILE--
 <?php
@@ -34,7 +33,7 @@ function ut_main()
     $test_params = array(
         'abc', 'abd', 'aaa',
         'аа', 'а', 'z',
-        '', '3',
+        '', null , '3',
         'y'  , 'i'  , 'k'
     );
 
@@ -69,6 +68,8 @@ source: а
 key: 610601050105
 source: z
 key: 5c01050105
+source: 
+key: 0101
 source: 
 key: 0101
 source: 3

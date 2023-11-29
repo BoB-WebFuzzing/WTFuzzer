@@ -1,9 +1,8 @@
 --TEST--
 PDO Common: PDOStatement iterator
---EXTENSIONS--
-pdo
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo')) die('skip');
 $dir = getenv('REDIR_TEST_DIR');
 if (false == $dir) die('skip no driver');
 require_once $dir . 'pdo_test.inc';
@@ -32,9 +31,6 @@ foreach ($stmt as $data)
 
 class Test
 {
-    public $val;
-    public $grp;
-
     function __construct($name = 'N/A')
     {
         echo __METHOD__ . "($name)\n";

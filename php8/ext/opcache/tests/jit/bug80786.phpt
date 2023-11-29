@@ -5,8 +5,6 @@ opcache.enable=1
 opcache.enable_cli=1
 opcache.jit_buffer_size=1M
 opcache.jit=function
---EXTENSIONS--
-opcache
 --FILE--
 <?php
 

@@ -1,7 +1,5 @@
 --TEST--
 imap_clearflag_full() passing a unique ID
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

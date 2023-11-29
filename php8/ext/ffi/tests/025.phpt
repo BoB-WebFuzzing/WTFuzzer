@@ -1,7 +1,7 @@
 --TEST--
 FFI 025: direct work with primitive types
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

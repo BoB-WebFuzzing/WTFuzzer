@@ -1,7 +1,11 @@
 --TEST--
 Test gzopen() function : variation: use include path (relative directories in path)
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 echo "*** Testing gzopen() : usage variation ***\n";

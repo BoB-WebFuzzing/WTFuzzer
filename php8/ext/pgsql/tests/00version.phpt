@@ -1,7 +1,5 @@
 --TEST--
 PostgreSQL version
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--
@@ -13,6 +11,7 @@ include('config.inc');
 $db = pg_connect($conn_str);
 var_dump(pg_version($db));
 pg_close($db);
+
 // Get environment vars for debugging
 var_dump(serialize($_ENV));
 

@@ -3,8 +3,12 @@ ext/sockets - socket_getsockname - basic test
 --CREDITS--
 Florian Anderiasch
 fa@php.net
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+    if (!extension_loaded('sockets')) {
+        die('skip sockets extension not available.');
+    }
+?>
 --FILE--
 <?php
     $s_c     = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);

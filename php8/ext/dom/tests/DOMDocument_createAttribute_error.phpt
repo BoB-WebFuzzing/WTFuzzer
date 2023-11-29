@@ -1,7 +1,7 @@
 --TEST--
 Test DOMDocument::createAttribute() for expected exception thrown when wrong parameter passed
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $dom = new DOMDocument();

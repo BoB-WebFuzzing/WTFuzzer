@@ -1,8 +1,9 @@
 --TEST--
 FTP with bogus server responses
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php
+require 'skipif.inc';
+?>
 --FILE--
 <?php
 $bogus = 1;

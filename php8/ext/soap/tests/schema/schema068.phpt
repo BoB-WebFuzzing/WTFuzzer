@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 68: Attribute with fixed value (3)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";

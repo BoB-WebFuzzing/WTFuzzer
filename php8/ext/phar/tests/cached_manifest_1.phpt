@@ -1,7 +1,9 @@
 --TEST--
 Phar: phar.cache_list basic read test
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.cache_list={PWD}/files/nophar.phar
 --FILE--

@@ -1,7 +1,7 @@
 --TEST--
 Bug #41582 (SimpleXML crashes when accessing newly created element)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 

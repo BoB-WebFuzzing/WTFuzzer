@@ -1,29 +1,24 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
 class Directory
 {
-    public readonly string $path;
-
-    /** @var resource */
-    public readonly mixed $handle;
-
     /**
-     * @tentative-return-type
+     * @return void
      * @implementation-alias closedir
      */
-    public function close(): void {}
+    public function close() {}
 
     /**
-     * @tentative-return-type
+     * @return void
      * @implementation-alias rewinddir
      */
-    public function rewind(): void {}
+    public function rewind() {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @implementation-alias readdir
      */
-    public function read(): string|false {}
+    public function read() {}
 }

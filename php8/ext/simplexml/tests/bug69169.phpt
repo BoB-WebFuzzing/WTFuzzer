@@ -1,7 +1,9 @@
 --TEST--
 Bug #69169 (simplexml_load_string parse wrongly when xml given in one row)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php
+if (!extension_loaded("simplexml")) die("skip SimpleXML not available");
+?>
 --FILE--
 <?php
 $a = '<?xml version="1.0" encoding="UTF-8"?>

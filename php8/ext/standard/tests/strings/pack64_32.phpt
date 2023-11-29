@@ -51,7 +51,7 @@ try {
 }
 
 ?>
---EXPECT--
+--EXPECTF--
 64-bit format codes are not available for 32-bit versions of PHP
 64-bit format codes are not available for 32-bit versions of PHP
 64-bit format codes are not available for 32-bit versions of PHP

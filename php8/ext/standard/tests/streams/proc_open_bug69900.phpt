@@ -1,7 +1,5 @@
 --TEST--
 Bug #69900 Commandline input/output weird behaviour with STDIO
---CONFLICTS--
-all
 --FILE--
 <?php
 

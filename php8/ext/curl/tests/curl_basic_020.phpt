@@ -2,8 +2,8 @@
 Test curl_getinfo() function with CURLINFO_HTTP_CODE parameter
 --CREDITS--
 Jean-Marc Fontaine <jmf@durcommefaire.net>
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
   include 'server.inc';

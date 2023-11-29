@@ -1,7 +1,7 @@
 --TEST--
 filter_var() and FILTER_SANITIZE_NUMBER_*
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 

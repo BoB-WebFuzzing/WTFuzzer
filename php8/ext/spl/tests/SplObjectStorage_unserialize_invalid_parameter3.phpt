@@ -1,5 +1,5 @@
 --TEST--
-Check that SplObjectStorage::unserialize doesn't throws exception when empty string passed
+Check that SplObjectStorage::unserialize doesn't throws exception when NULL passed
 --CREDITS--
 PHPNW Testfest 2009 - Simon Westcott (swestcott@gmail.com)
 --FILE--
@@ -8,7 +8,7 @@ PHPNW Testfest 2009 - Simon Westcott (swestcott@gmail.com)
 $s = new SplObjectStorage();
 
 try {
-    $s->unserialize('');
+    $s->unserialize(NULL);
 } catch(UnexpectedValueException $e) {
     echo $e->getMessage();
 }

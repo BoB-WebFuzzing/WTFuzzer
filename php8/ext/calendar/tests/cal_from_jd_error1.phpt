@@ -2,8 +2,8 @@
 Test cal_from_jd() function : error conditions
 --CREDITS--
 edgarsandi - <edgar.r.sandi@gmail.com>
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 try {

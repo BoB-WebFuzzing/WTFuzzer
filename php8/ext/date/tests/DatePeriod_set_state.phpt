@@ -19,9 +19,9 @@ var_dump($datePeriodObjectNew);
 
 ?>
 --EXPECTF--
-object(DatePeriod)#%d (%d) {
+object(DatePeriod)#%d (6) {
   ["start"]=>
-  object(DateTime)#%d (%d) {
+  object(DateTime)#%d (3) {
     ["date"]=>
     string(26) "2017-10-06 23:30:00.000000"
     ["timezone_type"]=>
@@ -34,7 +34,7 @@ object(DatePeriod)#%d (%d) {
   ["end"]=>
   NULL
   ["interval"]=>
-  object(DateInterval)#%d (%d) {
+  object(DateInterval)#%d (16) {
     ["y"]=>
     int(0)
     ["m"]=>
@@ -49,17 +49,27 @@ object(DatePeriod)#%d (%d) {
     int(0)
     ["f"]=>
     float(0)
+    ["weekday"]=>
+    int(0)
+    ["weekday_behavior"]=>
+    int(0)
+    ["first_last_day_of"]=>
+    int(0)
     ["invert"]=>
     int(0)
     ["days"]=>
     bool(false)
-    ["from_string"]=>
-    bool(false)
+    ["special_type"]=>
+    int(0)
+    ["special_amount"]=>
+    int(0)
+    ["have_weekday_relative"]=>
+    int(0)
+    ["have_special_relative"]=>
+    int(0)
   }
   ["recurrences"]=>
   int(25)
   ["include_start_date"]=>
   bool(true)
-  ["include_end_date"]=>
-  bool(false)
 }

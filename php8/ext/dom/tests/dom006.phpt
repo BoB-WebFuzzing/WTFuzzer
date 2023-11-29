@@ -1,7 +1,7 @@
 --TEST--
 Test 6: Extends Test
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php  require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

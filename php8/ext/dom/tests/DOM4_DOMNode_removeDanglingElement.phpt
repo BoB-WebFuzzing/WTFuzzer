@@ -1,7 +1,7 @@
 --TEST--
 DOMNode::remove() dangling element
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

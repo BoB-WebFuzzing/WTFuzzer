@@ -6,8 +6,8 @@ opcache.enable_cli=1
 opcache.optimization_level=-1
 opcache.opt_debug_level=0x20000
 opcache.preload=
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function esc(int $x) {

@@ -1,7 +1,7 @@
 --TEST--
 GMP casting using casting operators
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) print "skip"; ?>
 --FILE--
 <?php
 

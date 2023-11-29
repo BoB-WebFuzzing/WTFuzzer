@@ -1,7 +1,9 @@
 --TEST--
 bug #61443
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+extension_loaded("zlib") or die("skip");
+?>
 --FILE--
 <?php
 ob_start(); echo "foo\n"; ob_get_clean();

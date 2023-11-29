@@ -1,7 +1,11 @@
 --TEST--
 Test curl_version() basic functionality
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+    if (!extension_loaded("curl")) {
+        exit("skip curl extension not loaded");
+    }
+?>
 --FILE--
 <?php
     $info_curl = curl_version();
@@ -22,6 +26,6 @@ int(%i)
 int(%i)
 string(%i) "%s"
 string(%i) "%s"
-string(%i) "%S"
-string(%i) "%S"
+string(%i) "%s"
+string(%i) "%s"
 bool(true)

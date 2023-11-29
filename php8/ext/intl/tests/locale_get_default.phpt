@@ -2,8 +2,8 @@
 locale_get_default()
 --INI--
 intl.default_locale=en-US
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

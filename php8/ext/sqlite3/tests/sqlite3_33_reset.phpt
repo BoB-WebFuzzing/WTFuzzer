@@ -3,8 +3,8 @@ SQLite3:: reset
 --CREDITS--
 Ward Hus & James Cauwelier
 #@ PHP TESTFEST 2009 (BELGIUM)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 

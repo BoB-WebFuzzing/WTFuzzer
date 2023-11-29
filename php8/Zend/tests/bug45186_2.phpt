@@ -38,7 +38,7 @@ try {
 }
 
 ?>
---EXPECTF--
+--EXPECT--
 __call:
 string(3) "ABC"
 __call:
@@ -47,12 +47,8 @@ __call:
 string(3) "xyz"
 __call:
 string(3) "www"
-
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
 __call:
 string(1) "y"
-
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
 __call:
 string(1) "y"
 ok

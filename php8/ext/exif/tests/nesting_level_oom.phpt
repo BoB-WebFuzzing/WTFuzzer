@@ -1,7 +1,5 @@
 --TEST--
 Should not cause OOM
---EXTENSIONS--
-exif
 --FILE--
 <?php
 

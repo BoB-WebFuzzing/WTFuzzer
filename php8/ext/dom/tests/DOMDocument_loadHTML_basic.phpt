@@ -3,8 +3,10 @@ DOMDocument::loadHTML
 --CREDITS--
 Frank Cassedanne franck@ouarz.net
 #London TestFest 2008
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 $doc = new DOMDocument();

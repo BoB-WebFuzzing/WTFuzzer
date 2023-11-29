@@ -1,7 +1,11 @@
 --TEST--
 xml_parser_set_option() - Test invalid parameter
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+if (!extension_loaded('xml')) {
+    exit('Skip - XML extension not loaded');
+}
+?>
 --FILE--
 <?php
 
@@ -15,4 +19,4 @@ try {
 
 ?>
 --EXPECT--
-xml_parser_set_option(): Argument #2 ($option) must be a XML_OPTION_* constant
+xml_parser_set_option(): Argument #2 ($option) must be a PHP_XML_OPTION_* constant

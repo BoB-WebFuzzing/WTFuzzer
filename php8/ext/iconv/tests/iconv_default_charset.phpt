@@ -1,7 +1,10 @@
 --TEST--
 Test default_charset handling
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+extension_loaded('iconv') or die('skip');
+function_exists('iconv_get_encoding') or die("skip iconv_get_encoding() is not available in this build");
+?>
 --INI--
 error_reporting=E_ALL & ~E_DEPRECATED
 default_charset=UTF-8

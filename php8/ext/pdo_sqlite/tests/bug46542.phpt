@@ -1,7 +1,9 @@
 --TEST--
 Bug #46542 Extending PDO class with a __call() function
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo_sqlite')) print 'skip not loaded';
+?>
 --FILE--
 <?php
 class A extends PDO

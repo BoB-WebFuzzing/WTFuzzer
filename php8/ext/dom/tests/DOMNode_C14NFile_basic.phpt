@@ -1,7 +1,9 @@
 --TEST--
 DOMNode::C14NFile()
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+include('skipif.inc');
+?>
 --FILE--
 <?php
 $xml = <<< XML

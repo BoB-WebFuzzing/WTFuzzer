@@ -1,7 +1,5 @@
 --TEST--
 use_trans_sid should not affect SID
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -18,7 +16,7 @@ session.save_handler=files
 <?php
 error_reporting(E_ALL);
 
-session_id("test015");
+session_id("abtest");
 session_start();
 ?>
 <a href="/link?<?php echo SID; ?>">
@@ -26,4 +24,4 @@ session_start();
 session_destroy();
 ?>
 --EXPECT--
-<a href="/link?PHPSESSID=test015&PHPSESSID=test015">
+<a href="/link?PHPSESSID=abtest&PHPSESSID=abtest">

@@ -1,7 +1,10 @@
 --TEST--
 Test iconv_strrpos() function : error conditions - pass an unknown encoding
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+extension_loaded('iconv') or die('skip');
+function_exists('iconv_strrpos') or die("skip iconv_strrpos() is not available in this build");
+?>
 --FILE--
 <?php
 /*

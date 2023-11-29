@@ -1,7 +1,7 @@
 --TEST--
 Phar::setAlias() error
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -38,6 +38,9 @@ try {
 --CLEAN--
 <?php
 unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phar.php');
+unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.phartmp.php');
+unlink(__DIR__ . '/notphar.phar');
+__HALT_COMPILER();
 ?>
 --EXPECTF--
 hio

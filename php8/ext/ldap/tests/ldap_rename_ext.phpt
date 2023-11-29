@@ -2,9 +2,8 @@
 ldap_rename_ext() - Rename operation with controls
 --CREDITS--
 Côme Chilliet <mcmic@php.net>
---EXTENSIONS--
-ldap
 --SKIPIF--
+<?php require_once('skipif.inc'); ?>
 <?php require_once('skipifbindfailure.inc'); ?>
 <?php
 require_once('skipifcontrol.inc');
@@ -43,8 +42,7 @@ ldap_rename($link, "cn=userZ,$base", "cn=userA", "$base", true);
 remove_dummy_data($link, $base);
 ?>
 --EXPECTF--
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 bool(true)
 int(0)
 string(0) ""

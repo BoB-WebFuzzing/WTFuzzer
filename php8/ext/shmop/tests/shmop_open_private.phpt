@@ -1,7 +1,9 @@
 --TEST--
 shmop_open with IPC_PRIVATE creates private SHM
---EXTENSIONS--
-shmop
+--SKIPIF--
+<?php
+if (!extension_loaded('shmop')) die('skip shmop extension not available');
+?>
 --FILE--
 <?php
 $write = 'test';

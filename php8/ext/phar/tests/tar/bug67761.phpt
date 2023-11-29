@@ -1,7 +1,7 @@
 --TEST--
 Bug #67761 (Phar::mapPhar fails for Phars inside a path containing ".tar")
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php extension_loaded("phar") or die("SKIP need ext/phar support"); ?>
 --FILE--
 <?php
 

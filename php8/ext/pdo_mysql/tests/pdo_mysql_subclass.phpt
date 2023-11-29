@@ -1,9 +1,8 @@
 --TEST--
 MySQL PDOStatement->execute()/fetch(), Non-SELECT
---EXTENSIONS--
-pdo_mysql
 --SKIPIF--
 <?php
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'skipif.inc');
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
 MySQLPDOTest::skip();
 ?>
@@ -20,12 +19,12 @@ MySQLPDOTest::skip();
                 return call_user_func_array(array($this, 'parent::__construct'), func_get_args());
             }
 
-            public function exec($statement): int|false {
+            public function exec($statement) {
                 $this->protocol();
                 return parent::exec($statement);
             }
 
-            public function query(...$args): PDOStatement|false {
+            public function query(...$args) {
                 $this->protocol();
                 return parent::query(...$args);
             }
@@ -52,7 +51,6 @@ MySQLPDOTest::skip();
         }
 
         $db = new MyPDO(PDO_MYSQL_TEST_DSN, PDO_MYSQL_TEST_USER, PDO_MYSQL_TEST_PASS);
-        $db->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
         $db->exec('DROP TABLE IF EXISTS test');
         $db->exec('CREATE TABLE test(id INT)');
         $db->exec('INSERT INTO test(id) VALUES (1), (2)');
@@ -78,8 +76,6 @@ $db->exec('DROP TABLE IF EXISTS test');
 ?>
 --EXPECTF--
 __construct('%S', '%S', %s)
-
-Deprecated: Callables of the form ["MyPDO", "parent::__construct"] are deprecated in %s on line %d
 exec('DROP TABLE IF EXISTS test')
 exec('CREATE TABLE test(id INT)')
 exec('INSERT INTO test(id) VALUES (1), (2)')

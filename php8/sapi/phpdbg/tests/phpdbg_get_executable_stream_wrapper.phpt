@@ -25,7 +25,6 @@ prompt>
  */
 final class StreamWrapper
 {
-    public $context;
     public function stream_open(
         string $path,
         string $mode,

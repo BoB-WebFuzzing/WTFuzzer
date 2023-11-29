@@ -21,6 +21,7 @@ echo "\n#### variations with input string and pad-length ####\n";
 $input_strings = array(
     "variation", // normal string
     "", 	// empty string
+    NULL,  // NULL
     true,  // boolean
     15,  // numeric
     15.55,  // numeric
@@ -62,7 +63,13 @@ foreach ( $pad_strings as $pad_string ) {
 
 echo "\n#### error conditions ####\n";
 
-echo "\n--- empty padding string ---\n";
+echo "\n--- padding string as null ---\n";
+
+try {
+    str_pad($input_string, 12, NULL);
+} catch (\ValueError $e) {
+    echo $e->getMessage() . "\n";
+}
 
 try {
     str_pad($input_string, 12, "");
@@ -118,6 +125,36 @@ string(16) "variation======="
 string(16) "=======variation"
 string(16) "variation======="
 string(16) "===variation===="
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(0) ""
+string(9) "         "
+string(9) "========="
+string(9) "========="
+string(9) "========="
+string(9) "========="
+string(10) "          "
+string(10) "=========="
+string(10) "=========="
+string(10) "=========="
+string(10) "=========="
+string(16) "                "
+string(16) "================"
+string(16) "================"
+string(16) "================"
+string(16) "================"
 string(0) ""
 string(0) ""
 string(0) ""
@@ -301,6 +338,7 @@ string(16) "\t\variation\t\t"
 
 #### error conditions ####
 
---- empty padding string ---
+--- padding string as null ---
+str_pad(): Argument #3 ($pad_string) must be a non-empty string
 str_pad(): Argument #3 ($pad_string) must be a non-empty string
 str_pad(): Argument #4 ($pad_type) must be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH

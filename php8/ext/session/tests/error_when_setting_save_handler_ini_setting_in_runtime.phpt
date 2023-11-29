@@ -1,7 +1,5 @@
 --TEST--
 Error when setting session.save_handler to user via ini_set
---EXTENSIONS--
-session
 --SKIPIF--
 <?php
 include('skipif.inc');

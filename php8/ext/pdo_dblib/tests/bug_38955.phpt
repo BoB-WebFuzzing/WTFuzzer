@@ -1,9 +1,8 @@
 --TEST--
  PDO_DBLIB driver does not support transactions
---EXTENSIONS--
-pdo_dblib
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo_dblib')) die('skip not loaded');
 require __DIR__ . '/config.inc';
 ?>
 --FILE--

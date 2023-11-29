@@ -9,31 +9,31 @@ class MyIterator extends ArrayIterator {
         echo "   In " . __METHOD__ . "(" . implode(',', $args) . ")\n";
     }
 
-    function rewind(): void {
+    function rewind() {
         $args = func_get_args();
         echo "   In " . __METHOD__ . "(" . implode(',', $args) . ")\n";
-        parent::rewind();
+        return parent::rewind();
     }
 
-    function valid(): bool {
+    function valid() {
         $args = func_get_args();
         echo "   In " . __METHOD__ . "(" . implode(',', $args) . ")\n";
         return parent::valid();
     }
 
-    function current(): mixed {
+    function current() {
         $args = func_get_args();
         echo "   In " . __METHOD__ . "(" . implode(',', $args) . ")\n";
         return parent::current();
     }
 
-    function next(): void {
+    function next() {
         $args = func_get_args();
         echo "   In " . __METHOD__ . "(" . implode(',', $args) . ")\n";
-        parent::next();
+        return parent::next();
     }
 
-    function key(): string|int|null {
+    function key() {
         $args = func_get_args();
         echo "   In " . __METHOD__ . "(" . implode(',', $args) . ")\n";
         return parent::key();

@@ -1,7 +1,7 @@
 --TEST--
 Bug #70513: GMP Deserialization Type Confusion Vulnerability
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded('gmp')) die('skip requires gmp');
 --FILE--
 <?php
 

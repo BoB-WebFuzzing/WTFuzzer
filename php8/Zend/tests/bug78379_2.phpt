@@ -2,7 +2,6 @@
 Bug #78379.2 (Cast to object confuses GC, causes crash)
 --FILE--
 <?php
-#[AllowDynamicProperties]
 class E {}
 function f() {
     $e1 = new E;

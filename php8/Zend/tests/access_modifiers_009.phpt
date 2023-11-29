@@ -1,58 +1,26 @@
 --TEST--
-Inconsistencies when accessing protected members - is_callable
+Inconsistencies when accessing protected members - 2
+--XFAIL--
+Discussion: http://marc.info/?l=php-internals&m=120221184420957&w=2
 --FILE--
 <?php
 
 class A {
-    static protected function ma() {
-        return 'A::ma()';
-    }
-
-    static private function mp() {
-        return 'A::mp()';
-    }
+    static protected function f() {return 'A::f()';}
 }
-
 class B1 extends A {
-    static protected function ma() {
-        return 'B1::ma()';
-    }
-
-    static protected function mp() {
-        return 'B1::mp()';
-    }
-
-    static protected function mb() {
-        return 'B1::mb()';
-    }
+    static protected function f() {return 'B1::f()';}
 }
-
 class B2 extends A {
     static public function test() {
-        var_dump(is_callable('A::ma'));
-        var_dump(is_callable('A::mp'));
-        var_dump(is_callable('B1::ma')); // protected method defined also in A
-        var_dump(is_callable('B1::mp')); // protected method defined also in A but as private
-        var_dump(is_callable('B1::mb'));
+        var_dump(is_callable('B1::f'));
+        B1::f();
     }
 }
-
-var_dump(is_callable('B2::ma'));
-var_dump(is_callable('B2::mp'));
-var_dump(is_callable('B2::mb'));
-var_dump(is_callable('B2::test'));
-echo '----' . "\n";
 B2::test();
 
 ?>
---EXPECT--
+--EXPECTF--
 bool(false)
-bool(false)
-bool(false)
-bool(true)
-----
-bool(true)
-bool(false)
-bool(true)
-bool(false)
-bool(false)
+
+Fatal error: Call to protected method B1::f() from scope B2 in %s on line %d

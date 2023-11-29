@@ -1,7 +1,9 @@
 --TEST--
 Bug #52070 (imagedashedline() - dashed line sometimes is not visible)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $im = imagecreate(1200, 800);

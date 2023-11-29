@@ -1,7 +1,7 @@
 --TEST--
 Bug #43364 (recursive xincludes don't remove internal xml nodes properly)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function loopElements($nodes)

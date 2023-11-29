@@ -19,7 +19,9 @@ $misc_files = array(
   -2.34555,
   TRUE,
   FALSE,
+  NULL,
   " ",
+  @$file_handle
 );
 /* loop through to test each element in the above array
    is a writable file */
@@ -33,6 +35,10 @@ foreach( $misc_files as $misc_file ) {
 *** Testing is_writable(): usage variations ***
 
 *** Testing is_writable() with invalid filenames ***
+bool(false)
+bool(false)
+bool(false)
+bool(false)
 bool(false)
 bool(false)
 bool(false)

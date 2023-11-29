@@ -1,7 +1,7 @@
 --TEST--
 Test exif_imagetype() function : error conditions
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
 --FILE--
 <?php
 

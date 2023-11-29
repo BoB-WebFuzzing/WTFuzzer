@@ -56,7 +56,6 @@ runs:
           --enable-sysvmsg \
           --with-ffi \
           --enable-zend-test \
-          --enable-dl-test=shared \
           --with-ldap \
           --with-ldap-sasl \
           --with-password-argon2 \
@@ -74,11 +73,8 @@ runs:
           --with-imap \
           --with-imap-ssl \
           --with-pdo-odbc=unixODBC,/usr \
-          $([ -d "/opt/oracle/instantclient" ] && echo '--with-pdo-oci=shared,instantclient,/opt/oracle/instantclient') \
-          $([ -d "/opt/oracle/instantclient" ] && echo '--with-oci8=shared,instantclient,/opt/oracle/instantclient') \
+          --with-pdo-oci=shared,instantclient,/opt/oracle/instantclient \
+          --with-oci8=shared,instantclient,/opt/oracle/instantclient \
           --with-config-file-path=/etc \
           --with-config-file-scan-dir=/etc/php.d \
-          --with-pdo-firebird \
-          --with-pdo-dblib \
-          --enable-werror \
           ${{ inputs.configurationParameters }}

@@ -4,7 +4,6 @@ RecursiveIteratorIterator constructor should thrown if IteratorAggregate does no
 <?php
 
 class MyIteratorAggregate implements IteratorAggregate {
-    #[ReturnTypeWillChange]
     function getIterator() {
         return null;
     }

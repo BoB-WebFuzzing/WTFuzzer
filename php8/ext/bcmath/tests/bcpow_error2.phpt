@@ -1,7 +1,9 @@
 --TEST--
 bcpow() does not support exponents >= 2**63
---EXTENSIONS--
-bcmath
+--SKIPIF--
+<?php
+if (!extension_loaded('bcmath')) die('skip bcmath extension is not available');
+?>
 --FILE--
 <?php
 try {

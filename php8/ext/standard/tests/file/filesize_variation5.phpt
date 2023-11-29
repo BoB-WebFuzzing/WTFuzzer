@@ -7,6 +7,7 @@ Dave Kelsey <d_kelsey@uk.ibm.com>
 echo "*** Testing filesize(): usage variations ***\n";
 
 /* null, false, "", " " */
+var_dump( filesize(NULL) );
 var_dump( filesize(false) );
 var_dump( filesize('') );
 var_dump( filesize(' ') );
@@ -15,6 +16,7 @@ echo "*** Done ***\n";
 ?>
 --EXPECTF--
 *** Testing filesize(): usage variations ***
+bool(false)
 bool(false)
 bool(false)
 

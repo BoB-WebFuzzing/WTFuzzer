@@ -34,10 +34,11 @@
 #include "file.h"
 
 #ifndef	lint
-FILE_RCSID("@(#)$File: apprentice.c,v 1.301 2021/02/23 00:51:11 christos Exp $")
+FILE_RCSID("@(#)$File: apprentice.c,v 1.297 2020/05/09 18:57:15 christos Exp $")
 #endif	/* lint */
 
 #include "magic.h"
+#include "patchlevel.h"
 #include <stdlib.h>
 
 #if defined(__hpux) && !defined(HAVE_STRTOULL)
@@ -535,7 +536,6 @@ file_ms_alloc(int flags)
 	ms->elf_notes_max = FILE_ELF_NOTES_MAX;
 	ms->regex_max = FILE_REGEX_MAX;
 	ms->bytes_max = FILE_BYTES_MAX;
-	ms->encoding_max = FILE_ENCODING_MAX;
 	return ms;
 free:
 	efree(ms);
@@ -1187,7 +1187,7 @@ load_1(struct magic_set *ms, int action, const char *fn, int *errs,
 					continue;
 				}
 				if ((*bang[i].fun)(ms, &me,
-				    line + bang[i].len + 2,
+				    line + bang[i].len + 2, 
 				    len - bang[i].len - 2) != 0) {
 					(*errs)++;
 					continue;
@@ -1324,7 +1324,7 @@ apprentice_load(struct magic_set *ms, const char *fn, int action)
 	uint32_t i, j;
 	size_t files = 0, maxfiles = 0;
 	char **filearr = NULL;
-	zend_stat_t st = {0};
+	zend_stat_t st;
 	struct magic_map *map;
 	struct magic_entry_set mset[MAGIC_SETS];
 	php_stream *dir;
@@ -1416,10 +1416,7 @@ apprentice_load(struct magic_set *ms, const char *fn, int action)
 		 */
 		set_last_default(ms, mset[j].me, mset[j].count);
 
-		/* coalesce per file arrays into a single one, if needed */
-		if (mset[j].count == 0)
-			continue;
-
+		/* coalesce per file arrays into a single one */
 		if (coalesce_entries(ms, mset[j].me, mset[j].count,
 		    &map->magic[j], &map->nmagic[j]) == -1) {
 			errs++;
@@ -2089,13 +2086,6 @@ parse(struct magic_set *ms, struct magic_entry *me, const char *line,
 		return -1;
 	}
 
-	if (m->type == FILE_NAME && cont_level != 0) {
-		if (ms->flags & MAGIC_CHECK)
-			file_magwarn(ms, "`name%s' entries can only be "
-			    "declared at top level", l);
-		return -1;
-	}
-
 	/* New-style anding: "0 byte&0x80 =0x80 dynamically linked" */
 	/* New and improved: ~ & | ^ + - * / % -- exciting, isn't it? */
 
@@ -2709,7 +2699,7 @@ getvalue(struct magic_set *ms, struct magic *m, const char **p, int action)
 		ull = CAST(uint64_t, strtoull(*p, &ep, 0));
 		m->value.q = file_signextend(ms, m, ull);
 		if (*p == ep) {
-			file_magwarn(ms, "Unparsable number `%s'", *p);
+			file_magwarn(ms, "Unparseable number `%s'", *p);
 		} else {
 			size_t ts = typesize(m->type);
 			uint64_t x;
@@ -3111,8 +3101,8 @@ internal_loaded:
 	else
 		version = ptr[1];
 	if (version != VERSIONNO) {
-		file_error(ms, 0, "File %d supports only version %d magic "
-		    "files. `%s' is version %d", MAGIC_VERSION,
+		file_error(ms, 0, "File %d.%d supports only version %d magic "
+		    "files. `%s' is version %d", FILE_VERSION_MAJOR, patchlevel,
 		    VERSIONNO, dbname, version);
 		goto error;
 	}

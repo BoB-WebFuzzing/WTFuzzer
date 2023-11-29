@@ -36,7 +36,7 @@ EOT;
 
 
 $tester = new FPM\Tester($cfg, $code);
-$tester->start(extensions: ['pcntl']);
+$tester->start();
 $tester->expectLogStartNotices();
 $tester->multiRequest(2);
 $tester->status([

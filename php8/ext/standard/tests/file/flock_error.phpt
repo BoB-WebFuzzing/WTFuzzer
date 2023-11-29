@@ -19,6 +19,7 @@ $operations = array(
   0,
   LOCK_NB,
   FALSE,
+  NULL,
   array(1,2,3),
   array(),
   "string",
@@ -61,13 +62,15 @@ flock(): Argument #2 ($operation) must be one of LOCK_SH, LOCK_EX, or LOCK_UN
 --- Iteration 2 ---
 flock(): Argument #2 ($operation) must be one of LOCK_SH, LOCK_EX, or LOCK_UN
 --- Iteration 3 ---
-flock(): Argument #2 ($operation) must be of type int, array given
+flock(): Argument #2 ($operation) must be one of LOCK_SH, LOCK_EX, or LOCK_UN
 --- Iteration 4 ---
 flock(): Argument #2 ($operation) must be of type int, array given
 --- Iteration 5 ---
-flock(): Argument #2 ($operation) must be of type int, string given
+flock(): Argument #2 ($operation) must be of type int, array given
 --- Iteration 6 ---
 flock(): Argument #2 ($operation) must be of type int, string given
 --- Iteration 7 ---
+flock(): Argument #2 ($operation) must be of type int, string given
+--- Iteration 8 ---
 flock(): Argument #2 ($operation) must be of type int, string given
 flock(): supplied resource is not a valid stream resource

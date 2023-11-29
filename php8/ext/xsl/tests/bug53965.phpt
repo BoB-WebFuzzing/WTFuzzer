@@ -1,7 +1,9 @@
 --TEST--
 Bug #53965 (<xsl:include> cannot find files with relative paths when loaded with "file://")
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+if (!extension_loaded('xsl')) die("skip Extension XSL is required\n");
+?>
 --FILE--
 <?php
 

@@ -1,7 +1,7 @@
 --TEST--
 Test 1: Transform To XML String
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php require_once __DIR__ .'/skipif.inc'; ?>
 --FILE--
 <?php
 echo "Test 1: Transform To XML String";

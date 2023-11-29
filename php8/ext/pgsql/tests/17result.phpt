@@ -1,7 +1,5 @@
 --TEST--
 PostgreSQL pg_fetch_*() functions
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--
@@ -25,9 +23,9 @@ var_dump(pg_result_seek($result, 0));
 
 echo "Ok\n";
 ?>
---EXPECTF--
+--EXPECT--
 bool(true)
-object(stdClass)#%d (3) {
+object(stdClass)#1 (3) {
   ["num"]=>
   string(1) "1"
   ["str"]=>

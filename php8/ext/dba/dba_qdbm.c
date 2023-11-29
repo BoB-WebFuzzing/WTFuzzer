@@ -5,7 +5,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -20,12 +20,14 @@
 
 #include "php.h"
 
-#ifdef DBA_QDBM
+#if DBA_QDBM
 #include "php_qdbm.h"
 
 #ifdef QDBM_INCLUDE_FILE
 #include QDBM_INCLUDE_FILE
 #endif
+
+#define QDBM_DATA dba_qdbm_data *dba = info->dbf
 
 typedef struct {
 	DEPOT *dbf;
@@ -65,7 +67,7 @@ DBA_OPEN_FUNC(qdbm)
 
 DBA_CLOSE_FUNC(qdbm)
 {
-	dba_qdbm_data *dba = info->dbf;
+	QDBM_DATA;
 
 	dpclose(dba->dbf);
 	pefree(dba, info->flags & DBA_PERSISTENT);
@@ -73,30 +75,30 @@ DBA_CLOSE_FUNC(qdbm)
 
 DBA_FETCH_FUNC(qdbm)
 {
-	dba_qdbm_data *dba = info->dbf;
-	char *value;
+	QDBM_DATA;
+	char *value, *new = NULL;
 	int value_size;
-	zend_string *fetched_val = NULL;
 
-	value = dpget(dba->dbf, ZSTR_VAL(key), ZSTR_LEN(key), 0, -1, &value_size);
+	value = dpget(dba->dbf, key, keylen, 0, -1, &value_size);
 	if (value) {
-		fetched_val = zend_string_init(value, value_size, /* persistent */ false);
+		if (newlen) *newlen = value_size;
+		new = estrndup(value, value_size);
 		free(value);
 	}
 
-	return fetched_val;
+	return new;
 }
 
 DBA_UPDATE_FUNC(qdbm)
 {
-	dba_qdbm_data *dba = info->dbf;
+	QDBM_DATA;
 
-	if (dpput(dba->dbf, ZSTR_VAL(key), ZSTR_LEN(key), ZSTR_VAL(val), ZSTR_LEN(val), mode == 1 ? DP_DKEEP : DP_DOVER)) {
+	if (dpput(dba->dbf, key, keylen, val, vallen, mode == 1 ? DP_DKEEP : DP_DOVER)) {
 		return SUCCESS;
 	}
 
 	if (dpecode != DP_EKEEP) {
-		php_error_docref(NULL, E_WARNING, "%s", dperrmsg(dpecode));
+		php_error_docref2(NULL, key, val, E_WARNING, "%s", dperrmsg(dpecode));
 	}
 
 	return FAILURE;
@@ -104,10 +106,10 @@ DBA_UPDATE_FUNC(qdbm)
 
 DBA_EXISTS_FUNC(qdbm)
 {
-	dba_qdbm_data *dba = info->dbf;
+	QDBM_DATA;
 	char *value;
 
-	value = dpget(dba->dbf, ZSTR_VAL(key), ZSTR_LEN(key), 0, -1, NULL);
+	value = dpget(dba->dbf, key, keylen, 0, -1, NULL);
 	if (value) {
 		free(value);
 		return SUCCESS;
@@ -118,48 +120,48 @@ DBA_EXISTS_FUNC(qdbm)
 
 DBA_DELETE_FUNC(qdbm)
 {
-	dba_qdbm_data *dba = info->dbf;
+	QDBM_DATA;
 
-	return dpout(dba->dbf, ZSTR_VAL(key), ZSTR_LEN(key)) ? SUCCESS : FAILURE;
+	return dpout(dba->dbf, key, keylen) ? SUCCESS : FAILURE;
 }
 
 DBA_FIRSTKEY_FUNC(qdbm)
 {
-	dba_qdbm_data *dba = info->dbf;
+	QDBM_DATA;
 	int value_size;
-	char *value;
-	zend_string *key = NULL;
+	char *value, *new = NULL;
 
 	dpiterinit(dba->dbf);
 
 	value = dpiternext(dba->dbf, &value_size);
 	if (value) {
-		key = zend_string_init(value, value_size, /* persistent */ false);
+		if (newlen) *newlen = value_size;
+		new = estrndup(value, value_size);
 		free(value);
 	}
 
-	return key;
+	return new;
 }
 
 DBA_NEXTKEY_FUNC(qdbm)
 {
-	dba_qdbm_data *dba = info->dbf;
+	QDBM_DATA;
 	int value_size;
-	char *value;
-	zend_string *key = NULL;
+	char *value, *new = NULL;
 
 	value = dpiternext(dba->dbf, &value_size);
 	if (value) {
-		key = zend_string_init(value, value_size, /* persistent */ false);
+		if (newlen) *newlen = value_size;
+		new = estrndup(value, value_size);
 		free(value);
 	}
 
-	return key;
+	return new;
 }
 
 DBA_OPTIMIZE_FUNC(qdbm)
 {
-	dba_qdbm_data *dba = info->dbf;
+	QDBM_DATA;
 
 	dpoptimize(dba->dbf, 0);
 	return SUCCESS;
@@ -167,7 +169,7 @@ DBA_OPTIMIZE_FUNC(qdbm)
 
 DBA_SYNC_FUNC(qdbm)
 {
-	dba_qdbm_data *dba = info->dbf;
+	QDBM_DATA;
 
 	dpsync(dba->dbf);
 	return SUCCESS;

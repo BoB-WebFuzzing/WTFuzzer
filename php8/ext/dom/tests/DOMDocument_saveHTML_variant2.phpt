@@ -1,7 +1,9 @@
 --TEST--
 DOMDocument::saveHTML() vs DOMDocumet::saveXML()
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once __DIR__ .'/skipif.inc';
+?>
 --FILE--
 <?php
 $d = new DOMDocument();

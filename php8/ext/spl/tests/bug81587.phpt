@@ -1,7 +1,7 @@
 --TEST--
 Bug #81587: MultipleIterator Segmentation fault w/ SimpleXMLElement attached
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded('simplexml')) die('skip requires simplexml'); ?>
 --FILE--
 <?php
 $mi = new MultipleIterator();

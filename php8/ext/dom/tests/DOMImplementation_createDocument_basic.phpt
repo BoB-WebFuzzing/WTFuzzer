@@ -1,7 +1,9 @@
 --TEST--
 DOMImplementation::createDocument()
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+include('skipif.inc');
+?>
 --FILE--
 <?php
 declare(strict_types=1);

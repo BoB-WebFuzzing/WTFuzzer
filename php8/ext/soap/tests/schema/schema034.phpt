@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 34: Nested complex types (element ref)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";

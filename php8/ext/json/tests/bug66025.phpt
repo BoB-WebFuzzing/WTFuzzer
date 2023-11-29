@@ -4,7 +4,7 @@ Bug #66025 (Indent wrong when json_encode() called from jsonSerialize function)
 <?php
 
 class Foo implements JsonSerializable {
-    public function jsonSerialize(): mixed {
+    public function jsonSerialize() {
         return json_encode([1], JSON_PRETTY_PRINT);
     }
 }

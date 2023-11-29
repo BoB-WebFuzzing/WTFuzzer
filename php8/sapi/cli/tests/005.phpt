@@ -37,7 +37,7 @@ string(183) "Class [ <internal:Core> class stdClass ] {
 }
 
 "
-string(2232) "Class [ <internal:Core> class Exception implements Stringable, Throwable ] {
+string(2194) "Class [ <internal:Core> class Exception implements Stringable, Throwable ] {
 
   - Constants [0] {
   }
@@ -50,16 +50,16 @@ string(2232) "Class [ <internal:Core> class Exception implements Stringable, Thr
 
   - Properties [7] {
     Property [ protected $message = '' ]
-    Property [ private string $string = '' ]
+    Property [ private $string = '' ]
     Property [ protected $code = 0 ]
-    Property [ protected string $file = '' ]
-    Property [ protected int $line = 0 ]
-    Property [ private array $trace = [] ]
+    Property [ protected $file = NULL ]
+    Property [ protected $line = NULL ]
+    Property [ private array $trace = Array ]
     Property [ private ?Throwable $previous = NULL ]
   }
 
   - Methods [11] {
-    Method [ <internal:Core> private method __clone ] {
+    Method [ <internal:Core> final private method __clone ] {
 
       - Parameters [0] {
       }
@@ -79,7 +79,6 @@ string(2232) "Class [ <internal:Core> class Exception implements Stringable, Thr
 
       - Parameters [0] {
       }
-      - Tentative return [ void ]
     }
 
     Method [ <internal:Core, prototype Throwable> final public method getMessage ] {

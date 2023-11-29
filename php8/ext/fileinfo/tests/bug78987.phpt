@@ -1,7 +1,7 @@
 --TEST--
 Bug #78987 High memory usage during encoding detection
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --INI--
 memory_limit=512M
 --FILE--

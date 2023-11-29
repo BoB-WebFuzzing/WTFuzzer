@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 42bb5a4488d254e87d763c75ccff62e283e63335 */
+ * Stub hash: 31f7c4cd39e58d6474b90acd65f4b7bda7a6ddf3 */
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_TYPE_MASK_EX(arginfo_enchant_broker_init, 0, 0, EnchantBroker, MAY_BE_FALSE)
 ZEND_END_ARG_INFO()
@@ -157,34 +157,3 @@ static const zend_function_entry class_EnchantBroker_methods[] = {
 static const zend_function_entry class_EnchantDictionary_methods[] = {
 	ZEND_FE_END
 };
-
-static void register_enchant_symbols(int module_number)
-{
-	REGISTER_LONG_CONSTANT("ENCHANT_MYSPELL", PHP_ENCHANT_MYSPELL, CONST_PERSISTENT | CONST_DEPRECATED);
-	REGISTER_LONG_CONSTANT("ENCHANT_ISPELL", PHP_ENCHANT_ISPELL, CONST_PERSISTENT | CONST_DEPRECATED);
-#if defined(HAVE_ENCHANT_GET_VERSION)
-	REGISTER_STRING_CONSTANT("LIBENCHANT_VERSION", PHP_ENCHANT_GET_VERSION, CONST_PERSISTENT);
-#endif
-}
-
-static zend_class_entry *register_class_EnchantBroker(void)
-{
-	zend_class_entry ce, *class_entry;
-
-	INIT_CLASS_ENTRY(ce, "EnchantBroker", class_EnchantBroker_methods);
-	class_entry = zend_register_internal_class_ex(&ce, NULL);
-	class_entry->ce_flags |= ZEND_ACC_FINAL|ZEND_ACC_NO_DYNAMIC_PROPERTIES|ZEND_ACC_NOT_SERIALIZABLE;
-
-	return class_entry;
-}
-
-static zend_class_entry *register_class_EnchantDictionary(void)
-{
-	zend_class_entry ce, *class_entry;
-
-	INIT_CLASS_ENTRY(ce, "EnchantDictionary", class_EnchantDictionary_methods);
-	class_entry = zend_register_internal_class_ex(&ce, NULL);
-	class_entry->ce_flags |= ZEND_ACC_FINAL|ZEND_ACC_NO_DYNAMIC_PROPERTIES|ZEND_ACC_NOT_SERIALIZABLE;
-
-	return class_entry;
-}

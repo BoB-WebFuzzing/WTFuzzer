@@ -5,27 +5,27 @@ SPL: NoRewindIterator
 
 class ArrayIteratorEx extends ArrayIterator
 {
-    function rewind(): void
+    function rewind()
     {
         echo __METHOD__ . "\n";
         parent::rewind();
     }
-    function valid(): bool
+    function valid()
     {
         echo __METHOD__ . "\n";
         return parent::valid();
     }
-    function current(): mixed
+    function current()
     {
         echo __METHOD__ . "\n";
         return parent::current();
     }
-    function key(): string|int|null
+    function key()
     {
         echo __METHOD__ . "\n";
         return parent::key();
     }
-    function next(): void
+    function next()
     {
         echo __METHOD__ . "\n";
         parent::next();
@@ -34,27 +34,27 @@ class ArrayIteratorEx extends ArrayIterator
 
 class NoRewindIteratorEx extends NoRewindIterator
 {
-    function rewind(): void
+    function rewind()
     {
         echo __METHOD__ . "\n";
         parent::rewind();
     }
-    function valid(): bool
+    function valid()
     {
         echo __METHOD__ . "\n";
         return parent::valid();
     }
-    function current(): mixed
+    function current()
     {
         echo __METHOD__ . "\n";
         return parent::current();
     }
-    function key(): mixed
+    function key()
     {
         echo __METHOD__ . "\n";
         return parent::key();
     }
-    function next(): void
+    function next()
     {
         echo __METHOD__ . "\n";
         parent::next();

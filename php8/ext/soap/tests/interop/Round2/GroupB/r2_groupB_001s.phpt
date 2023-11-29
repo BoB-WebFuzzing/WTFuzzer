@@ -1,7 +1,7 @@
 --TEST--
 SOAP Interop Round2 groupB 001 (soap/direct): echoStructAsSimpleTypes
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--

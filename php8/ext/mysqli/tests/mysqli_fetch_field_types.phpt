@@ -1,9 +1,8 @@
 --TEST--
 mysqli_fetch_field() - data types/field->type
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

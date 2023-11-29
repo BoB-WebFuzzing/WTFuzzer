@@ -1,7 +1,7 @@
 --TEST--
 XML parser case folding test
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php include("skipif.inc"); ?>
 --FILE--
 <?php
 chdir(__DIR__);

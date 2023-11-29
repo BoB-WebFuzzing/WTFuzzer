@@ -1,7 +1,9 @@
 --TEST--
 SQLite3 authorizer crashes on NULL values
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded("sqlite3")) die("skip sqlite3 extension not available");
+?>
 --INI--
 open_basedir=.
 --FILE--

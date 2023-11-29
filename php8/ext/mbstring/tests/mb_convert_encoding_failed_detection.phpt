@@ -1,9 +1,5 @@
 --TEST--
 mb_convert_encoding() when encoding detection fails
---EXTENSIONS--
-mbstring
---INI--
-mbstring.strict_detection=1
 --FILE--
 <?php
 

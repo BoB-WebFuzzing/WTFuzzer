@@ -1,7 +1,7 @@
 --TEST--
 jdtomonthname() test
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php if (!extension_loaded("calendar")) print "skip"; ?>
 --FILE--
 <?php
 

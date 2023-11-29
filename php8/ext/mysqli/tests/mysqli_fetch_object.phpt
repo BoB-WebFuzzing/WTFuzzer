@@ -1,9 +1,8 @@
 --TEST--
 mysqli_fetch_object()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -24,8 +23,7 @@ require_once('skipifconnectfailure.inc');
     }
 
     class mysqli_fetch_object_test {
-        public $ID;
-        public $label;
+
         public $a = null;
         public $b = null;
 

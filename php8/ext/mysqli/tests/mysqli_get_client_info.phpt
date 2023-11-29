@@ -1,13 +1,17 @@
 --TEST--
 mysqli_get_client_info()
---EXTENSIONS--
-mysqli
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
+?>
 --FILE--
 <?php
-if (!is_string($info = mysqli_get_client_info()) || ('' === $info))
-    printf("[001] Expecting string/any_non_empty, got %s/%s\n", gettype($info), $info);
+    require_once("connect.inc");
+    if (!is_string($info = mysqli_get_client_info()) || ('' === $info))
+        printf("[001] Expecting string/any_non_empty, got %s/%s\n", gettype($info), $info);
 
-print "done!";
+    print "done!";
 ?>
 --EXPECT--
 done!

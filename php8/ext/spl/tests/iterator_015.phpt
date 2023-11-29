@@ -5,21 +5,21 @@ SPL: RecursiveIteratorIterator and beginChildren/endChildren
 
 class RecursiveArrayIteratorIterator extends RecursiveIteratorIterator
 {
-    function rewind(): void
+    function rewind()
     {
         echo "<ul>\n";
         parent::rewind();
     }
-    function beginChildren(): void
+    function beginChildren()
     {
         echo str_repeat('  ',$this->getDepth())."<ul>\n";
     }
 
-    function endChildren(): void
+    function endChildren()
     {
         echo str_repeat('  ',$this->getDepth())."</ul>\n";
     }
-    function valid(): bool
+    function valid()
     {
         if (!parent::valid()) {
             echo "<ul>\n";

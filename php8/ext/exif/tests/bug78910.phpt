@@ -1,7 +1,5 @@
 --TEST--
 Bug #78910: Heap-buffer-overflow READ in exif (OSS-Fuzz #19044)
---EXTENSIONS--
-exif
 --FILE--
 <?php
 

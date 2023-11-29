@@ -207,4 +207,4 @@ main (char *argv[], int argc)
 }
 
 #endif /* TEST */
-#endif /* NEED_CACHE */
+#endif /* HAVE_NEECACHE */

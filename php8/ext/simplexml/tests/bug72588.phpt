@@ -1,7 +1,9 @@
 --TEST--
 Bug #72588 (Using global var doesn't work while accessing SimpleXML element)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php
+if (!extension_loaded("simplexml")) die("skip SimpleXML not available");
+?>
 --FILE--
 <?php
 

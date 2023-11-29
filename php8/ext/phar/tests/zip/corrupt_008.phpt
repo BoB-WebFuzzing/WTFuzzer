@@ -1,7 +1,7 @@
 --TEST--
 Phar: unsupported compression methods
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 try {

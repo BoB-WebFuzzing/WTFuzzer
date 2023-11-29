@@ -1,7 +1,7 @@
 --TEST--
 oci_connect() with invalid character set
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded("oci8")) print "skip"; ?>
 --FILE--
 <?php
 

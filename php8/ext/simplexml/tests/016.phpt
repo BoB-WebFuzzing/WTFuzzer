@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: modifying attributes of singular subnode
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $xml =<<<EOF

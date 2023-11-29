@@ -1,7 +1,7 @@
 --TEST--
 readline_clear_history(): Basic test
---EXTENSIONS--
-readline
+--SKIPIF--
+<?php if (!extension_loaded("readline")) die("skip"); ?>
 --FILE--
 <?php
 

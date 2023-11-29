@@ -13,13 +13,13 @@ class Collection extends ArrayObject
         parent::__construct($this->data);
     }
 
-    function offsetGet($index): mixed
+    function offsetGet($index)
     {
         echo __METHOD__ . "($index)\n";
         return parent::offsetGet($index);
     }
 
-    function offsetSet($index, $value): void
+    function offsetSet($index, $value)
     {
         echo __METHOD__ . "(" . (is_null($index) ? "NULL" : $index) . ",$value)\n";
         parent::offsetSet($index, $value);

@@ -1,7 +1,7 @@
 --TEST--
 Large invalid octal number with underscores
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip tokenizer extension not enabled"; ?>
 --FILE--
 <?php
 

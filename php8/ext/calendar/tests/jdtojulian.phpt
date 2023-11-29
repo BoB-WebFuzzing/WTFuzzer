@@ -1,7 +1,7 @@
 --TEST--
 jdtojulian()
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 echo jdtojulian(0). "\n";

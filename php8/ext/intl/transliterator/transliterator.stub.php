@@ -1,65 +1,50 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
-/** @not-serializable */
 class Transliterator
 {
-    /**
-     * @var int
-     * @cvalue TRANSLITERATOR_FORWARD
-     */
-    public const FORWARD = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue TRANSLITERATOR_REVERSE
-     */
-    public const REVERSE = UNKNOWN;
-
-    public readonly string $id;
-
     final private function __construct() {}
 
     /**
-     * @tentative-return-type
+     * @return Transliterator|null
      * @alias transliterator_create
      */
-    public static function create(string $id, int $direction = Transliterator::FORWARD): ?Transliterator {}
+    public static function create(string $id, int $direction = Transliterator::FORWARD) {}
 
     /**
-     * @tentative-return-type
+     * @return Transliterator|null
      * @alias transliterator_create_from_rules
      */
-    public static function createFromRules(string $rules, int $direction = Transliterator::FORWARD): ?Transliterator {}
+    public static function createFromRules(string $rules, int $direction = Transliterator::FORWARD) {}
 
     /**
-     * @tentative-return-type
+     * @return Transliterator|null
      * @alias transliterator_create_inverse
      */
-    public function createInverse(): ?Transliterator {}
+    public function createInverse() {}
 
     /**
-     * @return array<int, string>|false
-     * @tentative-return-type
+     * @return array|false
      * @alias transliterator_list_ids
      */
-    public static function listIDs(): array|false {}
+    public static function listIDs() {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias transliterator_transliterate
      */
-    public function transliterate(string $string, int $start = 0, int $end = -1): string|false {}
+    public function transliterate(string $string, int $start = 0, int $end = -1) {}
 
     /**
-     * @tentative-return-type
+     * @return int|false
      * @alias transliterator_get_error_code
      */
-    public function getErrorCode(): int|false {}
+    public function getErrorCode() {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias transliterator_get_error_message
      */
-    public function getErrorMessage(): string|false {}
+    public function getErrorMessage() {}
 }

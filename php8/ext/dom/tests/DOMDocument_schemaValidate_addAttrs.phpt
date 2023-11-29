@@ -2,8 +2,8 @@
 DomDocument::schemaValidate() - Add missing attribute default values from schema
 --CREDITS--
 Chris Wright <info@daverandom.com>
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

@@ -1,7 +1,7 @@
 --TEST--
 Bug #45798 (sqlite3 doesn't track unexecuted statements)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 

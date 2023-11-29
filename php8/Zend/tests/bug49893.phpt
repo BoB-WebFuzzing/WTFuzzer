@@ -12,7 +12,6 @@ class A {
     }
 }
 class B {
-    public $a;
     function __construct() {
         $this->a = new A();
         throw new Exception("1");

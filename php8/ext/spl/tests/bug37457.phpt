@@ -13,31 +13,31 @@ class Collection implements Iterator
         $this->array = $a;
     }
 
-    public function current(): mixed
+    public function current()
     {
         echo __METHOD__ . "\n";
         return current($this->array);
     }
 
-    public function key(): mixed
+    public function key()
     {
         echo __METHOD__ . "\n";
         return key($this->array);
     }
 
-    public function next(): void
+    public function next()
     {
         echo __METHOD__ . "\n";
         $this->valid = (false !== next($this->array));
     }
 
-    public function valid(): bool
+    public function valid()
     {
         echo __METHOD__ . "\n";
         return $this->valid;
     }
 
-    public function rewind(): void
+    public function rewind()
     {
         echo __METHOD__ . "\n";
         $this->valid = (false !== reset($this->array));
@@ -46,7 +46,7 @@ class Collection implements Iterator
 
 class TestFilter extends FilterIterator
 {
-    public function accept(): bool
+    public function accept()
     {
         echo __METHOD__ . "\n";
         throw new Exception("Failure in Accept");

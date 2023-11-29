@@ -1,10 +1,9 @@
 --TEST--
 Bug #81037 PDO discards error message text from prepared statement
---EXTENSIONS--
-pdo
-pdo_mysql
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo') || !extension_loaded('pdo_mysql')) die('skip not loaded');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'skipif.inc');
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
 MySQLPDOTest::skip();
 ?>
@@ -33,4 +32,4 @@ require __DIR__ . '/mysql_pdo_test.inc';
 MySQLPDOTest::dropTestTable();
 ?>
 --EXPECT--
-SQLSTATE[HY093]: Invalid parameter number
+SQLSTATE[HY000]: General error: 2031 No data supplied for parameters in prepared statement

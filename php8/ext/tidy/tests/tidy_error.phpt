@@ -2,8 +2,10 @@
 Ensure tidy_get_status() returns correct status
 --CREDITS--
 Stefan Priebsch
---EXTENSIONS--
-tidy
+--SKIPIF--
+<?php
+ if (!extension_loaded("tidy")) print "skip tidy extension not loaded";
+?>
 --FILE--
 <?php
 

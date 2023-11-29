@@ -4,20 +4,20 @@ Bug #42703 (Exception raised in an iterator::current() causes segfault in Filter
 <?php
 class BlaIterator implements Iterator
 {
-    public function rewind(): void { }
+    public function rewind() { }
 
-    public function next(): void { }
+    public function next() { }
 
-    public function valid(): bool {
+    public function valid() {
         return true;
     }
 
-    public function current(): mixed
+    public function current()
     {
       throw new Exception('boo');
     }
 
-    public function key(): mixed { return null; }
+    public function key() { }
 }
 
 $it = new BlaIterator();
