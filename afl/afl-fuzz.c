@@ -568,25 +568,25 @@ void freeMap(Map* map) {
 char lines[MAX_LINES][MAX_LENGTH];
 
 int setFilter() {
-    FILE *file;
     int line_count = 0;
 
-    file = fopen("/tmp/filter.txt", "r");
+    FILE *fp;
 
-    while (fgets(lines[line_count], MAX_LENGTH, file) != NULL) {
-        lines[line_count][strcspn(lines[line_count], "\n")] = '\0';
-        line_count++;
+    if ((fp = fopen("/tmp/filter.txt", "r")) != NULL) {
+        while (fgets(lines[line_count], MAX_LENGTH, fp) != NULL) {
+            lines[line_count][strcspn(lines[line_count], "\n")] = '\0';
+            line_count++;
 
-        if (line_count >= MAX_LINES) {
-            break;
+            if (line_count >= MAX_LINES) {
+                break;
+            }
         }
+
+        fclose(fp);
     }
-
-    fclose(file);
-
-    // for (int i = 0; i < line_count; i++) {
-    //     printf("Line %d: %s\n", i + 1, lines[i]);
-    // }
+    else {
+        printf("/tmp/mutate.txt is not found\n");
+    }
 
     return 0;
 }
@@ -711,7 +711,7 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
     }
 
 // Select vuln class
-    switch (findIndex(vulns, 5, vuln)) {
+    switch (findIndex(vulns, 6, vuln)) {
         case 0:
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
@@ -5873,7 +5873,7 @@ static u8 fuzz_one(char** argv) {
 
   /* WTFUZZ init */
   Map vulnsMap;
-  size_t mapSize = 5;
+  size_t mapSize = 6;
 
   s32 len, fd, temp_len, i, j;
   u8  *in_buf, *out_buf, *orig_in, *ex_tmp, *eff_map = 0;
@@ -6092,22 +6092,29 @@ skip_interest:
 
   queue_search = queue;
 
-  FILE *fp;
-  fp = fopen("/tmp/mutate.txt", "r");
   char line[100];
   char vuln[20];
   int count;
   char * tweaked;
-  
-  initializeMap(&vulnsMap, mapSize);
 
-  while (fgets(line, sizeof(line), fp) != NULL) {
-    sscanf(line, "%s : %d", vuln, &count);
+  FILE *fp;
 
-    addToMap(&vulnsMap, vuln, count);
+  if ((fp = fopen("/tmp/mutate.txt", "r")) != NULL) {  
+    initializeMap(&vulnsMap, mapSize);
 
-    // printf("key : %s, value : %d\n------------\n", vuln, getFromMap(&vulnsMap, vuln));
-    i++;
+    while (fgets(line, sizeof(line), fp) != NULL) {
+      sscanf(line, "%s : %d", vuln, &count);
+
+      addToMap(&vulnsMap, vuln, count);
+
+      // printf("key : %s, value : %d\n------------\n", vuln, getFromMap(&vulnsMap, vuln));
+      i++;
+    }
+
+    fclose(fp);
+  }
+  else {
+    printf("/tmp/mutate.txt is not found\n");
   }
 
   sortMap(&vulnsMap);
@@ -6190,7 +6197,6 @@ skip_interest:
   }
 
   freeMap(&vulnsMap);
-  fclose(fp);
 
   new_hit_cnt = queued_paths + unique_crashes;
 
