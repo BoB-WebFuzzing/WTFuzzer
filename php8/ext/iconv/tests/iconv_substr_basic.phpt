@@ -1,7 +1,10 @@
 --TEST--
 Test iconv_substr() function : basic functionality
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+extension_loaded('iconv') or die('skip');
+function_exists('iconv_substr') or die("skip iconv_substr() is not available in this build");
+?>
 --INI--
 input_encoding=ISO-8859-1
 internal_encoding=ISO-8859-1

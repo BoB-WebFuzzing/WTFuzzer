@@ -1,7 +1,7 @@
 --TEST--
 filter_input()
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 

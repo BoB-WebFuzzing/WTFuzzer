@@ -16,12 +16,12 @@ $glue = ", "; // multiple car as glue
 $pieces = array("Red", "Green", "Blue", "Black", "White");
 var_dump( join($glue, $pieces) );
 
-// pieces as associative array (numeric values)
+// pices as associative array (numeric values)
 $pieces = array("Hour" => 10, "Minute" => 20, "Second" => 40);
 $glue = ':';
 var_dump( join($glue, $pieces) );
 
-// pieces as associative array (string/numeric values)
+// pices as associative array (string/numeric values)
 $pieces = array("Day" => 'Friday', "Month" => "September", "Year" => 2007);
 $glue = '/';
 var_dump( join($glue, $pieces) );

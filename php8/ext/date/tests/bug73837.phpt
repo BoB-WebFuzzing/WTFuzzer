@@ -17,7 +17,6 @@ while (time() < $startTS + 2) {
     }
     $prev_dt = $dt;
 }
-
 echo "Finished\n";
 ?>
 --EXPECTF--

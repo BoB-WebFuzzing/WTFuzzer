@@ -6,20 +6,20 @@ Bug #31185 (Crash when exceptions thrown from ArrayAccess::offsetUnset())
 class FooBar implements ArrayAccess {
     private $array = array();
 
-    public function offsetExists($index): bool {
+    public function offsetExists($index) {
         return isset($this->array[$index]);
     }
 
-    public function offsetGet($index): mixed {
+    public function offsetGet($index) {
         return $this->array[$index];
     }
 
-    public function offsetSet($index, $value): void {
+    public function offsetSet($index, $value) {
         echo __METHOD__ . "($index, $value)\n";
         $this->array[$index] = $value;
     }
 
-    public function offsetUnset($index): void {
+    public function offsetUnset($index) {
         throw new Exception('FAIL');
         unset($this->array[$index]);
     }

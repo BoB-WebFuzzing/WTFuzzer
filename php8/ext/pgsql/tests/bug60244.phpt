@@ -1,7 +1,5 @@
 --TEST--
 Bug #60244 (pg_fetch_* functions do not validate that row param is >0)
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
 include("skipif.inc");
@@ -12,7 +10,7 @@ include("skipif.inc");
 include 'config.inc';
 
 $db = pg_connect($conn_str);
-$result = pg_query($db, "select 'a' union select 'b'");
+$result = pg_query("select 'a' union select 'b'");
 
 try {
     var_dump(pg_fetch_array($result, -1));
@@ -43,7 +41,7 @@ var_dump(pg_fetch_row($result, 0));
 pg_close($db);
 
 ?>
---EXPECTF--
+--EXPECT--
 pg_fetch_array(): Argument #2 ($row) must be greater than or equal to 0
 pg_fetch_assoc(): Argument #2 ($row) must be greater than or equal to 0
 pg_fetch_object(): Argument #2 ($row) must be greater than or equal to 0
@@ -58,7 +56,7 @@ array(1) {
   ["?column?"]=>
   string(1) "a"
 }
-object(stdClass)#%d (1) {
+object(stdClass)#1 (1) {
   ["?column?"]=>
   string(1) "a"
 }

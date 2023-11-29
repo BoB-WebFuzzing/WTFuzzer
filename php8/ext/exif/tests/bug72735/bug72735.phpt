@@ -1,7 +1,7 @@
 --TEST--
 Bug #72735 (Samsung picture thumb not read (zero size))
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
 --FILE--
 <?php
 foreach (['nokia.jpg', 'samsung.jpg', 'panasonic.jpg'] as $picture) {

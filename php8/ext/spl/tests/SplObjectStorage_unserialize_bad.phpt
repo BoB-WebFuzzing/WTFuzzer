@@ -20,13 +20,13 @@ try {
 }
 echo "DONE\n";
 ?>
---EXPECT--
+--EXPECTF--
 Error at offset 6 of 34 bytes
 Error at offset 46 of 89 bytes
 object(SplObjectStorage)#2 (1) {
   ["storage":"SplObjectStorage":private]=>
   array(2) {
-    [0]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(stdClass)#3 (0) {
@@ -34,7 +34,7 @@ object(SplObjectStorage)#2 (1) {
       ["inf"]=>
       int(1)
     }
-    [1]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(stdClass)#1 (0) {

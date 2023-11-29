@@ -1,7 +1,5 @@
 --TEST--
 Bug #80462: Nullsafe operator tokenize with TOKEN_PARSE flag fails
---EXTENSIONS--
-tokenizer
 --FILE--
 <?php
 

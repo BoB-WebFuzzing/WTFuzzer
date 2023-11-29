@@ -1,7 +1,7 @@
 --TEST--
 Bug #42214 (SoapServer sends clients internal PHP errors)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $request = <<<EOF

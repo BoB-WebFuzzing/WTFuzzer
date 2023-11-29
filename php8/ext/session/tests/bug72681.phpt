@@ -1,7 +1,5 @@
 --TEST--
 Bug #72681: PHP Session Data Injection Vulnerability
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

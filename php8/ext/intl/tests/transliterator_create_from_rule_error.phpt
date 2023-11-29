@@ -1,7 +1,7 @@
 --TEST--
 Transliterator::createFromRules (error)
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);

@@ -1,9 +1,7 @@
 --TEST--
 spoofchecker with locale settings
---EXTENSIONS--
-intl
 --SKIPIF--
-<?php if(!class_exists("Spoofchecker")) print 'skip'; ?>
+<?php if(!extension_loaded('intl') || !class_exists("Spoofchecker")) print 'skip'; ?>
 --FILE--
 <?php
 

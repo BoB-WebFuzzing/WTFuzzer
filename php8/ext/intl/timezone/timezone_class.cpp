@@ -3,7 +3,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -351,6 +351,13 @@ static void TimeZone_object_init(TimeZone_object *to)
 }
 /* }}} */
 
+/* {{{ TimeZone_objects_dtor */
+static void TimeZone_objects_dtor(zend_object *object)
+{
+	zend_objects_destroy_object(object);
+}
+/* }}} */
+
 /* {{{ TimeZone_objects_free */
 static void TimeZone_objects_free(zend_object *object)
 {
@@ -388,9 +395,18 @@ static zend_object *TimeZone_object_create(zend_class_entry *ce)
  */
 U_CFUNC void timezone_register_IntlTimeZone_class(void)
 {
+	zend_class_entry ce;
+
 	/* Create and register 'IntlTimeZone' class. */
-	TimeZone_ce_ptr = register_class_IntlTimeZone();
-	TimeZone_ce_ptr->create_object = TimeZone_object_create;
+	INIT_CLASS_ENTRY(ce, "IntlTimeZone", class_IntlTimeZone_methods);
+	ce.create_object = TimeZone_object_create;
+	TimeZone_ce_ptr = zend_register_internal_class(&ce);
+	if (!TimeZone_ce_ptr) {
+		//can't happen now without bigger problems before
+		php_error_docref(NULL, E_ERROR,
+			"IntlTimeZone: class registration has failed.");
+		return;
+	}
 
 	memcpy(&TimeZone_handlers, &std_object_handlers,
 		sizeof TimeZone_handlers);
@@ -398,6 +414,30 @@ U_CFUNC void timezone_register_IntlTimeZone_class(void)
 	TimeZone_handlers.clone_obj = TimeZone_clone_obj;
 	TimeZone_handlers.compare = TimeZone_compare_objects;
 	TimeZone_handlers.get_debug_info = TimeZone_get_debug_info;
+	TimeZone_handlers.dtor_obj = TimeZone_objects_dtor;
 	TimeZone_handlers.free_obj = TimeZone_objects_free;
+
+
+	/* Declare 'IntlTimeZone' class constants */
+#define TIMEZONE_DECL_LONG_CONST(name, val) \
+	zend_declare_class_constant_long(TimeZone_ce_ptr, name, sizeof(name) - 1, \
+		val)
+
+	TIMEZONE_DECL_LONG_CONST("DISPLAY_SHORT", TimeZone::SHORT);
+	TIMEZONE_DECL_LONG_CONST("DISPLAY_LONG", TimeZone::LONG);
+
+	TIMEZONE_DECL_LONG_CONST("DISPLAY_SHORT_GENERIC", TimeZone::SHORT_GENERIC);
+	TIMEZONE_DECL_LONG_CONST("DISPLAY_LONG_GENERIC", TimeZone::LONG_GENERIC);
+	TIMEZONE_DECL_LONG_CONST("DISPLAY_SHORT_GMT", TimeZone::SHORT_GMT);
+	TIMEZONE_DECL_LONG_CONST("DISPLAY_LONG_GMT", TimeZone::LONG_GMT);
+	TIMEZONE_DECL_LONG_CONST("DISPLAY_SHORT_COMMONLY_USED", TimeZone::SHORT_COMMONLY_USED);
+	TIMEZONE_DECL_LONG_CONST("DISPLAY_GENERIC_LOCATION", TimeZone::GENERIC_LOCATION);
+
+	TIMEZONE_DECL_LONG_CONST("TYPE_ANY", UCAL_ZONE_TYPE_ANY);
+	TIMEZONE_DECL_LONG_CONST("TYPE_CANONICAL", UCAL_ZONE_TYPE_CANONICAL);
+	TIMEZONE_DECL_LONG_CONST("TYPE_CANONICAL_LOCATION", UCAL_ZONE_TYPE_CANONICAL_LOCATION);
+
+	/* Declare 'IntlTimeZone' class properties */
+
 }
 /* }}} */

@@ -35,22 +35,22 @@ Bug #40833 (Crash when using unset() on an ArrayAccess object retrieved via __ge
             $this->entity->whatever = null;
         }
 
-        function offsetUnset($offset): void
+        function offsetUnset($offset)
         {
             $this->clear();
 //			$this->entity->{$this->name} = null;
         }
 
-        function offsetSet($offset, $value): void
+        function offsetSet($offset, $value)
         {
         }
 
-        function offsetGet($offset): mixed
+        function offsetGet($offset)
         {
             return 'Bogus ';
         }
 
-        function offsetExists($offset): bool
+        function offsetExists($offset)
         {
         }
     }

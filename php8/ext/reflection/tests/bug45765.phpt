@@ -51,7 +51,7 @@ Object of class [ <user> class foo extends foo2 ] {
       @@ %s 10 - 11
 
       - Parameters [1] {
-        Parameter #0 [ <optional> $a = self::BAR ]
+        Parameter #0 [ <optional> $a = 'foo's bar' ]
       }
     }
 
@@ -59,7 +59,7 @@ Object of class [ <user> class foo extends foo2 ] {
       @@ %s 13 - 14
 
       - Parameters [1] {
-        Parameter #0 [ <optional> $a = parent::BAR ]
+        Parameter #0 [ <optional> $a = 'foobar' ]
       }
     }
 
@@ -67,7 +67,7 @@ Object of class [ <user> class foo extends foo2 ] {
       @@ %s 16 - 17
 
       - Parameters [1] {
-        Parameter #0 [ <optional> $a = foo::BAR ]
+        Parameter #0 [ <optional> $a = 'foo's bar' ]
       }
     }
 
@@ -75,7 +75,7 @@ Object of class [ <user> class foo extends foo2 ] {
       @@ %s 19 - 20
 
       - Parameters [1] {
-        Parameter #0 [ <optional> $a = foo2::BAR ]
+        Parameter #0 [ <optional> $a = 'foobar' ]
       }
     }
   }

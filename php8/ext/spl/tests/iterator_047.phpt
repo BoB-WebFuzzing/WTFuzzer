@@ -7,7 +7,7 @@ class MyRecursiveArrayIterator extends RecursiveArrayIterator
 {
     static public $fail = 0;
 
-    static function fail($state, $method): void
+    static function fail($state, $method)
     {
         if (self::$fail == $state)
         {
@@ -15,14 +15,14 @@ class MyRecursiveArrayIterator extends RecursiveArrayIterator
         }
     }
 
-    function hasChildren(): bool
+    function hasChildren()
     {
         echo __METHOD__ . "()\n";
         self::fail(1, __METHOD__);
         return parent::hasChildren();
     }
 
-    function getChildren(): ?RecursiveArrayIterator
+    function getChildren()
     {
         echo __METHOD__ . "()\n";
         self::fail(2, __METHOD__);

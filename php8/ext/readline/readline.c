@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -82,10 +82,7 @@ PHP_MINIT_FUNCTION(readline)
 #if HAVE_RL_CALLBACK_READ_CHAR
 	ZVAL_UNDEF(&_prepped_callback);
 #endif
-
-	register_readline_symbols(module_number);
-
-	return PHP_MINIT(cli_readline)(INIT_FUNC_ARGS_PASSTHRU);
+   	return PHP_MINIT(cli_readline)(INIT_FUNC_ARGS_PASSTHRU);
 }
 
 PHP_MSHUTDOWN_FUNCTION(readline)
@@ -143,12 +140,12 @@ PHP_FUNCTION(readline)
 /* {{{ Gets/sets various internal readline variables. */
 PHP_FUNCTION(readline_info)
 {
-	zend_string *what = NULL;
+	char *what = NULL;
 	zval *value = NULL;
-	size_t oldval;
+	size_t what_len, oldval;
 	char *oldstr;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|S!z!", &what, &value) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|s!z!", &what, &what_len, &value) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -180,7 +177,7 @@ PHP_FUNCTION(readline_info)
 		add_assoc_string(return_value,"readline_name",(char *)SAFE_STRING(rl_readline_name));
 		add_assoc_long(return_value,"attempted_completion_over",rl_attempted_completion_over);
 	} else {
-		if (zend_string_equals_literal_ci(what,"line_buffer")) {
+		if (!strcasecmp(what,"line_buffer")) {
 			oldstr = rl_line_buffer;
 			if (value) {
 				/* XXX if (rl_line_buffer) free(rl_line_buffer); */
@@ -190,22 +187,22 @@ PHP_FUNCTION(readline_info)
 				rl_line_buffer = strdup(Z_STRVAL_P(value));
 			}
 			RETVAL_STRING(SAFE_STRING(oldstr));
-		} else if (zend_string_equals_literal_ci(what, "point")) {
+		} else if (!strcasecmp(what, "point")) {
 			RETVAL_LONG(rl_point);
 #ifndef PHP_WIN32
-		} else if (zend_string_equals_literal_ci(what, "end")) {
+		} else if (!strcasecmp(what, "end")) {
 			RETVAL_LONG(rl_end);
 #endif
 #ifdef HAVE_LIBREADLINE
-		} else if (zend_string_equals_literal_ci(what, "mark")) {
+		} else if (!strcasecmp(what, "mark")) {
 			RETVAL_LONG(rl_mark);
-		} else if (zend_string_equals_literal_ci(what, "done")) {
+		} else if (!strcasecmp(what, "done")) {
 			oldval = rl_done;
 			if (value) {
 				rl_done = zval_get_long(value);
 			}
 			RETVAL_LONG(oldval);
-		} else if (zend_string_equals_literal_ci(what, "pending_input")) {
+		} else if (!strcasecmp(what, "pending_input")) {
 			oldval = rl_pending_input;
 			if (value) {
 				if (!try_convert_to_string(value)) {
@@ -214,17 +211,17 @@ PHP_FUNCTION(readline_info)
 				rl_pending_input = Z_STRVAL_P(value)[0];
 			}
 			RETVAL_LONG(oldval);
-		} else if (zend_string_equals_literal_ci(what, "prompt")) {
+		} else if (!strcasecmp(what, "prompt")) {
 			RETVAL_STRING(SAFE_STRING(rl_prompt));
-		} else if (zend_string_equals_literal_ci(what, "terminal_name")) {
+		} else if (!strcasecmp(what, "terminal_name")) {
 			RETVAL_STRING((char *)SAFE_STRING(rl_terminal_name));
-		} else if (zend_string_equals_literal_ci(what, "completion_suppress_append")) {
+		} else if (!strcasecmp(what, "completion_suppress_append")) {
 			oldval = rl_completion_suppress_append;
 			if (value) {
 				rl_completion_suppress_append = zend_is_true(value);
 			}
 			RETVAL_BOOL(oldval);
-		} else if (zend_string_equals_literal_ci(what, "completion_append_character")) {
+		} else if (!strcasecmp(what, "completion_append_character")) {
 			oldval = rl_completion_append_character;
 			if (value) {
 				if (!try_convert_to_string(value)) {
@@ -236,7 +233,7 @@ PHP_FUNCTION(readline_info)
 				oldval == 0 ? ZSTR_EMPTY_ALLOC() : ZSTR_CHAR(oldval));
 #endif
 #if HAVE_ERASE_EMPTY_LINE
-		} else if (zend_string_equals_literal_ci(what, "erase_empty_line")) {
+		} else if (!strcasecmp(what, "erase_empty_line")) {
 			oldval = rl_erase_empty_line;
 			if (value) {
 				rl_erase_empty_line = zval_get_long(value);
@@ -244,10 +241,10 @@ PHP_FUNCTION(readline_info)
 			RETVAL_LONG(oldval);
 #endif
 #ifndef PHP_WIN32
-		} else if (zend_string_equals_literal_ci(what,"library_version")) {
+		} else if (!strcasecmp(what,"library_version")) {
 			RETVAL_STRING((char *)SAFE_STRING(rl_library_version));
 #endif
-		} else if (zend_string_equals_literal_ci(what, "readline_name")) {
+		} else if (!strcasecmp(what, "readline_name")) {
 			oldstr = (char*)rl_readline_name;
 			if (value) {
 				/* XXX if (rl_readline_name) free(rl_readline_name); */
@@ -257,7 +254,7 @@ PHP_FUNCTION(readline_info)
 				rl_readline_name = strdup(Z_STRVAL_P(value));
 			}
 			RETVAL_STRING(SAFE_STRING(oldstr));
-		} else if (zend_string_equals_literal_ci(what, "attempted_completion_over")) {
+		} else if (!strcasecmp(what, "attempted_completion_over")) {
 			oldval = rl_attempted_completion_over;
 			if (value) {
 				rl_attempted_completion_over = zval_get_long(value);
@@ -326,7 +323,7 @@ PHP_FUNCTION(readline_list_history)
 	}
 
 #elif defined(HAVE_LIBEDIT) /* libedit */
-	{
+    {
 		HISTORY_STATE *hs;
 		int i;
 
@@ -341,7 +338,7 @@ PHP_FUNCTION(readline_list_history)
 			}
 		}
 		free(hs);
-	}
+    }
 
 #else /* readline */
 	history = history_list();
@@ -417,7 +414,7 @@ static char *_readline_command_generator(const char *text, int state)
 	while ((entry = zend_hash_get_current_data(myht)) != NULL) {
 		zend_hash_move_forward(myht);
 
-		convert_to_string(entry);
+		convert_to_string_ex(entry);
 		if (strncmp (Z_STRVAL_P(entry), text, strlen(text)) == 0) {
 			return (strdup(Z_STRVAL_P(entry)));
 		}

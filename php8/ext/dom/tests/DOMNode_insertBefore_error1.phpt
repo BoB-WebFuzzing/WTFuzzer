@@ -2,8 +2,8 @@
 DOMNode::insertBefore() should fail if node belongs to another document
 --CREDITS--
 Knut Urdalen <knut@php.net>
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

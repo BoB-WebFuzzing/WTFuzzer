@@ -1,7 +1,5 @@
 --TEST--
 Bug #72028 pg_query_params(): NULL converts to empty string
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--
@@ -14,7 +12,7 @@ $conn = pg_connect($conn_str);
 
 $table = "bug72028_" . md5(uniqid(time()));
 
-pg_query($conn, "CREATE TABLE $table (value TEXT, details TEXT);");
+pg_query("CREATE TABLE $table (value TEXT, details TEXT);");
 
 $sql = "INSERT INTO $table (value, details) VALUES ($1, $2)";
 
@@ -29,12 +27,12 @@ unset($p);
 
 $result = pg_query_params($conn, $sql, $params2);
 
-$r = pg_query($conn, "SELECT * FROM $table");
+$r = pg_query("SELECT * FROM $table");
 while (false !== ($i = pg_fetch_assoc($r))) {
     var_dump($i);
 }
 
-pg_query($conn, "DROP TABLE $table");
+pg_query("DROP TABLE $table");
 
 ?>
 --EXPECT--

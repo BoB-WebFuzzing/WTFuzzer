@@ -3,7 +3,6 @@ Foreach loop tests - modifying the object during the loop.
 --FILE--
 <?php
 
-#[AllowDynamicProperties]
 class C {
     public $a = "Original a";
     public $b = "Original b";

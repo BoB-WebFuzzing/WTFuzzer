@@ -1,7 +1,7 @@
 --TEST--
 Incorrect liveness computation for verify-return
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test($foo): string

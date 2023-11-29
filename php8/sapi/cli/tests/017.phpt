@@ -1,11 +1,9 @@
 --TEST--
 CLI -a and libedit
---EXTENSIONS--
-readline
 --SKIPIF--
 <?php
 include "skipif.inc";
-if (readline_info('done') !== NULL) {
+if (!extension_loaded('readline') || readline_info('done') !== NULL) {
     die ("skip need readline support using libedit");
 }
 if(substr(PHP_OS, 0, 3) == 'WIN' ) {

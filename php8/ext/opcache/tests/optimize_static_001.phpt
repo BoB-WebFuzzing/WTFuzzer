@@ -4,8 +4,8 @@ Keep BIND_STATIC when initial value refer to unresolved constants
 opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function foo() {

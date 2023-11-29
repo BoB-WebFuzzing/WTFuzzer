@@ -1,9 +1,8 @@
 --TEST--
 function test: mysqli_num_rows()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

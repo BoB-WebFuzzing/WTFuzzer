@@ -3,8 +3,10 @@ Test curl_copy_handle() change options in one handle
 --CREDITS--
 Francesco Fullone ff@ideato.it
 #PHPTestFest Cesena Italia on 2009-06-20
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+    if (!extension_loaded("curl")) exit("skip curl extension not loaded");
+?>
 --FILE--
 <?php
 echo "*** Testing curl_copy_handle(): basic ***\n";

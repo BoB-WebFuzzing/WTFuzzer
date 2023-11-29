@@ -1,7 +1,7 @@
 --TEST--
 gmp_binomial(): Binomial coefficients
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded('gmp')) die('skip gmp extension not loaded'); ?>
 --FILE--
 <?php
 

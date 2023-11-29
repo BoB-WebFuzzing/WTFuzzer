@@ -1,7 +1,11 @@
 --TEST--
 Test phpinfo() displays xsl info
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+    if (!extension_loaded("xsl")) {
+        die("SKIP extension gettext not loaded\n");
+    }
+?>
 --FILE--
 <?php
 phpinfo();

@@ -1,25 +1,20 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
 class php_user_filter
 {
-    public string $filtername = "";
-    public mixed $params = "";
-    /** @var resource|null */
-    public $stream = null;
-
     /**
      * @param resource $in
      * @param resource $out
      * @param int $consumed
-     * @tentative-return-type
+     * @return int
      */
-    public function filter($in, $out, &$consumed, bool $closing): int {}
+    public function filter($in, $out, &$consumed, bool $closing) {}
 
-    /** @tentative-return-type */
-    public function onCreate(): bool {}
+    /** @return bool */
+    public function onCreate() {}
 
-    /** @tentative-return-type */
-    public function onClose(): void {}
+    /** @return void */
+    public function onClose() {}
 }

@@ -1,7 +1,9 @@
 --TEST--
 Bug #78770: Incorrect callability check inside internal methods
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded("intl")) die("skip requires intl");
+?>
 --FILE--
 <?php
 
@@ -19,6 +21,5 @@ class Test {
 
 ?>
 ===DONE===
---EXPECTF--
-Deprecated: Use of "self" in callables is deprecated in %s on line %d
+--EXPECT--
 ===DONE===

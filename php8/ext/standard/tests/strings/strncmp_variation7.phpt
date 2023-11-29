@@ -15,5 +15,5 @@ echo "*** Done ***\n";
 ?>
 --EXPECT--
 *** Test strncmp() function: Checking with the null terminated strings ***
-int(1)
+int(5)
 *** Done ***

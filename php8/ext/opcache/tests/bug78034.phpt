@@ -1,7 +1,7 @@
 --TEST--
 Bug #78034: "pecl" tool fails with abort assertion in zend_ssa.c
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

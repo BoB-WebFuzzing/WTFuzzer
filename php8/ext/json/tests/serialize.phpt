@@ -17,7 +17,7 @@ class NonSerializingTest
 
 class SerializingTest extends NonSerializingTest implements JsonSerializable
 {
-    public function jsonSerialize(): mixed
+    public function jsonSerialize()
     {
         return $this->data;
     }
@@ -25,7 +25,7 @@ class SerializingTest extends NonSerializingTest implements JsonSerializable
 
 class ValueSerializingTest extends SerializingTest
 {
-    public function jsonSerialize(): mixed
+    public function jsonSerialize()
     {
         return array_values(is_array($this->data) ? $this->data : get_object_vars($this->data));
     }
@@ -33,7 +33,7 @@ class ValueSerializingTest extends SerializingTest
 
 class SelfSerializingTest extends SerializingTest
 {
-    public function jsonSerialize(): mixed
+    public function jsonSerialize()
     {
         return $this;
     }

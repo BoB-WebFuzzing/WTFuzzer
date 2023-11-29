@@ -1,7 +1,9 @@
 --TEST--
 Bug #73333 (2147483647 is fetched as string)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded('sqlite3')) die('skip sqlite3 extension not available');
+?>
 --FILE--
 <?php
 if (!defined('PHP_INT_MIN')) define('PHP_INT_MIN', -PHP_INT_MAX-1);

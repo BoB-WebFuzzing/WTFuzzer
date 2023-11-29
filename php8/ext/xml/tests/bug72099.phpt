@@ -1,7 +1,9 @@
 --TEST--
 Bug #72099: xml_parse_into_struct segmentation fault
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+require_once("skipif.inc");
+?>
 --FILE--
 <?php
 $var1=xml_parser_create_ns();

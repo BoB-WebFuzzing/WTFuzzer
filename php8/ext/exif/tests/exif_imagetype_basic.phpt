@@ -1,7 +1,7 @@
 --TEST--
 Check for exif_imagetype default behaviour
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
 --INI--
 output_handler=
 zlib.output_compression=0

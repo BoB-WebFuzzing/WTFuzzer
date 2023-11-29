@@ -6,8 +6,8 @@ echo "*** Testing uniqid() : basic functionality ***\n";
 
 echo "\nuniqid() without a prefix\n";
 var_dump(uniqid());
-var_dump(uniqid('', true));
-var_dump(uniqid('', false));
+var_dump(uniqid(null, true));
+var_dump(uniqid(null, false));
 echo "\n\n";
 
 echo "uniqid() with a prefix\n";
@@ -17,6 +17,7 @@ $prefix = array (
                 99999,
                 "99999",
                 10.5e2,
+                null,
                 true,
                 false
                 );
@@ -51,6 +52,10 @@ string(17) "1050%s"
 string(27) "1050%s.%s"
 string(17) "1050%s"
 
+string(13) "%s"
+string(23) "%s.%s"
+string(13) "%s"
+
 string(14) "1%s"
 string(24) "1%s.%s"
 string(14) "1%s"
@@ -58,3 +63,4 @@ string(14) "1%s"
 string(13) "%s"
 string(23) "%s.%s"
 string(13) "%s"
+

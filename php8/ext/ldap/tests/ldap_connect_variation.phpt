@@ -3,8 +3,8 @@ ldap_connect() - Variation
 --CREDITS--
 Patrick Allaert <patrickallaert@php.net>
 # Belgian PHP Testfest 2009
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require "connect.inc";
@@ -30,13 +30,8 @@ $link = ldap_connect("nonexistent" . $host);
 var_dump($link);
 ?>
 --EXPECTF--
-object(LDAP\Connection)#%d (0) {
-}
-object(LDAP\Connection)#%d (0) {
-}
-object(LDAP\Connection)#%d (0) {
-}
-object(LDAP\Connection)#%d (0) {
-}
-object(LDAP\Connection)#%d (0) {
-}
+resource(%d) of type (ldap link)
+resource(%d) of type (ldap link)
+resource(%d) of type (ldap link)
+resource(%d) of type (ldap link)
+resource(%d) of type (ldap link)

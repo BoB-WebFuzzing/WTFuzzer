@@ -1,7 +1,7 @@
 --TEST--
 Inlining of functions with ref arguments
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

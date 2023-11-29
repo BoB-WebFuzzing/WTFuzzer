@@ -23,7 +23,7 @@ class MyRegexIterator extends RegexIterator
         }
     }
 
-    function accept(): bool
+    function accept()
     {
         @preg_match_all($this->re, (string)($this->uk ? $this->key() : $this->current()), $sub);
         $ret = parent::accept();

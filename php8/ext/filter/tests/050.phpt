@@ -1,7 +1,7 @@
 --TEST--
 filter_var() and double overflow/underflow
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 $test = array(

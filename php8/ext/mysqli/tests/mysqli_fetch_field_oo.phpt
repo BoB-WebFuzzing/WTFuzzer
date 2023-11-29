@@ -1,9 +1,8 @@
 --TEST--
 mysqli_fetch_field()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -42,6 +41,10 @@ require_once('skipifconnectfailure.inc');
     if ($tmp->charsetnr != $charsetInfo->number) {
         printf("[005] Expecting charset %s/%d got %d\n",
             $charsetInfo->charset, $charsetInfo->number, $tmp->charsetnr);
+    }
+    if ($tmp->length != $charsetInfo->max_length) {
+        printf("[006] Expecting length %d got %d\n",
+            $charsetInfo->max_length, $tmp->max_length);
     }
     if ($tmp->db != $db) {
         printf("[007] Expecting database '%s' got '%s'\n",
@@ -83,7 +86,7 @@ object(stdClass)#%d (13) {
   ["catalog"]=>
   string(%d) "%s"
   ["max_length"]=>
-  int(0)
+  int(1)
   ["length"]=>
   int(11)
   ["charsetnr"]=>

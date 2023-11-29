@@ -35,9 +35,7 @@ Class [ <internal%s> class Directory ] {
   - Static methods [0] {
   }
 
-  - Properties [2] {
-    Property [ public readonly string $path ]
-    Property [ public readonly mixed $handle ]
+  - Properties [0] {
   }
 
   - Methods [3] {
@@ -45,29 +43,22 @@ Class [ <internal%s> class Directory ] {
 
       - Parameters [0] {
       }
-      - Tentative return [ void ]
     }
 
     Method [ <internal:standard> public method rewind ] {
 
       - Parameters [0] {
       }
-      - Tentative return [ void ]
     }
 
     Method [ <internal:standard> public method read ] {
 
       - Parameters [0] {
       }
-      - Tentative return [ string|false ]
     }
   }
 }
 Cannot instantiate a valid Directory directly:
 object(Directory)#%d (0) {
-  ["path"]=>
-  uninitialized(string)
-  ["handle"]=>
-  uninitialized(mixed)
 }
 Unable to find my handle property

@@ -1,8 +1,10 @@
 --TEST--
 Bug #79177 (FFI doesn't handle well PHP exceptions within callback)
---EXTENSIONS--
-ffi
-zend_test
+--SKIPIF--
+<?php
+if (!extension_loaded('ffi')) die('skip ffi extension not available');
+if (!extension_loaded('zend-test')) die('skip zend-test extension not available');
+?>
 --FILE--
 <?php
 require_once __DIR__ . '/utils.inc';

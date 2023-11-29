@@ -1,9 +1,8 @@
 --TEST--
 GH-8058 (NULL pointer dereference in mysqlnd package (#81706))
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once 'skipif.inc';
 require_once 'skipifconnectfailure.inc';
 ?>
 --FILE--

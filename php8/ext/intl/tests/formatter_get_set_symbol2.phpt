@@ -1,8 +1,7 @@
 --TEST--
 numfmt_get/set_symbol() icu >= 4.8
---EXTENSIONS--
-intl
 --SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip intl extension not loaded'; ?>
 <?php if (PHP_INT_SIZE != 8) die('skip 64-bit only'); ?>
 --FILE--
 <?php

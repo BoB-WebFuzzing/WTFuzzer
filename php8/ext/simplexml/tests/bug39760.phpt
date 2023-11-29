@@ -1,7 +1,7 @@
 --TEST--
 Bug #39760 (cloning fails on nested SimpleXML-Object)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip simplexml extension is not loaded"; ?>
 --FILE--
 <?php
 

@@ -1,7 +1,5 @@
 --TEST--
 a script should not be able to modify session.use_trans_sid
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -16,7 +14,7 @@ session.save_handler=files
 <?php
 error_reporting(E_ALL);
 
-session_id("test014");
+session_id("abtest");
 session_start();
 
 ?>

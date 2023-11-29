@@ -22,6 +22,7 @@ $names_arr = array(
   -1,
   TRUE,
   FALSE,
+  NULL,
   "",
   " ",
   //this one also generates a java message rather than our own so we don't replicate php message
@@ -63,16 +64,18 @@ ValueError: Path cannot be empty
 -- Iteration 3 --
 ValueError: Path cannot be empty
 -- Iteration 4 --
-9 bytes written to: ' '
+ValueError: Path cannot be empty
 -- Iteration 5 --
-ValueError: file_put_contents(): Argument #1 ($filename) must not contain any null bytes
+9 bytes written to: ' '
 -- Iteration 6 --
-TypeError: file_put_contents(): Argument #1 ($filename) must be of type string, array given
+ValueError: file_put_contents(): Argument #1 ($filename) must not contain any null bytes
 -- Iteration 7 --
+TypeError: file_put_contents(): Argument #1 ($filename) must be of type string, array given
+-- Iteration 8 --
 
 Warning: file_put_contents(%sdir): Failed to open stream: %s in %s on line %d
 Failed to write data to: '%sir'
--- Iteration 8 --
+-- Iteration 9 --
 
 Warning: file_put_contents(%sphp): Failed to open stream: %s in %s on line %d
 Failed to write data to: '%sphp'

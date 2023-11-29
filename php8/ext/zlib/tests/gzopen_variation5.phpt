@@ -1,7 +1,11 @@
 --TEST--
 Test gzopen() function : variation: use include path and stream context create a file, relative path
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 require_once('gzopen_include_path.inc');

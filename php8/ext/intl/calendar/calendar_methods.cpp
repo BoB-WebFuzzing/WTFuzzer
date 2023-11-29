@@ -3,7 +3,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -115,11 +115,11 @@ public:
 		uenum_close(uenum);
 	}
 
-	int32_t count(UErrorCode& status) const override {
+	int32_t count(UErrorCode& status) const {
 		return uenum_count(uenum, &status);
 	}
 
-	const UnicodeString* snext(UErrorCode& status) override
+	virtual const UnicodeString* snext(UErrorCode& status)
 	{
 		int32_t length;
 		const UChar* str = uenum_unext(uenum, &length, &status);
@@ -129,7 +129,7 @@ public:
 		return &unistr.setTo(str, length);
 	}
 
-	const char* next(int32_t *resultLength, UErrorCode &status) override
+	virtual const char* next(int32_t *resultLength, UErrorCode &status)
 	{
 		int32_t length = -1;
 		const char* str = uenum_next(uenum, &length, &status);
@@ -144,12 +144,12 @@ public:
 		return str;
 	}
 
-	void reset(UErrorCode& status) override
+	void reset(UErrorCode& status)
 	{
 		uenum_reset(uenum, &status);
 	}
 
-	UClassID getDynamicClassID() const override;
+	virtual UClassID getDynamicClassID() const;
 
 	static UClassID U_EXPORT2 getStaticClassID();
 
@@ -165,7 +165,7 @@ U_CFUNC PHP_FUNCTION(intlcal_get_keyword_values_for_locale)
 				*locale;
 	size_t			key_len,
 				locale_len;
-	bool	commonly_used;
+	zend_bool	commonly_used;
 	intl_error_reset(NULL);
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ssb",
@@ -405,6 +405,7 @@ U_CFUNC PHP_FUNCTION(intlcal_set)
 		co->ucal->set((int32_t)args[0], (int32_t)args[1], (int32_t)args[2], (int32_t)args[3], (int32_t)args[4], (int32_t)args[5]);
 	}
 
+	// TODO Make void?
 	RETURN_TRUE;
 }
 
@@ -424,7 +425,6 @@ U_CFUNC PHP_FUNCTION(intlcal_roll)
 
 	if (Z_TYPE_P(zvalue) == IS_FALSE || Z_TYPE_P(zvalue) == IS_TRUE) {
 		value = Z_TYPE_P(zvalue) == IS_TRUE ? 1 : -1;
-		php_error_docref(NULL, E_DEPRECATED, "Passing bool is deprecated, use 1 or -1 instead");
 	} else {
 		value = zval_get_long(zvalue);
 		ZEND_VALUE_ERROR_OUT_OF_BOUND_VALUE(value, 3);
@@ -440,7 +440,7 @@ U_CFUNC PHP_FUNCTION(intlcal_roll)
 U_CFUNC PHP_FUNCTION(intlcal_clear)
 {
 	zend_long field;
-	bool field_is_null = 1;
+	zend_bool field_is_null = 1;
 	CALENDAR_METHOD_INIT_VARS;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(),
@@ -614,7 +614,7 @@ U_CFUNC PHP_FUNCTION(intlcal_get_minimal_days_in_first_week)
 
 	uint8_t result = co->ucal->getMinimalDaysInFirstWeek();
 	INTL_METHOD_CHECK_STATUS(co,
-		"intlcal_get_first_day_of_week: Call to ICU method has failed"); /* TODO Is it really a failure? */
+		"intlcal_get_first_day_of_week: Call to ICU method has failed");
 
 	RETURN_LONG((zend_long)result);
 }
@@ -757,7 +757,7 @@ U_CFUNC PHP_FUNCTION(intlcal_is_set)
 U_CFUNC PHP_FUNCTION(intlcal_is_weekend)
 {
 	double date;
-	bool date_is_null = 1;
+	zend_bool date_is_null = 1;
 	CALENDAR_METHOD_INIT_VARS;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(),
@@ -799,7 +799,7 @@ U_CFUNC PHP_FUNCTION(intlcal_set_first_day_of_week)
 
 U_CFUNC PHP_FUNCTION(intlcal_set_lenient)
 {
-	bool is_lenient;
+	zend_bool is_lenient;
 	CALENDAR_METHOD_INIT_VARS;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(),
@@ -910,6 +910,7 @@ U_CFUNC PHP_FUNCTION(intlcal_set_repeated_wall_time_option)
 
 	co->ucal->setRepeatedWallTimeOption((UCalendarWallTimeOption)option);
 
+	// TODO Return void?
 	RETURN_TRUE;
 }
 
@@ -934,6 +935,7 @@ U_CFUNC PHP_FUNCTION(intlcal_set_skipped_wall_time_option)
 
 	co->ucal->setSkippedWallTimeOption((UCalendarWallTimeOption)option);
 
+	// TODO Return void?
 	RETURN_TRUE;
 }
 

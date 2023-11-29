@@ -1,7 +1,7 @@
 --TEST--
 Bug #71020 (Use after free in Collator::sortWithSortKeys)
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

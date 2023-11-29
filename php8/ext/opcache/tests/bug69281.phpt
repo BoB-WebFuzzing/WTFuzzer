@@ -6,8 +6,8 @@ opcache.enable_cli=1
 opcache.file_update_protection=0
 opcache.validate_timestamps=0
 opcache.file_cache_only=0
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 var_dump(opcache_is_script_cached(__FILE__));

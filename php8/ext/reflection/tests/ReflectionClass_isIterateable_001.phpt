@@ -10,14 +10,14 @@ Interface ExtendsIterator extends Iterator {
 Interface ExtendsIteratorAggregate extends IteratorAggregate {
 }
 Class IteratorImpl implements Iterator {
-    public function next(): void {}
-    public function key(): mixed {}
-    public function rewind(): void {}
-    public function current(): mixed {}
-    public function valid(): bool {}
+    public function next() {}
+    public function key() {}
+    public function rewind() {}
+    public function current() {}
+    public function valid() {}
 }
 Class IteratorAggregateImpl implements IteratorAggregate {
-    public function getIterator(): Traversable {}
+    public function getIterator() {}
 }
 Class ExtendsIteratorImpl extends IteratorImpl {
 }

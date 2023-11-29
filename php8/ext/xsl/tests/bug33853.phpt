@@ -1,7 +1,9 @@
 --TEST--
 Bug #33853 (php:function call __autoload with lowercase param)
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+if (!extension_loaded('xsl')) die('skip xsl not loaded');
+?>
 --FILE--
 <?php
 

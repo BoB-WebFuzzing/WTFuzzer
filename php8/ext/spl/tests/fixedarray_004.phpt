@@ -7,10 +7,10 @@ $a = new SplFixedArray(10);
 
 try {
     $a[] = 1;
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
+} catch (Exception $e) {
+    var_dump($e->getMessage());
 }
 
 ?>
 --EXPECT--
-[] operator not supported for SplFixedArray
+string(29) "Index invalid or out of range"

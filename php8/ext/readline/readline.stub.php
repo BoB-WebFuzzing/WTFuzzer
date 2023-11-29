@@ -1,16 +1,13 @@
 <?php
 
-/** @generate-class-entries */
-
-/**
- * @var string
- * @cvalue READLINE_LIB
- */
-const READLINE_LIB = UNKNOWN;
+/** @generate-function-entries */
 
 function readline(?string $prompt = null): string|false {}
 
-/** @param int|string|bool|null $value */
+/**
+ * @param int|string|bool|null $value
+ * @return array|int|string|bool|null
+ */
 function readline_info(?string $var_name = null, $value = null): mixed {}
 
 function readline_add_history(string $prompt): bool {}
@@ -18,10 +15,6 @@ function readline_add_history(string $prompt): bool {}
 function readline_clear_history(): bool {}
 
 #ifdef HAVE_HISTORY_LIST
-/**
- * @return array<int, string>
- * @refcount 1
- */
 function readline_list_history(): array {}
 #endif
 

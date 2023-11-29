@@ -4,10 +4,9 @@ ldap_search() test
 Davide Mendolia <idaf1er@gmail.com>
 Patrick Allaert <patrickallaert@php.net>
 Belgian PHP Testfest 2009
---EXTENSIONS--
-ldap
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifbindfailure.inc');
 ?>
 --FILE--
@@ -37,8 +36,7 @@ $link = ldap_connect_and_bind($host, $port, $user, $passwd, $protocol_version);
 remove_dummy_data($link, $base);
 ?>
 --EXPECTF--
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(4) {
   ["count"]=>
   int(3)
@@ -87,8 +85,7 @@ array(4) {
 }
 
 Warning: ldap_search(): Partial search results returned: Sizelimit exceeded in %s on line %d
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(2) {
   ["count"]=>
   int(1)

@@ -3,8 +3,8 @@ Test curl_multi_select()
 --CREDITS--
 Ivo Jansch <ivo@ibuildings.com>
 #testfest Utrecht 2009
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php if (!extension_loaded("curl")) print "skip"; ?>
 --FILE--
 <?php
 

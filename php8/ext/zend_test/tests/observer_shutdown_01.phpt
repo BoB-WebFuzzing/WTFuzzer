@@ -1,7 +1,7 @@
 --TEST--
 Observer: Function calls from a shutdown handler are observable
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip: zend-test extension required'); ?>
 --INI--
 zend_test.observer.enabled=1
 zend_test.observer.observe_all=1
@@ -24,16 +24,13 @@ function foo() {
 echo 'Done: ' . bar(40) . PHP_EOL;
 ?>
 --EXPECTF--
-<!-- init '%s' -->
-<file '%s'>
-  <!-- init register_shutdown_function() -->
-  <register_shutdown_function>
-  </register_shutdown_function:NULL>
+<!-- init '%s%eobserver_shutdown_%d.php' -->
+<file '%s%eobserver_shutdown_%d.php'>
   <!-- init bar() -->
   <bar>
   </bar:40>
 Done: 40
-</file '%s'>
+</file '%s%eobserver_shutdown_%d.php'>
 <!-- init {closure}() -->
 <{closure}>
   <!-- init foo() -->

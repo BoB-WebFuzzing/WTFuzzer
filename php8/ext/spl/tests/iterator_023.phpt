@@ -5,13 +5,13 @@ SPL: RecursiveIteratorIterator and catch getChildren
 
 class MyRecursiveArrayIterator extends RecursiveArrayIterator
 {
-    function getChildren(): ?RecursiveArrayIterator
+    function getChildren()
     {
         echo __METHOD__ . "\n";
         return $this->current();
     }
 
-    function valid(): bool
+    function valid()
     {
         if (!parent::valid())
         {
@@ -37,14 +37,14 @@ class RecursiveArrayIteratorIterator extends RecursiveIteratorIterator
         parent::__construct($it, RecursiveIteratorIterator::LEAVES_ONLY, RecursiveIteratorIterator::CATCH_GET_CHILD);
     }
 
-    function rewind(): void
+    function rewind()
     {
         echo __METHOD__ . "\n";
         $this->skip = false;
         parent::rewind();
     }
 
-    function valid(): bool
+    function valid()
     {
         echo __METHOD__ . "\n";
         if ($this->skip)
@@ -55,25 +55,25 @@ class RecursiveArrayIteratorIterator extends RecursiveIteratorIterator
         return parent::valid();
     }
 
-    function current(): mixed
+    function current()
     {
         echo __METHOD__ . "\n";
         return parent::current();
     }
 
-    function key(): int
+    function key()
     {
         echo __METHOD__ . "\n";
         return parent::key();
     }
 
-    function next(): void
+    function next()
     {
         echo __METHOD__ . "\n";
         parent::next();
     }
 
-    function callHasChildren(): bool
+    function callHasChildren()
     {
         $this->skip = false;
         $has = parent::callHasChildren();
@@ -89,7 +89,7 @@ class RecursiveArrayIteratorIterator extends RecursiveIteratorIterator
         return $res;
     }
 
-    function callGetChildren(): MyRecursiveArrayIterator
+    function callGetChildren()
     {
         if ($this->over == 2)
         {
@@ -100,12 +100,12 @@ class RecursiveArrayIteratorIterator extends RecursiveIteratorIterator
         return new MyRecursiveArrayIterator($this->current());
     }
 
-    function beginChildren(): void
+    function beginChildren()
     {
         echo __METHOD__ . "(".$this->getDepth().")\n";
     }
 
-    function endChildren(): void
+    function endChildren()
     {
         echo __METHOD__ . "(".$this->getDepth().")\n";
     }

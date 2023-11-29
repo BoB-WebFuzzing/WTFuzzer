@@ -1,7 +1,5 @@
 --TEST--
 Bug #37706 (Test LOB locator reuse. Extends simple test of lob_037.phpt)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs

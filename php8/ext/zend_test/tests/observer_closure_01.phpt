@@ -1,7 +1,7 @@
 --TEST--
 Observer: Basic observability of closures
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip: zend-test extension required'); ?>
 --INI--
 zend_test.observer.enabled=1
 zend_test.observer.observe_all=1
@@ -23,41 +23,27 @@ $foo($bar);
 echo 'DONE' . PHP_EOL;
 ?>
 --EXPECTF--
-<!-- init '%s' -->
-<file '%s'>
+<!-- init '%s%eobserver_closure_%d.php' -->
+<file '%s%eobserver_closure_%d.php'>
   <!-- init {closure}() -->
   <{closure}>
 Answer
     <!-- init {closure}() -->
     <{closure}>
-      <!-- init array_sum() -->
-      <array_sum>
-      </array_sum>
-      <!-- init var_dump() -->
-      <var_dump>
 int(42)
-      </var_dump>
     </{closure}>
   </{closure}>
   <{closure}>
 Answer
     <{closure}>
-      <array_sum>
-      </array_sum>
-      <var_dump>
 int(42)
-      </var_dump>
     </{closure}>
   </{closure}>
   <{closure}>
 Answer
     <{closure}>
-      <array_sum>
-      </array_sum>
-      <var_dump>
 int(42)
-      </var_dump>
     </{closure}>
   </{closure}>
 DONE
-</file '%s'>
+</file '%s%eobserver_closure_%d.php'>

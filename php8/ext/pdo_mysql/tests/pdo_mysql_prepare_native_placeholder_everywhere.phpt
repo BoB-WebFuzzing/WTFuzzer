@@ -1,9 +1,8 @@
 --TEST--
 MySQL PDO->prepare(),native PS, anonymous placeholder
---EXTENSIONS--
-pdo_mysql
 --SKIPIF--
 <?php
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'skipif.inc');
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
 MySQLPDOTest::skip();
 $db = MySQLPDOTest::factory();
@@ -12,8 +11,6 @@ $db = MySQLPDOTest::factory();
 <?php
     require_once(__DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
     $db = MySQLPDOTest::factory();
-    $db->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
-
     try {
         $db->setAttribute(PDO::MYSQL_ATTR_DIRECT_QUERY, 1);
         if (1 != $db->getAttribute(PDO::MYSQL_ATTR_DIRECT_QUERY))
@@ -44,7 +41,16 @@ $db = MySQLPDOTest::factory();
                 var_export($stmt->errorCode(), true),
                 var_export($stmt->errorInfo(), true));
 
-        var_dump($stmt->fetchAll(PDO::FETCH_ASSOC));
+        $tmp = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (!MySQLPDOTest::isPDOMySQLnd()) {
+            if (isset($tmp[0]['id'])) {
+                // libmysql should return a string here whereas mysqlnd returns a native int
+                if (gettype($tmp[0]['id']) == 'string')
+                    // convert to int for the test output...
+                    settype($tmp[0]['id'], 'integer');
+            }
+        }
+        var_dump($tmp);
 
     } catch (PDOException $e) {
         printf("[001] %s [%s] %s\n",
@@ -76,7 +82,7 @@ array(1) {
     ["?"]=>
     string(2) "id"
     ["id"]=>
-    string(1) "1"
+    int(1)
     ["label"]=>
     string(4) "row1"
   }

@@ -2,8 +2,12 @@
 mixed socket_getopt( resource $socket , int $level , int $optname ) ;
 --CREDITS--
 marcosptf - <marcosptf@yahoo.com.br> - #phparty7 - @phpsp - novatec/2015 - sao paulo - br
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+if (!extension_loaded('sockets')) {
+  die('skip sockets extension not available.');
+}
+?>
 --FILE--
 <?php
 $domain = AF_INET;
@@ -40,6 +44,14 @@ var_dump($r);
 $r = socket_getopt($s, $level, IP_MULTICAST_IF);
 var_dump($r);
 echo "\n";
+?>
+--CLEAN--
+<?php
+unset($domain);
+unset($level);
+socket_close($s);
+unset($s);
+unset($r");
 ?>
 --EXPECT--
 Setting IP_MULTICAST_TTL

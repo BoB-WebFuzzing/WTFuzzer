@@ -1,7 +1,7 @@
 --TEST--
 Phar: phar:// file_get_contents
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 --FILE--

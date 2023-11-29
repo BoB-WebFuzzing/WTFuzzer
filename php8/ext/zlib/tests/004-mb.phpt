@@ -1,7 +1,7 @@
 --TEST--
 gzfile() with various invalid params
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("zlib")) print "skip"; ?>
 --FILE--
 <?php
 

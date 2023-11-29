@@ -1,12 +1,10 @@
 --TEST--
 Test getimagesize() function : basic functionality for shockwave-flash
---EXTENSIONS--
-zlib
 --SKIPIF--
 <?php
-if (!defined("IMAGETYPE_SWC")) {
-    die("skip IMAGETYPE_SWC is not available");
-}
+    if (!defined("IMAGETYPE_SWC") || !extension_loaded('zlib')) {
+        die("skip zlib extension is not available or SWC not supported");
+    }
 ?>
 --FILE--
 <?php

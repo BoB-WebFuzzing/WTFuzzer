@@ -4,8 +4,6 @@ Bug #60634 (Segmentation fault when trying to die() in SessionHandler::write()) 
 session.save_path=
 session.name=PHPSESSID
 session.save_handler=files
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -31,7 +29,7 @@ function write($id, $session_data) {
     undefined_function();
 }
 
-function destroy($id): bool {
+function destroy($id) {
     return true;
 }
 
@@ -52,4 +50,4 @@ Stack trace:
 #1 {main}
   thrown in %s on line %d
 
-Warning: PHP Request Shutdown: Cannot call session save handler in a recursive manner in Unknown on line 0
+Warning: Unknown: Cannot call session save handler in a recursive manner in Unknown on line 0

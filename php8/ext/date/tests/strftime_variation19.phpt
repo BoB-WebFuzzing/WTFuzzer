@@ -24,23 +24,15 @@ foreach($inputs as $key =>$value) {
 }
 
 ?>
---EXPECTF--
+--EXPECT--
 *** Testing strftime() : usage variation ***
 
 --Newline character--
-
-Deprecated: Function strftime() is deprecated in %s on line %d
 string(1) "
 "
-
-Deprecated: Function strftime() is deprecated in %s on line %d
 string(1) "
 "
 
 --Tab character--
-
-Deprecated: Function strftime() is deprecated in %s on line %d
 string(1) "	"
-
-Deprecated: Function strftime() is deprecated in %s on line %d
 string(1) "	"

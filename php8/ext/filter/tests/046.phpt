@@ -1,7 +1,7 @@
 --TEST--
 Integer overflow
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 $max = sprintf("%d", PHP_INT_MAX);

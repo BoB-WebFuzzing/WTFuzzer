@@ -40,10 +40,8 @@ if (is_uploaded_file($_FILES["file4"]["tmp_name"])) {
 --EXPECTF--
 array(4) {
   ["file2"]=>
-  array(6) {
+  array(5) {
     ["name"]=>
-    string(0) ""
-    ["full_path"]=>
     string(0) ""
     ["type"]=>
     string(0) ""
@@ -55,10 +53,8 @@ array(4) {
     int(0)
   }
   ["file3"]=>
-  array(6) {
+  array(5) {
     ["name"]=>
-    string(0) ""
-    ["full_path"]=>
     string(0) ""
     ["type"]=>
     string(0) ""
@@ -70,10 +66,8 @@ array(4) {
     int(0)
   }
   ["file4"]=>
-  array(6) {
+  array(5) {
     ["name"]=>
-    string(9) "file4.txt"
-    ["full_path"]=>
     string(9) "file4.txt"
     ["type"]=>
     string(15) "text/plain-file"
@@ -85,10 +79,8 @@ array(4) {
     int(0)
   }
   ["file1"]=>
-  array(6) {
+  array(5) {
     ["name"]=>
-    string(9) "file1.txt"
-    ["full_path"]=>
     string(9) "file1.txt"
     ["type"]=>
     string(15) "text/plain-file"

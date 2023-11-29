@@ -1,7 +1,7 @@
 --TEST--
 SOAP Interop Round2 groupB 004 (soap/direct): echoNestedStruct
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--

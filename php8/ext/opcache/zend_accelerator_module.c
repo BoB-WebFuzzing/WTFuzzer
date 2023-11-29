@@ -7,7 +7,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -40,7 +40,6 @@
 #define STRING_NOT_NULL(s) (NULL == (s)?"":s)
 #define MIN_ACCEL_FILES 200
 #define MAX_ACCEL_FILES 1000000
-#define MAX_INTERNED_STRINGS_BUFFER_SIZE ((zend_long)((UINT32_MAX-PLATFORM_ALIGNMENT-sizeof(zend_accel_shared_globals))/(1024*1024)))
 #define TOKENTOSTR(X) #X
 
 static zif_handler orig_file_exists = NULL;
@@ -71,30 +70,11 @@ static ZEND_INI_MH(OnUpdateMemoryConsumption)
 		zend_accel_error(ACCEL_LOG_WARNING, "opcache.memory_consumption is set below the required 8MB.\n");
 		return FAILURE;
 	}
-	if (UNEXPECTED(memsize > ZEND_LONG_MAX / (1024 * 1024))) {
-		*p = ZEND_LONG_MAX & ~(1024 * 1024 - 1);
+	if (UNEXPECTED(memsize > ZEND_ULONG_MAX / (1024 * 1024))) {
+		*p = ZEND_ULONG_MAX;
 	} else {
 		*p = memsize * (1024 * 1024);
 	}
-	return SUCCESS;
-}
-
-static ZEND_INI_MH(OnUpdateInternedStringsBuffer)
-{
-	zend_long *p = (zend_long *) ZEND_INI_GET_ADDR();
-	zend_long size = zend_ini_parse_quantity_warn(new_value, entry->name);
-
-	if (size < 0) {
-		zend_accel_error(ACCEL_LOG_WARNING, "opcache.interned_strings_buffer must be greater than or equal to 0, " ZEND_LONG_FMT " given.\n", size);
-		return FAILURE;
-	}
-	if (size > MAX_INTERNED_STRINGS_BUFFER_SIZE) {
-		zend_accel_error(ACCEL_LOG_WARNING, "opcache.interned_strings_buffer must be less than or equal to " ZEND_LONG_FMT ", " ZEND_LONG_FMT " given.\n", MAX_INTERNED_STRINGS_BUFFER_SIZE, size);
-		return FAILURE;
-	}
-
-	*p = size;
-
 	return SUCCESS;
 }
 
@@ -128,19 +108,6 @@ static ZEND_INI_MH(OnUpdateMaxWastedPercentage)
 	return SUCCESS;
 }
 
-static ZEND_INI_MH(OnUpdateConsistencyChecks)
-{
-	zend_long *p = (zend_long *) ZEND_INI_GET_ADDR();
-	zend_long consistency_checks = atoi(ZSTR_VAL(new_value));
-
-	if (consistency_checks != 0) {
-		zend_accel_error(ACCEL_LOG_WARNING, "opcache.consistency_checks is reset back to 0 because it does not work properly (see GH-8065, GH-10624).\n");
-		return FAILURE;
-	}
-	*p = 0;
-	return SUCCESS;
-}
-
 static ZEND_INI_MH(OnEnable)
 {
 	if (stage == ZEND_INI_STAGE_STARTUP ||
@@ -149,8 +116,11 @@ static ZEND_INI_MH(OnEnable)
 		return OnUpdateBool(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage);
 	} else {
 		/* It may be only temporary disabled */
-		bool *p = (bool *) ZEND_INI_GET_ADDR();
-		if (zend_ini_parse_bool(new_value)) {
+		zend_bool *p = (zend_bool *) ZEND_INI_GET_ADDR();
+		if ((ZSTR_LEN(new_value) == 2 && strcasecmp("on", ZSTR_VAL(new_value)) == 0) ||
+		    (ZSTR_LEN(new_value) == 3 && strcasecmp("yes", ZSTR_VAL(new_value)) == 0) ||
+		    (ZSTR_LEN(new_value) == 4 && strcasecmp("true", ZSTR_VAL(new_value)) == 0) ||
+			atoi(ZSTR_VAL(new_value)) != 0) {
 			zend_error(E_WARNING, ACCELERATOR_PRODUCT_NAME " can't be temporary enabled (it may be only disabled till the end of request)");
 			return FAILURE;
 		} else {
@@ -167,7 +137,7 @@ static ZEND_INI_MH(OnUpdateFileCache)
 		if (!ZSTR_LEN(new_value)) {
 			new_value = NULL;
 		} else {
-			zend_stat_t buf = {0};
+			zend_stat_t buf;
 
 		    if (!IS_ABSOLUTE_PATH(ZSTR_VAL(new_value), ZSTR_LEN(new_value)) ||
 			    zend_stat(ZSTR_VAL(new_value), &buf) != 0 ||
@@ -198,7 +168,7 @@ static ZEND_INI_MH(OnUpdateJit)
 static ZEND_INI_MH(OnUpdateJitDebug)
 {
 	zend_long *p = (zend_long *) ZEND_INI_GET_ADDR();
-	zend_long val = zend_ini_parse_quantity_warn(new_value, entry->name);
+	zend_long val = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
 
 	if (zend_jit_debug_config(*p, val, stage) == SUCCESS) {
 		*p = val;
@@ -209,19 +179,19 @@ static ZEND_INI_MH(OnUpdateJitDebug)
 
 static ZEND_INI_MH(OnUpdateCounter)
 {
-	zend_long val = zend_ini_parse_quantity_warn(new_value, entry->name);
+	zend_long val = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
 	if (val >= 0 && val < 256) {
 		zend_long *p = (zend_long *) ZEND_INI_GET_ADDR();
 		*p = val;
 		return SUCCESS;
 	}
-	zend_error(E_WARNING, "Invalid \"%s\" setting; using default value instead. Should be between 0 and 255", ZSTR_VAL(entry->name));
+	zend_error(E_WARNING, "Invalid \"%s\" setting. Should be between 0 and 256", ZSTR_VAL(entry->name));
 	return FAILURE;
 }
 
 static ZEND_INI_MH(OnUpdateUnrollC)
 {
-	zend_long val = zend_ini_parse_quantity_warn(new_value, entry->name);
+	zend_long val = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
 	if (val > 0 && val < ZEND_JIT_TRACE_MAX_CALL_DEPTH) {
 		zend_long *p = (zend_long *) ZEND_INI_GET_ADDR();
 		*p = val;
@@ -234,7 +204,7 @@ static ZEND_INI_MH(OnUpdateUnrollC)
 
 static ZEND_INI_MH(OnUpdateUnrollR)
 {
-	zend_long val = zend_ini_parse_quantity_warn(new_value, entry->name);
+	zend_long val = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
 	if (val >= 0 && val < ZEND_JIT_TRACE_MAX_RET_DEPTH) {
 		zend_long *p = (zend_long *) ZEND_INI_GET_ADDR();
 		*p = val;
@@ -247,7 +217,7 @@ static ZEND_INI_MH(OnUpdateUnrollR)
 
 static ZEND_INI_MH(OnUpdateUnrollL)
 {
-	zend_long val = zend_ini_parse_quantity_warn(new_value, entry->name);
+	zend_long val = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
 	if (val > 0 && val < ZEND_JIT_TRACE_MAX_LOOPS_UNROLL) {
 		zend_long *p = (zend_long *) ZEND_INI_GET_ADDR();
 		*p = val;
@@ -272,10 +242,10 @@ ZEND_INI_BEGIN()
 
 	STD_PHP_INI_ENTRY("opcache.log_verbosity_level"   , "1"   , PHP_INI_SYSTEM, OnUpdateLong, accel_directives.log_verbosity_level,       zend_accel_globals, accel_globals)
 	STD_PHP_INI_ENTRY("opcache.memory_consumption"    , "128"  , PHP_INI_SYSTEM, OnUpdateMemoryConsumption,    accel_directives.memory_consumption,        zend_accel_globals, accel_globals)
-	STD_PHP_INI_ENTRY("opcache.interned_strings_buffer", "8"  , PHP_INI_SYSTEM, OnUpdateInternedStringsBuffer,	 accel_directives.interned_strings_buffer,   zend_accel_globals, accel_globals)
+	STD_PHP_INI_ENTRY("opcache.interned_strings_buffer", "8"  , PHP_INI_SYSTEM, OnUpdateLong,                 accel_directives.interned_strings_buffer,   zend_accel_globals, accel_globals)
 	STD_PHP_INI_ENTRY("opcache.max_accelerated_files" , "10000", PHP_INI_SYSTEM, OnUpdateMaxAcceleratedFiles,	 accel_directives.max_accelerated_files,     zend_accel_globals, accel_globals)
 	STD_PHP_INI_ENTRY("opcache.max_wasted_percentage" , "5"   , PHP_INI_SYSTEM, OnUpdateMaxWastedPercentage,	 accel_directives.max_wasted_percentage,     zend_accel_globals, accel_globals)
-	STD_PHP_INI_ENTRY("opcache.consistency_checks"    , "0"   , PHP_INI_ALL   , OnUpdateConsistencyChecks,	     accel_directives.consistency_checks,        zend_accel_globals, accel_globals)
+	STD_PHP_INI_ENTRY("opcache.consistency_checks"    , "0"   , PHP_INI_ALL   , OnUpdateLong,	             accel_directives.consistency_checks,        zend_accel_globals, accel_globals)
 	STD_PHP_INI_ENTRY("opcache.force_restart_timeout" , "180" , PHP_INI_SYSTEM, OnUpdateLong,	             accel_directives.force_restart_timeout,     zend_accel_globals, accel_globals)
 	STD_PHP_INI_ENTRY("opcache.revalidate_freq"       , "2"   , PHP_INI_ALL   , OnUpdateLong,	             accel_directives.revalidate_freq,           zend_accel_globals, accel_globals)
 	STD_PHP_INI_ENTRY("opcache.file_update_protection", "2"   , PHP_INI_ALL   , OnUpdateLong,                accel_directives.file_update_protection,    zend_accel_globals, accel_globals)
@@ -340,21 +310,17 @@ ZEND_INI_END()
 
 static int filename_is_in_cache(zend_string *filename)
 {
-	zend_string *key;
+	char *key;
+	int key_length;
 
-	key = accel_make_persistent_key(filename);
+	key = accel_make_persistent_key(ZSTR_VAL(filename), ZSTR_LEN(filename), &key_length);
 	if (key != NULL) {
-		zend_persistent_script *persistent_script = zend_accel_hash_find(&ZCSG(hash), key);
+		zend_persistent_script *persistent_script = zend_accel_hash_str_find(&ZCSG(hash), key, key_length);
 		if (persistent_script && !persistent_script->corrupted) {
 			if (ZCG(accel_directives).validate_timestamps) {
 				zend_file_handle handle;
-				int ret;
-
-				zend_stream_init_filename_ex(&handle, filename);
-				ret = validate_timestamp_and_record_ex(persistent_script, &handle) == SUCCESS
-					? 1 : 0;
-				zend_destroy_file_handle(&handle);
-				return ret;
+				zend_stream_init_filename(&handle, ZSTR_VAL(filename));
+				return validate_timestamp_and_record_ex(persistent_script, &handle) == SUCCESS;
 			}
 
 			return 1;
@@ -366,14 +332,15 @@ static int filename_is_in_cache(zend_string *filename)
 
 static int accel_file_in_cache(INTERNAL_FUNCTION_PARAMETERS)
 {
-	if (ZEND_NUM_ARGS() == 1) {
-		zval *zv = ZEND_CALL_ARG(execute_data , 1);
+	zval zfilename;
 
-		if (Z_TYPE_P(zv) == IS_STRING && Z_STRLEN_P(zv) != 0) {
-			return filename_is_in_cache(Z_STR_P(zv));
-		}
+	if (ZEND_NUM_ARGS() != 1 ||
+	    zend_get_parameters_array_ex(1, &zfilename) == FAILURE ||
+	    Z_TYPE(zfilename) != IS_STRING ||
+	    Z_STRLEN(zfilename) == 0) {
+		return 0;
 	}
-	return 0;
+	return filename_is_in_cache(Z_STR(zfilename));
 }
 
 static ZEND_NAMED_FUNCTION(accel_file_exists)
@@ -507,7 +474,7 @@ void zend_accel_info(ZEND_MODULE_INFO_FUNC_ARGS)
 			snprintf(buf, sizeof(buf), "%zu", ZSMMG(wasted_shared_memory));
 			php_info_print_table_row(2, "Wasted memory", buf);
 			if (ZCSG(interned_strings).start && ZCSG(interned_strings).end) {
-				snprintf(buf, sizeof(buf), "%zu", (size_t)((char*)ZCSG(interned_strings).top - (char*)(accel_shared_globals + 1)));
+				snprintf(buf, sizeof(buf), "%zu", (size_t)((char*)ZCSG(interned_strings).top - (char*)ZCSG(interned_strings).start));
 				php_info_print_table_row(2, "Interned Strings Used memory", buf);
 				snprintf(buf, sizeof(buf), "%zu", (size_t)((char*)ZCSG(interned_strings).end - (char*)ZCSG(interned_strings).top));
 				php_info_print_table_row(2, "Interned Strings Free memory", buf);
@@ -578,7 +545,7 @@ static int accelerator_get_scripts(zval *return_value)
 
 			array_init(&persistent_script_report);
 			add_assoc_str(&persistent_script_report, "full_path", zend_string_dup(script->script.filename, 0));
-			add_assoc_long(&persistent_script_report, "hits", script->dynamic_members.hits);
+			add_assoc_long(&persistent_script_report, "hits", (zend_long)script->dynamic_members.hits);
 			add_assoc_long(&persistent_script_report, "memory_consumption", script->dynamic_members.memory_consumption);
 			ta = localtime(&script->dynamic_members.last_used);
 			str = asctime(ta);
@@ -592,7 +559,7 @@ static int accelerator_get_scripts(zval *return_value)
 			timerclear(&exec_time);
 			timerclear(&fetch_time);
 
-			zend_hash_update(Z_ARRVAL_P(return_value), cache_entry->key, &persistent_script_report);
+			zend_hash_str_update(Z_ARRVAL_P(return_value), cache_entry->key, cache_entry->key_length, &persistent_script_report);
 		}
 	}
 	accelerator_shm_read_unlock();
@@ -605,7 +572,7 @@ ZEND_FUNCTION(opcache_get_status)
 {
 	zend_long reqs;
 	zval memory_usage, statistics, scripts;
-	bool fetch_scripts = 1;
+	zend_bool fetch_scripts = 1;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|b", &fetch_scripts) == FAILURE) {
 		RETURN_THROWS();
@@ -648,8 +615,8 @@ ZEND_FUNCTION(opcache_get_status)
 		zval interned_strings_usage;
 
 		array_init(&interned_strings_usage);
-		add_assoc_long(&interned_strings_usage, "buffer_size", (char*)ZCSG(interned_strings).end - (char*)(accel_shared_globals + 1));
-		add_assoc_long(&interned_strings_usage, "used_memory", (char*)ZCSG(interned_strings).top - (char*)(accel_shared_globals + 1));
+		add_assoc_long(&interned_strings_usage, "buffer_size", (char*)ZCSG(interned_strings).end - (char*)ZCSG(interned_strings).start);
+		add_assoc_long(&interned_strings_usage, "used_memory", (char*)ZCSG(interned_strings).top - (char*)ZCSG(interned_strings).start);
 		add_assoc_long(&interned_strings_usage, "free_memory", (char*)ZCSG(interned_strings).end - (char*)ZCSG(interned_strings).top);
 		add_assoc_long(&interned_strings_usage, "number_of_strings", ZCSG(interned_strings).nNumOfElements);
 		add_assoc_zval(return_value, "interned_strings_usage", &interned_strings_usage);
@@ -682,7 +649,7 @@ ZEND_FUNCTION(opcache_get_status)
 			zend_op_array *op_array;
 
 			array_init(&scripts);
-			ZEND_HASH_MAP_FOREACH_PTR(&ZCSG(preload_script)->script.function_table, op_array) {
+			ZEND_HASH_FOREACH_PTR(&ZCSG(preload_script)->script.function_table, op_array) {
 				add_next_index_str(&scripts, op_array->function_name);
 			} ZEND_HASH_FOREACH_END();
 			add_assoc_zval(&statistics, "functions", &scripts);
@@ -693,7 +660,7 @@ ZEND_FUNCTION(opcache_get_status)
 			zend_string *key;
 
 			array_init(&scripts);
-			ZEND_HASH_MAP_FOREACH_STR_KEY_PTR(&ZCSG(preload_script)->script.class_table, key, ce) {
+			ZEND_HASH_FOREACH_STR_KEY_PTR(&ZCSG(preload_script)->script.class_table, key, ce) {
 				if (ce->refcount > 1 && !zend_string_equals_ci(key, ce->name)) {
 					add_next_index_str(&scripts, key);
 				} else {
@@ -870,10 +837,11 @@ ZEND_FUNCTION(opcache_reset)
 /* {{{ Invalidates cached script (in necessary or forced) */
 ZEND_FUNCTION(opcache_invalidate)
 {
-	zend_string *script_name;
-	bool force = 0;
+	char *script_name;
+	size_t script_name_len;
+	zend_bool force = 0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S|b", &script_name, &force) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|b", &script_name, &script_name_len, &force) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -881,7 +849,7 @@ ZEND_FUNCTION(opcache_invalidate)
 		RETURN_FALSE;
 	}
 
-	if (zend_accel_invalidate(script_name, force) == SUCCESS) {
+	if (zend_accel_invalidate(script_name, script_name_len, force) == SUCCESS) {
 		RETURN_TRUE;
 	} else {
 		RETURN_FALSE;
@@ -890,13 +858,14 @@ ZEND_FUNCTION(opcache_invalidate)
 
 ZEND_FUNCTION(opcache_compile_file)
 {
-	zend_string *script_name;
+	char *script_name;
+	size_t script_name_len;
 	zend_file_handle handle;
 	zend_op_array *op_array = NULL;
 	zend_execute_data *orig_execute_data = NULL;
 	uint32_t orig_compiler_options;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &script_name) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &script_name, &script_name_len) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -905,7 +874,7 @@ ZEND_FUNCTION(opcache_compile_file)
 		RETURN_FALSE;
 	}
 
-	zend_stream_init_filename_ex(&handle, script_name);
+	zend_stream_init_filename(&handle, script_name);
 
 	orig_execute_data = EG(current_execute_data);
 	orig_compiler_options = CG(compiler_options);
@@ -921,7 +890,7 @@ ZEND_FUNCTION(opcache_compile_file)
 			op_array = persistent_compile_file(&handle, ZEND_INCLUDE);
 		} zend_catch {
 			EG(current_execute_data) = orig_execute_data;
-			zend_error(E_WARNING, ACCELERATOR_PRODUCT_NAME " could not compile file %s", ZSTR_VAL(handle.filename));
+			zend_error(E_WARNING, ACCELERATOR_PRODUCT_NAME " could not compile file %s", handle.filename);
 		} zend_end_try();
 	}
 
@@ -942,9 +911,9 @@ ZEND_FUNCTION(opcache_is_script_cached)
 {
 	zend_string *script_name;
 
-	ZEND_PARSE_PARAMETERS_START(1, 1)
-		Z_PARAM_STR(script_name)
-	ZEND_PARSE_PARAMETERS_END();
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &script_name) == FAILURE) {
+		RETURN_THROWS();
+	}
 
 	if (!validate_api_restriction()) {
 		RETURN_FALSE;

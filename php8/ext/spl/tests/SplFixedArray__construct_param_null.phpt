@@ -10,8 +10,7 @@ $array = new SplFixedArray( NULL );
 print_r( $array );
 
 ?>
---EXPECTF--
-Deprecated: SplFixedArray::__construct(): Passing null to parameter #1 ($size) of type int is deprecated in %s on line %d
+--EXPECT--
 SplFixedArray Object
 (
 )

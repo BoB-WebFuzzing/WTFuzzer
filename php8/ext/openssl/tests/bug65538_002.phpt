@@ -1,9 +1,8 @@
 --TEST--
 Bug #65538: SSL context "cafile" disallows URL stream wrappers
---EXTENSIONS--
-openssl
 --SKIPIF--
 <?php
+if (!extension_loaded('openssl')) die('skip, openssl required');
 if (getenv("SKIP_ONLINE_TESTS")) die("skip online test");
 ?>
 --FILE--

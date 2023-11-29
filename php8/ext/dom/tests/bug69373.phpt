@@ -1,7 +1,7 @@
 --TEST--
 Bug #69373 References to deleted XPath query results
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require 'skipif.inc' ?>
 --FILE--
 <?php
 $doc = new DOMDocument();

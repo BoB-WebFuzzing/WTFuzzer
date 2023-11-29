@@ -105,7 +105,18 @@ object(DateTime)#%d (3) {
   ["timezone"]=>
   string(%d) "%s"
 }
-bool(false)
+array(4) {
+  ["warning_count"]=>
+  int(0)
+  ["warnings"]=>
+  array(0) {
+  }
+  ["error_count"]=>
+  int(0)
+  ["errors"]=>
+  array(0) {
+  }
+}
 
 
 string(7) "Y-m-d +"
@@ -122,7 +133,7 @@ array(4) {
   ["errors"]=>
   array(1) {
     [10]=>
-    string(%d) "Not enough data available to satisfy format"
+    string(12) "Data missing"
   }
 }
 
@@ -137,4 +148,15 @@ object(DateTime)#%d (3) {
   ["timezone"]=>
   string(%d) "%s"
 }
-bool(false)
+array(4) {
+  ["warning_count"]=>
+  int(0)
+  ["warnings"]=>
+  array(0) {
+  }
+  ["error_count"]=>
+  int(0)
+  ["errors"]=>
+  array(0) {
+  }
+}

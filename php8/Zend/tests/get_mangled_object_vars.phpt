@@ -3,7 +3,6 @@ get_mangled_object_vars() function
 --FILE--
 <?php
 
-#[AllowDynamicProperties]
 class A {
     public $pub = 1;
     protected $prot = 2;
@@ -20,7 +19,6 @@ $obj->{"6"} = 6;
 var_export(get_mangled_object_vars($obj));
 echo "\n";
 
-#[AllowDynamicProperties]
 class AO extends ArrayObject {
     private $priv = 1;
 }
@@ -35,10 +33,10 @@ echo "\n";
 ?>
 --EXPECT--
 array (
+  '' . "\0" . 'B' . "\0" . 'priv' => 4,
   'pub' => 1,
   '' . "\0" . '*' . "\0" . 'prot' => 2,
   '' . "\0" . 'A' . "\0" . 'priv' => 3,
-  '' . "\0" . 'B' . "\0" . 'priv' => 4,
   'dyn' => 5,
   6 => 6,
 )

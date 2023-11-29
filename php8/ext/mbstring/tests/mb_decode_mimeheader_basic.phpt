@@ -1,7 +1,10 @@
 --TEST--
 Test mb_decode_mimeheader() function : basic functionality
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_decode_mimeheader') or die("skip mb_decode_mimeheader() is not available in this build");
+?>
 --FILE--
 <?php
 echo "*** Testing mb_decode_mimeheader() : basic functionality ***\n";

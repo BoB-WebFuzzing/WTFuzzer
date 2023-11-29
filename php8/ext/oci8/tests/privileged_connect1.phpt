@@ -1,9 +1,8 @@
 --TEST--
 privileged connect tests
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php 
+if (!extension_loaded('oci8')) die("skip no oci8 extension");
 if (getenv('SKIP_ASAN')) die('skip leaks memory under asan');
 ?>
 --INI--

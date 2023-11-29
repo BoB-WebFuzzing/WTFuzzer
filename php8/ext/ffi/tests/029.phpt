@@ -1,7 +1,7 @@
 --TEST--
 FFI 029: _Alignas
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

@@ -1,7 +1,5 @@
 --TEST--
 session object serialization
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -13,7 +11,6 @@ session.save_handler=files
 <?php
 error_reporting(E_ALL);
 
-#[AllowDynamicProperties]
 class foo {
     public $bar = "ok";
 

@@ -1,7 +1,9 @@
 --TEST--
 Bug #7658 (modify archive with general bit flag 3 set)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 $expect = array(

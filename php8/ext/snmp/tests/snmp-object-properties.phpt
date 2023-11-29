@@ -2,8 +2,6 @@
 OO API: SNMP object properties
 --CREDITS--
 Boris Lytochkin
---EXTENSIONS--
-snmp
 --SKIPIF--
 <?php
 require_once(__DIR__.'/skipif.inc');
@@ -158,8 +156,6 @@ object(SNMP)#%d (%d) {
 bool(true)
 bool(true)
 bool(false)
-
-Deprecated: Creation of dynamic property SNMP::$123 is deprecated in %s on line %d
 object(SNMP)#%d (%d) {
   ["info"]=>
   array(3) {
@@ -196,5 +192,5 @@ NULL
 bool(false)
 SNMP retrieval method must be a bitmask of SNMP_VALUE_LIBRARY, SNMP_VALUE_PLAIN, and SNMP_VALUE_OBJECT
 SNMP output print format must be an SNMP_OID_OUTPUT_* constant
-Cannot write read-only property SNMP::$info
+SNMP::$info property is read-only
 NULL

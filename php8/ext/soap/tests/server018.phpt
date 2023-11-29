@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 18: user fault (through throw)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test() {

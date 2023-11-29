@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 6: simpleType/restriction (referenced by ellement)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";

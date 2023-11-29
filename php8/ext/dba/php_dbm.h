@@ -1,7 +1,7 @@
 #ifndef PHP_DBM_H
 #define PHP_DBM_H
 
-#ifdef DBA_DBM
+#if DBA_DBM
 
 #include "php_dba.h"
 

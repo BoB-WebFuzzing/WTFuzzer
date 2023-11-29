@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -176,7 +176,7 @@ PHP_COM_DOTNET_API ITypeLib *php_com_load_typelib(char *search_string, int codep
 }
 
 /* Given a type-library, merge it into the current engine state */
-PHP_COM_DOTNET_API zend_result php_com_import_typelib(ITypeLib *TL, int mode, int codepage)
+PHP_COM_DOTNET_API int php_com_import_typelib(ITypeLib *TL, int mode, int codepage)
 {
 	int i, j, interfaces;
 	TYPEKIND pTKind;
@@ -186,6 +186,8 @@ PHP_COM_DOTNET_API zend_result php_com_import_typelib(ITypeLib *TL, int mode, in
 	BSTR bstr_ids;
 	zend_constant c;
 	zval *exists, results, value;
+	char *const_name;
+	size_t len;
 
 	if (TL == NULL) {
 		return FAILURE;
@@ -197,8 +199,6 @@ PHP_COM_DOTNET_API zend_result php_com_import_typelib(ITypeLib *TL, int mode, in
 		if (pTKind == TKIND_ENUM) {
 			ITypeLib_GetTypeInfo(TL, i, &TypeInfo);
 			for (j = 0; ; j++) {
-				zend_string *const_name;
-
 				if (FAILED(ITypeInfo_GetVarDesc(TypeInfo, j, &pVarDesc))) {
 					break;
 				}
@@ -208,16 +208,16 @@ PHP_COM_DOTNET_API zend_result php_com_import_typelib(ITypeLib *TL, int mode, in
 					continue;
 				}
 
-				const_name = php_com_olestring_to_string(bstr_ids, codepage);
+				const_name = php_com_olestring_to_string(bstr_ids, &len, codepage);
 				SysFreeString(bstr_ids);
 
 				/* sanity check for the case where the constant is already defined */
 				php_com_zval_from_variant(&value, pVarDesc->lpvarValue, codepage);
-				if ((exists = zend_get_constant(const_name)) != NULL) {
+				if ((exists = zend_get_constant_str(const_name, len)) != NULL) {
 					if (COMG(autoreg_verbose) && !compare_function(&results, &value, exists)) {
-						php_error_docref(NULL, E_WARNING, "Type library constant %s is already defined", ZSTR_VAL(const_name));
+						php_error_docref(NULL, E_WARNING, "Type library constant %s is already defined", const_name);
 					}
-					zend_string_release_ex(const_name, /* persistent */ false);
+					efree(const_name);
 					ITypeInfo_ReleaseVarDesc(TypeInfo, pVarDesc);
 					continue;
 				}
@@ -226,13 +226,8 @@ PHP_COM_DOTNET_API zend_result php_com_import_typelib(ITypeLib *TL, int mode, in
 				if (Z_TYPE(value) == IS_LONG) {
 					ZEND_CONSTANT_SET_FLAGS(&c, mode, 0);
 					ZVAL_LONG(&c.value, Z_LVAL(value));
-					if (mode & CONST_PERSISTENT) {
-						/* duplicate string in a persistent manner */
-						c.name = zend_string_dup(const_name, /* persistent */ true);
-						zend_string_release_ex(const_name, /* persistent */ false);
-					} else {
-						c.name = const_name;
-					}
+					c.name = zend_string_init(const_name, len, mode & CONST_PERSISTENT);
+					efree(const_name);
 					zend_register_constant(&c);
 				}
 				ITypeInfo_ReleaseVarDesc(TypeInfo, pVarDesc);
@@ -302,8 +297,7 @@ php_com_load_typelib_via_cache_return:
 	return TL;
 }
 
-ITypeInfo *php_com_locate_typeinfo(zend_string *type_lib_name, php_com_dotnet_object *obj,
-	zend_string *dispatch_name, bool sink)
+ITypeInfo *php_com_locate_typeinfo(char *typelibname, php_com_dotnet_object *obj, char *dispname, int sink)
 {
 	ITypeInfo *typeinfo = NULL;
 	ITypeLib *typelib = NULL;
@@ -311,7 +305,7 @@ ITypeInfo *php_com_locate_typeinfo(zend_string *type_lib_name, php_com_dotnet_ob
 	GUID iid;
 
 	if (obj) {
-		if (dispatch_name == NULL && sink) {
+		if (dispname == NULL && sink) {
 			if (V_VT(&obj->v) == VT_DISPATCH) {
 				IProvideClassInfo2 *pci2;
 				IProvideClassInfo *pci;
@@ -327,7 +321,7 @@ ITypeInfo *php_com_locate_typeinfo(zend_string *type_lib_name, php_com_dotnet_ob
 					IProvideClassInfo_Release(pci);
 				}
 			}
-		} else if (dispatch_name == NULL) {
+		} else if (dispname == NULL) {
 			if (obj->typeinfo) {
 				ITypeInfo_AddRef(obj->typeinfo);
 				return obj->typeinfo;
@@ -337,14 +331,14 @@ ITypeInfo *php_com_locate_typeinfo(zend_string *type_lib_name, php_com_dotnet_ob
 					return typeinfo;
 				}
 			}
-		} else if (dispatch_name && obj->typeinfo) {
+		} else if (dispname && obj->typeinfo) {
 			unsigned int idx;
 			/* get the library from the object; the rest will be dealt with later */
 			ITypeInfo_GetContainingTypeLib(obj->typeinfo, &typelib, &idx);
-		} else if (type_lib_name == NULL) {
+		} else if (typelibname == NULL) {
 			if (V_VT(&obj->v) == VT_DISPATCH) {
 				IDispatch_GetTypeInfo(V_DISPATCH(&obj->v), 0, LANG_NEUTRAL, &typeinfo);
-				if (dispatch_name) {
+				if (dispname) {
 					unsigned int idx;
 					/* get the library from the object; the rest will be dealt with later */
 					ITypeInfo_GetContainingTypeLib(typeinfo, &typelib, &idx);
@@ -356,15 +350,15 @@ ITypeInfo *php_com_locate_typeinfo(zend_string *type_lib_name, php_com_dotnet_ob
 				}
 			}
 		}
-	} else if (type_lib_name) {
+	} else if (typelibname) {
 		/* Fetch the typelibrary and use that to look things up */
-		typelib = php_com_load_typelib(ZSTR_VAL(type_lib_name), CP_THREAD_ACP);
+		typelib = php_com_load_typelib(typelibname, CP_THREAD_ACP);
 	}
 
-	if (!gotguid && dispatch_name && typelib) {
+	if (!gotguid && dispname && typelib) {
 		unsigned short cfound;
 		MEMBERID memid;
-		OLECHAR *olename = php_com_string_to_olestring(ZSTR_VAL(dispatch_name), ZSTR_LEN(dispatch_name), CP_ACP);
+		OLECHAR *olename = php_com_string_to_olestring(dispname, strlen(dispname), CP_ACP);
 
 		cfound = 1;
 		if (FAILED(ITypeLib_FindName(typelib, olename, 0, &typeinfo, &memid, &cfound)) || cfound == 0) {
@@ -463,30 +457,32 @@ static inline const char *vt_to_string(VARTYPE vt)
 	return "?";
 }
 
-static zend_string *php_com_string_from_clsid(const CLSID *clsid, int codepage)
+static char *php_com_string_from_clsid(const CLSID *clsid, int codepage)
 {
 	LPOLESTR ole_clsid;
-	zend_string *clsid_str;
+	char *clsid_str;
 
 	StringFromCLSID(clsid, &ole_clsid);
-	clsid_str = php_com_olestring_to_string(ole_clsid, codepage);
+	clsid_str = php_com_olestring_to_string(ole_clsid, NULL, codepage);
 	LocalFree(ole_clsid);
 
 	return clsid_str;
 }
 
 
-bool php_com_process_typeinfo(ITypeInfo *typeinfo, HashTable *id_to_name, bool printdef, GUID *guid, int codepage)
+int php_com_process_typeinfo(ITypeInfo *typeinfo, HashTable *id_to_name, int printdef, GUID *guid, int codepage)
 {
 	TYPEATTR *attr;
 	FUNCDESC *func;
 	int i;
 	OLECHAR *olename;
-	zend_string *ansi_name = NULL;
+	char *ansiname = NULL;
+	size_t ansinamelen;
+	int ret = 0;
 	DISPID lastid = 0;	/* for props */
 
 	if (FAILED(ITypeInfo_GetTypeAttr(typeinfo, &attr))) {
-		return false;
+		return 0;
 	}
 
 	/* verify that it is suitable */
@@ -497,16 +493,17 @@ bool php_com_process_typeinfo(ITypeInfo *typeinfo, HashTable *id_to_name, bool p
 		}
 
 		if (printdef) {
-			zend_string *guid_str;
+			char *guidstring;
 
 			ITypeInfo_GetDocumentation(typeinfo, MEMBERID_NIL, &olename, NULL, NULL, NULL);
-			ansi_name = php_com_olestring_to_string(olename, codepage);
+			ansiname = php_com_olestring_to_string(olename, &ansinamelen, codepage);
 			SysFreeString(olename);
 
-			guid_str = php_com_string_from_clsid(&attr->guid, codepage);
-			php_printf("class %s { /* GUID=%s */\n", ZSTR_VAL(ansi_name), ZSTR_VAL(guid_str));
-			zend_string_release_ex(guid_str, /* persistent */ false);
-			zend_string_release_ex(ansi_name, /* persistent */ false);
+			guidstring = php_com_string_from_clsid(&attr->guid, codepage);
+			php_printf("class %s { /* GUID=%s */\n", ansiname, guidstring);
+			efree(guidstring);
+
+			efree(ansiname);
 		}
 
 		if (id_to_name) {
@@ -528,12 +525,13 @@ bool php_com_process_typeinfo(ITypeInfo *typeinfo, HashTable *id_to_name, bool p
 				lastid = func->memid;
 
 				ITypeInfo_GetDocumentation(typeinfo, func->memid, &olename, NULL, NULL, NULL);
-				ansi_name = php_com_olestring_to_string(olename, codepage);
+				ansiname = php_com_olestring_to_string(olename, &ansinamelen, codepage);
 				SysFreeString(olename);
 
 				if (printdef) {
 					int j;
-					zend_string *func_desc;
+					char *funcdesc;
+					size_t funcdesclen;
 					unsigned int cnames = 0;
 					BSTR *names;
 
@@ -556,18 +554,18 @@ bool php_com_process_typeinfo(ITypeInfo *typeinfo, HashTable *id_to_name, bool p
 
 						ITypeInfo_GetDocumentation(typeinfo, func->memid, NULL, &olename, NULL, NULL);
 						if (olename) {
-							func_desc = php_com_olestring_to_string(olename, codepage);
+							funcdesc = php_com_olestring_to_string(olename, &funcdesclen, codepage);
 							SysFreeString(olename);
-							php_printf("\t/* %s */\n", ZSTR_VAL(func_desc));
-							zend_string_release_ex(func_desc, /* persistent */ false);
+							php_printf("\t/* %s */\n", funcdesc);
+							efree(funcdesc);
 						}
 
-						php_printf("\tvar $%s;\n\n", ZSTR_VAL(ansi_name));
+						php_printf("\tvar $%s;\n\n", ansiname);
 
 					} else {
 						/* a function */
 
-						php_printf("\tfunction %s(\n", ZSTR_VAL(ansi_name));
+						php_printf("\tfunction %s(\n", ansiname);
 
 						for (j = 0; j < func->cParams; j++) {
 							ELEMDESC *elem = &func->lprgelemdescParam[j];
@@ -589,22 +587,20 @@ bool php_com_process_typeinfo(ITypeInfo *typeinfo, HashTable *id_to_name, bool p
 
 							/* when we handle prop put and get, this will look nicer */
 							if (j+1 < (int)cnames) {
-								func_desc = php_com_olestring_to_string(names[j+1], codepage);
+								funcdesc = php_com_olestring_to_string(names[j+1], &funcdesclen, codepage);
 								SysFreeString(names[j+1]);
-								php_printf(" */ %s%s%c\n",
-									elem->tdesc.vt == VT_PTR ? "&$" : "$",
-									ZSTR_VAL(func_desc),
-									j == func->cParams - 1 ? ' ' : ','
-								);
 							} else {
-								php_printf(" */ %s???%c\n",
-									elem->tdesc.vt == VT_PTR ? "&$" : "$",
-									j == func->cParams - 1 ? ' ' : ','
-								);
+								funcdesc = "???";
 							}
 
+							php_printf(" */ %s%s%c\n",
+									elem->tdesc.vt == VT_PTR ? "&$" : "$",
+									funcdesc,
+									j == func->cParams - 1 ? ' ' : ','
+									);
+
 							if (j+1 < (int)cnames) {
-								zend_string_release_ex(func_desc, /* persistent */ false);
+								efree(funcdesc);
 							}
 						}
 
@@ -612,10 +608,10 @@ bool php_com_process_typeinfo(ITypeInfo *typeinfo, HashTable *id_to_name, bool p
 
 						ITypeInfo_GetDocumentation(typeinfo, func->memid, NULL, &olename, NULL, NULL);
 						if (olename) {
-							func_desc = php_com_olestring_to_string(olename, codepage);
+							funcdesc = php_com_olestring_to_string(olename, &funcdesclen, codepage);
 							SysFreeString(olename);
-							php_printf("\t\t/* %s */\n", ZSTR_VAL(func_desc));
-							zend_string_release_ex(func_desc, /* persistent */ false);
+							php_printf("\t\t/* %s */\n", funcdesc);
+							efree(funcdesc);
 						}
 
 						php_printf("\t}\n");
@@ -625,11 +621,12 @@ bool php_com_process_typeinfo(ITypeInfo *typeinfo, HashTable *id_to_name, bool p
 				}
 
 				if (id_to_name) {
-					zend_string *lc_ansi_name = zend_string_tolower(ansi_name);
-					ZVAL_STR(&tmp, lc_ansi_name);
+					zend_str_tolower(ansiname, ansinamelen);
+					ZVAL_STRINGL(&tmp, ansiname, ansinamelen);
 					zend_hash_index_update(id_to_name, func->memid, &tmp);
+					// TODO: avoid reallocation???
 				}
-				zend_string_release_ex(ansi_name, /* persistent */ false);
+				efree(ansiname);
 			}
 			ITypeInfo_ReleaseFuncDesc(typeinfo, func);
 		}
@@ -637,11 +634,13 @@ bool php_com_process_typeinfo(ITypeInfo *typeinfo, HashTable *id_to_name, bool p
 		if (printdef) {
 			php_printf("}\n");
 		}
+
+		ret = 1;
 	} else {
 		zend_throw_error(NULL, "Type kind must be dispatchable, %08x given", attr->typekind);
 	}
 
 	ITypeInfo_ReleaseTypeAttr(typeinfo, attr);
 
-	return true;
+	return ret;
 }

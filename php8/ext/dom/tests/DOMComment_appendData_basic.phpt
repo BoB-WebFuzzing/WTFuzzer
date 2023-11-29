@@ -3,8 +3,8 @@ Test adding data to a DOMComment
 --CREDITS--
 Andrew Larssen <al@larssen.org>
 London TestFest 2008
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

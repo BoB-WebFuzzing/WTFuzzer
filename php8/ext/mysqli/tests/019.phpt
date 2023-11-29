@@ -1,9 +1,8 @@
 --TEST--
 mysqli fetch (bind_param + bind_result)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

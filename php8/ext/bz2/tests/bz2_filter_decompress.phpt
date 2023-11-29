@@ -1,7 +1,7 @@
 --TEST--
 bzip2.decompress (with convert.base64-decode)
---EXTENSIONS--
-bz2
+--SKIPIF--
+<?php if (!extension_loaded("bz2")) print "skip"; ?>
 --FILE--
 <?php
 $text = 'QlpoNDFBWSZTWRN6QG0AAAoVgECFACA395UgIABIintI1N6mpowIQ0E1MTTAQGYTNcRyMZm5kgW3ib7hVboE7Tmqj3ToGZ5G3q1ZauD2G58hibSck8KS95EEAbx1Cn+LuSKcKEgJvSA2gA==';

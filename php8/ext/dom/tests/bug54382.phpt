@@ -1,7 +1,9 @@
 --TEST--
 Bug #54382 DOMNode::getAttributeNodeNS doesn't get xmlns* attributes
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 $xmlString = '<?xml version="1.0" encoding="utf-8" ?>

@@ -1,7 +1,7 @@
 --TEST--
 Bug #70453 (IntlChar::foldCase() incorrect arguments and missing constants)
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if (!extension_loaded('intl')) die("skip requires ext/intl") ?>
 --FILE--
 <?php
 $method = new ReflectionMethod('IntlChar', 'foldCase');

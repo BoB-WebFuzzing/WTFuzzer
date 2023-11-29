@@ -5,12 +5,12 @@ SPL: ArrayIterator implementing RecursiveIterator
 
 class MyRecursiveArrayIterator extends ArrayIterator implements RecursiveIterator
 {
-    function hasChildren(): bool
+    function hasChildren()
     {
         return is_array($this->current());
     }
 
-    function getChildren(): MyRecursiveArrayIterator
+    function getChildren()
     {
         return new MyRecursiveArrayIterator($this->current());
     }

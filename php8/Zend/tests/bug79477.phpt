@@ -3,7 +3,6 @@ Bug #79477: casting object into array creates references
 --FILE--
 <?php
 
-#[AllowDynamicProperties]
 class Test {
     public $prop = 'default value';
 }

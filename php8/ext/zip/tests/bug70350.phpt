@@ -1,7 +1,9 @@
 --TEST--
 Bug #70350 (ZipArchive::extractTo allows for directory traversal when creating directories)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 

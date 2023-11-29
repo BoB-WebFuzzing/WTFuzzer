@@ -2,8 +2,8 @@
 Phar object passed URL
 --INI--
 default_charset=UTF-8
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 try {

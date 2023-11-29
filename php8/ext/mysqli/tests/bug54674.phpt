@@ -1,15 +1,15 @@
 --TEST--
 Bug #54674 mysqlnd valid_sjis_(head|tail) is using invalid operator and range.
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --INI--
 mysqli.max_links = 1
 mysqli.allow_persistent = Off
 mysqli.max_persistent = 0
+mysqli.reconnect = Off
 --FILE--
 <?php
     include ("connect.inc");

@@ -3,8 +3,8 @@ DOMDocument::$encoding - read/write tests (dom_document_encoding_read/dom_docume
 --CREDITS--
 Hans Zaunere
 # TestFest 2009 NYPHP
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

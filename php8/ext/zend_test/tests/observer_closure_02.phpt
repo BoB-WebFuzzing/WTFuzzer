@@ -1,7 +1,7 @@
 --TEST--
 Observer: Observability of fake closures
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip: zend_test extension required'); ?>
 --INI--
 zend_test.observer.enabled=1
 zend_test.observer.observe_all=1
@@ -22,14 +22,11 @@ $closure();
 echo 'DONE' . PHP_EOL;
 ?>
 --EXPECTF--
-<!-- init '%s' -->
-<file '%s'>
-  <!-- init Closure::fromCallable() -->
-  <Closure::fromCallable>
-  </Closure::fromCallable>
+<!-- init '%s%eobserver_closure_%d.php' -->
+<file '%s%eobserver_closure_%d.php'>
   <!-- init Foo::bar() -->
   <Foo::bar>
 Called as fake closure.
   </Foo::bar>
 DONE
-</file '%s'>
+</file '%s%eobserver_closure_%d.php'>

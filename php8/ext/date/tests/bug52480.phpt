@@ -1,5 +1,7 @@
 --TEST--
 Bug #52480 (Incorrect difference using DateInterval)
+--XFAIL--
+See https://bugs.php.net/bug.php?id=52480
 --FILE--
 <?php
 

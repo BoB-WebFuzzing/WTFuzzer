@@ -1,9 +1,11 @@
 --TEST--
 BZ2 with strings
---EXTENSIONS--
-bz2
+--SKIPIF--
+<?php if (!extension_loaded("bz2")) print "skip"; ?>
 --FILE--
 <?php
+
+error_reporting(E_ALL);
 
 # This FAILS
 $blaat = <<<HEREDOC
@@ -15,8 +17,11 @@ HEREDOC;
 
 $blaat2 = bzdecompress(bzcompress($blaat));
 
-var_dump($blaat === $blaat2);
+$tests = <<<TESTS
+ \$blaat === \$blaat2
+TESTS;
 
+include(__DIR__ . '/../../../tests/quicktester.inc');
 ?>
 --EXPECT--
-bool(true)
+OK

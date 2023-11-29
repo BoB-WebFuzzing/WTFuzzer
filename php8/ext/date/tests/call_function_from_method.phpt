@@ -6,8 +6,6 @@ date.timezone=UTC
 <?php
 
 class Date {
-    public $date;
-
     public function __construct($in) {
         $this->date = date_create($in);
     }

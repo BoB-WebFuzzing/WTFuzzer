@@ -1,7 +1,5 @@
 --TEST--
 Calling XSLTProcessor::transformToDoc() without stylesheet
---EXTENSIONS--
-xsl
 --FILE--
 <?php
 

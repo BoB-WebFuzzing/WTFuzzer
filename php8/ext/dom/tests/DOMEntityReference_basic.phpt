@@ -1,7 +1,7 @@
 --TEST--
 DOMEntityReference - read $nodeName property
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $der = new DOMEntityReference('nbsp');

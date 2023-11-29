@@ -1,7 +1,7 @@
 --TEST--
 Bug #72658 Locale::lookup() / locale_lookup() hangs if no match found
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

@@ -7,7 +7,7 @@ define('OBJECT_COUNT', 10000);
 $containers = array();
 
 class ObjectOne {
-    protected $guid = 0;
+    protected $_guid = 0;
     public function __construct() {
         global $containers;
         $this->guid = 1;

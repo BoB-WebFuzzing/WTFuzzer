@@ -4,7 +4,6 @@ Bug #53903 streamwrapper/stream_stat causes problems
 <?php
 
 class sw {
-    public $context;
 
     public function stream_open($path, $mode, $options, &$opened_path) {
         return true;

@@ -1,7 +1,7 @@
 --TEST--
 Calling mb_convert_case() with an invalid casing mode
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --FILE--
 <?php
 

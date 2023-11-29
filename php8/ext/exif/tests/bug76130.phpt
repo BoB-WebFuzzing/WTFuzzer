@@ -6,8 +6,10 @@ notices and warnings are to be expected anyway, we suppress these, since the are
 not relevant for this test.
 --INI--
 error_reporting=E_ALL & ~E_WARNING & ~E_NOTICE
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php
+if (!extension_loaded('exif')) die('skip exif extension not available');
+?>
 --FILE--
 <?php
 exif_read_data(__DIR__ . '/bug76130_1.jpg');

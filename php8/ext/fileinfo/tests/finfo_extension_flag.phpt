@@ -1,7 +1,9 @@
 --TEST--
 Test FILEINFO_EXTENSION flag
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php
+if (!class_exists('finfo'))
+    die('skip no fileinfo extension');
 --FILE--
 <?php
 

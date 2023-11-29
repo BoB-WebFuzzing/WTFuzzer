@@ -21,6 +21,7 @@ $values = array(23,
         "23.45",
         "2.345e1",
         "1000",
+        null,
         true,
         false);
 
@@ -41,5 +42,6 @@ float(3.829113652)
 float(3.848471992)
 float(3.848471992)
 float(7.60090271)
+float(0)
 float(0.881373587)
 float(0)

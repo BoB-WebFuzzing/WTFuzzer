@@ -1,7 +1,9 @@
 --TEST--
 IntlGregorianCalendar::__construct(): bad arguments
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -27,7 +29,7 @@ try {
     echo $e->getMessage(), "\n";
 }
 try {
-    var_dump(new IntlGregorianCalendar(1,2,3,4,5,array()));
+    var_dump(new IntlGregorianCalendar(1,2,3,4,NULL,array()));
 } catch (TypeError $e) {
     echo $e->getMessage(), "\n";
 }

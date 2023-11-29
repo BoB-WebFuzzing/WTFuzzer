@@ -1,7 +1,7 @@
 --TEST--
 Test 12: Using Associative Array of Parameters
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php require_once __DIR__ .'/skipif.inc'; ?>
 --FILE--
 <?php
 echo "Test 12: Using Associative Array of Parameters";

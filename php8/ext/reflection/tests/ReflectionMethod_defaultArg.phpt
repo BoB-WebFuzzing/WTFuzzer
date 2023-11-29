@@ -32,13 +32,13 @@ Method [ <user> private method bar ] {
   @@ %s
 
   - Parameters [1] {
-    Parameter #0 [ <optional> $a = self::class ]
+    Parameter #0 [ <optional> $a = 'T' ]
   }
 }
 Method [ <user> private method bar ] {
   @@ %s
 
   - Parameters [1] {
-    Parameter #0 [ <optional> $a = self::class ]
+    Parameter #0 [ <optional> $a = 'B' ]
   }
 }

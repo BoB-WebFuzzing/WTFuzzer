@@ -1,7 +1,5 @@
 --TEST--
 Test session_module_name() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -17,8 +15,6 @@ echo "*** Testing session_module_name() : variation ***\n";
 
 require_once "save_handler.inc";
 $path = __DIR__;
-$path = __DIR__ . '/session_module_name_variation4';
-@mkdir($path);
 session_save_path($path);
 session_module_name("files");
 
@@ -39,7 +35,6 @@ var_dump($_SESSION);
 var_dump(session_destroy());
 
 ob_end_flush();
-rmdir($path);
 ?>
 --EXPECT--
 *** Testing session_module_name() : variation ***

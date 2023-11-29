@@ -1,7 +1,9 @@
 --TEST--
 Test posix_strerror() function : error conditions
---EXTENSIONS--
-posix
+--SKIPIF--
+<?php
+    if(!extension_loaded("posix")) print "skip - POSIX extension not loaded";
+?>
 --FILE--
 <?php
 echo "*** Testing posix_strerror() : error conditions ***\n";

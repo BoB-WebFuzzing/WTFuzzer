@@ -1,7 +1,8 @@
 --TEST--
 COM: Loading typelib corrupts memory
---EXTENSIONS--
-com_dotnet
+--SKIPIF--
+<?php
+if (!extension_loaded("com_dotnet")) print "skip COM/.Net support not present"; ?>
 --FILE--
 <?php
 error_reporting(E_ALL);

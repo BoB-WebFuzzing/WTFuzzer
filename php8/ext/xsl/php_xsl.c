@@ -5,7 +5,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -29,7 +29,6 @@ static zend_object_handlers xsl_object_handlers;
 
 static const zend_module_dep xsl_deps[] = {
 	ZEND_MOD_REQUIRED("libxml")
-	ZEND_MOD_REQUIRED("dom")
 	ZEND_MOD_END
 };
 
@@ -112,13 +111,16 @@ zend_object *xsl_objects_new(zend_class_entry *class_type)
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(xsl)
 {
+	zend_class_entry ce;
+
 	memcpy(&xsl_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	xsl_object_handlers.offset = XtOffsetOf(xsl_object, std);
 	xsl_object_handlers.clone_obj = NULL;
 	xsl_object_handlers.free_obj = xsl_objects_free_storage;
 
-	xsl_xsltprocessor_class_entry = register_class_XSLTProcessor();
-	xsl_xsltprocessor_class_entry->create_object = xsl_objects_new;
+	INIT_CLASS_ENTRY(ce, "XSLTProcessor", class_XSLTProcessor_methods);
+	ce.create_object = xsl_objects_new;
+	xsl_xsltprocessor_class_entry = zend_register_internal_class(&ce);
 
 #ifdef HAVE_XSL_EXSLT
 	exsltRegisterAll();
@@ -132,7 +134,25 @@ PHP_MINIT_FUNCTION(xsl)
 				   xsl_ext_function_object_php);
 	xsltSetGenericErrorFunc(NULL, php_libxml_error_handler);
 
-	register_php_xsl_symbols(module_number);
+	REGISTER_LONG_CONSTANT("XSL_CLONE_AUTO",      0,     CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("XSL_CLONE_NEVER",    -1,     CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("XSL_CLONE_ALWAYS",    1,     CONST_CS | CONST_PERSISTENT);
+
+	REGISTER_LONG_CONSTANT("XSL_SECPREF_NONE",             XSL_SECPREF_NONE,             CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("XSL_SECPREF_READ_FILE",        XSL_SECPREF_READ_FILE,        CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("XSL_SECPREF_WRITE_FILE",       XSL_SECPREF_WRITE_FILE,       CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("XSL_SECPREF_CREATE_DIRECTORY", XSL_SECPREF_CREATE_DIRECTORY, CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("XSL_SECPREF_READ_NETWORK",     XSL_SECPREF_READ_NETWORK,     CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("XSL_SECPREF_WRITE_NETWORK",    XSL_SECPREF_WRITE_NETWORK,    CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("XSL_SECPREF_DEFAULT",          XSL_SECPREF_DEFAULT,          CONST_CS | CONST_PERSISTENT);
+
+	REGISTER_LONG_CONSTANT("LIBXSLT_VERSION",           LIBXSLT_VERSION,            CONST_CS | CONST_PERSISTENT);
+	REGISTER_STRING_CONSTANT("LIBXSLT_DOTTED_VERSION",  LIBXSLT_DOTTED_VERSION,     CONST_CS | CONST_PERSISTENT);
+
+#ifdef HAVE_XSL_EXSLT
+	REGISTER_LONG_CONSTANT("LIBEXSLT_VERSION",           LIBEXSLT_VERSION,            CONST_CS | CONST_PERSISTENT);
+	REGISTER_STRING_CONSTANT("LIBEXSLT_DOTTED_VERSION",  LIBEXSLT_DOTTED_VERSION,     CONST_CS | CONST_PERSISTENT);
+#endif
 
 	return SUCCESS;
 }

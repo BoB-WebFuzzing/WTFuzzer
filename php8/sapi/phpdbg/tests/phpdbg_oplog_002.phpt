@@ -6,7 +6,7 @@ q
 --EXPECTF--
 [Successful compilation of %s]
 prompt> 
-Warning: Cannot end an oplog without starting it in %s on line 3
+Warning: Can not end an oplog without starting it in %s on line 3
 NULL
 [Script ended normally]
 prompt> 

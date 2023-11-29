@@ -1,14 +1,17 @@
 --TEST--
 EXPLAIN - metadata
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
-require_once 'skipifconnectfailure.inc';
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
+require_once("connect.inc");
+if (!$IS_MYSQLND)
+  die("skip Open libmysql/MySQL issue http://bugs.mysql.com/?id=62350");
 ?>
 --FILE--
 <?php
-    require_once 'table.inc';
+    require_once('connect.inc');
+    require_once('table.inc');
 
     if (!$res = mysqli_query($link, 'EXPLAIN SELECT t1.*, t2.* FROM test AS t1, test AS t2'))
         printf("[001] [%d] %s\n", mysqli_errno($link), mysqli_error($link));
@@ -153,7 +156,7 @@ require_once 'skipifconnectfailure.inc';
 ?>
 --CLEAN--
 <?php
-require_once "clean_table.inc";
+    require_once("clean_table.inc");
 ?>
 --EXPECT--
 done!

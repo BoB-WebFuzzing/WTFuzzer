@@ -1,7 +1,5 @@
 --TEST--
 Tokenization of namespaced names
---EXTENSIONS--
-tokenizer
 --FILE--
 <?php
 

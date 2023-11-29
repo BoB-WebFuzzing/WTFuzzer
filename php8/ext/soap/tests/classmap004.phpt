@@ -1,7 +1,7 @@
 --TEST--
 SOAP Classmap 4: encoding of objects with __get()
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 ini_set("soap.wsdl_cache_enabled",0);
@@ -34,7 +34,6 @@ function f(){
 }
 
 class LocalSoapClient extends SoapClient {
-  private $server;
 
   function __construct($wsdl, $options) {
     parent::__construct($wsdl, $options);
@@ -42,7 +41,7 @@ class LocalSoapClient extends SoapClient {
     $this->server->addFunction("f");
   }
 
-  function __doRequest($request, $location, $action, $version, $one_way = 0): ?string {
+  function __doRequest($request, $location, $action, $version, $one_way = 0) {
     ob_start();
     $this->server->handle($request);
     $response = ob_get_contents();

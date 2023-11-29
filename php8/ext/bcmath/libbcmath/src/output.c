@@ -56,10 +56,18 @@ static char ref_str[] = "0123456789ABCDEF";
    non-zero, we must output one space before the number.  OUT_CHAR
    is the actual routine for writing the characters. */
 
-void bc_out_long (long val, size_t size, bool space, void (*out_char)(char) )
+void
+bc_out_long (val, size, space, out_char)
+     long val;
+     int size, space;
+#ifdef __STDC__
+     void (*out_char)(int);
+#else
+     void (*out_char)();
+#endif
 {
   char digits[40];
-  size_t len, ix;
+  int len, ix;
 
   if (space) (*out_char) (' ');
   snprintf(digits, sizeof(digits), "%ld", val);
@@ -76,11 +84,15 @@ void bc_out_long (long val, size_t size, bool space, void (*out_char)(char) )
 /* Output of a bcd number.  NUM is written in base O_BASE using OUT_CHAR
    as the routine to do the actual output of the characters. */
 
-void bc_out_num (bc_num num, int o_base, void (*out_char)(char), int leading_zero)
+void
+#ifdef __STDC__
+bc_out_num (bc_num num, int o_base, void (*out_char)(int), int leading_zero)
+#else
+bc_out_num (bc_num num, int o_base, void (*out_char)(), int leading_zero)
+#endif
 {
   char *nptr;
-  int  index, fdigit;
-  bool pre_space;
+  int  index, fdigit, pre_space;
   stk_rec *digits, *temp;
   bc_num int_part, frac_part, base, cur_dig, t_num, max_o_digit;
 
@@ -166,7 +178,7 @@ void bc_out_num (bc_num num, int o_base, void (*out_char)(char), int leading_zer
 	if (num->n_scale > 0)
 	  {
 	    (*out_char) ('.');
-	    pre_space = false;
+	    pre_space = 0;
 	    t_num = bc_copy_num (BCG(_one_));
 	    while (t_num->n_len <= num->n_scale) {
 	      bc_multiply (frac_part, base, &frac_part, num->n_scale);
@@ -177,7 +189,7 @@ void bc_out_num (bc_num num, int o_base, void (*out_char)(char), int leading_zer
 		(*out_char) (ref_str[fdigit]);
 	      else {
 		bc_out_long (fdigit, max_o_digit->n_len, pre_space, out_char);
-		pre_space = true;
+		pre_space = 1;
 	      }
 	      bc_multiply (t_num, base, &t_num, 0);
 	    }

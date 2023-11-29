@@ -3,9 +3,10 @@ Testing ftp_rmdir returns true
 --CREDITS--
 Rodrigo Moyle <eu [at] rodrigorm [dot] com [dot] br>
 #testfest PHPSP on 2009-06-20
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php
+require 'skipif.inc';
+?>
 --FILE--
 <?php
 require 'server.inc';

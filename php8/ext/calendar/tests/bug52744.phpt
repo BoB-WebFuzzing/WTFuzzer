@@ -1,7 +1,7 @@
 --TEST--
 Bug #52744 (cal_days_in_month incorrect for December 1 BCE)
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 var_dump(cal_days_in_month(CAL_GREGORIAN, 12, -1));

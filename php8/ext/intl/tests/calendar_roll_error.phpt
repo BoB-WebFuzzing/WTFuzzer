@@ -2,8 +2,10 @@
 IntlCalendar::roll(): bad arguments
 --INI--
 date.timezone=Atlantic/Azores
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 
@@ -21,6 +23,6 @@ try {
     echo $e->getMessage() . \PHP_EOL;
 }
 ?>
---EXPECT--
+--EXPECTF--
 IntlCalendar::roll(): Argument #1 ($field) must be a valid field
 intlcal_roll(): Argument #1 ($calendar) must be of type IntlCalendar, int given

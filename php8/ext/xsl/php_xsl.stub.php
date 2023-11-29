@@ -1,121 +1,54 @@
 <?php
 
-/** @generate-class-entries */
-
-/** @var int */
-const XSL_CLONE_AUTO = 0;
-/** @var int */
-const XSL_CLONE_NEVER = -1;
-/** @var int */
-const XSL_CLONE_ALWAYS = 1;
-
-/**
- * @var int
- * @cvalue XSL_SECPREF_NONE
- */
-const XSL_SECPREF_NONE = UNKNOWN;
-/**
- * @var int
- * @cvalue XSL_SECPREF_READ_FILE
- */
-const XSL_SECPREF_READ_FILE = UNKNOWN;
-/**
- * @var int
- * @cvalue XSL_SECPREF_WRITE_FILE
- */
-const XSL_SECPREF_WRITE_FILE = UNKNOWN;
-/**
- * @var int
- * @cvalue XSL_SECPREF_CREATE_DIRECTORY
- */
-const XSL_SECPREF_CREATE_DIRECTORY = UNKNOWN;
-/**
- * @var int
- * @cvalue XSL_SECPREF_READ_NETWORK
- */
-const XSL_SECPREF_READ_NETWORK = UNKNOWN;
-/**
- * @var int
- * @cvalue XSL_SECPREF_WRITE_NETWORK
- */
-const XSL_SECPREF_WRITE_NETWORK = UNKNOWN;
-/**
- * @var int
- * @cvalue XSL_SECPREF_DEFAULT
- */
-const XSL_SECPREF_DEFAULT = UNKNOWN;
-
-/**
- * @var int
- * @cvalue LIBXSLT_VERSION
- */
-const LIBXSLT_VERSION = UNKNOWN;
-/**
- * @var string
- * @cvalue LIBXSLT_DOTTED_VERSION
- */
-const LIBXSLT_DOTTED_VERSION = UNKNOWN;
-
-#ifdef HAVE_XSL_EXSLT
-/**
- * @var int
- * @cvalue LIBEXSLT_VERSION
- */
-const LIBEXSLT_VERSION = UNKNOWN;
-/**
- * @var string
- * @cvalue LIBEXSLT_DOTTED_VERSION
- */
-const LIBEXSLT_DOTTED_VERSION = UNKNOWN;
-#endif
+/** @generate-function-entries */
 
 class XSLTProcessor
 {
     /**
      * @param DOMDocument|SimpleXMLElement $stylesheet
-     * @tentative-return-type
+     * @return bool
      */
-    public function importStylesheet(object $stylesheet): bool {}
+    public function importStylesheet(object $stylesheet) {}
 
     /**
      * @param DOMDocument|SimpleXMLElement $document
-     * @tentative-return-type
+     * @return DOMDocument|false
      */
-    public function transformToDoc(object $document, ?string $returnClass = null): object|false {}
+    public function transformToDoc(object $document, ?string $returnClass = null) {}
 
     /**
      * @param DOMDocument|SimpleXMLElement $document
-     * @tentative-return-type
+     * @return int
      */
-    public function transformToUri(object $document, string $uri): int {}
+    public function transformToUri(object $document, string $uri) {}
 
     /**
      * @param DOMDocument|SimpleXMLElement $document
-     * @tentative-return-type
+     * @return string|false|null
      */
-    public function transformToXml(object $document): string|null|false {}
-
-    /** @tentative-return-type */
-    public function setParameter(string $namespace, array|string $name, ?string $value = null): bool {}
-
-    /** @tentative-return-type */
-    public function getParameter(string $namespace, string $name): string|false {}
-
-    /** @tentative-return-type */
-    public function removeParameter(string $namespace, string $name): bool {}
-
-    /** @tentative-return-type */
-    public function hasExsltSupport(): bool {}
-
-    /** @tentative-return-type */
-    public function registerPHPFunctions(array|string|null $functions = null): void {}
+    public function transformToXml(object $document) {}
 
     /** @return bool */
-    public function setProfiling(?string $filename) {} // TODO make the return type void
+    public function setParameter(string $namespace, array|string $name, ?string $value = null) {}
 
-    /** @tentative-return-type */
-    public function setSecurityPrefs(int $preferences): int {}
+    /** @return string|false */
+    public function getParameter(string $namespace, string $name) {}
 
-    /** @tentative-return-type */
-    public function getSecurityPrefs(): int {}
+    /** @return bool */
+    public function removeParameter(string $namespace, string $name) {}
+
+    /** @return bool */
+    public function hasExsltSupport() {}
+
+    /** @return void */
+    public function registerPHPFunctions(array|string|null $functions = null) {}
+
+    /** @return bool */
+    public function setProfiling(?string $filename) {}
+
+    /** @return int */
+    public function setSecurityPrefs(int $preferences) {}
+
+    /** @return int */
+    public function getSecurityPrefs() {}
 }

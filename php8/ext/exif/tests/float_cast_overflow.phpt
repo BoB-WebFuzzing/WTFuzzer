@@ -1,7 +1,5 @@
 --TEST--
 Overflow in float to int cast
---EXTENSIONS--
-exif
 --FILE--
 <?php
 

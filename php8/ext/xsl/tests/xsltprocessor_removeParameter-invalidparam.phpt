@@ -1,7 +1,11 @@
 --TEST--
 Check xsltprocessor::removeParameter with invalid parameter
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+        if (!extension_loaded('xsl')) {
+                die("skip\n");
+        }
+?>
 --FILE--
 <?php
 include __DIR__ .'/prepare.inc';

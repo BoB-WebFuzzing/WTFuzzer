@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "php.h"
-
 struct fpm_array_s {
 	void *data;
 	size_t sz;
@@ -86,7 +84,7 @@ static inline void *fpm_array_push(struct fpm_array_s *a) /* {{{ */
 
 	if (a->used == a->allocated) {
 		size_t new_allocated = a->allocated ? a->allocated * 2 : 20;
-		void *new_ptr = safe_perealloc(a->data, a->sz, new_allocated, 0, true);
+		void *new_ptr = realloc(a->data, a->sz * new_allocated);
 
 		if (!new_ptr) {
 			return 0;

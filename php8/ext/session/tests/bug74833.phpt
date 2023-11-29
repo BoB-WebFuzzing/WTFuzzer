@@ -1,7 +1,5 @@
 --TEST--
 Bug #74833 Session module number is uninitialized when SID is reset
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

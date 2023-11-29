@@ -3,8 +3,8 @@ ldap_set_option() - ldap_set_option() operation that should fail
 --CREDITS--
 Patrick Allaert <patrickallaert@php.net>
 # Belgian PHP Testfest 2009
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require "connect.inc";

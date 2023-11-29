@@ -1,9 +1,8 @@
 --TEST--
 Bug #78152: PDO::exec() - Bad error handling with multiple commands
---EXTENSIONS--
-pdo_mysql
 --SKIPIF--
 <?php
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'skipif.inc');
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
 MySQLPDOTest::skip();
 ?>

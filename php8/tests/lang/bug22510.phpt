@@ -2,8 +2,6 @@
 Bug #22510 (segfault among complex references)
 --FILE--
 <?php
-
-#[AllowDynamicProperties]
 class foo
 {
     public $list = array();
@@ -31,8 +29,6 @@ class foo
 
 class bar
 {
-    public $instance;
-
     function run1() {
         print __CLASS__."::".__FUNCTION__."\n";
         $this->instance = new foo();

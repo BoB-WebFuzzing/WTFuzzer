@@ -1,7 +1,7 @@
 --TEST--
 Bug #42082 (NodeList length zero should be empty)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $doc = new DOMDocument();

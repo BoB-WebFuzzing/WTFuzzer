@@ -4,7 +4,7 @@ Test glob() function: ensure no platform difference
 <?php
 $path = __DIR__;
 
-ini_set('open_basedir', '');
+ini_set('open_basedir', NULL);
 
 var_dump(glob("$path/*.none"));
 var_dump(glob("$path/?.none"));

@@ -1,7 +1,7 @@
 --TEST--
 Bug #47430 (Errors after writing to nodeValue parameter of an absent previousSibling).
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $xml = '<?xml

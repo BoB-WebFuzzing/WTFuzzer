@@ -1,7 +1,7 @@
 --TEST--
 Test 6: Transform To Doc
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php require_once __DIR__ .'/skipif.inc'; ?>
 --FILE--
 <?php
 echo "Test 6: Transform To Doc";

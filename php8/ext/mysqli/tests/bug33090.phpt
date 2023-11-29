@@ -1,9 +1,8 @@
 --TEST--
 Bug #33090 (mysql_prepare doesn't return an error)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

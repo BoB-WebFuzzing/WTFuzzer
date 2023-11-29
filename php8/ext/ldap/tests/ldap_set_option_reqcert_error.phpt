@@ -2,8 +2,8 @@
 ldap_option_reqcert_basic() - Error test for TLS require cert ldap option
 --CREDITS--
 Edwin Hoksberg <edwin@edwinhoksberg.nl>
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once __DIR__ .'/skipif.inc'; ?>
 --FILE--
 <?php
 require "connect.inc";

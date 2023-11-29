@@ -1,7 +1,10 @@
 --TEST--
 Test mb_strrchr() function : variation - case sensitivity
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_strrchr') or die("skip mb_strrchr() is not available in this build");
+?>
 --FILE--
 <?php
 echo "*** Testing mb_strrchr() : variation ***\n";

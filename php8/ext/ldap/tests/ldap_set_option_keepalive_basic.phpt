@@ -2,8 +2,8 @@
 ldap_set_option() - Basic test for TCP keepalive ldap options
 --CREDITS--
 Chad Sikorra <Chad.Sikorra@gmail.com>
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require "connect.inc";

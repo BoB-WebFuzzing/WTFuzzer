@@ -1,7 +1,5 @@
 --TEST--
 rewriter uses arg_separator.output for modifying URLs
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -19,7 +17,7 @@ session.save_handler=files
 
 error_reporting(E_ALL);
 
-session_id("test020");
+session_id("abtest");
 session_start();
 ?>
 <a href="link.php?a=b">
@@ -27,4 +25,4 @@ session_start();
 session_destroy();
 ?>
 --EXPECT--
-<a href="link.php?a=b&amp;PHPSESSID=test020">
+<a href="link.php?a=b&amp;PHPSESSID=abtest">

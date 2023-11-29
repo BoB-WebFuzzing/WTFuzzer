@@ -14,7 +14,8 @@ $asso_arrays = array(
 
        // array with numeric keys
 /*1*/  array(1 => 'one', 2 => 2, 1234567890 => 'big', -1 => 'negative key',
-             0 => "zero key"),
+             2.3 => 'float key', 0 => "zero key", 0.2 => 'decimal key',
+             2e2 => 'exp key1', -2e3 => 'negative exp key'),
 
        // array with string keys
        array('one' => 1, "two" => 2.0, "three" => 'three',

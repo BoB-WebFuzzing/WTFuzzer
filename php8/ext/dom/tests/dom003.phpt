@@ -1,7 +1,7 @@
 --TEST--
 Test 3: Exception Test
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -30,8 +30,6 @@ object(DOMException)#%d (%d) {
   string(23) "Hierarchy Request Error"
   ["string":"Exception":private]=>
   string(0) ""
-  ["code"]=>
-  int(3)
   ["file":protected]=>
   string(%d) "%sdom003.php"
   ["line":protected]=>
@@ -59,6 +57,8 @@ object(DOMException)#%d (%d) {
   }
   ["previous":"Exception":private]=>
   NULL
+  ["code"]=>
+  int(3)
 }
 --- Don't catch exception with try/catch
 

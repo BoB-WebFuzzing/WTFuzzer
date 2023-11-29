@@ -1,7 +1,5 @@
 --TEST--
 PostgreSQL pg_convert() (9.0+)
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
 include("skipif.inc");
@@ -62,4 +60,4 @@ Array of values must be an associative array with string keys
 Array of values must be an associative array with string keys
 Values must be of type string|int|float|bool|null, array given
 Values must be of type string|int|float|bool|null, stdClass given
-Values must be of type string|int|float|bool|null, PgSql\Connection given
+Values must be of type string|int|float|bool|null, resource given

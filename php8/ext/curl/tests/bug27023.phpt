@@ -2,8 +2,8 @@
 Bug #27023 (CURLOPT_POSTFIELDS does not parse content types for files)
 --INI--
 error_reporting = E_ALL & ~E_DEPRECATED
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 

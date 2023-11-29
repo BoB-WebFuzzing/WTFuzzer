@@ -12,5 +12,5 @@ interface I2 extends I1 {
 
 echo "Done\n";
 ?>
---EXPECT--
-Done
+--EXPECTF--
+Fatal error: Cannot inherit previously-inherited or override constant FOO from interface I1 in %s on line 6

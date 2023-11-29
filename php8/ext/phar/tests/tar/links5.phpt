@@ -1,7 +1,7 @@
 --TEST--
 Phar: tar with relative link to subdirectory file from subdirectory file
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 --FILE--

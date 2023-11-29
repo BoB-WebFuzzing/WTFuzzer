@@ -18,10 +18,8 @@ $format = '%b %d %Y %H:%M:%S';
 var_dump( strptime('foo', $format) );
 
 ?>
---EXPECTF--
+--EXPECT--
 *** Testing strptime() : error conditions ***
 
 -- Testing strptime() function on failure --
-
-Deprecated: Function strptime() is deprecated in %s on line %d
 bool(false)

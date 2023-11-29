@@ -2,8 +2,8 @@
 bug 7715, floats value with integer or incomplete input
 --INI--
 precision=14
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 $data = array(

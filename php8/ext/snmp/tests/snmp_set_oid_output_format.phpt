@@ -2,8 +2,6 @@
 Function snmp_set_oid_output_format
 --CREDITS--
 Olivier Doucet
---EXTENSIONS--
-snmp
 --SKIPIF--
 <?php
 require_once(__DIR__.'/skipif.inc');

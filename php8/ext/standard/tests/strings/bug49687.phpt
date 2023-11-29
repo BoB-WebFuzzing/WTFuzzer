@@ -13,13 +13,8 @@ foreach ($tests as $t) {
 }
 echo "Done.\n";
 ?>
---EXPECTF--
-Deprecated: Function utf8_decode() is deprecated in %s on line %d
+--EXPECT--
 413f3e42
-
-Deprecated: Function utf8_decode() is deprecated in %s on line %d
 3f22
-
-Deprecated: Function utf8_decode() is deprecated in %s on line %d
 413f3f423f433f3f
 Done.

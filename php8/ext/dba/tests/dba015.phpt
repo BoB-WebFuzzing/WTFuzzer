@@ -1,15 +1,11 @@
 --TEST--
 DBA with persistent connections
---EXTENSIONS--
-dba
 --SKIPIF--
 <?php
 $handler = "flatfile";
 require_once(__DIR__ .'/skipif.inc');
 die("info $HND handler used");
 ?>
---CONFLICTS--
-dba
 --FILE--
 <?php
 

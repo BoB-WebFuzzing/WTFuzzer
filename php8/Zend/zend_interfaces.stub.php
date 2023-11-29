@@ -1,49 +1,49 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
 interface Traversable {}
 
 interface IteratorAggregate extends Traversable
 {
-    /** @tentative-return-type */
-    public function getIterator(): Traversable;
+    /** @return Traversable */
+    public function getIterator();
 }
 
 interface Iterator extends Traversable
 {
-    /** @tentative-return-type */
-    public function current(): mixed;
+    /** @return mixed */
+    public function current();
 
-    /** @tentative-return-type */
-    public function next(): void;
+    /** @return void */
+    public function next();
 
-    /** @tentative-return-type */
-    public function key(): mixed;
+    /** @return mixed */
+    public function key();
 
-    /** @tentative-return-type */
-    public function valid(): bool;
+    /** @return bool */
+    public function valid();
 
-    /** @tentative-return-type */
-    public function rewind(): void;
+    /** @return void */
+    public function rewind();
 }
 
 interface ArrayAccess
 {
-    /** @tentative-return-type */
-    public function offsetExists(mixed $offset): bool;
+    /** @return bool */
+    public function offsetExists(mixed $offset);
 
     /**
      * Actually this should be return by ref but atm cannot be.
-     * @tentative-return-type
+     * @return mixed
      */
-    public function offsetGet(mixed $offset): mixed;
+    public function offsetGet(mixed $offset);
 
-    /** @tentative-return-type */
-    public function offsetSet(mixed $offset, mixed $value): void;
+    /** @return void */
+    public function offsetSet(mixed $offset, mixed $value);
 
-    /** @tentative-return-type */
-    public function offsetUnset(mixed $offset): void;
+    /** @return void */
+    public function offsetUnset(mixed $offset);
 }
 
 interface Serializable
@@ -57,8 +57,8 @@ interface Serializable
 
 interface Countable
 {
-    /** @tentative-return-type */
-    public function count(): int;
+    /** @return int */
+    public function count();
 }
 
 interface Stringable
@@ -66,20 +66,19 @@ interface Stringable
     public function __toString(): string;
 }
 
-/**
- * @not-serializable
- */
 final class InternalIterator implements Iterator
 {
-    private function __construct() {}
+    private function __construct();
 
-    public function current(): mixed {}
+    /** @return mixed */
+    public function current();
 
-    public function key(): mixed {}
+    /** @return mixed */
+    public function key();
 
-    public function next(): void {}
+    public function next(): void;
 
-    public function valid(): bool {}
+    public function valid(): bool;
 
-    public function rewind(): void {}
+    public function rewind(): void;
 }

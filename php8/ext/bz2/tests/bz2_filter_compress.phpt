@@ -1,7 +1,7 @@
 --TEST--
 bzip2.compress (with convert.base64-encode)
---EXTENSIONS--
-bz2
+--SKIPIF--
+<?php if (!extension_loaded("bz2")) print "skip"; ?>
 --FILE--
 <?php
 $text = 'I am the very model of a modern major general, I\'ve information vegetable, animal, and mineral.';

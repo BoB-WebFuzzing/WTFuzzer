@@ -1,7 +1,9 @@
 --TEST--
 Test mb_substitute_character() function : basic functionality
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+?>
 --FILE--
 <?php
 echo "*** Testing mb_substitute_character() : basic functionality ***\n";

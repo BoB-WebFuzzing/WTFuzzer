@@ -35,7 +35,7 @@ foreach($files as $name => $cont)
     if (empty($ulen)) $ulen = strlen($cont);
     if (empty($clen)) $clen = strlen($comp);
     if (empty($crc32))$crc32= crc32((binary)$cont);
-    $meta = isset($meta) ? serialize($meta) : "";
+    if (isset($meta)) $meta = serialize($meta);
 
     // write manifest entry
     $manifest .= pack('V', strlen($name)) . (binary)$name;

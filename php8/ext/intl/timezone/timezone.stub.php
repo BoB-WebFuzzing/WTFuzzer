@@ -1,216 +1,157 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
-/** @not-serializable */
 class IntlTimeZone
 {
-    /**
-     * @var int
-     * @cvalue TimeZone::SHORT
-     */
-    public const DISPLAY_SHORT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue TimeZone::LONG
-     */
-    public const DISPLAY_LONG = UNKNOWN;
-
-    /**
-     * @var int
-     * @cvalue TimeZone::SHORT_GENERIC
-     */
-    public const DISPLAY_SHORT_GENERIC = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue TimeZone::LONG_GENERIC
-     */
-    public const DISPLAY_LONG_GENERIC = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue TimeZone::SHORT_GMT
-     */
-    public const DISPLAY_SHORT_GMT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue TimeZone::LONG_GMT
-     */
-    public const DISPLAY_LONG_GMT = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue TimeZone::SHORT_COMMONLY_USED
-     */
-    public const DISPLAY_SHORT_COMMONLY_USED = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue TimeZone::GENERIC_LOCATION
-     */
-    public const DISPLAY_GENERIC_LOCATION = UNKNOWN;
-
-    /**
-     * @var int
-     * @cvalue UCAL_ZONE_TYPE_ANY
-     */
-    public const TYPE_ANY = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UCAL_ZONE_TYPE_CANONICAL
-     */
-    public const TYPE_CANONICAL = UNKNOWN;
-    /**
-     * @var int
-     * @cvalue UCAL_ZONE_TYPE_CANONICAL_LOCATION
-     */
-    public const TYPE_CANONICAL_LOCATION = UNKNOWN;
-
     private function __construct() {}
 
     /**
-     * @tentative-return-type
+     * @return int|false
      * @alias intltz_count_equivalent_ids
      */
-    public static function countEquivalentIDs(string $timezoneId): int|false {}
+    public static function countEquivalentIDs(string $timezoneId) {}
 
     /**
-     * @tentative-return-type
+     * @return IntlTimeZone
      * @alias intltz_create_default
      */
-    public static function createDefault(): IntlTimeZone {}
+    public static function createDefault() {}
 
     /**
      * @param IntlTimeZone|string|int|float|null $countryOrRawOffset
-     * @tentative-return-type
+     * @return IntlIterator|false
      * @alias intltz_create_enumeration
      */
-    public static function createEnumeration($countryOrRawOffset = null): IntlIterator|false {}
+    public static function createEnumeration($countryOrRawOffset = null) {}
 
     /**
-     * @tentative-return-type
+     * @return IntlTimeZone|null
      * @alias intltz_create_time_zone
      */
-    public static function createTimeZone(string $timezoneId): ?IntlTimeZone {}
+    public static function createTimeZone(string $timezoneId) {}
 
     /**
-     * @tentative-return-type
+     * @return IntlIterator|false
      * @alias intltz_create_time_zone_id_enumeration
      */
-    public static function createTimeZoneIDEnumeration(int $type, ?string $region = null, ?int $rawOffset = null): IntlIterator|false {}
+    public static function createTimeZoneIDEnumeration(int $type, ?string $region = null, ?int $rawOffset = null) {}
 
     /**
-     * @tentative-return-type
+     * @return IntlTimeZone|null
      * @alias intltz_from_date_time_zone
      */
-    public static function fromDateTimeZone(DateTimeZone $timezone): ?IntlTimeZone {}
+    public static function fromDateTimeZone(DateTimeZone $timezone) {}
 
     /**
      * @param bool $isSystemId
-     * @tentative-return-type
+     * @return string|false
      * @alias intltz_get_canonical_id
      */
-    public static function getCanonicalID(string $timezoneId, &$isSystemId = null): string|false {}
+    public static function getCanonicalID(string $timezoneId, &$isSystemId = null) {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias intltz_get_display_name
      */
-    public function getDisplayName(bool $dst = false, int $style = IntlTimeZone::DISPLAY_LONG, ?string $locale = null): string|false {}
+    public function getDisplayName(bool $dst = false, int $style = IntlTimeZone::DISPLAY_LONG, ?string $locale = null) {}
 
     /**
-     * @tentative-return-type
+     * @return int
      * @alias intltz_get_dst_savings
      */
-    public function getDSTSavings(): int {}
+    public function getDSTSavings() {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias intltz_get_equivalent_id
      */
-    public static function getEquivalentID(string $timezoneId, int $offset): string|false {}
+    public static function getEquivalentID(string $timezoneId, int $offset) {}
 
     /**
-     * @tentative-return-type
+     * @return int|false
      * @alias intltz_get_error_code
      */
-    public function getErrorCode(): int|false {}
+    public function getErrorCode() {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias intltz_get_error_message
      */
-    public function getErrorMessage(): string|false {}
+    public function getErrorMessage() {}
 
     /**
-     * @tentative-return-type
+     * @return IntlTimeZone
      * @alias intltz_get_gmt
      */
-    public static function getGMT(): IntlTimeZone {}
+    public static function getGMT() {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias intltz_get_id
      */
-    public function getID(): string|false {}
+    public function getID() {}
 
     /**
      * @param int $rawOffset
      * @param int $dstOffset
-     * @tentative-return-type
+     * @return bool
      * @alias intltz_get_offset
      */
-    public function getOffset(float $timestamp, bool $local, &$rawOffset, &$dstOffset): bool {}
+    public function getOffset(float $timestamp, bool $local, &$rawOffset, &$dstOffset) {}
 
     /**
-     * @tentative-return-type
+     * @return int
      * @alias intltz_get_raw_offset
      */
-    public function getRawOffset(): int {}
+    public function getRawOffset() {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias intltz_get_region
      */
-    public static function getRegion(string $timezoneId): string|false {}
+    public static function getRegion(string $timezoneId) {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias intltz_get_tz_data_version
      */
-    public static function getTZDataVersion(): string|false {}
+    public static function getTZDataVersion() {}
 
     /**
-     * @tentative-return-type
+     * @return IntlTimeZone
      * @alias intltz_get_unknown
      */
-    public static function getUnknown(): IntlTimeZone {}
+    public static function getUnknown() {}
 
 #if U_ICU_VERSION_MAJOR_NUM >= 52
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias intltz_get_windows_id
      */
-    public static function getWindowsID(string $timezoneId): string|false {}
+    public static function getWindowsID(string $timezoneId) {}
 
     /**
-     * @tentative-return-type
+     * @return string|false
      * @alias intltz_get_id_for_windows_id
      */
-    public static function getIDForWindowsID(string $timezoneId, ?string $region = null): string|false {}
+    public static function getIDForWindowsID(string $timezoneId, ?string $region = null) {}
 #endif
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias intltz_has_same_rules
      */
-    public function hasSameRules(IntlTimeZone $other): bool {}
+    public function hasSameRules(IntlTimeZone $other) {}
 
     /**
-     * @tentative-return-type
+     * @return DateTimeZone|false
      * @alias intltz_to_date_time_zone
      */
-    public function toDateTimeZone(): DateTimeZone|false {}
+    public function toDateTimeZone() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias intltz_use_daylight_time
      */
-    public function useDaylightTime(): bool {}
+    public function useDaylightTime() {}
 }

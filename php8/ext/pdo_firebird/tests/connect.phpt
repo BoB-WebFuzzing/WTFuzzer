@@ -1,7 +1,5 @@
 --TEST--
 PDO_Firebird: connect/disconnect
---EXTENSIONS--
-pdo_firebird
 --SKIPIF--
 <?php require('skipif.inc'); ?>
 --ENV--

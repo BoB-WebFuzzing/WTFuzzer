@@ -2,8 +2,6 @@
 imap_headerinfo() function : basic functionality
 --CREDITS--
 Olivier Doucet
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

@@ -1,5 +1,5 @@
 --TEST--
-Bug #53437 (DateInterval basic serialization)
+Bug #53437 DateInterval basic serialization
 --FILE--
 <?php
 $di0 = new DateInterval('P2Y4DT6H8M');
@@ -11,8 +11,8 @@ $di1 = unserialize($s);
 var_dump($di0, $di1);
 
 ?>
---EXPECTF--
-object(DateInterval)#1 (%d) {
+--EXPECT--
+object(DateInterval)#1 (16) {
   ["y"]=>
   int(2)
   ["m"]=>
@@ -27,14 +27,26 @@ object(DateInterval)#1 (%d) {
   int(0)
   ["f"]=>
   float(0)
+  ["weekday"]=>
+  int(0)
+  ["weekday_behavior"]=>
+  int(0)
+  ["first_last_day_of"]=>
+  int(0)
   ["invert"]=>
   int(0)
   ["days"]=>
   bool(false)
-  ["from_string"]=>
-  bool(false)
+  ["special_type"]=>
+  int(0)
+  ["special_amount"]=>
+  int(0)
+  ["have_weekday_relative"]=>
+  int(0)
+  ["have_special_relative"]=>
+  int(0)
 }
-object(DateInterval)#2 (%d) {
+object(DateInterval)#2 (16) {
   ["y"]=>
   int(2)
   ["m"]=>
@@ -49,10 +61,22 @@ object(DateInterval)#2 (%d) {
   int(0)
   ["f"]=>
   float(0)
+  ["weekday"]=>
+  int(0)
+  ["weekday_behavior"]=>
+  int(0)
+  ["first_last_day_of"]=>
+  int(0)
   ["invert"]=>
   int(0)
   ["days"]=>
   bool(false)
-  ["from_string"]=>
-  bool(false)
+  ["special_type"]=>
+  int(0)
+  ["special_amount"]=>
+  int(0)
+  ["have_weekday_relative"]=>
+  int(0)
+  ["have_special_relative"]=>
+  int(0)
 }

@@ -72,7 +72,6 @@ function normalizeOutput(string $out): string {
         'Resource ID#%d used as offset, casting to integer (%d)',
         $out);
     $out = preg_replace('/string\(\d+\) "([^"]*%d)/', 'string(%d) "$1', $out);
-    $out = str_replace("\0", '%0', $out);
     return $out;
 }
 
@@ -87,7 +86,6 @@ function formatToRegex(string $format): string {
     $result = str_replace('%x', '[0-9a-fA-F]+', $result);
     $result = str_replace('%f', '[+-]?\.?\d+\.?\d*(?:[Ee][+-]?\d+)?', $result);
     $result = str_replace('%c', '.', $result);
-    $result = str_replace('%0', '\0', $result);
     return "/^$result$/s";
 }
 
@@ -115,7 +113,7 @@ function generateMinimallyDifferingOutput(string $out, string $oldExpect) {
 
 function insertOutput(string $phpt, string $out): string {
     return preg_replace_callback('/--EXPECTF?--.*?(--CLEAN--|$)/sD', function($matches) use($out) {
-        $hasWildcard = preg_match('/%[resSaAwidxfc0]/', $out);
+        $hasWildcard = preg_match('/%[resSaAwidxfc]/', $out);
         $F = $hasWildcard ? 'F' : '';
         return "--EXPECT$F--\n" . $out . "\n" . $matches[1];
     }, $phpt);

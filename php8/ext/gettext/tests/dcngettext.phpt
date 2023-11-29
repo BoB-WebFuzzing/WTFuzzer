@@ -1,9 +1,8 @@
 --TEST--
 dcngettext() tests
---EXTENSIONS--
-gettext
 --SKIPIF--
 <?php
+if (!extension_loaded("gettext")) die("skip");
 if (!function_exists("dcngettext")) die("skip dcngettext() doesn't exist");
 ?>
 --FILE--

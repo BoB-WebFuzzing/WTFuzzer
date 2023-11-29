@@ -21,8 +21,7 @@ date.timezone=
     echo date(DATE_ISO8601, $date3), "\n";
     echo date(DATE_ISO8601, $date4), "\n";
 ?>
---EXPECTF--
-Warning: PHP Startup: Invalid date.timezone value '', using 'UTC' instead in %s on line %d
+--EXPECT--
 America/Indiana/Knox
 2005-01-12T03:00:00-0500
 2005-07-12T03:00:00-0500

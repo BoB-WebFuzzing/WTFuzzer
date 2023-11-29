@@ -3,8 +3,8 @@ Bug #77215: CFG assertion failure on multiple finalizing switch frees in one blo
 --INI--
 opcache.enable_cli=1
 opcache.optimization_level=-1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

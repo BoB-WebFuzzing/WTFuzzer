@@ -1,7 +1,9 @@
 --TEST--
 Bug #72258 ZipArchive converts filenames to unrecoverable form
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 

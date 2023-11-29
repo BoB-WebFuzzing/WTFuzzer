@@ -1,7 +1,9 @@
 --TEST--
 Bug #71894 (AddressSanitizer: global-buffer-overflow in zif_cal_from_jd)
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php
+if (!extension_loaded('calendar')) die('skip ext/calendar required');
+?>
 --FILE--
 <?php
 var_dump(cal_from_jd(347997, CAL_JEWISH));

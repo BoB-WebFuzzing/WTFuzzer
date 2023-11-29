@@ -12,7 +12,7 @@ class ObserverImpl implements SplObserver
         $this->name = '$' . $name;
     }
 
-    function update(SplSubject $subject): void
+    function update(SplSubject $subject)
     {
         echo $this->name . '->' . __METHOD__ . '(' . $subject->getName() . ");\n";
     }
@@ -33,7 +33,7 @@ class SubjectImpl implements SplSubject
         $this->name = '$' . $name;
     }
 
-    function attach(SplObserver $observer): void
+    function attach(SplObserver $observer)
     {
         echo '$sub->' . __METHOD__ . '(' . $observer->getName() . ");\n";
         if (!in_array($observer, $this->observers))
@@ -42,7 +42,7 @@ class SubjectImpl implements SplSubject
         }
     }
 
-    function detach(SplObserver $observer): void
+    function detach(SplObserver $observer)
     {
         echo '$sub->' . __METHOD__ . '(' . $observer->getName() . ");\n";
         $idx = array_search($observer, $this->observers);
@@ -52,7 +52,7 @@ class SubjectImpl implements SplSubject
         }
     }
 
-    function notify(): void
+    function notify()
     {
         echo '$sub->' . __METHOD__ . "();\n";
         foreach($this->observers as $observer)

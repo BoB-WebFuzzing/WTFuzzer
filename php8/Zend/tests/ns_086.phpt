@@ -1,7 +1,11 @@
 --TEST--
 086: bracketed namespace with encoding
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+if (!extension_loaded("mbstring")) {
+  die("skip Requires mbstring extension");
+}
+?>
 --INI--
 zend.multibyte=1
 --FILE--

@@ -1,7 +1,7 @@
 --TEST--
 Bug #39662 (Segfault when calling asXML() of a cloned SimpleXMLElement)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip simplexml extension is not loaded"; ?>
 --FILE--
 <?php
 

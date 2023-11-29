@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -105,8 +105,6 @@ typedef struct CharSet {
 		char end;
 	} *ranges;
 } CharSet;
-
-typedef zend_long (*int_string_formater)(const char*, char**, int);
 
 /*
  * Declarations for functions used only in this file.
@@ -585,7 +583,7 @@ PHPAPI int php_sscanf_internal( char *string, char *format,
 	int  base = 0;
 	int  underflow = 0;
 	size_t width;
-	int_string_formater fn = NULL;
+	zend_long (*fn)() = NULL;
 	char *ch, sch;
 	int  flags;
 	char buf[64];	/* Temporary buffer to hold scanned number
@@ -742,29 +740,29 @@ literal:
 			case 'D':
 				op = 'i';
 				base = 10;
-				fn = (int_string_formater)ZEND_STRTOL_PTR;
+				fn = (zend_long (*)())ZEND_STRTOL_PTR;
 				break;
 			case 'i':
 				op = 'i';
 				base = 0;
-				fn = (int_string_formater)ZEND_STRTOL_PTR;
+				fn = (zend_long (*)())ZEND_STRTOL_PTR;
 				break;
 			case 'o':
 				op = 'i';
 				base = 8;
-				fn = (int_string_formater)ZEND_STRTOL_PTR;
+				fn = (zend_long (*)())ZEND_STRTOL_PTR;
 				break;
 			case 'x':
 			case 'X':
 				op = 'i';
 				base = 16;
-				fn = (int_string_formater)ZEND_STRTOL_PTR;
+				fn = (zend_long (*)())ZEND_STRTOL_PTR;
 				break;
 			case 'u':
 				op = 'i';
 				base = 10;
 				flags |= SCAN_UNSIGNED;
-				fn = (int_string_formater)ZEND_STRTOUL_PTR;
+				fn = (zend_long (*)())ZEND_STRTOUL_PTR;
 				break;
 
 			case 'f':

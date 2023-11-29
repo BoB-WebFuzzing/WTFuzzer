@@ -2,8 +2,8 @@
 PHP bug #77143: Heap Buffer Overflow (READ: 4) in phar_parse_pharfile
 --INI--
 phar.readonly=0
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 chdir(__DIR__);

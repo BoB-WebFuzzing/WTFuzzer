@@ -31,7 +31,9 @@ try {
 fclose($file_handle);
 
 // different invalid format strings
-$invalid_formats = array("", "%", "%h", "%.", "%d%m");
+$invalid_formats = array( $undefined_var,
+                          "%", "%h", "%.", "%d%m"
+                   );
 
 
 // looping to use various invalid formats with fscanf()
@@ -55,10 +57,12 @@ $file_path = __DIR__;
 $filename = "$file_path/fscanf_error.tmp";
 unlink($filename);
 ?>
---EXPECT--
+--EXPECTF--
 *** Testing fscanf() for error conditions ***
 fscanf(): supplied resource is not a valid File-Handle resource
 Different numbers of variable names and field specifiers
+
+Warning: Undefined variable $undefined_var in %s on line %d
 array(0) {
 }
 Bad scan conversion character "

@@ -2,10 +2,9 @@
 Test the use of controls
 --CREDITS--
 Côme Chilliet <mcmic@php.net>
---EXTENSIONS--
-ldap
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifbindfailure.inc');
 require_once('skipifcontrol.inc');
 skipifunsupportedcontrol(LDAP_CONTROL_ASSERT);
@@ -66,8 +65,7 @@ Warning: ldap_modify(): Modify: Assertion Failed in %s on line %d
 Warning: ldap_delete(): Delete: Assertion Failed in %s on line %d
 
 Warning: ldap_compare(): Compare: Assertion Failed in %s on line %d
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(2) {
   ["count"]=>
   int(1)
@@ -90,8 +88,7 @@ array(2) {
 }
 bool(false)
 bool(true)
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(2) {
   ["count"]=>
   int(1)
@@ -113,8 +110,7 @@ array(2) {
   }
 }
 bool(false)
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(2) {
   ["count"]=>
   int(1)
@@ -142,8 +138,7 @@ bool(false)
 bool(true)
 int(-1)
 bool(true)
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(4) {
   ["count"]=>
   int(3)
@@ -154,8 +149,7 @@ array(4) {
   [2]=>
   string(10) "Antarctica"
 }
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(3) {
   ["count"]=>
   int(2)

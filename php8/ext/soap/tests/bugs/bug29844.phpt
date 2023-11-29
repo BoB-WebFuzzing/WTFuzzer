@@ -1,7 +1,7 @@
 --TEST--
 Bug #29844 (SOAP doesn't return the result of a valid SOAP request)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--
@@ -14,7 +14,6 @@ class hello_world {
 }
 
 class LocalSoapClient extends SoapClient {
-  private $server;
 
   function __construct($wsdl, $options) {
     parent::__construct($wsdl, $options);
@@ -22,7 +21,7 @@ class LocalSoapClient extends SoapClient {
     $this->server->setClass('hello_world');
   }
 
-  function __doRequest($request, $location, $action, $version, $one_way = 0): ?string {
+  function __doRequest($request, $location, $action, $version, $one_way = 0) {
     ob_start();
     $this->server->handle($request);
     $response = ob_get_contents();

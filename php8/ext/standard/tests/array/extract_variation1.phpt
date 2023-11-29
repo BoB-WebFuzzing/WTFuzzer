@@ -6,21 +6,21 @@ Test extract() function (variation 1)
 $val = 4;
 $str = "John";
 
-var_dump($val);
-var_dump($str);
+debug_zval_dump($val);
+debug_zval_dump($str);
 
 /* Extracting Global Variables */
 var_dump(extract($GLOBALS, EXTR_REFS));
-var_dump($val);
-var_dump($str);
+debug_zval_dump($val);
+debug_zval_dump($str);
 
 echo "\nDone";
 ?>
 --EXPECTF--
 int(4)
-string(4) "John"
+string(4) "John" refcount(%d)
 int(%d)
 int(4)
-string(4) "John"
+string(4) "John" refcount(%d)
 
 Done

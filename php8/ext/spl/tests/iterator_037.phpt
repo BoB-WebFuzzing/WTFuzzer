@@ -27,7 +27,10 @@ function test($ar, $flags)
 
 class MyItem
 {
-    function __construct(public $value) {}
+    function __construct($value)
+    {
+        $this->value = $value;
+    }
 
     function __toString()
     {

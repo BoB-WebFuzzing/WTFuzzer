@@ -1,7 +1,11 @@
 --TEST--
 shmop extension test
---EXTENSIONS--
-shmop
+--SKIPIF--
+<?php
+    if (!extension_loaded("shmop")) {
+        die("skip shmop() extension not available");
+    }
+?>
 --FILE--
 <?php
     $hex_shm_id = 0xff3;
@@ -70,9 +74,9 @@ shmop
         echo "ok\n";
     }
 ?>
---EXPECTF--
+--EXPECT--
 shm open for create: ok
-shm size is: %d
+shm size is: 1024
 shm write test #1: ok
 data in memory is: test #1 of the shmop() extension
 shm open for read only: ok

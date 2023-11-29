@@ -1,7 +1,5 @@
 --TEST--
 GMP operators throw errors with wrong parameter names
---EXTENSIONS--
-gmp
 --FILE--
 <?php
 

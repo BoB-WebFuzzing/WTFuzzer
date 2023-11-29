@@ -1,7 +1,7 @@
 --TEST--
 Bug #27303 (OCIBindByName binds numeric PHP values as characters)
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --FILE--
 <?php
 

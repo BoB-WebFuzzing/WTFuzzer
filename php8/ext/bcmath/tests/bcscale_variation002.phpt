@@ -1,7 +1,7 @@
 --TEST--
 bcadd() incorrect argument count
---EXTENSIONS--
-bcmath
+--SKIPIF--
+<?php if(!extension_loaded("bcmath")) print "skip"; ?>
 --INI--
 bcmath.scale=-2
 --FILE--

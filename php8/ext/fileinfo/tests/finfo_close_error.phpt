@@ -1,7 +1,7 @@
 --TEST--
 Test finfo_close() function : error conditions
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 echo "*** Testing finfo_close() : error conditions ***\n";
@@ -19,4 +19,4 @@ try {
 *** Testing finfo_close() : error conditions ***
 
 -- Testing finfo_close() function with wrong resource type --
-finfo_close(): Argument #1 ($finfo) must be of type finfo, resource given
+finfo_close(): supplied resource is not a valid file_info resource

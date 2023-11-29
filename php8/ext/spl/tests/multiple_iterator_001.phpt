@@ -13,16 +13,7 @@ echo "-- Default flags, no iterators --\n";
 foreach($m as $value) {
     var_dump($value);
 }
-try {
-    var_dump($m->current());
-} catch (RuntimeException $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump($m->key());
-} catch (RuntimeException $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump($m->current());
 
 $m->attachIterator($iter1);
 $m->attachIterator($iter2);
@@ -114,8 +105,7 @@ foreach($m as $key => $value) {
 ?>
 --EXPECTF--
 -- Default flags, no iterators --
-Called current() on an invalid iterator
-Called key() on an invalid iterator
+bool(false)
 -- Default flags, MultipleIterator::MIT_NEED_ALL | MultipleIterator::MIT_KEYS_NUMERIC --
 bool(true)
 array(3) {

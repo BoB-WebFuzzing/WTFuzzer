@@ -12,7 +12,6 @@ class DestructableObject
 
 class DestructorCreator
 {
-    public $test;
     public function __destruct()
     {
         $this->test = new DestructableObject;

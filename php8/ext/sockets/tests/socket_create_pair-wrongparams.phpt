@@ -1,19 +1,20 @@
 --TEST--
 Test parameter handling in socket_create_pair()
---EXTENSIONS--
-sockets
 --SKIPIF--
 <?php
 if (substr(PHP_OS, 0, 3) == 'WIN') {
     die('skip.. Not valid for Windows');
 }
+if (!extension_loaded('sockets')) {
+    die('SKIP The sockets extension is not loaded.');
+}
 --FILE--
 <?php
 
-var_dump(socket_create_pair(AF_INET, 0, 0, $sockets));
+var_dump(socket_create_pair(AF_INET, null, null, $sockets));
 
 try {
-    var_dump(socket_create_pair(31337, 0, 0, $sockets));
+    var_dump(socket_create_pair(31337, null, null, $sockets));
 } catch (\ValueError $e) {
     echo $e->getMessage() . \PHP_EOL;
 }

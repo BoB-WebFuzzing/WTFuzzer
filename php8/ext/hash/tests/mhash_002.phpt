@@ -2,8 +2,6 @@
 MHash: mhash_get_block_size() & mhash_get_hash_name() test
 --SKIPIF--
 <?php if(!function_exists('mhash')) { die('skip mhash compatibility layer not available'); } ?>
---INI--
-error_reporting=E_ALL&~E_DEPRECATED
 --FILE--
 <?php
 $supported_hash_al = array(

@@ -2,8 +2,8 @@
 Phar front controller phps
 --INI--
 default_charset=UTF-8
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller3.php
 REQUEST_URI=/frontcontroller3.php/a.phps

@@ -38,16 +38,12 @@ echo "-\n";
 C::test();
 
 ?>
---EXPECTF--
+--EXPECT--
 A
 -
 B
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
 B
 -
 C
 B
-
-Deprecated: Use of "parent" in callables is deprecated in %s on line %d
 B

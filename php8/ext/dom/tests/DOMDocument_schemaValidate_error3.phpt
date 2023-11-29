@@ -3,8 +3,8 @@ DomDocument::schemaValidate() - empty string for schema file name
 --CREDITS--
 Daniel Convissor <danielc@php.net>
 # TestFest 2009 NYPHP
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

@@ -1,7 +1,7 @@
 --TEST--
 Bug #54089 (token_get_all() does not stop after __halt_compiler)
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip"; ?>
 --FILE--
 <?php
 $codes = array(

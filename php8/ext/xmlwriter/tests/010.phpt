@@ -1,7 +1,9 @@
 --TEST--
 xmlwriter_start/end_attribute()
---EXTENSIONS--
-xmlwriter
+--SKIPIF--
+<?php
+if (!extension_loaded("xmlwriter")) die("skip");
+?>
 --FILE--
 <?php
 
@@ -41,7 +43,7 @@ var_dump(file_get_contents($file));
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 bool(true)
 bool(true)
 bool(true)

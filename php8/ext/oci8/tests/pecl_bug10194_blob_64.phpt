@@ -1,7 +1,5 @@
 --TEST--
 PECL Bug #10194 (segfault in Instant Client when memory_limit is reached inside the callback)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on thes

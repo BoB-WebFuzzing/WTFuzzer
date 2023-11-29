@@ -1,7 +1,11 @@
 --TEST--
 Test xml_set_processing_instruction_handler function : basic
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+if (!extension_loaded("xml")) {
+    print "skip - XML extension not loaded";
+}
+?>
 --FILE--
 <?php
 class XML_Parser

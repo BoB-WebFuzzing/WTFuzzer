@@ -1,7 +1,9 @@
 --TEST--
 Bug #74099 Memory leak with openssl_encrypt()
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php
+if (!extension_loaded("openssl")) die("skip");
+?>
 --FILE--
 <?php
 $aad = random_bytes(32);

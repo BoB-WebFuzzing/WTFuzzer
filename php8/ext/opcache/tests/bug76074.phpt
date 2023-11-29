@@ -1,7 +1,7 @@
 --TEST--
 Bug #76074 (opcache corrupts variable in for-loop)
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

@@ -1,7 +1,7 @@
 --TEST--
 zend multibyte (7)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --INI--
 zend.multibyte=On
 zend.script_encoding=ISO-8859-1

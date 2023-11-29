@@ -1,5 +1,5 @@
 --TEST--
-RFC1867 character quoting
+RFC1867 character quotting
 --INI--
 file_uploads=1
 max_input_vars=1000

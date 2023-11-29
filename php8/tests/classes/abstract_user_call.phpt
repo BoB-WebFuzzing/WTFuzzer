@@ -1,5 +1,5 @@
 --TEST--
-ZE2 An abstract method cannot be called indirectly
+ZE2 An abstrcat method cannot be called indirectly
 --FILE--
 <?php
 
@@ -27,8 +27,6 @@ try {
 }
 
 ?>
---EXPECTF--
+--EXPECT--
 test::func()
-
-Deprecated: Callables of the form ["test", "test_base::func"] are deprecated in %s on line %d
 call_user_func(): Argument #1 ($callback) must be a valid callback, cannot call abstract method test_base::func()

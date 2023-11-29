@@ -1,7 +1,7 @@
 --TEST--
 Bug #49354 (mb_strcut() cuts wrong length when offset is in the middle of a multibyte character)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 $crap = 'AåBäCöDü';

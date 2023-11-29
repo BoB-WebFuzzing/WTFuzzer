@@ -1,7 +1,9 @@
 --TEST--
 openssl key from zval leaks
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php
+if (!extension_loaded("openssl")) die("skip");
+?>
 --FILE--
 <?php
 $cert = false;

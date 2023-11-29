@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 47: Extension of complex type (2)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";

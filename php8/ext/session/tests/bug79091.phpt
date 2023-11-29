@@ -1,52 +1,54 @@
 --TEST--
 Bug #79091 (heap use-after-free in session_create_id())
---EXTENSIONS--
-session
+--SKIPIF--
+<?php
+if (!extension_loaded('session')) die('skip session extension not available');
+?>
 --FILE--
 <?php
 class MySessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
-    public function close(): bool
+    public function close()
     {
         return true;
     }
 
-    public function destroy($session_id): bool
+    public function destroy($session_id)
     {
         return true;
     }
 
-    public function gc($maxlifetime): int|false
+    public function gc($maxlifetime)
     {
         return true;
     }
 
-    public function open($save_path, $session_name): bool
+    public function open($save_path, $session_name)
     {
         return true;
     }
 
-    public function read($session_id): string|false
+    public function read($session_id)
     {
         return '';
     }
 
-    public function write($session_id, $session_data): bool
+    public function write($session_id, $session_data)
     {
         return true;
     }
 
-    public function create_sid(): string
+    public function create_sid()
     {
         return uniqid();
     }
 
-    public function updateTimestamp($key, $val): bool
+    public function updateTimestamp($key, $val)
     {
         return true;
     }
 
-    public function validateId($key): bool
+    public function validateId($key)
     {
         return true;
     }

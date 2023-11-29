@@ -1,7 +1,5 @@
 --TEST--
 Bug #64609 (pg_convert enum type support)
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
 include("skipif.inc");
@@ -14,14 +12,14 @@ error_reporting(E_ALL);
 include 'config.inc';
 
 $db = pg_connect($conn_str);
-pg_query($db, "BEGIN");
-pg_query($db, "CREATE TYPE t_enum AS ENUM ('ok', 'ko')");
-pg_query($db, "CREATE TABLE test_enum (a t_enum)");
+pg_query("BEGIN");
+pg_query("CREATE TYPE t_enum AS ENUM ('ok', 'ko')");
+pg_query("CREATE TABLE test_enum (a t_enum)");
 
 $fields = array('a' => 'ok');
 $converted = pg_convert($db, 'test_enum', $fields);
 
-pg_query($db, "ROLLBACK");
+pg_query("ROLLBACK");
 
 var_dump($converted);
 ?>

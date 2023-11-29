@@ -1,7 +1,9 @@
 --TEST--
 Bug #81351 (xml_parse may fail, but has no error code)
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+if (!extension_loaded('xml')) die("skip xml extension not available");
+?>
 --FILE--
 <?php
 $xml = <<<XML

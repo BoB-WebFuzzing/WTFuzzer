@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -20,7 +20,7 @@
 
 #include "php.h"
 
-#ifdef DBA_NDBM
+#if DBA_NDBM
 #include "php_ndbm.h"
 
 #include <fcntl.h>
@@ -28,11 +28,13 @@
 #include NDBM_INCLUDE_FILE
 #endif
 
+#define NDBM_GKEY datum gkey; gkey.dptr = (char *) key; gkey.dsize = keylen
+
 DBA_OPEN_FUNC(ndbm)
 {
 	DBM *dbf;
 	int gmode = 0;
-	int filemode = info->file_permission;
+	int filemode = 0644;
 	dba_info *pinfo = (dba_info *) info;
 
 	switch(info->mode) {
@@ -52,6 +54,10 @@ DBA_OPEN_FUNC(ndbm)
 			return FAILURE; /* not possible */
 	}
 
+	if(info->argc > 0) {
+		filemode = zval_get_long(&info->argv[0]);
+	}
+
 	dbf = dbm_open(info->path, gmode, filemode);
 
 	pinfo->dbf = dbf;
@@ -66,26 +72,24 @@ DBA_CLOSE_FUNC(ndbm)
 DBA_FETCH_FUNC(ndbm)
 {
 	datum gval;
-	datum gkey;
+	char *new = NULL;
 
-	gkey.dptr = ZSTR_VAL(key);
-	gkey.dsize = ZSTR_LEN(key);
+	NDBM_GKEY;
 	gval = dbm_fetch(info->dbf, gkey);
-	if (gval.dptr) {
-		return zend_string_init(gval.dptr, gval.dsize, /* persistent */ false);
+	if(gval.dptr) {
+		if(newlen) *newlen = gval.dsize;
+		new = estrndup(gval.dptr, gval.dsize);
 	}
-	return NULL;
+	return new;
 }
 
 DBA_UPDATE_FUNC(ndbm)
 {
 	datum gval;
-	datum gkey;
 
-	gkey.dptr = ZSTR_VAL(key);
-	gkey.dsize = ZSTR_LEN(key);
-	gval.dptr = ZSTR_VAL(val);
-	gval.dsize = ZSTR_LEN(val);
+	NDBM_GKEY;
+	gval.dptr = (char *) val;
+	gval.dsize = vallen;
 
 	if(!dbm_store(info->dbf, gkey, gval, mode == 1 ? DBM_INSERT : DBM_REPLACE))
 		return SUCCESS;
@@ -95,12 +99,9 @@ DBA_UPDATE_FUNC(ndbm)
 DBA_EXISTS_FUNC(ndbm)
 {
 	datum gval;
-	datum gkey;
-
-	gkey.dptr = ZSTR_VAL(key);
-	gkey.dsize = ZSTR_LEN(key);
+	NDBM_GKEY;
 	gval = dbm_fetch(info->dbf, gkey);
-	if (gval.dptr) {
+	if(gval.dptr) {
 		return SUCCESS;
 	}
 	return FAILURE;
@@ -108,33 +109,34 @@ DBA_EXISTS_FUNC(ndbm)
 
 DBA_DELETE_FUNC(ndbm)
 {
-	datum gkey;
-
-	gkey.dptr = ZSTR_VAL(key);
-	gkey.dsize = ZSTR_LEN(key);
+	NDBM_GKEY;
 	return(dbm_delete(info->dbf, gkey) == -1 ? FAILURE : SUCCESS);
 }
 
 DBA_FIRSTKEY_FUNC(ndbm)
 {
 	datum gkey;
+	char *key = NULL;
 
 	gkey = dbm_firstkey(info->dbf);
-	if (gkey.dptr) {
-		return zend_string_init(gkey.dptr, gkey.dsize, /* persistent */ false);
+	if(gkey.dptr) {
+		if(newlen) *newlen = gkey.dsize;
+		key = estrndup(gkey.dptr, gkey.dsize);
 	}
-	return NULL;
+	return key;
 }
 
 DBA_NEXTKEY_FUNC(ndbm)
 {
 	datum gkey;
+	char *nkey = NULL;
 
 	gkey = dbm_nextkey(info->dbf);
-	if (gkey.dptr) {
-		return zend_string_init(gkey.dptr, gkey.dsize, /* persistent */ false);
+	if(gkey.dptr) {
+		if(newlen) *newlen = gkey.dsize;
+		nkey = estrndup(gkey.dptr, gkey.dsize);
 	}
-	return NULL;
+	return nkey;
 }
 
 DBA_OPTIMIZE_FUNC(ndbm)

@@ -4,8 +4,8 @@ ISSUE #128 (opcache_invalidate segmentation fault)
 opcache.enable=1
 opcache.enable_cli=1
 opcache.optimization_level=-1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 var_dump(opcache_invalidate('1'));

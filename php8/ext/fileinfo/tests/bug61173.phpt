@@ -1,7 +1,9 @@
 --TEST--
 Bug #61173: Unable to detect error from finfo constructor
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php
+if (!class_exists('finfo'))
+    die('skip no fileinfo extension');
 --FILE--
 <?php
 

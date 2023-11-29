@@ -1,7 +1,9 @@
 --TEST--
 Bug #75378 ([REGRESSION] IntlDateFormatter::parse() does not change $position argument)
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl')) die('skip this test requires ext/intl');
+?>
 --FILE--
 <?php
 

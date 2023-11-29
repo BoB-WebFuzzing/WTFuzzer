@@ -1,7 +1,5 @@
 --TEST--
 Bug #55688 (Crash when calling SessionHandler::gc())
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -11,12 +9,7 @@ session.save_handler=files
 <?php
 ini_set('session.save_handler', 'files');
 $x = new SessionHandler;
-
-try {
-    $x->gc(1);
-} catch (Error $exception) {
-    echo $exception->getMessage() . "\n";
-}
+$x->gc(1);
 ?>
---EXPECT--
-Session is not active
+--EXPECTF--
+Warning: SessionHandler::gc(): Session is not active in %s on line %d

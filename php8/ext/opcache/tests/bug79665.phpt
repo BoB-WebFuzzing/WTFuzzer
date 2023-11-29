@@ -1,7 +1,9 @@
 --TEST--
 Bug #79665 (ini_get() and opcache_get_configuration() may be inconsistent)
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php
+require __DIR__ . '/skipif.inc';
+?>
 --INI--
 opcache.max_wasted_percentage=60
 opcache.memory_consumption=7

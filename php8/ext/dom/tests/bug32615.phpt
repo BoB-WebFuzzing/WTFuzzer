@@ -1,7 +1,7 @@
 --TEST--
 Bug #32615 (Replacing and inserting Fragments)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $dom = new DomDocument;

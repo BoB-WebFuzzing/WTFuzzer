@@ -1,7 +1,7 @@
 --TEST--
 bug #71428.2: inheritance of ye olde dynamic interfaces
---EXTENSIONS--
-pdo
+--SKIPIF--
+<?php if (!extension_loaded('pdo')) die("skip PDO is not available"); ?>
 --FILE--
 <?php
 interface StatementInterface {

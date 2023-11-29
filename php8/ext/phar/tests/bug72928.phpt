@@ -1,7 +1,7 @@
 --TEST--
 Phar: #72928 (Out of bound when verify signature of zip phar in phar_parse_zipfile)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 chdir(__DIR__);

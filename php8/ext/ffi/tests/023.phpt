@@ -1,7 +1,7 @@
 --TEST--
 FFI 023: GCC struct extensions
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

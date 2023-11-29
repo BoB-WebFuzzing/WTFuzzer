@@ -7,7 +7,7 @@ $obj[] = 1;
 $obj[] = 2;
 var_dump(count($obj));
 class SplDoublyLinkedList2 extends SplDoublyLinkedList{
-    public function count(): int {
+    public function count() {
         return -parent::count();
     }
 }

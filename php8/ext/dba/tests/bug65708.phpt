@@ -1,18 +1,17 @@
 --TEST--
 Bug #65708 (dba functions cast $key param to string in-place, bypassing copy on write)
---EXTENSIONS--
-dba
 --SKIPIF--
 <?php
-require_once __DIR__ . '/setup/setup_dba_tests.inc';
-check_skip_any();
+    require_once(__DIR__ .'/skipif.inc');
 ?>
 --FILE--
 <?php
-require_once __DIR__ . '/setup/setup_dba_tests.inc';
-$name = 'bug65708.db';
 
-$db = get_any_db($name);
+error_reporting(E_ALL);
+
+require_once(__DIR__ .'/test.inc');
+
+$db = dba_popen($db_filename, 'c');
 
 $key = 1;
 $copy = $key;
@@ -30,12 +29,9 @@ dba_close($db);
 ?>
 --CLEAN--
 <?php
-require_once __DIR__ . '/setup/setup_dba_tests.inc';
-$db_name = 'bug65708.db';
-cleanup_standard_db($db_name);
+    require(__DIR__ .'/clean.inc');
 ?>
---EXPECTF--
-Using handler: "%s"
+--EXPECT--
 integer
 integer
 integer

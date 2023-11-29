@@ -1,11 +1,12 @@
 --TEST--
 Incomplete initialization edge case where mysql->mysql is NULL
---EXTENSIONS--
-mysqli
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 
-mysqli_report(MYSQLI_REPORT_OFF);
 $mysqli = new mysqli();
 @$mysqli->__construct('doesnotexist');
 $mysqli->close();

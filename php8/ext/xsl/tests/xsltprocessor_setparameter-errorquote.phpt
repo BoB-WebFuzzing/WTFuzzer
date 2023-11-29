@@ -2,8 +2,12 @@
 Check xsltprocessor::setparameter error handling with both single and double quotes
 --DESCRIPTION--
 Memleak: http://bugs.php.net/bug.php?id=48221
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+        if (!extension_loaded('xsl')) {
+                die("skip\n");
+        }
+?>
 --FILE--
 <?php
 include __DIR__ .'/prepare.inc';

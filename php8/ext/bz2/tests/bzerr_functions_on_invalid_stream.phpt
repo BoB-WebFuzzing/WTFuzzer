@@ -5,23 +5,16 @@ Calling bzerr* functions on non-bz2 streams
 --FILE--
 <?php
 $f = fopen(__FILE__, 'r');
-try {
-    var_dump(bzerrno($f));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(bzerrstr($f));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
-try {
-    var_dump(bzerror($f));
-} catch (TypeError $e) {
-    echo $e->getMessage(), "\n";
-}
+var_dump(bzerrno($f));
+var_dump(bzerrstr($f));
+var_dump(bzerror($f));
 ?>
---EXPECT--
-bzerrno(): Argument #1 ($bz) must be a bz2 stream
-bzerrstr(): Argument #1 ($bz) must be a bz2 stream
-bzerror(): Argument #1 ($bz) must be a bz2 stream
+--EXPECTF--
+Warning: bzerrno(): Stream is not a bz2 stream in %s on line %d
+bool(false)
+
+Warning: bzerrstr(): Stream is not a bz2 stream in %s on line %d
+bool(false)
+
+Warning: bzerror(): Stream is not a bz2 stream in %s on line %d
+bool(false)

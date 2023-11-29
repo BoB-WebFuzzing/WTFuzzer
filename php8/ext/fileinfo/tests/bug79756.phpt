@@ -1,7 +1,9 @@
 --TEST--
 Bug #79756 (finfo_file crash (FILEINFO_MIME))
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php
+if (!extension_loaded('fileinfo')) die('skip fileinfo extension not available');
+?>
 --FILE--
 <?php
 $filename = __DIR__ . '/bug79756.xls';

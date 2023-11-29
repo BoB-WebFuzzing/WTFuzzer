@@ -1,7 +1,7 @@
 --TEST--
 Type inference of SEND_UNPACK with empty array
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test() {

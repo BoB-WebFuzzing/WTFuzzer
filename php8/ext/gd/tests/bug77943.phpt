@@ -1,7 +1,9 @@
 --TEST--
 Bug #77943 (imageantialias($image, false); does not work)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 require_once __DIR__ . '/func.inc';

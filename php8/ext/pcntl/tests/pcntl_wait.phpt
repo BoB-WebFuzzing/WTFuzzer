@@ -1,8 +1,8 @@
 --TEST--
 pcntl_wait()
---EXTENSIONS--
-pcntl
-posix
+--SKIPIF--
+<?php if (!extension_loaded("pcntl")) print "skip"; ?>
+<?php if (!extension_loaded("posix")) die("skip posix extension not available"); ?>
 --FILE--
 <?php
 $pid = pcntl_fork();

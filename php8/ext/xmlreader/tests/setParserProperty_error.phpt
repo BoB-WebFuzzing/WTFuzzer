@@ -1,7 +1,7 @@
 --TEST--
 XMLReader: setParserProperty Error
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip XMLReader extension required"; ?>
 --FILE--
 <?php
 

@@ -1,7 +1,7 @@
 --TEST--
 Phar front controller 404 tar-based
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller6.phar.php
 REQUEST_URI=/frontcontroller6.phar.php/notfound.php

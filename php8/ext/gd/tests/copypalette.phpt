@@ -1,7 +1,9 @@
 --TEST--
 imagepalettecopy
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+        if (!function_exists('imagecolorat')) die("skip gd extension not available\n");
+?>
 --FILE--
 <?php
 $failed = false;

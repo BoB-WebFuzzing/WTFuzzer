@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 2: function with parameters and result
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function Add($x,$y) {

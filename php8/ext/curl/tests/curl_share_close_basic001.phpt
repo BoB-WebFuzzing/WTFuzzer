@@ -1,7 +1,7 @@
 --TEST--
 curl_share_close basic test
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php if( !extension_loaded( 'curl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

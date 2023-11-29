@@ -1,7 +1,9 @@
 --TEST--
 socket_select() error conditions
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+if (!extension_loaded('sockets')) die('skip socket extension not available');
+?>
 --FILE--
 <?php
 $r = $w = $e = ['no resource'];

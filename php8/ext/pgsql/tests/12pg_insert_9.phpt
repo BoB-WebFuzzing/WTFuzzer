@@ -1,7 +1,5 @@
 --TEST--
 PostgreSQL pg_insert() (9.0+)
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
 include("skipif.inc");
@@ -21,7 +19,7 @@ $fields = array('num'=>'1234', 'str'=>'AAA', 'bin'=>'BBB');
 pg_insert($db, $table_name, $fields) or print "Error in test 1\n";
 echo pg_insert($db, $table_name, $fields, PGSQL_DML_STRING)."\n";
 echo pg_insert($db, $table_name, $fields, PGSQL_DML_STRING|PGSQL_DML_ESCAPE)."\n";
-var_dump( pg_insert($db, $table_name, $fields, PGSQL_DML_EXEC) );
+var_dump( pg_insert($db, $table_name, $fields, PGSQL_DML_EXEC) ); // Return resource
 
 /* Invalid values */
 try {
@@ -56,11 +54,10 @@ echo "Ok\n";
 --EXPECTF--
 INSERT INTO "php_pgsql_test" ("num","str","bin") VALUES (1234,E'AAA',E'\\x424242');
 INSERT INTO "php_pgsql_test" ("num","str","bin") VALUES ('1234','AAA','BBB');
-object(PgSql\Result)#%d (0) {
-}
+resource(%d) of type (pgsql result)
 Array of values must be an associative array with string keys
 Array of values must be an associative array with string keys
 Values must be of type string|int|float|bool|null, array given
 Values must be of type string|int|float|bool|null, stdClass given
-Values must be of type string|int|float|bool|null, PgSql\Connection given
+Values must be of type string|int|float|bool|null, resource given
 Ok

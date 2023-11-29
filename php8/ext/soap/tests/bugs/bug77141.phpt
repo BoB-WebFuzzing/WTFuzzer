@@ -1,17 +1,12 @@
 --TEST--
 Bug #77141 (Signedness issue in SOAP when precision=-1)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php
+if (!extension_loaded('soap')) die('skip soap extension not available');
+?>
 --FILE--
 <?php
-class MySoapClient extends SoapClient {
-    public function __doRequest($request, $location, $action, $version, $one_way = 0): string {
-        echo $request, "\n";
-        return '';
-    }
-}
-
-$soap = new MySoapClient(
+$soap = new \SoapClient(
     null,
     array(
         'location' => "http://localhost/soap.php",
@@ -23,6 +18,7 @@ $soap = new MySoapClient(
 );
 ini_set('precision', -1);
 $soap->call(1.1);
+echo $soap->__getLastRequest();
 ?>
 --EXPECT--
 <?xml version="1.0" encoding="UTF-8"?>

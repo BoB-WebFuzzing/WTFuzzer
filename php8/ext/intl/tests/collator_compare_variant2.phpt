@@ -1,8 +1,7 @@
 --TEST--
 compare()
---EXTENSIONS--
-intl
 --SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 <?php if (version_compare(INTL_ICU_VERSION, '51.2') < 0) die('skip for ICU >= 51.2'); ?>
 --FILE--
 <?php
@@ -72,11 +71,12 @@ function ut_main()
         array( 'ab'  , 'b'  ),
         array( 'ab'  , 'a'  ),
         array( 123  , 'abc' ),
-        array( 'ac' , ''    ),
+        array( 'ac' , null  ),
         array( '.'  , '.'   ),
         // Try to compare long strings.
         array( 'abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcde',
                'abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdea'),
+        array( null , null  )
     );
 
     $res_str .= compare_pairs( 'en_US', $test_params );
@@ -91,7 +91,7 @@ function ut_main()
         array( 'а',   'b' ),
         array( 'а',   'bb' ),
         array( 'а',   'ab' ),
-        array( 'а',   '' )
+        array( 'а',   null )
     );
 
     $res_str .= compare_pairs( 'ru_RU', $test_params );
@@ -120,9 +120,10 @@ ut_run();
 'ab' < 'b'
 'ab' > 'a'
 123 < 'abc'
-'ac' > ''
+'ac' > NULL
 '.' = '.'
 'abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcde' < 'abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdea'
+NULL = NULL
 'а' < 'б'
 'а' < 'аа'
 'аб' < 'ба'
@@ -130,5 +131,5 @@ ut_run();
 'а' < 'b'
 'а' < 'bb'
 'а' < 'ab'
-'а' > ''
+'а' > NULL
 'y' < 'k'

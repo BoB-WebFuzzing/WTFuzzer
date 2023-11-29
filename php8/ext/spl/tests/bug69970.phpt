@@ -6,10 +6,10 @@ Bug #69970 (Use-after-free vulnerability in spl_recursive_it_move_forward_ex())
 $count = 10;
 
 class RecursiveArrayIteratorIterator extends RecursiveIteratorIterator {
-  function rewind(): void {
+  function rewind() {
     echo "dummy\n";
   }
-  function endChildren(): void {
+  function endChildren() {
       global $count;
       echo $this->getDepth();
       if (--$count > 0) {

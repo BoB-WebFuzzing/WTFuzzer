@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: Simple document
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 

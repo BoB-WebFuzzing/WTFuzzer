@@ -1,7 +1,9 @@
 --TEST--
 Phar with object in metadata
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.require_hash=0
 phar.readonly=0

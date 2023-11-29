@@ -1,7 +1,10 @@
 --TEST--
 Test mb_internal_encoding() function : usage variations - Test different encodings
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_internal_encoding') or die("skip mb_internal_encoding() is not available in this build");
+?>
 --FILE--
 <?php
 /*
@@ -47,6 +50,10 @@ $encoding = array('UCS-4',			/*1*/
                   'ISO-8859-13',
                   'ISO-8859-14',
                   'ISO-8859-15',	/*35*/
+                  'byte2be',
+                  'byte2le',
+                  'byte4be',
+                  'byte4le',
                   'BASE64',			/*40*/
                   'HTML-ENTITIES',
                   '7bit',
@@ -256,84 +263,104 @@ string(11) "ISO-8859-15"
 -- Iteration 36 --
 string(11) "ISO-8859-15"
 bool(true)
-string(6) "BASE64"
+string(7) "byte2be"
 
 -- Iteration 37 --
+string(7) "byte2be"
+bool(true)
+string(7) "byte2le"
+
+-- Iteration 38 --
+string(7) "byte2le"
+bool(true)
+string(7) "byte4be"
+
+-- Iteration 39 --
+string(7) "byte4be"
+bool(true)
+string(7) "byte4le"
+
+-- Iteration 40 --
+string(7) "byte4le"
+bool(true)
+string(6) "BASE64"
+
+-- Iteration 41 --
 string(6) "BASE64"
 bool(true)
 string(13) "HTML-ENTITIES"
 
--- Iteration 38 --
+-- Iteration 42 --
 string(13) "HTML-ENTITIES"
 bool(true)
 string(4) "7bit"
 
--- Iteration 39 --
+-- Iteration 43 --
 string(4) "7bit"
 bool(true)
 string(4) "8bit"
 
--- Iteration 40 --
+-- Iteration 44 --
 string(4) "8bit"
 bool(true)
 string(6) "EUC-CN"
 
--- Iteration 41 --
+-- Iteration 45 --
 string(6) "EUC-CN"
 bool(true)
 string(5) "CP936"
 
--- Iteration 42 --
+-- Iteration 46 --
 string(5) "CP936"
 bool(true)
 string(2) "HZ"
 
--- Iteration 43 --
+-- Iteration 47 --
 string(2) "HZ"
 bool(true)
 string(6) "EUC-TW"
 
--- Iteration 44 --
+-- Iteration 48 --
 string(6) "EUC-TW"
 bool(true)
 string(5) "CP950"
 
--- Iteration 45 --
+-- Iteration 49 --
 string(5) "CP950"
 bool(true)
 string(5) "BIG-5"
 
--- Iteration 46 --
+-- Iteration 50 --
 string(5) "BIG-5"
 bool(true)
 string(6) "EUC-KR"
 
--- Iteration 47 --
+-- Iteration 51 --
 string(6) "EUC-KR"
 bool(true)
 string(3) "UHC"
 
--- Iteration 48 --
+-- Iteration 52 --
 string(3) "UHC"
 bool(true)
 string(11) "ISO-2022-KR"
 
--- Iteration 49 --
+-- Iteration 53 --
 string(11) "ISO-2022-KR"
 bool(true)
 string(12) "Windows-1251"
 
--- Iteration 50 --
+-- Iteration 54 --
 string(12) "Windows-1251"
 bool(true)
 string(12) "Windows-1252"
 
--- Iteration 51 --
+-- Iteration 55 --
 string(12) "Windows-1252"
 bool(true)
 string(5) "CP866"
 
--- Iteration 52 --
+-- Iteration 56 --
 string(5) "CP866"
 bool(true)
 string(6) "KOI8-R"

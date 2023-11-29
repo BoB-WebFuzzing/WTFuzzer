@@ -1,7 +1,5 @@
 --TEST--
 Test session_module_name() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

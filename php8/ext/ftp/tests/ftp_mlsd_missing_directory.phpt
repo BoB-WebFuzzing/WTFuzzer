@@ -2,9 +2,10 @@
 Testing ftp_mlsd returns false on server error
 --CREDITS--
 Andreas Treichel <gmblar+github [at] gmail [dot] com>
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php
+require 'skipif.inc';
+?>
 --FILE--
 <?php
 require 'server.inc';

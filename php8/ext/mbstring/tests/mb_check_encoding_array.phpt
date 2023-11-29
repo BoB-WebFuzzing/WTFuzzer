@@ -1,7 +1,7 @@
 --TEST--
 mb_check_encoding() - Circular references
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 ini_set('default_charset', 'UTF-8');

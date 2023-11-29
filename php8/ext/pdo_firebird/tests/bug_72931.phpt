@@ -1,7 +1,5 @@
 --TEST--
 PDO_Firebird: Bug 72931 Insert returning fails on Firebird 3
---EXTENSIONS--
-pdo_firebird
 --SKIPIF--
 <?php require('skipif.inc'); ?>
 --ENV--
@@ -10,7 +8,8 @@ LSAN_OPTIONS=detect_leaks=0
 <?php
 require 'testdb.inc';
 
-$dbh->exec('recreate table tablea (id integer)');
+@$dbh->exec('drop table tablea');
+$dbh->exec('create table tablea (id integer)');
 $S = $dbh->prepare('insert into tablea (id) values (1) returning id');
 $S->execute();
 $D = $S->fetch(PDO::FETCH_NUM);

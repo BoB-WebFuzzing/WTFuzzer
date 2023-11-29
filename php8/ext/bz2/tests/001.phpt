@@ -1,7 +1,7 @@
 --TEST--
 bzopen() and invalid parameters
---EXTENSIONS--
-bz2
+--SKIPIF--
+<?php if (!extension_loaded("bz2")) print "skip"; ?>
 --FILE--
 <?php
 

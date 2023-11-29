@@ -1,7 +1,7 @@
 --TEST--
 Bug #35785 (SimpleXML memory read error)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 

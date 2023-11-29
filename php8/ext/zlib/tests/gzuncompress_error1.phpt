@@ -1,7 +1,11 @@
 --TEST--
 Test gzuncompress() function : error conditions
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 echo "*** Testing gzuncompress() : error conditions ***\n";

@@ -1,7 +1,7 @@
 --TEST--
 Bug #64931 (phar_add_file is too restrictive on filename)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php extension_loaded("phar") or die("skip need ext/phar support"); ?>
 --INI--
 phar.readonly=0
 --FILE--

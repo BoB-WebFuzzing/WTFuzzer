@@ -1,7 +1,7 @@
 --TEST--
 Bug #73668: "SIGFPE Arithmetic exception" in opcache when divide by minus 1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $a/-1;

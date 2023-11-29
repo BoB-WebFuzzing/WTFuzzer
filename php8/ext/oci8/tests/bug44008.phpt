@@ -1,7 +1,5 @@
 --TEST--
 Bug #44008 (Incorrect usage of OCILob->close crashes PHP)
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs

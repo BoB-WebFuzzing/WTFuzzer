@@ -1,7 +1,9 @@
 --TEST--
 Bug #75273 (php_zlib_inflate_filter() may not update bytes_consumed)
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded('zlib')) die('skip zlib extension not available');
+?>
 --FILE--
 <?php
 function non_repeating_str($len = 8192) {

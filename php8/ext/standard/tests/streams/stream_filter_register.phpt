@@ -6,12 +6,12 @@ User Group: PHP-WVL & PHPGent #PHPTestFest
 --FILE--
 <?php
 class foo extends php_user_filter {
-  function filter($in, $out, &$consumed, $closing): int {
+  function filter($in, $out, &$consumed, $closing) {
   }
 }
 
 class bar extends php_user_filter {
-  function filter($in, $out, &$consumed, $closing): int {
+  function filter($in, $out, &$consumed, $closing) {
   }
 }
 

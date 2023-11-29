@@ -21,7 +21,7 @@ foreach ( $dp as $d )
 
 ?>
 --EXPECT--
-Unknown or bad format (2D)
+DatePeriod::__construct(): Unknown or bad format (2D)
 string(24) "2008-07-20T22:44:53+0200"
 string(24) "2008-07-21T22:44:53+0200"
 string(24) "2008-07-22T22:44:53+0200"

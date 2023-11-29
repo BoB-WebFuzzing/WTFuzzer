@@ -1,7 +1,7 @@
 --TEST--
 Check for libsodium ed25519 signatures
---EXTENSIONS--
-sodium
+--SKIPIF--
+<?php if (!extension_loaded("sodium")) print "skip"; ?>
 --FILE--
 <?php
 $keypair = sodium_crypto_sign_keypair();

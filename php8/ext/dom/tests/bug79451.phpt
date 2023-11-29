@@ -1,7 +1,7 @@
 --TEST--
 Bug #79451 (Using DOMDocument->replaceChild on doctype causes double free)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $dom = new \DOMDocument();

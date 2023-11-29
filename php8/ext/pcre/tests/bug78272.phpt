@@ -1,7 +1,9 @@
 --TEST--
 Bug #78272: calling preg_match() before pcntl_fork() will freeze child process
---EXTENSIONS--
-pcntl
+--SKIPIF--
+<?php
+if (!extension_loaded('pcntl')) die("skip pcntl extension required");
+?>
 --FILE--
 <?php
 preg_match('/abc/', 'abcde', $r);

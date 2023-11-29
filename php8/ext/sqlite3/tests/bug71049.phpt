@@ -1,7 +1,8 @@
 --TEST--
 Bug #71049 (SQLite3Stmt::execute() releases bound parameter instead of internal buffer)
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php
+if (!extension_loaded('sqlite3')) die('skip'); ?>
 --FILE--
 <?php
 

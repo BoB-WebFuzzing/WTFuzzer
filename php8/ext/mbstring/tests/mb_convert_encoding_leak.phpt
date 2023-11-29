@@ -1,7 +1,7 @@
 --TEST--
 mb_convert_encoding() shouldn't leak keys
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --FILE--
 <?php
 

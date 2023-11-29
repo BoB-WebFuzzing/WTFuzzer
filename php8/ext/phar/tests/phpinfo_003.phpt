@@ -1,9 +1,8 @@
 --TEST--
 Phar: phpinfo display 3
---EXTENSIONS--
-phar
 --SKIPIF--
 <?php
+if (!extension_loaded("phar")) die("skip");
 if (extension_loaded("zlib")) die("skip zlib loaded");
 if (extension_loaded("bz2")) die("skip bz2 loaded");
 $arr = Phar::getSupportedSignatures();

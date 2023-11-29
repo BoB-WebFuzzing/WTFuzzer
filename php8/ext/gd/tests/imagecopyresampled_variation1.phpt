@@ -1,7 +1,9 @@
 --TEST--
 Test for correct colors of imagecopyresampled() wrt. alpha
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip ext/gd required');
+?>
 --FILE--
 <?php
 

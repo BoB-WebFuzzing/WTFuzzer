@@ -4,12 +4,12 @@ Bug #64353 (Built-in classes can be unavailable with dynamic includes and OPcach
 allow_url_include=1
 opcache.enable=1
 opcache.enable_cli=1
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class BugLoader extends php_user_filter {
-    public function filter($in, $out, &$consumed, $closing): int {
+    public function filter($in, $out, &$consumed, $closing) {
         if (!class_exists("Test")) {
             eval("class Test extends ArrayObject {}");
         }

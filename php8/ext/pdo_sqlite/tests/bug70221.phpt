@@ -1,7 +1,9 @@
 --TEST--
 Bug #70221 (persistent sqlite connection + custom function segfaults)
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo_sqlite')) print 'skip not loaded';
+?>
 --FILE--
 <?php
 $dbfile = __DIR__ . '/test.sqlite';

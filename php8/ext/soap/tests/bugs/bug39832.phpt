@@ -1,7 +1,7 @@
 --TEST--
 Bug #39832 (SOAP Server: parameter not matching the WSDL specified type are set to 0)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--

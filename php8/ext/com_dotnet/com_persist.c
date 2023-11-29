@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -337,9 +337,14 @@ CPH_METHOD(GetCurFileName)
 		res = IPersistFile_GetCurFile(helper->ipf, &olename);
 
 		if (res == S_OK) {
-			zend_string *str = php_com_olestring_to_string(olename, helper->codepage);
+			size_t len;
+			char *str = php_com_olestring_to_string(olename,
+				   &len, helper->codepage);
+			RETVAL_STRINGL(str, len);
+			// TODO: avoid reallocarion???
+			efree(str);
 			CoTaskMemFree(olename);
-			RETURN_STR(str);
+			return;
 		} else if (res == S_FALSE) {
 			CoTaskMemFree(olename);
 			RETURN_FALSE;
@@ -358,7 +363,7 @@ CPH_METHOD(SaveToFile)
 	HRESULT res;
 	char *filename, *fullpath = NULL;
 	size_t filename_len;
-	bool remember = TRUE;
+	zend_bool remember = TRUE;
 	OLECHAR *olefilename = NULL;
 	CPH_FETCH();
 
@@ -714,15 +719,21 @@ static zend_object* helper_new(zend_class_entry *ce)
 	return &helper->std;
 }
 
-void php_com_persist_minit(INIT_FUNC_ARGS)
+int php_com_persist_minit(INIT_FUNC_ARGS)
 {
+	zend_class_entry ce;
+
 	memcpy(&helper_handlers, &std_object_handlers, sizeof(helper_handlers));
 	helper_handlers.free_obj = helper_free_storage;
 	helper_handlers.clone_obj = helper_clone;
 
-	helper_ce = register_class_COMPersistHelper();
-	helper_ce->create_object = helper_new;
+	INIT_CLASS_ENTRY(ce, "COMPersistHelper", class_COMPersistHelper_methods);
+	ce.create_object = helper_new;
+	helper_ce = zend_register_internal_class(&ce);
+	helper_ce->ce_flags |= ZEND_ACC_FINAL;
 
 	le_istream = zend_register_list_destructors_ex(istream_dtor,
 			NULL, "com_dotnet_istream_wrapper", module_number);
+
+	return SUCCESS;
 }

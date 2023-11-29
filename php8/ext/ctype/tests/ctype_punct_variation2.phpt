@@ -1,7 +1,7 @@
 --TEST--
 Test ctype_punct() function : usage variations - different integers
---EXTENSIONS--
-ctype
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 /*
@@ -14,7 +14,7 @@ echo "*** Testing ctype_punct() : usage variations ***\n";
 $orig = setlocale(LC_CTYPE, "C");
 
 for ($c = 1; $c < 256; $c++) {
-    if (ctype_punct(chr($c))) {
+    if (ctype_punct($c)) {
         echo "character code $c is punctuation\n";
     }
 }

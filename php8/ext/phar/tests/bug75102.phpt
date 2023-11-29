@@ -1,7 +1,9 @@
 --TEST--
 Bug #75102 (`PharData` says invalid checksum for valid tar)
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded('phar')) die('skip phar extension not available');
+?>
 --FILE--
 <?php
 $phar = new PharData(__DIR__ . '/bug75102.tar');

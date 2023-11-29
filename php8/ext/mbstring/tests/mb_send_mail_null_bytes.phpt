@@ -1,7 +1,5 @@
 --TEST--
 mb_send_mail() with null bytes in arguments
---EXTENSIONS--
-mbstring
 --FILE--
 <?php
 

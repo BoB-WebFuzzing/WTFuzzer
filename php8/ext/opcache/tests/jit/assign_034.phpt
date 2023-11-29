@@ -7,8 +7,8 @@ opcache.file_update_protection=0
 opcache.jit_buffer_size=1M
 opcache.protect_memory=1
 ;opcache.jit_debug=257
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function bar() {

@@ -1,7 +1,7 @@
 --TEST--
 Regression: sort_wsk() and copy-on-write.
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 /*

@@ -1,7 +1,7 @@
 --TEST--
 token_get_all() and wrong parameters
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip"; ?>
 --FILE--
 <?php
 

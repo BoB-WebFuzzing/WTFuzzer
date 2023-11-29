@@ -1,7 +1,7 @@
 --TEST--
 FFI 016: Structure constraints
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

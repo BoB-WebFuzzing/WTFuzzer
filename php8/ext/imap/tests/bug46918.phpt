@@ -1,7 +1,11 @@
 --TEST--
 Bug #46918 (imap_rfc822_parse_adrlist host part not filled in correctly)
---EXTENSIONS--
-imap
+--SKIPIF--
+<?php
+        if (!extension_loaded("imap")) {
+                die("skip imap extension not available");
+        }
+?>
 --FILE--
 <?php
 
@@ -68,4 +72,4 @@ array (
      'host' => '.SYNTAX-ERROR.',
   ),
 )
-Notice: PHP Request Shutdown: Unexpected characters at end of address: @two (errflg=3) in Unknown on line 0
+Notice: Unknown: Unexpected characters at end of address: @two (errflg=3) in Unknown on line 0

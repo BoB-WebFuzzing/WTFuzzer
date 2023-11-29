@@ -44,6 +44,8 @@ DBDN=`sudo ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config '(&(olcRootD
 
 sudo ldapadd -Q -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/ppolicy.ldif
 
+sudo service slapd restart
+
 sudo ldapmodify -Q -Y EXTERNAL -H ldapi:/// << EOF
 dn: $DBDN
 changetype: modify
@@ -88,6 +90,8 @@ add: olcModuleLoad
 olcModuleLoad: dds
 EOF
 
+sudo service slapd restart
+
 sudo ldapadd -Q -Y EXTERNAL -H ldapi:/// << EOF
 dn: olcOverlay=sssvlv,$DBDN
 objectClass: olcOverlayConfig
@@ -112,12 +116,16 @@ objectClass: olcDdsConfig
 olcOverlay: dds
 EOF
 
+sudo service slapd restart
+
 sudo ldapmodify -Q -Y EXTERNAL -H ldapi:/// << EOF
 dn: $DBDN
 changetype: modify
 add: olcDbIndex
 olcDbIndex: entryExpireTimestamp eq
 EOF
+
+sudo service slapd restart
 
 ldapadd -H ldapi:/// -D cn=Manager,dc=my-domain,dc=com -w secret <<EOF
 dn: dc=my-domain,dc=com
@@ -155,8 +163,6 @@ o: php ldap tests
 ## pwdAllowUserChange: TRUE
 ## pwdSafeModify: FALSE
 EOF
-
-sudo service slapd restart
 
 # Verify TLS connection
 tries=0

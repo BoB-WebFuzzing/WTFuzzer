@@ -2,8 +2,6 @@
 Function snmp2_getnext
 --CREDITS--
 Olivier Doucet & Boris Lytochkin
---EXTENSIONS--
-snmp
 --SKIPIF--
 <?php
 require_once(__DIR__.'/skipif.inc');

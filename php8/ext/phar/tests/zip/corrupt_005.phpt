@@ -1,7 +1,7 @@
 --TEST--
 Phar: encrypted zip
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 try {

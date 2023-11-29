@@ -1,7 +1,7 @@
 --TEST--
 Phar front controller $_SERVER munging failure tar-based
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller18.phar.php
 REQUEST_URI=/frontcontroller18.phar.php/fronk.gronk

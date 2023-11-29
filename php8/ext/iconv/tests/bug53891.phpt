@@ -1,7 +1,9 @@
 --TEST--
 Bug #53891 (iconv_mime_encode() fails to Q-encode UTF-8 string)
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+if (!extension_loaded('iconv')) die('skip iconv extension not available');
+?>
 --FILE--
 <?php
 $preferences = array(

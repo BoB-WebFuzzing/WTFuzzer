@@ -1,7 +1,7 @@
 --TEST--
 Bug #66289 Locale::lookup incorrectly returns en or en_US if locale is empty
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

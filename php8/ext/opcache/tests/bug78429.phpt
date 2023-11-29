@@ -1,7 +1,7 @@
 --TEST--
 Bug #78429 (opcache_compile_file(__FILE__); segfaults)
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 opcache.enable_cli=0
 --FILE--

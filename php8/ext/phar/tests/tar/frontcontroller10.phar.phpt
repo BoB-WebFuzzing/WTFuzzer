@@ -2,8 +2,8 @@
 Phar front controller rewrite array invalid tar-based
 --INI--
 default_charset=UTF-8
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --ENV--
 SCRIPT_NAME=/frontcontroller10.phar.php
 REQUEST_URI=/frontcontroller10.phar.php/hi

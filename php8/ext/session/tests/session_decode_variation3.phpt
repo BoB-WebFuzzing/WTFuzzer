@@ -1,7 +1,5 @@
 --TEST--
 Test session_decode() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -33,7 +31,7 @@ ob_end_flush();
 Warning: session_start(): Cannot find session serialization handler "blah" - session startup failed in %s on line %d
 bool(false)
 
-Warning: Undefined global variable $_SESSION in %s on line %d
+Warning: Undefined variable $_SESSION in %s on line %d
 NULL
 array(3) {
   ["foo"]=>

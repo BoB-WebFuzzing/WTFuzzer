@@ -1,8 +1,7 @@
 --TEST--
 ldap_count_references() - Basic ldap_count_references test
---EXTENSIONS--
-ldap
 --SKIPIF--
+<?php require_once('skipif.inc'); ?>
 <?php require_once('skipifbindfailure.inc'); ?>
 --FILE--
 <?php
@@ -33,5 +32,5 @@ ldap_delete($link, "cn=userref,$base", [['oid' => LDAP_CONTROL_MANAGEDSAIT, 'isc
 ldap_delete($link, "cn=userref2,$base", [['oid' => LDAP_CONTROL_MANAGEDSAIT, 'iscritical' => TRUE]]);
 remove_dummy_data($link, $base);
 ?>
---EXPECT--
+--EXPECTF--
 int(2)

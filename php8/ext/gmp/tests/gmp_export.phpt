@@ -1,7 +1,7 @@
 --TEST--
 gmp_export() basic tests
---EXTENSIONS--
-gmp
+--SKIPIF--
+<?php if (!extension_loaded("gmp")) echo "skip"; ?>
 --FILE--
 <?php
 

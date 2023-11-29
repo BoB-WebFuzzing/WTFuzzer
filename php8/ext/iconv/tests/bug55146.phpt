@@ -1,7 +1,9 @@
 --TEST--
 Bug #55146 (iconv_mime_decode_headers() skips some headers)
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+if (!extension_loaded('iconv')) die('skip iconv extension not available');
+?>
 --FILE--
 <?php
 

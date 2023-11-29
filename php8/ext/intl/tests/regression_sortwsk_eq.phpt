@@ -1,7 +1,7 @@
 --TEST--
 Regression: sort_wsk() eq but different len.
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 /*

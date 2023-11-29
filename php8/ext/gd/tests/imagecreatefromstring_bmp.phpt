@@ -1,9 +1,8 @@
 --TEST--
 imagecreatefromstring() - BMP format
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
+if (!extension_loaded('gd')) die('skip ext/gd required');
 if (!(imagetypes() & IMG_BMP)) die('skip BMP support required');
 ?>
 --FILE--

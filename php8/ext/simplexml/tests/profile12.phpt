@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML [profile]: Accessing namespaced root and non namespaced children
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 

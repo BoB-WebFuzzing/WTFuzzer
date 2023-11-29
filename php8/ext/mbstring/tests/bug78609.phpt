@@ -1,7 +1,9 @@
 --TEST--
 Bug #78609 (mb_check_encoding() no longer supports stringable objects)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+if (!extension_loaded('mbstring')) die('skip mbstring extension not available');
+?>
 --FILE--
 <?php
 class Foo

@@ -1,7 +1,9 @@
 --TEST--
 Bug #32589 (crash inside imap_mail_compose() function)
---EXTENSIONS--
-imap
+--SKIPIF--
+<?php
+extension_loaded('imap') or die('skip imap extension not available in this build');
+?>
 --FILE--
 <?php
 $m_envelope["To"] = "mail@example.com";

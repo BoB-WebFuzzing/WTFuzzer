@@ -1,7 +1,9 @@
 --TEST--
 mb_http_input() with pass encoding
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip mbstring not available');
+?>
 --POST--
 a=日本語0123456789日本語カタカナひらがな
 --GET--

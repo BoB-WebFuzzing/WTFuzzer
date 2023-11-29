@@ -1,8 +1,8 @@
 --TEST--
 PHP bug #74196: PharData->decompress() does not correctly support dot names
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
+<?php if (!extension_loaded("zlib")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0

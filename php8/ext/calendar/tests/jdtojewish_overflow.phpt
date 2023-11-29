@@ -2,8 +2,10 @@
 jdtojewish(): test overflow
 --CREDITS--
 neweracracker@gmail.com
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php
+if (!extension_loaded('calendar')) die('skip ext/calendar required');
+?>
 --FILE--
 <?php
 for ($i=324542840; $i<324542850; $i++) {

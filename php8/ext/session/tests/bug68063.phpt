@@ -1,7 +1,5 @@
 --TEST--
 Bug #68063 (Empty session IDs do still start sessions)
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--

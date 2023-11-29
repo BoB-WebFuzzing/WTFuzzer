@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML [profile]: Accessing a namespaced element
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $root = simplexml_load_string('<?xml version="1.0"?>

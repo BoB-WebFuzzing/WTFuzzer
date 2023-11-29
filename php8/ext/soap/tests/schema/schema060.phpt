@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 60: SOAP 1.2 Multidimensional array (literal encoding)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";

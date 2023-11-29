@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 13: array handling
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function Sum($a) {

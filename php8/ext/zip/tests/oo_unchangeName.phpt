@@ -2,8 +2,8 @@
 Test basic ZipArchive::unchangeName() method
 --CREDITS--
 PHP TestFest 2017 - Bergfreunde, Florian Engelhardt
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php if (!extension_loaded("zip")) print "skip"; ?>
 --FILE--
 <?php
 $dirname = __DIR__ . '/';

@@ -5,11 +5,10 @@ opcache.enable=1
 opcache.enable_cli=1
 opcache.jit_buffer_size=1M
 zend_test.replace_zend_execute_ex=1
---EXTENSIONS--
-opcache
-zend_test
 --SKIPIF--
-<?php if ((opcache_get_status()['jit']['on'] ?? false) === false) die('skip: JIT is not available'); ?>
+<?php require_once('skipif.inc'); ?>
+<?php if (!isset(opcache_get_status()["jit"])) die('skip: JIT is not available'); ?>
+<?php if (!extension_loaded('zend-test')) die('skip: zend-test extension required'); ?>
 --FILE--
 <?php
 

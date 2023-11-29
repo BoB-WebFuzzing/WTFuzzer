@@ -1,7 +1,7 @@
 --TEST--
 SQLite3 extended error code Function
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 

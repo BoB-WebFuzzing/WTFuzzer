@@ -1,7 +1,9 @@
 --TEST--
 Bug #79371 (mb_strtolower (UTF-32LE): stack-buffer-overflow)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+if (!extension_loaded('mbstring')) die('skip mbstring extension not available');
+?>
 --FILE--
 <?php
 $bytes = array(0xef, 0xbf, 0xbd, 0xef);

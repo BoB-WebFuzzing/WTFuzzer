@@ -1,7 +1,5 @@
 --TEST--
 Bug #68638 pg_update() fails to store infinite values
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--
@@ -13,7 +11,7 @@ $conn = pg_connect($conn_str);
 
 $table='test_68638';
 
-pg_query($conn, "CREATE TABLE $table (id INT, value FLOAT)");
+pg_query("CREATE TABLE $table (id INT, value FLOAT)");
 
 pg_insert($conn,$table, array('id' => 1, 'value' => 1.2));
 pg_insert($conn,$table, array('id' => 2, 'value' => 10));
@@ -25,12 +23,12 @@ pg_update($conn,$table, array('value' => 'inf'), array('id' => 1));
 pg_update($conn,$table, array('value' => '-inf'), array('id' => 2));
 pg_update($conn,$table, array('value' => '+inf'), array('id' => 3));
 
-$rs = pg_query($conn, "SELECT * FROM $table");
+$rs = pg_query("SELECT * FROM $table");
 while ($row = pg_fetch_assoc($rs)) {
         var_dump($row);
 }
 
-pg_query($conn, "DROP TABLE $table");
+pg_query("DROP TABLE $table");
 
 ?>
 --EXPECT--

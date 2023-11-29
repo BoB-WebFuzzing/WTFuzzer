@@ -1,7 +1,9 @@
 --TEST--
 imagegetinterpolation() and imagesetinterpolation() basic test
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $methods = array(

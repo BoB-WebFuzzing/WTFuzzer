@@ -1,7 +1,7 @@
 --TEST--
 Phar: tar with bad checksum
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 $fname = __DIR__ . '/' . basename(__FILE__, '.php') . '.tar';

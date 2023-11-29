@@ -1,7 +1,5 @@
 --TEST--
 oci_collection_assign()
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs

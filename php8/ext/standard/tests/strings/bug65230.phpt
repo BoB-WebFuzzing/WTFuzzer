@@ -8,7 +8,6 @@ if (substr(PHP_OS, 0, 3) != 'WIN') {
 ?>
 --INI--
 date.timezone=Europe/Berlin
-error_reporting=E_ALL&~E_DEPRECATED
 --FILE--
 <?php
 

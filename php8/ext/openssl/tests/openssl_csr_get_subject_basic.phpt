@@ -1,10 +1,8 @@
 --TEST--
 openssl_csr_get_subject() tests
---EXTENSIONS--
-openssl
 --SKIPIF--
 <?php
-if (!defined("OPENSSL_KEYTYPE_DSA")) die("skip DSA disabled");
+if (!extension_loaded("openssl")) die("skip");
 ?>
 --FILE--
 <?php
@@ -27,7 +25,7 @@ $dn = array(
 );
 
 $args = array(
-    "digest_alg" => "sha256",
+    "digest_alg" => "sha1",
     "private_key_bits" => 2048,
     "private_key_type" => OPENSSL_KEYTYPE_DSA,
     "encrypt_key" => true,

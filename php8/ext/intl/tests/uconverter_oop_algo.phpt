@@ -1,7 +1,7 @@
 --TEST--
 UConverter Algorithmic converters
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 $c = new UConverter('utf-8', 'latin1');

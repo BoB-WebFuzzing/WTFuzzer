@@ -42,7 +42,11 @@ try {
 }
 
 echo "\nPrivate method:\n";
-var_dump($privateMethod->invoke($testClassInstance));
+try {
+    var_dump($privateMethod->invoke($testClassInstance));
+} catch (ReflectionException $e) {
+    var_dump($e->getMessage());
+}
 
 echo "\nAbstract method:\n";
 $abstractMethod = new ReflectionMethod("AbstractClass::foo");
@@ -61,8 +65,7 @@ invoke() on a non-instance:
 string(72) "Given object is not an instance of the class this method was declared in"
 
 Private method:
-Called privateMethod()
-NULL
+string(86) "Trying to invoke private method TestClass::privateMethod() from scope ReflectionMethod"
 
 Abstract method:
 string(53) "Trying to invoke abstract method AbstractClass::foo()"

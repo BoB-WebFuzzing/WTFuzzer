@@ -1,8 +1,9 @@
 --TEST--
 FTP cwd
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php
+require 'skipif.inc';
+?>
 --FILE--
 <?php
 require 'server.inc';

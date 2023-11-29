@@ -3,8 +3,6 @@ imap_open() ValueErrors
 --CREDITS--
 Paul Sohier
 #phptestfest utrecht
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');
@@ -23,7 +21,7 @@ try {
 }
 
 try {
-    imap_open('', '', '', 0, -1);
+    imap_open('', '', '', NIL, -1);
 } catch (\ValueError $e) {
     echo $e->getMessage() . \PHP_EOL;
 }
@@ -36,4 +34,4 @@ Warning: imap_open(): Couldn't open stream  in %s on line %d
 imap_open(): Argument #4 ($flags) must be a bitmask of the OP_* constants, and CL_EXPUNGE
 imap_open(): Argument #5 ($retries) must be greater than or equal to 0
 
-Notice: PHP Request Shutdown: Can't open mailbox : no such mailbox (errflg=2) in Unknown on line 0
+Notice: Unknown: Can't open mailbox : no such mailbox (errflg=2) in Unknown on line 0

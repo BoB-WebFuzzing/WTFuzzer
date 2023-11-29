@@ -1,7 +1,7 @@
 --TEST--
 Bug #77058: Type inference in opcache causes side effects
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

@@ -3,8 +3,8 @@ Tests DOMDocument::resoleExternals get and set
 --CREDITS--
 Chris Snyder <chsnyder@gmail.com>
 # TestFest 2009 NYPHP
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 // create dom document

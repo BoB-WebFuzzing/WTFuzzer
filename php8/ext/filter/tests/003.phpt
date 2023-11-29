@@ -1,7 +1,5 @@
 --TEST--
 GET/POST/REQUEST Test
---EXTENSIONS--
-filter
 --POST--
 d=4&e=5
 --GET--

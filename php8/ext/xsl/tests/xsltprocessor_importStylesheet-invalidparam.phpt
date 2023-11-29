@@ -1,7 +1,11 @@
 --TEST--
 XSLTProcessor::importStylesheet() - Test with invalid stylesheet
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php
+if (!extension_loaded('xsl')) {
+    exit('Skip - XSL extension not loaded');
+}
+?>
 --FILE--
 <?php
 

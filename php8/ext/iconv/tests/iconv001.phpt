@@ -1,7 +1,7 @@
 --TEST--
 iconv() test 1
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php include('skipif.inc'); ?>
 --INI--
 error_reporting=2039
 --FILE--

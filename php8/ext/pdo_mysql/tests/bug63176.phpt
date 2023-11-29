@@ -1,9 +1,8 @@
 --TEST--
 Bug #63176 (Segmentation fault when instantiate 2 persistent PDO to the same db server)
---EXTENSIONS--
-pdo_mysql
 --SKIPIF--
 <?php
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'skipif.inc');
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc');
 MySQLPDOTest::skip();
 ?>
@@ -20,7 +19,6 @@ class PDO3 extends PDO {
 
 
 class ModelA {
-    public $db;
     public function __construct($h) {
         var_dump($h);
         if ($h) {

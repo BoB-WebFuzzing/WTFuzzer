@@ -1,7 +1,5 @@
 --TEST--
 Bug #70133 (Extended SessionHandler::read is ignoring $session_id when calling parent)
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -13,7 +11,7 @@ session.use_strict_mode=0
 
 class CustomReadHandler extends \SessionHandler {
 
-    public function read($session_id): string|false {
+    public function read($session_id) {
         return parent::read('mycustomsession');
     }
 }

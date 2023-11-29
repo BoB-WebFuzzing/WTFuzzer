@@ -1,7 +1,7 @@
 --TEST--
 Phar: test fopen() interception
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip");?>
 --INI--
 phar.require_hash=1
 phar.readonly=0

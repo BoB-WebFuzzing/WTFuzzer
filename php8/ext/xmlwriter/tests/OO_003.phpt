@@ -1,7 +1,7 @@
 --TEST--
 XMLWriter: libxml2 XML Writer, membuffer, flush, text, attribute
---EXTENSIONS--
-xmlwriter
+--SKIPIF--
+<?php if (!extension_loaded("xmlwriter")) print "skip"; ?>
 --FILE--
 <?php
 

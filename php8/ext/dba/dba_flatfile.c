@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -20,7 +20,7 @@
 
 #include "php.h"
 
-#ifdef DBA_FLATFILE
+#if DBA_FLATFILE
 #include "php_flatfile.h"
 
 #include "libflatfile/flatfile.h"
@@ -31,6 +31,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#define FLATFILE_DATA flatfile *dba = info->dbf
+#define FLATFILE_GKEY datum gkey; gkey.dptr = (char *) key; gkey.dsize = keylen
 
 DBA_OPEN_FUNC(flatfile)
 {
@@ -44,7 +47,7 @@ DBA_OPEN_FUNC(flatfile)
 
 DBA_CLOSE_FUNC(flatfile)
 {
-	flatfile *dba = info->dbf;
+	FLATFILE_DATA;
 
 	if (dba->nextkey.dptr) {
 		efree(dba->nextkey.dptr);
@@ -54,32 +57,31 @@ DBA_CLOSE_FUNC(flatfile)
 
 DBA_FETCH_FUNC(flatfile)
 {
-	flatfile *dba = info->dbf;
 	datum gval;
-	datum gkey;
-	zend_string *fetched_val = NULL;
+	char *new = NULL;
 
-	gkey.dptr = ZSTR_VAL(key);
-	gkey.dsize = ZSTR_LEN(key);
+	FLATFILE_DATA;
+	FLATFILE_GKEY;
 
 	gval = flatfile_fetch(dba, gkey);
 	if (gval.dptr) {
-		fetched_val = zend_string_init(gval.dptr, gval.dsize, /* persistent */ false);
+		if (newlen) {
+			*newlen = gval.dsize;
+		}
+		new = estrndup(gval.dptr, gval.dsize);
 		efree(gval.dptr);
 	}
-	return fetched_val;
+	return new;
 }
 
 DBA_UPDATE_FUNC(flatfile)
 {
-	flatfile *dba = info->dbf;
 	datum gval;
-	datum gkey;
 
-	gkey.dptr = ZSTR_VAL(key);
-	gkey.dsize = ZSTR_LEN(key);
-	gval.dptr = ZSTR_VAL(val);
-	gval.dsize = ZSTR_LEN(val);
+	FLATFILE_DATA;
+	FLATFILE_GKEY;
+	gval.dptr = (char *) val;
+	gval.dsize = vallen;
 
 	switch(flatfile_store(dba, gkey, gval, mode==1 ? FLATFILE_INSERT : FLATFILE_REPLACE)) {
 		case 0:
@@ -87,24 +89,20 @@ DBA_UPDATE_FUNC(flatfile)
 		case 1:
 			return FAILURE;
 		case -1:
-			// TODO Check when this happens and confirm this can even happen
-			php_error_docref(NULL, E_WARNING, "Operation not possible");
+			php_error_docref1(NULL, key, E_WARNING, "Operation not possible");
 			return FAILURE;
 		default:
-			// TODO Convert this to an assertion failure
-			php_error_docref(NULL, E_WARNING, "Unknown return value");
+			php_error_docref2(NULL, key, val, E_WARNING, "Unknown return value");
 			return FAILURE;
 	}
 }
 
 DBA_EXISTS_FUNC(flatfile)
 {
-	flatfile *dba = info->dbf;
 	datum gval;
-	datum gkey;
+	FLATFILE_DATA;
+	FLATFILE_GKEY;
 
-	gkey.dptr = ZSTR_VAL(key);
-	gkey.dsize = ZSTR_LEN(key);
 	gval = flatfile_fetch(dba, gkey);
 	if (gval.dptr) {
 		efree(gval.dptr);
@@ -115,31 +113,31 @@ DBA_EXISTS_FUNC(flatfile)
 
 DBA_DELETE_FUNC(flatfile)
 {
-	flatfile *dba = info->dbf;
-	datum gkey;
-
-	gkey.dptr = ZSTR_VAL(key);
-	gkey.dsize = ZSTR_LEN(key);
+	FLATFILE_DATA;
+	FLATFILE_GKEY;
 	return(flatfile_delete(dba, gkey) == -1 ? FAILURE : SUCCESS);
 }
 
 DBA_FIRSTKEY_FUNC(flatfile)
 {
-	flatfile *dba = info->dbf;
+	FLATFILE_DATA;
 
 	if (dba->nextkey.dptr) {
 		efree(dba->nextkey.dptr);
 	}
 	dba->nextkey = flatfile_firstkey(dba);
 	if (dba->nextkey.dptr) {
-		return zend_string_init(dba->nextkey.dptr, dba->nextkey.dsize, /* persistent */ false);
+		if (newlen)  {
+			*newlen = dba->nextkey.dsize;
+		}
+		return estrndup(dba->nextkey.dptr, dba->nextkey.dsize);
 	}
 	return NULL;
 }
 
 DBA_NEXTKEY_FUNC(flatfile)
 {
-	flatfile *dba = info->dbf;
+	FLATFILE_DATA;
 
 	if (!dba->nextkey.dptr) {
 		return NULL;
@@ -150,7 +148,10 @@ DBA_NEXTKEY_FUNC(flatfile)
 	}
 	dba->nextkey = flatfile_nextkey(dba);
 	if (dba->nextkey.dptr) {
-		return zend_string_init(dba->nextkey.dptr, dba->nextkey.dsize, /* persistent */ false);
+		if (newlen) {
+			*newlen = dba->nextkey.dsize;
+		}
+		return estrndup(dba->nextkey.dptr, dba->nextkey.dsize);
 	}
 	return NULL;
 }

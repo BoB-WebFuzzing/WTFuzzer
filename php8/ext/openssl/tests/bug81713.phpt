@@ -1,10 +1,8 @@
 --TEST--
 Bug #81713 (OpenSSL functions null byte injection)
---EXTENSIONS--
-openssl
 --SKIPIF--
 <?php
-if (!defined("OPENSSL_KEYTYPE_DSA")) die("skip DSA disabled");
+if (!extension_loaded("openssl")) die("skip openssl not loaded");
 ?>
 --FILE--
 <?php

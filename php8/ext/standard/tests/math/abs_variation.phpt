@@ -78,17 +78,13 @@ foreach($inputs as $input) {
 
 fclose($fp);
 ?>
---EXPECTF--
+--EXPECT--
 *** Testing abs() : usage variations ***
 
 -- Iteration 1 --
-
-Deprecated: abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 int(0)
 
 -- Iteration 2 --
-
-Deprecated: abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 int(0)
 
 -- Iteration 3 --
@@ -125,13 +121,9 @@ abs(): Argument #1 ($num) must be of type int|float, string given
 abs(): Argument #1 ($num) must be of type int|float, classA given
 
 -- Iteration 14 --
-
-Deprecated: abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 int(0)
 
 -- Iteration 15 --
-
-Deprecated: abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in %s on line %d
 int(0)
 
 -- Iteration 16 --

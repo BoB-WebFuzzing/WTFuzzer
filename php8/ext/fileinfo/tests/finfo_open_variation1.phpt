@@ -1,7 +1,7 @@
 --TEST--
 Test finfo_open() function : variations in opening
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 $magicFile = __DIR__ . DIRECTORY_SEPARATOR . 'magic';
@@ -16,7 +16,5 @@ var_dump( finfo_open( FILEINFO_DEVICES | FILEINFO_RAW, $magicFile ) );
 ?>
 --EXPECTF--
 *** Testing finfo_open() : variations in opening ***
-object(finfo)#%d (0) {
-}
-object(finfo)#%d (0) {
-}
+resource(%d) of type (file_info)
+resource(%d) of type (file_info)

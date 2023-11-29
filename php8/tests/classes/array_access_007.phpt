@@ -10,15 +10,15 @@ class OverloadedArray implements ArrayAccess {
         $this->realArray = array();
     }
 
-    function offsetExists($index): bool {
+    function offsetExists($index) {
         return array_key_exists($this->realArray, $index);
     }
 
-    function offsetGet($index): mixed {
+    function offsetGet($index) {
         return $this->realArray[$index];
     }
 
-    function offsetSet($index, $value): void {
+    function offsetSet($index, $value) {
         if (is_null($index)) {
             $this->realArray[] = $value;
         } else {
@@ -26,7 +26,7 @@ class OverloadedArray implements ArrayAccess {
         }
     }
 
-    function offsetUnset($index): void {
+    function offsetUnset($index) {
         unset($this->realArray[$index]);
     }
 

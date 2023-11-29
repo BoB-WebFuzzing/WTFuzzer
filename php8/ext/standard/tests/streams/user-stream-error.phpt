@@ -4,7 +4,6 @@ E_ERROR during UserStream Open
 <?php
 
 class FailStream {
-  public $context;
   public function stream_open($path, $mode, $options, &$opened_path) {
     _some_undefined_function();
   }

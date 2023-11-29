@@ -1,7 +1,7 @@
 --TEST--
 Test 5: Checking Indent
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php require_once __DIR__ .'/skipif.inc'; ?>
 --FILE--
 <?php
 echo "Test 5: Checking Indent";

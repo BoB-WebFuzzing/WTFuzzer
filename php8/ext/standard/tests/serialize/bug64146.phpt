@@ -3,6 +3,8 @@ Bug #64146 (serialize incorrectly saving objects when they are cloned)
 --FILE--
 <?php
 
+echo "Test\n";
+
 class A
 {
     public $a = array();
@@ -51,8 +53,8 @@ print $a->a[1]->b->c . "\n";
 
 ?>
 Done
---EXPECTF--
-Deprecated: %s implements the Serializable interface, which is deprecated. Implement __serialize() and __unserialize() instead (or in addition, if support for old PHP versions is necessary) in %s on line %d
+--EXPECT--
+Test
 1
 2
 Done

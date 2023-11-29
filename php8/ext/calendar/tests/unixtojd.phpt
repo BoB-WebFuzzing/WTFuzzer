@@ -1,7 +1,7 @@
 --TEST--
 unixtojd()
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --ENV--
 TZ=UTC
 --FILE--

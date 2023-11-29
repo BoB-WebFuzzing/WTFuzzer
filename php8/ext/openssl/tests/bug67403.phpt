@@ -1,7 +1,7 @@
 --TEST--
 Bug #67403: Add signatureType to openssl_x509_parse
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) die("skip"); ?>
 --FILE--
 <?php
 $r = openssl_x509_parse(file_get_contents(__DIR__.'/bug64802.pem'));

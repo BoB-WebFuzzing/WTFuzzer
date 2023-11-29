@@ -4,8 +4,8 @@ Nullsafe e-ssa pi node placement
 opcache.enable=1
 opcache.enable_cli=1
 opcache.opt_debug_level=0x200000
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once(__DIR__ . '/../skipif.inc'); ?>
 --FILE--
 <?php
 

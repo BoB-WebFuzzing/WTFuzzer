@@ -1,7 +1,7 @@
 --TEST--
 mb_encoding_aliases()
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 $list = mb_encoding_aliases("ASCII");

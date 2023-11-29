@@ -1,7 +1,7 @@
 --TEST--
 msgfmt_parse() tests
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

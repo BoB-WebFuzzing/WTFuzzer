@@ -1,7 +1,7 @@
 --TEST--
 SQLite3::reset prepared statement results
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 

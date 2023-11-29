@@ -1,7 +1,7 @@
 --TEST--
 mb_output_handler() and mbstring.http_output_conv_mimetypes (5)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 mb_http_output("EUC-JP");

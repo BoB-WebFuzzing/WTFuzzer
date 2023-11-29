@@ -1,7 +1,7 @@
 --TEST--
 FFI 045: FFI::isNull()
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

@@ -1,7 +1,9 @@
 --TEST--
 DOMImplementation::hasFeature()
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+include('skipif.inc');
+?>
 --FILE--
 <?php
 $imp = new DOMImplementation();

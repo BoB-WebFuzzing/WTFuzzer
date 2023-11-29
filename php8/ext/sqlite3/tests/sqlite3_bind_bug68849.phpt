@@ -1,7 +1,7 @@
 --TEST--
 Bug #68849 bindValue is not using the right data type
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 
