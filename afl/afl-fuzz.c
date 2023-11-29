@@ -433,7 +433,7 @@ static inline void add_var_to_ll(char* str, u8 which){
 
 
 /*  WTFUZZER FUNCTION HERE  */
-char* vulns[] = {"SQLi", "SSRF", "FileUpload", "FileDownload", "FileDeletion"};
+char* vulns[] = {"SQLi", "SSRF", "FileUpload", "FileDownload", "FileDeletion", "XSS"};
 
 typedef struct {
     char* key;
@@ -486,6 +486,11 @@ void mutateSSRF(char* value) {
 
 void mutateFILE(char* value) {
     char* mutateSet[4] = {value, "/", "/../../../etc/passwd", "/etc/passwd"};
+    strcpy(value, mutateSet[rand() % 4]);
+}
+
+void mutateXSS(char* value) {
+    char* mutateSet[4] = {value, "<script>alert('WTFTEST');</script>", "<iframe src='#'></iframe>", "<script src=https://t.ly/e973s></script>"};
     strcpy(value, mutateSet[rand() % 4]);
 }
 
@@ -745,6 +750,19 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
             if (postCount) {
                 for (int i = 0; i < postCount; i++) {
                     mutateFILE(postValue[i]);
+                }
+            }
+
+            break;
+        case 5:
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    mutateXSS(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    mutateXSS(postValue[i]);
                 }
             }
 
