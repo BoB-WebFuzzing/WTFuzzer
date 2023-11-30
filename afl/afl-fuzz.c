@@ -527,7 +527,7 @@ char* XSSmutateSet[3];
 void initXSSmutateSet(char* value) {
     XSSmutateSet[0] = strdup(value);
     XSSmutateSet[1] = strdup("<script>alert(\'WTFTEST\');</script>");
-    XSSmutateSet[2] = strdup("<iframe src=\'#\'></iframe>123456789000");
+    XSSmutateSet[2] = strdup("<iframe src=\"javascript:alert(\'WTFTEST\')\"></iframe>");
 }
 
 void freeXSSmutateSet() {
