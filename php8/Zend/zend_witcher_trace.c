@@ -732,15 +732,100 @@ void vld_external_trace(zend_execute_data *execute_data, const zend_op *opline){
 }
 */
 
+typedef struct _save_value
+{
+    uint8_t type;
+    uint32_t value;
+} save_value;
+
+typedef struct _trace_parameter
+{
+    save_value result;
+    char *str_nm;
+    char *type_pr;
+    int is_check;
+} trace_parameter;
+
+typedef struct _web_trace
+{
+    char *parameter_str;
+    int value;
+    int check[2048];
+    int is_trace;
+
+    trace_parameter tp;
+
+    int loop_len;
+    save_value loop[512];
+
+} web_trace;
+
 #define str_witcher_print_op "tracetest"
 static bool trace_run = false;
+static zend_op *test = NULL;
+
+static int wt_len;
+static web_trace wt[512];
+
+static trace_parameter is_parameter;
+
+static int enter_func;
+
+static int enter_func_check_length;
+static int enter_func_check[128]; // 트레이싱하는것들 중에 무엇무엇이 들어있는지..
+
+static int enter_func_sv_length;
+static save_value enter_func_sv[sizeof(enter_func_check) * 3]; // 정보들을 모두 저장
+
+static bool global_print;
+
+static return_count;
+
+static int check_u_func;
+
+static save_value new_ret;
+
+// 트레이싱 할 함수 리스트
+static const char *trace_funcs[] = {
+    "mysqli_query", "mysqli_multi_query",
+    "query", "exec",
+    "prepare", "query",
+    "pg_execute", "pg_query", "pg_query_params",
+    "find", "findOne", "findAndModify", "drop", "insert", "update",
+    "file_get_contents", "curl_exec", "file",
+    "move_uploaded_file", "copy",
+    "readfile",
+    "unlink",
+    "addslashes"};
+
+static int index_trace_func;
 
 void vld_start_trace()
 {
+    //printf(" reset files \n");
+    {
+        FILE *file = fopen("/tmp/dict.txt", "w");
+        if (file)
+            close(file);
+
+        file = fopen("/tmp/trace.txt", "w");
+        if (file)
+            close(file);
+    }
+
+    index_trace_func = 0;
+    return_count = 0;
+    global_print = false;
+    check_u_func = 0;
+
+    enter_func = 0;
+    wt_len = 0;
+    memset(&is_parameter, 0, sizeof(trace_parameter));
+
     if (getenv("START_TRACE"))
         trace_run = true;
 
-    printf("vld_start_trace()\n");
+    // printf("vld_start_trace()\n");
 
     if (afl_area_ptr == NULL)
     {
@@ -791,12 +876,45 @@ void printLineFromFile(const char *filename, int lineNumber)
 
     https://opensource.apple.com/source/apache_mod_php/apache_mod_php-148/php/Zend/zend_inheritance.c.auto.html
 */
+#define CT_CONSTANT_EX(op_array, num) \
+    ((op_array)->literals + (num))
 
-static zend_op *test = NULL;
+#define CT_CONSTANT(node) \
+    CT_CONSTANT_EX(CG(active_op_array), (node).constant)
+
+#define CRT_CONSTANT_EX(op_array, opline, node)                                    \
+    (((op_array)->fn_flags & ZEND_ACC_DONE_PASS_TWO) ? RT_CONSTANT(opline, (node)) \
+                                                     : CT_CONSTANT_EX(op_array, (node).constant))
+
+#define CRT_CONSTANT(node) \
+    CRT_CONSTANT_EX(op_array, opline, node)
+
+#define ZEND_CALL_VAR(call, n) \
+    ((zval *)(((char *)(call)) + ((int)(n))))
+
+#define EX_VAR(n) ZEND_CALL_VAR(execute_data, n)
+
+#define ZEND_FETCH_R 80
+#define ZEND_FETCH_DIM_R 81
+#define ZEND_ASSIGN 22
+
+#define ZEND_NEW 68
+#define ZEND_SEND_VAR_EX 66
+#define ZEND_DO_FCALL 60
+
+#define ZEND_INIT_FCALL 61
+#define ZEND_SEND_VAR 117
+#define ZEND_DO_ICALL 129
+#define ZEND_DO_UCALL 130 // 유저가 만든 함수 call
+
+#define ZEND_RETURN 62
+
 void vld_external_trace(zend_execute_data *execute_data, const zend_op *opline)
 {
     if (trace_run == true)
     {
+        bool print = false;
+
         FILE *ofile = NULL;
 
         const char *opname = zend_get_opcode_name(opline->opcode);
@@ -808,888 +926,1650 @@ void vld_external_trace(zend_execute_data *execute_data, const zend_op *opline)
             debug_print(("!!!!!\n"));
 
         // 현재 opline
-        debug_print(("\n%d] %s (%d)   %lx:%lx    %lx:%lx      %lx:%lx|\t ", opline->lineno, opname, opline->opcode, opline->op1_type, opline->op1.var, opline->op2_type, opline->op2.var, opline->result_type, opline->result.var));
+        // debug_print(("\n%d] %s (%d)   %lx:%lx    %lx:%lx      %lx:%lx\n", opline->lineno, opname, opline->opcode, opline->op1_type, opline->op1.var, opline->op2_type, opline->op2.var, opline->result_type, opline->result.var));
 
-        printf("\n\topline : %lx\n", opline);
-        // printf("\n\t&opline : %x\n", &opline);
-        printf("\texecute line : %lx\n", execute_data->opline);
-        printf("\thandler... : %lx\n", opline->handler);
-        printf("\tThis... : %lx\n", &execute_data->This);
-        printf("\tThis... : %u\n", execute_data->This.u1.v.type);
-        printf("extra_named_params... : %lx\n", execute_data->extra_named_params);
-        printf("symbol_table... : %lx\n", execute_data->symbol_table);
+        // printf("%d, %d\n", execute_data->opline->opcode, opline->opcode);
 
-        // printf("%x\n", sizeof(zend_object)); // 0x38
+        if (global_print)
+            printf("%s[%d](%d[%d], %d[%d]) => %d[%d]\n",
+                   opname, opline->opcode,
+                   opline->op1, opline->op1_type,
+                   opline->op2, opline->op2_type,
+                   opline->result, opline->result_type);
 
-        if (execute_data->func)
+        switch (opline->opcode)
         {
-            printf("\t\t\t[+] %lx\n", execute_data->func);
-            printf("\t\t\t\t[+] %lx\n", execute_data->func->op_array);
-            if (execute_data->func->common.arg_info)
+        case ZEND_FETCH_DIM_R:
+            // 그 타입이면..
+            if (execute_data->opline->opcode == ZEND_FETCH_R)
             {
-                printf("\t\t\t[*] common.arg_info here !\n");
-                if (execute_data->func->common.arg_info->name)
+                /*
+                    ZEND_FETCH_R[80](896[1], -1[0]) => 160[2]
+                    ZEND_FETCH_DIM_R[81](160[2], 880[1]) => 176[2]
+                */
+
+                // printf("\t\t\t ===== Parameter ===== \n");
+                if (execute_data->opline->op1_type == 1)
                 {
-                    printf("\t\t\t\t[+] name : %s\n", execute_data->func->common.arg_info->name->val);
+                    is_parameter.is_check = 1;
+                    is_parameter.result.type = opline->result_type;
+                    is_parameter.result.value = opline->result.var;
+
+                    is_parameter.str_nm = ((zval *)((char *)opline + opline->op2.var))->value.str->val;
+                    is_parameter.type_pr = ((zval *)((char *)execute_data->opline + execute_data->opline->op1.var))->value.str->val;
+
+                    printf("\t\t\t\t인자값 추출 %s[\'%s\']\n",
+                           is_parameter.type_pr,
+                           is_parameter.str_nm);
+
+                    // TODO [ DICT.txt 파일로 내보내기? ]
+                    FILE *file = fopen("/tmp/dict.txt", "a");
+                    if (file == NULL)
+                    {
+                        printf("can't open file\n");
+                    }
+                    else
+                    {
+                        // printf("wrote...\n");
+                        fprintf(file, "%s %s\n", is_parameter.type_pr, is_parameter.str_nm);
+                        fclose(file);
+                    }
+                }
+                // printf("\t\t\t ===================== \n");
+            }
+            break;
+
+        case ZEND_ASSIGN:
+            // 파라미터 할당 추적
+            if (is_parameter.is_check == 1)
+            {
+                if (opline->op2.var == is_parameter.result.value)
+                {
+                    wt[wt_len].tp = is_parameter;
+
+                    wt[wt_len].loop[wt[wt_len].loop_len].type = opline->op1_type;
+                    wt[wt_len].loop[wt[wt_len].loop_len].value = opline->op1.var;
+
+                    wt[wt_len].loop_len++;
+                    wt[wt_len].is_trace = true;
+
+                    wt_len++;
+                    is_parameter.is_check = 0;
                 }
             }
-        }
+            break;
 
-        zend_string *cv = EX(func)->op_array.vars[EX_VAR_TO_NUM(opline->op1.var)];
-        if (cv)
-        {
-            printf("===11cvcvcvcvcvcv===\n\t%s\n", ZSTR_VAL(cv));
-        }   
+        // 함수 진입 확인
+        case ZEND_NEW: // NEW의 경우 NEW에 리턴 값이 참조해야되는 값임
+            enter_func = 3;
 
-        cv = EX(func)->op_array.vars[EX_VAR_TO_NUM(opline->op2.var)];
-        if (cv)
-        {   
-            printf("===22cvcvcvcvcvcv===\n\t%s\n", ZSTR_VAL(cv));
-        }
+            new_ret.type = opline->result_type;
+            new_ret.value = opline->result.var;
+            break;
 
-        /*
-        # define CT_CONSTANT_EX(op_array, num) \
-	        ((op_array)->literals + (num))
-        */
-        // zval *zv = CT_CONSTANT_EX(&EX(func)->op_array, opline->op2.num);
+        case ZEND_INIT_FCALL:
+            enter_func = 1;
 
-        // 0x40
-
-
-
-        printf("\t\t1. %x\n", opline->op2.var);
-        printf("\t\t2. %x\n", EX_VAR_TO_NUM(opline->op2.var));
-  
-        printf("\t\t\t[*] last_literal : %x\n", EX(func)->op_array.last_literal);
-        printf("\t\t\t[*] last_var : %x\n", EX(func)->op_array.last_var);
-
-        for (int i = 0; i < EX(func)->op_array.last_literal; i++)
-        {
-            printf("\t\t %x\n", EX(func)->op_array.literals[i].u1.v.type);
-            printf("\t\t\t%lx\n", &EX(func)->op_array.literals[i]);
-            printf("\t\t\t%lx\n", EX(func)->op_array.literals[i]);
-            switch (EX(func)->op_array.literals[i].u1.v.type)
+            // 무슨 함수인가?
+            // printf("\t\t\t ==================\n");
+            // printf("\t\t\t == 함수 타입 : %d\n", ((zval *)((char *)opline + opline->op2.var))->u1.v.type);
+            if (((zval *)((char *)opline + opline->op2.var))->u1.v.type != IS_STRING)
             {
-            case IS_VAR:
-                printf("\t\t\ttmp type : %lx\n", EX(func)->op_array.literals[i].value.lval);
                 break;
-            case IS_STRING:
-                printf("\t\tstr : %s\n", EX(func)->op_array.literals[i].value.str->val);
+            }
+
+            // printf("\t\t\t == 함수 호출 : %s\n", ((zval *)((char *)opline + opline->op2.var))->value.str->val);
+            // printf("\t\t\t == size : %d\n", ((zval *)((char *)opline + opline->op2.var))->value.str->len);
+
+            // addslashes
+            // [TODO] 문자열 집합으로 비교해야함 - 임시 방편 addslashes
+            // 무엇을 타겟?    https://github1s.com/BoB-WebFuzzing/WTFuzzer-PHP/blob/master/hook.php#L1-L148
+
+            int num_tr_func = sizeof(trace_funcs) / sizeof(trace_funcs[0]);
+            // printf("\tnum_tr_func : %d\n", num_tr_func);
+
+            bool check = true;
+
+            for (int cur = 0; cur < num_tr_func; cur++)
+            {
+                check = true;
+
+                char *check_str = trace_funcs[cur];
+                size_t check_str_len = strlen(check_str);
+                // printf("\t\t%s(%d)\n", check_str, check_str_len);
+
+                if (((zval *)((char *)opline + opline->op2.var))->value.str->len == check_str_len)
+                {
+                    for (int i = 0; i < check_str_len; i++)
+                    {
+                        //  printf("\t\t\t %c\n", ((zval *)((char *)opline + opline->op2.var))->value.str->val[i]);
+
+                        if (check_str[i] != ((zval *)((char *)opline + opline->op2.var))->value.str->val[i])
+                            check = false;
+                        // if (check_str[i] == ((zval *)((char *)opline + opline->op2.var))->value.str->val[i])
+                        // {
+                        //     printf("\t\t\t\t OK\n");
+
+                        // }
+                        // else
+                        // {
+                        //      printf("\t\t\t\t NO\n");
+                        //     check = false;
+                        // }
+                    }
+
+                    // printf("\t\t\t ==================\n");
+                }
+                else
+                {
+                    check = false;
+                }
+
+                if (check)
+                {
+                    enter_func = 2;
+                    index_trace_func = cur;
+                    printf("\t\t\t\t == %s 탐지 == \n", trace_funcs[index_trace_func]);
+                    break;
+                }
+            }
+
+            break;
+
+        case ZEND_SEND_VAR_EX: //  NEW
+
+            // NEW RET이 어느 파라미터에 참조되는가..
+            if (enter_func == 3)
+            {
+                for (int i = 0; i < wt_len; i++)
+                {
+                    for (int j = 0; j < wt[i].loop_len; j++)
+                    {
+                        if (
+                            (wt[i].loop[j].type == opline->op1_type) &&
+                            (wt[i].loop[j].value == opline->op1.var))
+                        {
+                            // 한번더 등록되는 경우가 있음
+                            bool check_duplicates = false;
+                            for (int z = j; z < wt[i].loop_len; z++)
+                            {
+                                if (
+                                    (wt[i].loop[z].type == new_ret.type) &&
+                                    (wt[i].loop[z].value == new_ret.value))
+                                {
+                                    check_duplicates = true;
+                                }
+                            }
+
+                            // 중복 X
+                            if (!check_duplicates)
+                            {
+                                wt[i].loop[wt[i].loop_len].type = new_ret.type;
+                                wt[i].loop[wt[i].loop_len].value = new_ret.value;
+                                wt[i].loop_len++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            break;
+        case ZEND_SEND_VAR:
+            // printf("ZEND_SEND_VAR 진입 %d \n", enter_func);
+            if (enter_func == 1)
+            {
+                // 0 2 4 -> op1
+                enter_func_sv[enter_func_sv_length].type = opline->op1_type;
+                enter_func_sv[enter_func_sv_length].value = opline->op1.var;
+                enter_func_sv_length++;
+
+                // 1 3 5 -> ret
+                enter_func_sv[enter_func_sv_length].type = opline->result_type;
+                enter_func_sv[enter_func_sv_length].value = opline->result.var;
+                enter_func_sv_length++;
+            }
+            else if (enter_func == 2)
+            {
+                // trace 확인 해야함
+                bool final_check = false;
+                web_trace *wt_tmp = (web_trace *)malloc(wt_len * sizeof(web_trace));
+                int wt_tmp_len = 0;
+                for (int i = 0; i < wt_len; i++)
+                {
+                    for (int j = 0; j < wt[i].loop_len; j++)
+                    {
+                        // //printf("%x == %x\n%x == %x\n",
+                        //        wt[i].loop[j].type, opline->op1_type,
+                        //        wt[i].loop[j].value, opline->op1.var);
+
+                        if (
+                            (wt[i].loop[j].type == opline->op1_type) &&
+                            (wt[i].loop[j].value == opline->op1.var))
+                        {
+                            // printf("check! %s \n", wt[i].tp.str_nm);
+                            wt_tmp[wt_tmp_len] = wt[i];
+                            wt_tmp_len++;
+
+                            wt[i].is_trace = false;
+                            final_check = true;
+                        }
+                    }
+                }
+
+                if (final_check)
+                {
+                    for (int i = 0; i < wt_tmp_len; i++)
+                    {
+                        printf("\t\t\t======================================\n");
+                        printf("\t\t\t======================================\n");
+                        printf("\t\t\t\t%s[\'%s\'] trace done.\n", wt_tmp[i].tp.type_pr, wt_tmp[i].tp.str_nm);
+                        printf("\t\t\t\t\t func: %s\n", trace_funcs[index_trace_func]);
+                        printf("\t\t\t======================================\n");
+                        printf("\t\t\t======================================\n");
+
+                        // [TODO] 파일로 내보내기?
+                        FILE *file = fopen("/tmp/trace.txt", "a");
+                        if (file == NULL)
+                        {
+                            printf("can't open file\n");
+                        }
+                        else
+                        {
+                            // printf("wrote...\n");
+                            fprintf(file, "%s %s %s\n", wt_tmp[i].tp.type_pr, wt_tmp[i].tp.str_nm, trace_funcs[index_trace_func]);
+                            fclose(file);
+                        }
+
+                        // 추적 종료?
+                        // wt_tmp[i].loop_len=0;
+                    }
+                }
+
+                free(wt_tmp);
+            }
+            break;
+
+        case ZEND_DO_FCALL: // NEW
+            return_count++;
+            enter_func = 0;
+            break;
+        case ZEND_DO_ICALL:
+            // 정리
+            if (enter_func == 1)
+            {
+                // printf("enter_func = 1\n");
+                for (int e = 0; e < enter_func_sv_length; e++)
+                {
+                    for (int i = 0; i < wt_len; i++)
+                    {
+                        bool loop_check = false;
+                        for (int j = 0; j < wt[i].loop_len; j++)
+                        {
+                            if ((enter_func_sv[e].type == wt[i].loop[j].type) && (enter_func_sv[e].value == wt[i].loop[j].value))
+                            {
+                                loop_check = true;
+                            }
+                        }
+                        if (loop_check)
+                        {
+                            print = true;
+                            wt[i].loop[wt[i].loop_len].type = opline->result_type;
+                            wt[i].loop[wt[i].loop_len].value = opline->result.var;
+                            wt[i].loop_len++;
+                        }
+                    }
+                }
+            }
+
+            enter_func = 0;
+            enter_func_check_length = 0;
+            enter_func_sv_length = 0;
+            break;
+
+        // [TODO] ZEND_DO_UCALL 일때
+        // 내부도 추적할 수 있어야 함..
+        case ZEND_DO_UCALL:
+            // ZEND_DO_ICALL과 같은 동작을 해야함 ( ZEND_SEND_VAL 추적 )
+
+            if (enter_func == 1)
+            {
+                // printf("enter_func = 1\n");
+
+                // + 리턴 값도 추가해야 함
+                int is_add_return = 0;
+                for (int e = 0; e < enter_func_sv_length; e = e + 2)
+                {
+                    for (int i = 0; i < wt_len; i++)
+                    {
+                        bool loop_check = false;
+                        for (int j = 0; j < wt[i].loop_len; j++)
+                        {
+                            if ((enter_func_sv[e].type == wt[i].loop[j].type) && (enter_func_sv[e].value == wt[i].loop[j].value))
+                            {
+                                is_add_return = i;
+                                loop_check = true;
+                            }
+                        }
+                        if (loop_check)
+                        {
+                            print = true;
+                            // ZEND_SEND_VAR의 리턴 값도 넣어야 함
+                            // -> e의 홀수 + 1에 자리 하고 있음
+                            if (is_add_return == i)
+                            {
+
+                                // 짝수 0, 2, 4, 6 -> op1
+                                if ((e % 2) == 0)
+                                {
+                                    wt[i].loop[wt[i].loop_len].type = enter_func_sv[e + 1].type;
+                                    wt[i].loop[wt[i].loop_len].value = enter_func_sv[e + 1].value;
+                                    wt[i].loop_len++;
+                                }
+                                else
+                                {
+                                    printf("e가 홀수임. 문제 발생. 형빈 호출 필요 \n");
+                                }
+
+                                is_add_return++;
+                            }
+                            wt[i].loop[wt[i].loop_len].type = opline->result_type;
+                            wt[i].loop[wt[i].loop_len].value = opline->result.var;
+                            wt[i].loop_len++;
+                        }
+                    }
+                }
+            }
+
+            enter_func = 0;
+            enter_func_check_length = 0;
+            enter_func_sv_length = 0;
+            // ==
+
+            // UCALL의 경우 사용자가 만든 function에 진입 -> 트레이싱이 가능해짐 -> Return 카운터를 증가시켜서 Depth를 증가시켜야함
+            return_count++;
+
+            // ZEND_DO_UCALL 의 반환 값이 결국 나중에 있을 Return의 반환값임.
+            check_u_func = 1; // Return에서의 값을 추적해야함 -> Return의 반환 값이 ZEND_DO_UCALL의 반환 값이기 때문
+
+            // 리턴 값을 추적해야 함.
+
+            break;
+
+        case ZEND_RETURN:
+
+            // ZEND_DO_UCALL 리턴 값과 매칭?
+            if (check_u_func > 0 && return_count > 0)
+            {
+                // 할 필요가 없을듯
+                // 어차피 RETURN에 반환된 RET값은 사용되지 않고
+                // ZEND_DO_UCALL 리턴 값이 사용됨.
+                check_u_func = 0;
+            }
+
+            // 트레이싱 초기화
+            if (return_count == 0)
+            {
+                memset(wt, 0, sizeof(wt));
+                wt_len = 0;
+            }
+
+            return_count--;
+            break;
+        }
+
+        if (print && global_print)
+        {
+            printf("============= print =============\n");
+            for (int i = 0; i < wt_len; i++)
+            {
+                if (wt[i].is_trace == true)
+                {
+                    printf("trace : %s %s\n", wt[i].tp.type_pr, wt[i].tp.str_nm);
+
+                    for (int j = 0; j < wt[i].loop_len; j++)
+                    {
+                        printf("\t [%d][%d]\n", wt[i].loop[j].type, wt[i].loop[j].value);
+                    }
+                }
+            }
+            printf("============== end ==============\n");
+            print = false;
+        }
+
+        // printf("==========================\n");
+        for (int i = 0; i < wt_len; i++)
+        {
+            int arg_check = 0;
+            for (int j = 0; j < wt[i].loop_len; j++)
+            {
+                // 이제부터 모든 opcode의 파라미터들을 감시해야함
+                // op1
+
+                if ((opline->op1_type != 0x0))
+                {
+                    if ((wt[i].loop[j].value == opline->op1.var) &&
+                        wt[i].loop[j].type == opline->op1_type)
+                    {
+                        arg_check += (1 << 0);
+                    }
+                }
+
+                // op2
+                if ((opline->op2_type != 0x0))
+                {
+                    if ((wt[i].loop[j].value == opline->op2.var) &&
+                        wt[i].loop[j].type == opline->op2_type)
+                    {
+                        arg_check += (1 << 1);
+                    }
+                }
+
+                // ret
+                if ((opline->result_type != 0x0))
+                {
+                    if ((wt[i].loop[j].value == opline->result.var) &&
+                        wt[i].loop[j].type == opline->result_type)
+                    {
+                        arg_check += (1 << 2);
+                    }
+                }
+            }
+
+            print = true;
+            // printf("%d\n", arg_check);
+            switch (arg_check)
+            {
+            case 0:
+                // printf("아무것도 없음\n");
+                print = false;
                 break;
-            default:
-                printf("unknown\n");
+            case 1: // op2, ret
+
+                if ((opline->op2_type != 0x0))
+                {
+                    wt[i].loop[wt[i].loop_len].type = opline->op2_type;
+                    wt[i].loop[wt[i].loop_len].value = opline->op2.var;
+                    wt[i].loop_len++;
+                }
+                if ((opline->result_type != 0x0))
+                {
+                    wt[i].loop[wt[i].loop_len].type = opline->result_type;
+                    wt[i].loop[wt[i].loop_len].value = opline->result.var;
+                    wt[i].loop_len++;
+                }
+
+                break;
+            case 2: // op1, ret
+                if ((opline->op1_type != 0x0))
+                {
+                    wt[i].loop[wt[i].loop_len].type = opline->op1_type;
+                    wt[i].loop[wt[i].loop_len].value = opline->op1.var;
+                    wt[i].loop_len++;
+                }
+                if ((opline->result_type != 0x0))
+                {
+                    wt[i].loop[wt[i].loop_len].type = opline->result_type;
+                    wt[i].loop[wt[i].loop_len].value = opline->result.var;
+                    wt[i].loop_len++;
+                }
+
+                break;
+            case 4: // op1, op2
+                if ((opline->op2_type != 0x0))
+                {
+                    wt[i].loop[wt[i].loop_len].type = opline->op2_type;
+                    wt[i].loop[wt[i].loop_len].value = opline->op2.var;
+                    wt[i].loop_len++;
+                }
+                if ((opline->op1_type != 0x0))
+                {
+                    wt[i].loop[wt[i].loop_len].type = opline->op1_type;
+                    wt[i].loop[wt[i].loop_len].value = opline->op1.var;
+                    wt[i].loop_len++;
+                }
+                break;
+
+            case 3: // ret
+                if ((opline->result_type != 0x0))
+                {
+                    wt[i].loop[wt[i].loop_len].type = opline->result_type;
+                    wt[i].loop[wt[i].loop_len].value = opline->result.var;
+                    wt[i].loop_len++;
+                }
+                break;
+            case 5: // op2
+                if ((opline->op2_type != 0x0))
+                {
+                    wt[i].loop[wt[i].loop_len].type = opline->op2_type;
+                    wt[i].loop[wt[i].loop_len].value = opline->op2.var;
+                    wt[i].loop_len++;
+                }
+                break;
+            case 6: // op1
+                if ((opline->op1_type != 0x0))
+                {
+                    wt[i].loop[wt[i].loop_len].type = opline->op1_type;
+                    wt[i].loop[wt[i].loop_len].value = opline->op1.var;
+                    wt[i].loop_len++;
+                }
+                break;
+
+            case 7:
                 break;
             }
         }
 
-        // printf("\t\t\t[*]nNumOfElements : %x\n", EX(func)->op_array.static_variables->nNumOfElements);
-        // printf("\t\t\t[*]nNumUsed : %x\n", EX(func)->op_array.static_variables->nNumUsed);
-        
-
-        // if(zv){
-        //     printf("wow!\n");
-        //     printf("\ttype : %x\n",zv->u1.v.type);
-        //     printf("\ttype_flag : %x\n",zv->u1.v.type_flags);
-        //     printf("\tvalue : %lx\n", zv->value);
-        
-        // }
-
-
-
-
-        // if (test == NULL)
-        // {
-        //     test = opline;
-        //     printf("%x : %x\n", test, opline);
-        // }
-        // zval *zv = RT_CONSTANT(test, opline->op1);
-        // if (zv)
-        // {
-        //     printf("\t[*] Z_TYPE_P(zv) : %lx\n", Z_TYPE_P(zv));
-        // }
-
-        
-
-        // cv++;
-        // zval *test = cv;
-        // if (test)
-        // {
-        //     printf("\t======\t%x\n", test->u1.v.type);
-        // }
-
-        // if (opline->op2_type == IS_CONST)
-        // {
-        //     printf("is ISCONST\n");
-        //     zval *tmp = CT_CONSTANT_EX(&execute_data->func->op_array, opline->op2.constant);
-        //     if (tmp)
-        //     {
-        //         printf("\ttmp OK\n");
-        //         printf("tmp type : %x\n", Z_TYPE_P(tmp));
-        //     }
-
-        //     zval *val = CT_CONSTANT(opline->op2);
-        //     if (val)
-        //     {
-        //         printf("\tval OK\n");
-        //         printf("val type : %x\n", Z_TYPE_P(val));
-        //     }
-        // }
-
-        // if (opline->op2_type == IS_CONST)
-        // {
-        //     zend_op *op2 = opline + opline->op2.jmp_offset;
-        //     zend_string *constant_value = EX(func)->op_array.literals[op2->op2.constant]->val.str;
-        //     printf("Constant value: %s\n", ZSTR_VAL(constant_value));
-        // }
-        // cv = EX(func)->op_array.vars[EX_VAR_TO_NUM(opline->op2.var)];
-        // if (cv)
-        // {
-        //     printf("===22cvcvcvcvcvcv===\n\t%s\n", ZSTR_VAL(cv));
-        // }
-
-        // zval *zv;
-        // zv = RT_CONSTANT(execute_data->extra_named_params, opline->op1);
-        // printf("\t\t[1] Type as integer: %u\n", zv->u1.v.type);
-        // printf("\t\t\tlen:%lx\n",zv->value.str->len);
-        // printf("\t\t[1] Type as integer: %u\n", zv->u1.v.type_flags);
-        // zv = RT_CONSTANT(execute_data->extra_named_params, opline->op2);
-        // printf("\t\t[2] Type as integer: %u\n", zv->u1.v.type);
-        // printf("\t\t[2] Type as integer: %u\n", zv->u1.v.type_flags);
-        // zv = RT_CONSTANT(execute_data->extra_named_params, opline->result);
-        // printf("\t\t[3] Type as integer: %u\n", zv->u1.v.type);
-        // printf("\t\t[3] Type as integer: %u\n", zv->u1.v.type_flags);
-
-        if (execute_data->call)
+        if (print && global_print)
         {
-            printf("\t\t\t[*] call here !\n");
+            printf("============= print =============\n");
+            for (int i = 0; i < wt_len; i++)
+            {
+                if (wt[i].is_trace == true)
+                {
+                    printf("trace : %s %s\n", wt[i].tp.type_pr, wt[i].tp.str_nm);
+
+                    for (int j = 0; j < wt[i].loop_len; j++)
+                    {
+                        printf("\t [%d][%d]\n", wt[i].loop[j].type, wt[i].loop[j].value);
+                    }
+                }
+            }
+            printf("============== end ==============\n");
+            print = false;
         }
 
-        if (execute_data->prev_execute_data)
+        // printf("\texecute_data : %x\n", execute_data);
+        // printf("\texecute_data->call : %lx\n", execute_data->call);
+        // printf("\texecute_data->prev : %lx\n", execute_data->prev_execute_data);
+        // printf("\texecute_data->zval return : %lx\n", execute_data->return_value);
+
+        zend_string *cv;
+        zval *isok;
+        zval *tmp_var;
+
+        switch (opline->op1_type)
         {
-            printf("\t\t\t[*] prev_execute_data here !\n");
+        case IS_CV:
+            cv = EX(func)->op_array.vars[EX_VAR_TO_NUM(opline->op1.var)];
+            // printf("[1]. %s\n", ZSTR_VAL(cv));
+            break;
+
+        case IS_CONST:
+            isok = (zval *)((char *)opline + opline->op1.var);
+            switch (isok->u1.v.type)
+            {
+            case IS_STRING:
+                // printf("[1]. %s\n", ZSTR_VAL(isok->value.str));
+                break;
+            case IS_LONG:
+                // printf("[1]. %d\n", isok->value.lval);
+                break;
+            }
+            break;
+
+        default:
+            break;
         }
 
-        // if(zv.u1.v.type == IS_STRING){
-        //     printf("\tstr : %s\n", &zv.value.str->val);
-        //     printf("\tstr : %s\n", zv.value.str->val);
-        // }
+        switch (opline->op2_type)
+        {
+        case IS_CV:
+            cv = EX(func)->op_array.vars[EX_VAR_TO_NUM(opline->op2.var)];
+            // printf("[2]. %s\n", ZSTR_VAL(cv));
+            break;
 
-        // zend_object *tmp = RT_CONSTANT2(opline, opline->op1);
-        // if(tmp){
-        //     printf("type : %x\n", tmp->ce->type);
-        //     printf("zval type : %x\n", tmp->properties_table->u1.v.type);
-        // }
+        // -
+        case IS_CONST:
+            isok = (zval *)((char *)opline + opline->op2.var);
+            switch (isok->u1.v.type)
+            {
+            case IS_STRING:
+                // printf("[2]. %s\n", ZSTR_VAL(isok->value.str));
+                break;
+            case IS_LONG:
+                // printf("[2]. %d\n", isok->value.lval);
+                break;
+            }
+            break;
 
-        // printf("%d\n", sizeof(zend_object));
+        default:
+            break;
+        }
 
-        // char *test = (char *)opline; // opline을 char 포인터로 형변환
+        switch (opline->result_type)
+        {
+        case IS_CV:
+            cv = EX(func)->op_array.vars[EX_VAR_TO_NUM(opline->result.var)];
+            // printf("[R]. %s\n", ZSTR_VAL(cv));
+            break;
 
-        // for (int i = 0; i < 16; i++)
-        // {
-        //     printf("%x\n", *test++); // 각 바이트를 1바이트씩 출력
-        // }
-        //     zval zv;
-        //     zv = *RT_CONSTANT(opline, opline->op1);
-        //     printf("zv : %x\n", &zv);
+        // -
+        case IS_CONST:
+            isok = (zval *)((char *)opline + opline->result.var);
+            switch (isok->u1.v.type)
+            {
+            case IS_STRING:
+                // printf("[R]. %s\n", ZSTR_VAL(isok->value.str));
+                break;
+            case IS_LONG:
+                // printf("[R]. %d\n", isok->value.lval);
+                break;
+            }
+            break;
 
-        //     if(zv.u1.v.type == IS_STRING){
-        //         debug_print(("str : %s\n", &zv.value.str->val[0]));
-        //     }else if(zv.u1.v.type == IS_CONST){
-        //         debug_print(("val : %d\n", zv.value.))
-        //     }
-        // IS_OBJECT
+        default:
+            break;
+        }
 
-        // if (zv)
-        // {
-        //     switch (opline->op1_type)
-        //     {
-        //     case IS_CV:
-        //         if (Z_TYPE(zv) == IS_STRING)
-        //         {
-        //             char *str = Z_STRVAL(zv);
-        //             debug_print(("\top1_str : %s\n", str));
-        //         }
-        //         else
-        //         {
-        //             debug_print(("\top1_zv_type : unknown(%d)\n", Z_TYPE(zv)));
-        //         }
-        //         break;
-        //     case IS_CONST:
-        //         if (Z_TYPE(zv) == IS_STRING)
-        //         {
-        //             char *str = Z_STRVAL(zv);
-        //             debug_print(("\top1_str : %s\n", str));
-        //         }
-        //         else
-        //         {
-        //             debug_print(("\top1_zv_type : unknown(%d)\n", Z_TYPE(zv)));
-        //         }
-        //         break;
-        //     default:
-        //         debug_print(("\top1_type : %d\n", opline->op1_type));
-        //         break;
-        //     }
-        // }
+        // printf("\n\topline : %lx\n", opline);
+        // // printf("\n\t&opline : %x\n", &opline);
+        // printf("\texecute line : %lx\n", execute_data->opline);
+        // printf("\thandler... : %lx\n", opline->handler);
+        // printf("\tThis... : %lx\n", &execute_data->This);
+        // printf("\tThis... : %u\n", execute_data->This.u1.v.type);
+        // printf("extra_named_params... : %lx\n", execute_data->extra_named_params);
+        // printf("symbol_table... : %lx\n", execute_data->symbol_table);
 
-        // zv = RT_CONSTANT(opline, opline->op2);
-        // if (zv)
-        // {
-        //     switch (opline->op2_type)
-        //     {
-        //     case IS_CV:
-        //         if (Z_TYPE(zv) == IS_STRING)
-        //         {
-        //             char *str = Z_STRVAL_P(zv);
-        //             debug_print(("\top2_str : %s\n", str));
-        //         }
-        //         else
-        //         {
-        //             debug_print(("\top2_zv_type : unknown(%d)\n", Z_TYPE(zv)));
-        //         }
-        //         break;
-        //     default:
-        //         debug_print(("\top2_type : %d\n", opline->op2_type));
-        //         break;
-        //     }
-        // }
+        // // printf("%x\n", sizeof(zend_object)); // 0x38
 
-        // zv = RT_CONSTANT(opline, opline->result);
-        // if (zv)
-        // {
-        //     switch (opline->result_type)
-        //     {
-        //     case IS_CV:
-        //         if (Z_TYPE(zv) == IS_STRING)
-        //         {
-        //             char *str = Z_STRVAL_P(zv);
-        //             debug_print(("\tresult_str : %s\n", str));
-        //         }
-        //         else
-        //         {
-        //             debug_print(("\tresult_zv_type : unknown(%d)\n", Z_TYPE(zv)));
-        //         }
-        //         break;
-        //     default:
-        //         debug_print(("\tresult_type : %d\n", opline->result_type));
-        //         break;
-        //     }
-        // }
-
-        // if(opline->op1_type == IS_CV)
-        // {
-        //     debug_print(("\n\t\t\tO?\n"));
-
-        //     zval *zv;
-        //     size_t len;
-
-        //     zv = RT_CONSTANT(opline, opline->op1);
-
-        //     debug_print(("opline addr : %x\n", opline));
-        //     debug_print(("zval size : %d\n", sizeof(zval)));
-        //     if(zv){
-        //         debug_print(("\t\t\tOooOOOOoo?\n"));
-        //         //debug_print(("\t\t\str  : %s\n", zv->value.str));
-        //         debug_print(("\t\t\tcheck : %d\n", zv->u1.v.type));
-        //     }
-
-        //     zv = RT_CONSTANT(&opline, opline->op1);
-
-        //     debug_print(("opline addr : %x\n", opline));
-        //     debug_print(("zval size : %d\n", sizeof(zval)));
-        //     if(zv){
-        //         debug_print(("\t\t\tOooOOOOoo?\n"));
-        //         //debug_print(("\t\t\str  : %s\n", zv->value.str));
-        //         debug_print(("\t\t\tcheck : %d\n", zv->u1.v.type));
-        //     }
-
-        // }
-
-        // // common 여부
         // if (execute_data->func)
-        //     if (execute_data->func->common.attributes)
-        //     {
-        //         debug_print(("\tattributes OK\n"));
-        //     }
-
-        // if(execute_data->func->internal_function.function_name){
-        //      debug_print(("\tinternal : %s\n", ZSTR_VAL(execute_data->func->internal_function.function_name)));
-        // }
-
-        // if(execute_data->func->internal_function.attributes){
-        //     debug_print(("\tinter - attributes OK\n"));
-        // }
-
-        // if (execute_data->func->op_array.scope)
         // {
-        //     debug_print(("\t scope O \n"));
-
-        //     if (execute_data->func->op_array.scope->name)
-        //         debug_print(("\t test %s\n", execute_data->func->op_array.scope->name->val));
-        // }
-
-        // if (EX(func) && EX(func)->op_array.filename)
-        // {
-        //     // #define EX(element) 			((execute_data)->element)
-        //     // func -> execute_data->func
-        //     debug_print(("\n%s:%d\n", ZSTR_VAL(EX(func)->op_array.filename), opline->lineno));
-
-        //     printLineFromFile(ZSTR_VAL(EX(func)->op_array.filename), opline->lineno);
-        //     debug_print(("line_start : %d\n", execute_data->func->op_array.line_start));
-        //     debug_print(("line_end : %d\n", execute_data->func->op_array.line_end));
-        //     if (execute_data->func->op_array.doc_comment)
-        //         debug_print(("doc_comment : %s\n", ZSTR_VAL(execute_data->func->op_array.doc_comment)));
-
-        //     debug_print(("\n%s:%d\n", ZSTR_VAL(execute_data->func->op_array.filename), opline->lineno));
-
-        //     // if (execute_data->func->op_array.function_name)
-        //     //     debug_print(("function name: %s\n", ZSTR_VAL(execute_data->func->op_array.function_name)));
-
-        //     debug_print(("num_args : %d\n", execute_data->func->op_array.num_args));
-        //     debug_print(("required_num_args : %d\n", execute_data->func->op_array.required_num_args));
-        //     debug_print(("temporary : %d\n", execute_data->func->op_array.T));
-        //     debug_print(("last var : %d\n", execute_data->func->op_array.last_var));
-        //     debug_print(("last : %d\n", execute_data->func->op_array.last));
-        //     debug_print(("num_dynamic_func_defs : %d\n", execute_data->func->op_array.num_dynamic_func_defs));
-
-        //     int last_var = execute_data->func->op_array.last_var;
-
-        //     if(execute_data->func->op_array.static_variables_ptr__ptr){
-        //         debug_print(("static_variables OK\n"));
-        //         debug_print(("nNumUsed : %d\n", execute_data->func->op_array.static_variables_ptr__ptr->nNumUsed));
-        //         debug_print(("nNumOfElements : %d\n", execute_data->func->op_array.static_variables_ptr__ptr->nNumOfElements));
-        //     }
-
-        //     if(execute_data->func->op_array.attributes){
-        //         debug_print(("attributes OK\n"));
-        //         debug_print(("nNumUsed : %d\n", execute_data->func->op_array.attributes->nNumUsed));
-        //     }
-
-        //     debug_print(("last var : %d\n", last_var));
-        //     if (last_var)
+        //     printf("\t\t\t[+] %lx\n", execute_data->func);
+        //     printf("\t\t\t\t[+] %lx\n", execute_data->func->op_array);
+        //     if (execute_data->func->common.arg_info)
         //     {
-        //         for(int i=0; i<last_var; i++){
-        //             debug_print(("\tstr : %s\n", ZSTR_VAL(execute_data->func->op_array.vars[i])));
-        //             //debug_print(("\thash : %x\n", execute_data->func->op_array.vars[i]->h));
+        //         printf("\t\t\t[*] common.arg_info here !\n");
+        //         if (execute_data->func->common.arg_info->name)
+        //         {
+        //             printf("\t\t\t\t[+] name : %s\n", execute_data->func->common.arg_info->name->val);
         //         }
         //     }
+        // }
 
-        //     int last_literal = execute_data->func->op_array.last_literal;
-        //     debug_print(("last_literal : %d\n", last_literal));
-        //     if(last_literal){
-        //         for(int i=0; i<last_literal;i++){
-        //             debug_print(("\ttype : %x\n", execute_data->func->op_array.literals[i].u1.v.type));
-        //             if(execute_data->func->op_array.literals[i].u1.v.type == IS_STRING){
-        //                 debug_print(("\tstr : %s\n", execute_data->func->op_array.literals[i].value.str->val));
+        // printf("=========================================\n");
+        // // printf("extra_named_params??\n");
+        // // zend_array *extra_named_params = execute_data->extra_named_params;
+        // // if(extra_named_params){
+        // //     printf("==extra here!!==\n");
+        // //     printf("extra : %lx\n", extra_named_params);
+        // //     // printf("\t flags : %x\n", extra_named_params->u.v.flags);
+        // //     // printf("\tnNumUsed : %x\n", extra_named_params->nNumUsed);
+        // //     // printf("\tnNumOfElements : %x\n", extra_named_params->nNumOfElements);
+        // //     // printf("\tnTableSize : %x\n", extra_named_params->nTableSize);
+
+        // //     printf("\t\t HASH_FLAG_STATIC_KEYS : %x\n", HASH_FLAG_STATIC_KEYS);
+        // //     if (extra_named_params->arData)
+        // //         for (int i = 0; i < extra_named_params->nNumUsed; i++)
+        // //         {
+        // //             printf("\t\t\t arData key : %s\n", extra_named_params->arData[i].key->val);
+        // //         }
+        // // }
+
+        // printf("=========================================\n");
+        // printf("GET print\n");
+        // zend_array *symbol_table = execute_data->symbol_table;
+        // if (symbol_table)
+        // {
+        //     printf("==symbol table==\n");
+        //     printf("\tnNumUsed : %x\n", symbol_table->nNumUsed);
+        //     printf("\tnNumOfElements : %x\n", symbol_table->nNumOfElements);
+        //     printf("\tnTableSize : %x\n", symbol_table->nTableSize);
+
+        //     printf("\t flags : %x\n", symbol_table->u.v.flags);
+
+        //     printf("\t\t HASH_FLAG_STATIC_KEYS : %x\n", HASH_FLAG_STATIC_KEYS);
+        //     if (symbol_table->arData)
+        //         for (int i = 0; i < symbol_table->nNumUsed; i++)
+        //         {
+        //             Bucket *data = &symbol_table->arData[i];
+        //             printf("\t\t\t arData key : %s\n", data->key->val);
+        //             printf("\t\t\t Type : %x\n", data->val.u1.v.type);
+
+        //             switch( data->val.u1.v.type){
+        //                 case IS_STRING:
+        //                     printf("\t\t\t\t str : %s\n", data->val.value.str->val);
+        //                     break;
+
+        //                 case IS_ARRAY:
+        //                     //zend_array *in_arr = data->val.value.arr;
+
+        //                     break;
+
         //             }
         //         }
-        //     }
         // }
 
-        // zend_array *symbol_table = execute_data->func->op_array.static_variables;
-        // if(symbol_table != NULL)
+        // /*
+        // zend_dump_op_line(&EX(func)->op_array, NULL, EX(opline), ZEND_DUMP_LINE_NUMBERS, NULL);
+        // */
+        // printf("=========================================\n");
+        // if (opline->op2_type == IS_CONST)
         // {
-        //     zend_string *key;
-        //     zval *value;
+        //     printf("zval sizeof : %x\n", sizeof(zval));
 
-        //     int i=0;
-        //     ZEND_HASH_FOREACH_STR_KEY_VAL(symbol_table, key, value)
-        //     {
-        //          debug_print(("\t======= looop %d ======\n", i++));
-        //     }
-        //     ZEND_HASH_FOREACH_END();
-        // }
-        // // // 이전 opline
-        // // const zend_op *preopline = execute_data->opline;
-        // // const char *preopname = zend_get_opcode_name(preopline->opcode);
-        // // debug_print(("%d] %s (%d)   %d    %d \n", preopline->lineno, preopname, preopline->opcode, preopline->op1_type, preopline->op2_type));
+        //     printf("op2.value(%d) / zval(%d) = %d\n", opline->op2.constant, sizeof(zval),opline->op2.constant / sizeof(zval));
 
-        // // fprintf(ofile, "==============================\n");
-        // // zend_execute_data *call = execute_data->call;
-        // // if (call)
-        // // {
-        // //     fprintf(ofile, "call O\n");
-        // //     zend_function *fbc = call->func;
-        // //     if (fbc)
-        // //     {
-        // //         fprintf(ofile, "fbc O\n");
-        // //         zend_string *fname2 = fbc->common.function_name;
-        // //         if (fname2)
-        // //         {
-        // //             fprintf(ofile, "fname2 O\n");
-        // //             fprintf(ofile, "FunctionName:%s\n", ZSTR_VAL(fname2));
-        // //         }
-        // //     }
-        // // }
+        //     // zval *op = CRT_CONSTANT_EX(EX(func)->op_array, opline, opline->op2);
 
-        // // zend_function *current_function = execute_data->func;
-
-        // // check debug
-        // // if (current_function)
-        // // {
-        // //     fprintf(ofile, "current_function O\n");
-
-        // //     if (current_function->common.function_name)
-        // //     {
-        // //         fprintf(ofile, "len : %x\n", current_function->common.function_name->len);
-
-        // //         fprintf(ofile, "str : %s\n", current_function->common.function_name->val);
-        // //     }
-        // //     else
-        // //     {
-        // //         fprintf(ofile, "common.function_name X \n");
-        // //     }
-
-        // //     zend_internal_function current_internal_funtion = execute_data->func->internal_function;
-
-        // //     if (current_internal_funtion.function_name)
-        // //     {
-        // //         fprintf(ofile, "current_internal_funtion.function_name O\n");
-
-        // //         fprintf(ofile, "len : %x\n", current_internal_funtion.function_name->len);
-
-        // //         fprintf(ofile, "str : %s\n", current_internal_funtion.function_name->val);
-        // //     }
-        // //     else
-        // //     {
-        // //         fprintf(ofile, "current_internal_funtion.function_name X\n");
-        // //     }
-        // // }
-        // // else
-        // // {
-        // //     fprintf(ofile, "current_function X\n");
-        // // }
-
-        // // // end
-
-        // // if (current_function && current_function->common.function_name)
-        // // {
-        // //     fprintf(ofile, "Currently executing function: %s\n", ZSTR_VAL(current_function->common.function_name));
-        // // }
-        // // else
-        // // {
-        // //     fprintf(ofile, "Currently executing function: Unknown function\n");
-        // // }
-
-        // // fprintf(ofile, "============ zend_execute_data ======\n");
-        // // fprintf(ofile, "============ zend_op =========\n");
-        // // fprintf(ofile, "%d] %s (%d)   %d    %d \n", opline->lineno, opname, opline->opcode, opline->op1_type, opline->op2_type);
-
-        // // // Print all members of _zend_op struct
-        // // fprintf(ofile, "Line: %d\n", opline->lineno);
-        // // fprintf(ofile, "Opcode: %s (%d)\n", opname, opline->opcode);
-        // // fprintf(ofile, "Operand 1 type: %d\n", opline->op1_type);
-        // // fprintf(ofile, "Operand 2 type: %d\n", opline->op2_type);
-
-        // // debug_print(("=extra=\n"));
-        // // if (execute_data && execute_data->extra_named_params)
-        // // {
-        // //     zend_array *tmp = execute_data->extra_named_params;
-        // //     debug_print(("nNumUsed : %d\n", tmp->nNumUsed));
-        // //     debug_print(("nNumOfElements : %d\n", tmp->nNumOfElements));
-        // //     debug_print(("nTableSize : %d\n", tmp->nTableSize));
-        // // }
-        // // else
-        // // {
-        // //     debug_print(("execute_data or extra_named_params is NULL\n"));
-        // // }
-
-        // // debug_print(("=extra=\n"));
-
-        // if (execute_data->prev_execute_data)
-        // {
-        //     debug_print(("execute_data->prev_execute_data\n"));
-        //     zend_string *func_str = execute_data->prev_execute_data->func->common.function_name;
-        //     uint32_t *func_num_args = execute_data->prev_execute_data->func->common.num_args;
-        //     uint32_t *required_num_args = execute_data->prev_execute_data->func->common.required_num_args;
-
-        //     if (func_str)
-        //         debug_print(("func str : %s\n", func_str->val));
-        //     if (func_num_args)
-        //         debug_print(("func_num_args : %d\n", func_num_args));
-
-        //     if (required_num_args)
-        //         debug_print(("func_required : %d\n", required_num_args));
-        // }
-
-        // if (execute_data->func)
-        // {
-        //     debug_print(("execute_data->func\n"));
-        //     zend_string *func_str = execute_data->func->common.function_name;
-        //     uint32_t *func_num_args = execute_data->func->common.num_args;
-        //     uint32_t *required_num_args = execute_data->func->common.required_num_args;
-
-        //     if (func_str)
-        //         debug_print(("func str : %s\n", func_str->val));
-        //     if (func_num_args)
-        //         debug_print(("func_num_args : %d\n", func_num_args));
-
-        //     if (required_num_args)
-        //         debug_print(("func_required : %d\n", required_num_args));
-        // }
-
-        // if (execute_data->call)
-        // {
-        //     debug_print(("execute_data->call\n"));
-        //     zend_execute_data *tmp = execute_data->call;
-
-        //     if (tmp->func)
-        //     {
-        //         debug_print(("tmp->func\n"));
-        //         zend_string *func_str = tmp->func->common.function_name;
-        //         uint32_t *func_num_args = tmp->func->common.num_args;
-        //         uint32_t *required_num_args = tmp->func->common.required_num_args;
-
-        //         if (func_str)
-        //             debug_print(("func str : %s\n", func_str->val));
-        //         if (func_num_args)
-        //             debug_print(("func_num_args : %d\n", func_num_args));
-
-        //         if (required_num_args)
-        //             debug_print(("func_required : %d\n", required_num_args));
-        //     }
-        // }
-        // debug_print(("op1 type : %d ", opline->op1_type));
-
-        // if (opline->op1_type != IS_UNUSED)
-        // {
-        //     debug_print(("op1 : %x \t", opline->op1.var));
-
-        //     // zval *tmp = opline->op1.var;
-        //     // debug_print(("tmp type : %x | \t ", tmp->u1.v.type));
-
-        //     // char key_str[20];                              // Assuming key won't exceed 20 characters when converted to string
-        //     // snprintf(key_str, sizeof(key_str), "%d", opline->op1.var); // Convert integer key to string
-
-        //     // zval *val;
-        //     // if (executor_globals.zend_constants)
-        //     // {
-        //     //     zend_string *constant_name = zend_string_init(key_str, strlen(key_str), 0);
-        //     //     if ((val = zend_hash_find(executor_globals.zend_constants, constant_name)) != NULL)
-        //     //     {
-        //     //         debug_print(("Constant: %s, Value: %d\n", key_str, Z_TYPE_P(val)));
-
-        //     //     }
-        //     //     else
-        //     //     {
-        //     //         debug_print(("Constant '%s' not found.\n", key_str));
-        //     //     }
-        //     //     zend_string_release(constant_name);
-        //     // }
-        //     // HashTable *tmp_constants = executor_globals.zend_constants;
-        //     // if (tmp_constants)
-        //     // {
-        //     //     Bucket *tmp_bucket = tmp_constants->arData[opline->op1.var];
+        //     // if(op){
+        //     //     printf("1op??? type : %s\n", zend_get_type_by_const(op->u1.v.type));
         //     // }
 
-        //     // zval *var_value = compiler_globals.active_op_array->vars[opline->op1.var];
-        //     // if (var_value != NULL)
+        //     // if (
+        //     //     opline->opcode == ZEND_SWITCH_LONG ||| opline->opcode == ZEND_SWITCH_STRING || opline->opcode == ZEND_MATCH)
         //     // {
-        //     //     // 변수가 존재하면 처리합니다.
-        //     //     switch (Z_TYPE_P(var_value))
+        //     //     HashTable *jumptable = Z_ARRVAL_P(op);
+        //     //     zend_string *key;
+        //     //     zend_ulong num_key;
+        //     //     zval *zv;
+        //     //     ZEND_HASH_FOREACH_KEY_VAL(jumptable, num_key, key, zv)
+        //     //     {
+        //     //         if (key)
+        //     //         {
+        //     //             fprintf(stderr, " \"%s\":", ZSTR_VAL(key));
+        //     //         }
+        //     //         else
+        //     //         {
+        //     //             fprintf(stderr, " " ZEND_LONG_FMT ":", num_key);
+        //     //         }
+        //     //         if (b)
+        //     //         {
+        //     //             fprintf(stderr, " BB%d,", b->successors[n++]);
+        //     //         }
+        //     //         else
+        //     //         {
+        //     //             fprintf(stderr, " %04u,", (uint32_t)ZEND_OFFSET_TO_OPLINE_NUM(op_array, opline, Z_LVAL_P(zv)));
+        //     //         }
+        //     //     }
+        //     //     ZEND_HASH_FOREACH_END();
+        //     //     fprintf(stderr, " default:");
+        //     // }
+        //     // else
+        //     // {
+        //     //     zend_dump_const(op);
+        //     // }
+        // }
+
+        //     printf("=========================================\n");
+
+        //     zval *isok = (zval*)((char*)opline + opline->op2.var);
+
+        //     printf("%lx + %lx\n", opline, opline->op2.var);
+        //     printf("isok : %lx\n", isok);
+        //     printf("\tisok .type : %d\n", isok->u1.v.type);
+
+        //     zend_string *cv = EX(func)->op_array.vars[EX_VAR_TO_NUM(opline->op1.var)];
+        //     if (cv)
+        //     {
+        //         printf("cv : %lx\n", cv);
+        //         printf("===11cvcvcvcvcvcv===\n\t%s\n", ZSTR_VAL(cv));
+        //     }
+
+        //     cv = EX(func)->op_array.vars[EX_VAR_TO_NUM(opline->op2.var)];
+        //     if (cv)
+        //     {
+        //         printf("===22cvcvcvcvcvcv===\n\t%s\n", ZSTR_VAL(cv));
+        //     }
+
+        //     /*
+        //     # define CT_CONSTANT_EX(op_array, num) \
+        //         ((op_array)->literals + (num))
+        //     */
+        //     // zval *zv = CT_CONSTANT_EX(&EX(func)->op_array, opline->op2.num);
+
+        //     // 0x40
+
+        //     // https://www.phpinternalsbook.com/php7/zvals/basic_structure.html
+
+        //     printf("\t\t1. %x\n", opline->op2.var);
+        //     printf("\t\t2. %x\n", EX_VAR_TO_NUM(opline->op2.var));
+
+        //     printf("\t\t\t[*] last_literal : %x\n", EX(func)->op_array.last_literal);
+        //     printf("\t\t\t[*] last_var : %x\n", EX(func)->op_array.last_var);
+
+        //     zval *p = EX(func)->op_array.literals;
+        //     zval *end = p + EX(func)->op_array.last_literal;
+        //     // ADD_SIZE(sizeof(zval) * EX(func)->op_array.last_literal);
+        //     int i = 0;
+        //     while (p < end)
+        //     {
+        //         printf("p: %lx\n", p);
+        //         printf("\t\t[%d]. %x\n", i++, p->u1.v.type);
+
+        //         switch (p->u1.v.type)
+        //         {
+        //         case IS_STRING:
+        //             printf("\t\t\tstr : (%d)%s\n", p->value.str->len, p->value.str->val);
+        //             break;
+
+        //         case IS_LONG:
+        //             printf("\t\t\tstr : %d\n", p->value.lval);
+        //             break;
+        //         }
+
+        //         p++;
+        //     }
+
+        //     // for (int i = 0; i < EX(func)->op_array.last_literal; i++)
+        //     // {
+        //     //     printf("\t\t %x\n", EX(func)->op_array.literals[i].u1.v.type);
+        //     //     printf("\t\t\t%lx\n", &EX(func)->op_array.literals[i]);
+        //     //     printf("\t\t\t%lx\n", EX(func)->op_array.literals[i]);
+        //     //     switch (EX(func)->op_array.literals[i].u1.v.type)
+        //     //     {
+        //     //     case IS_VAR:
+        //     //         printf("\t\t\ttmp type : %lx\n", EX(func)->op_array.literals[i].value.lval);
+        //     //         break;
+        //     //     case IS_STRING:
+        //     //         printf("\t\tstr : %s\n", EX(func)->op_array.literals[i].value.str->val);
+        //     //         break;
+        //     //     default:
+        //     //         printf("unknown\n");
+        //     //         break;
+        //     //     }
+        //     // }
+
+        //     // printf("\t\t\t[*]nNumOfElements : %x\n", EX(func)->op_array.static_variables->nNumOfElements);
+        //     // printf("\t\t\t[*]nNumUsed : %x\n", EX(func)->op_array.static_variables->nNumUsed);
+
+        //     // if(zv){
+        //     //     printf("wow!\n");
+        //     //     printf("\ttype : %x\n",zv->u1.v.type);
+        //     //     printf("\ttype_flag : %x\n",zv->u1.v.type_flags);
+        //     //     printf("\tvalue : %lx\n", zv->value);
+
+        //     // }
+
+        //     // if (test == NULL)
+        //     // {
+        //     //     test = opline;
+        //     //     printf("%x : %x\n", test, opline);
+        //     // }
+        //     // zval *zv = RT_CONSTANT(test, opline->op1);
+        //     // if (zv)
+        //     // {
+        //     //     printf("\t[*] Z_TYPE_P(zv) : %lx\n", Z_TYPE_P(zv));
+        //     // }
+
+        //     // cv++;
+        //     // zval *test = cv;
+        //     // if (test)
+        //     // {
+        //     //     printf("\t======\t%x\n", test->u1.v.type);
+        //     // }
+
+        //     // if (opline->op2_type == IS_CONST)
+        //     // {
+        //     //     printf("is ISCONST\n");
+        //     //     zval *tmp = CT_CONSTANT_EX(&execute_data->func->op_array, opline->op2.constant);
+        //     //     if (tmp)
+        //     //     {
+        //     //         printf("\ttmp OK\n");
+        //     //         printf("tmp type : %x\n", Z_TYPE_P(tmp));
+        //     //     }
+
+        //     //     zval *val = CT_CONSTANT(opline->op2);
+        //     //     if (val)
+        //     //     {
+        //     //         printf("\tval OK\n");
+        //     //         printf("val type : %x\n", Z_TYPE_P(val));
+        //     //     }
+        //     // }
+
+        //     // if (opline->op2_type == IS_CONST)
+        //     // {
+        //     //     zend_op *op2 = opline + opline->op2.jmp_offset;
+        //     //     zend_string *constant_value = EX(func)->op_array.literals[op2->op2.constant]->val.str;
+        //     //     printf("Constant value: %s\n", ZSTR_VAL(constant_value));
+        //     // }
+        //     // cv = EX(func)->op_array.vars[EX_VAR_TO_NUM(opline->op2.var)];
+        //     // if (cv)
+        //     // {
+        //     //     printf("===22cvcvcvcvcvcv===\n\t%s\n", ZSTR_VAL(cv));
+        //     // }
+
+        //     // zval *zv;
+        //     // zv = RT_CONSTANT(execute_data->extra_named_params, opline->op1);
+        //     // printf("\t\t[1] Type as integer: %u\n", zv->u1.v.type);
+        //     // printf("\t\t\tlen:%lx\n",zv->value.str->len);
+        //     // printf("\t\t[1] Type as integer: %u\n", zv->u1.v.type_flags);
+        //     // zv = RT_CONSTANT(execute_data->extra_named_params, opline->op2);
+        //     // printf("\t\t[2] Type as integer: %u\n", zv->u1.v.type);
+        //     // printf("\t\t[2] Type as integer: %u\n", zv->u1.v.type_flags);
+        //     // zv = RT_CONSTANT(execute_data->extra_named_params, opline->result);
+        //     // printf("\t\t[3] Type as integer: %u\n", zv->u1.v.type);
+        //     // printf("\t\t[3] Type as integer: %u\n", zv->u1.v.type_flags);
+
+        //     if (execute_data->call)
+        //     {
+        //         printf("\t\t\t[*] call here !\n");
+        //     }
+
+        //     if (execute_data->prev_execute_data)
+        //     {
+        //         printf("\t\t\t[*] prev_execute_data here !\n");
+        //     }
+
+        //     // if(zv.u1.v.type == IS_STRING){
+        //     //     printf("\tstr : %s\n", &zv.value.str->val);
+        //     //     printf("\tstr : %s\n", zv.value.str->val);
+        //     // }
+
+        //     // zend_object *tmp = RT_CONSTANT2(opline, opline->op1);
+        //     // if(tmp){
+        //     //     printf("type : %x\n", tmp->ce->type);
+        //     //     printf("zval type : %x\n", tmp->properties_table->u1.v.type);
+        //     // }
+
+        //     // printf("%d\n", sizeof(zend_object));
+
+        //     // char *test = (char *)opline; // opline을 char 포인터로 형변환
+
+        //     // for (int i = 0; i < 16; i++)
+        //     // {
+        //     //     printf("%x\n", *test++); // 각 바이트를 1바이트씩 출력
+        //     // }
+        //     //     zval zv;
+        //     //     zv = *RT_CONSTANT(opline, opline->op1);
+        //     //     printf("zv : %x\n", &zv);
+
+        //     //     if(zv.u1.v.type == IS_STRING){
+        //     //         debug_print(("str : %s\n", &zv.value.str->val[0]));
+        //     //     }else if(zv.u1.v.type == IS_CONST){
+        //     //         debug_print(("val : %d\n", zv.value.))
+        //     //     }
+        //     // IS_OBJECT
+
+        //     // if (zv)
+        //     // {
+        //     //     switch (opline->op1_type)
+        //     //     {
+        //     //     case IS_CV:
+        //     //         if (Z_TYPE(zv) == IS_STRING)
+        //     //         {
+        //     //             char *str = Z_STRVAL(zv);
+        //     //             debug_print(("\top1_str : %s\n", str));
+        //     //         }
+        //     //         else
+        //     //         {
+        //     //             debug_print(("\top1_zv_type : unknown(%d)\n", Z_TYPE(zv)));
+        //     //         }
+        //     //         break;
+        //     //     case IS_CONST:
+        //     //         if (Z_TYPE(zv) == IS_STRING)
+        //     //         {
+        //     //             char *str = Z_STRVAL(zv);
+        //     //             debug_print(("\top1_str : %s\n", str));
+        //     //         }
+        //     //         else
+        //     //         {
+        //     //             debug_print(("\top1_zv_type : unknown(%d)\n", Z_TYPE(zv)));
+        //     //         }
+        //     //         break;
+        //     //     default:
+        //     //         debug_print(("\top1_type : %d\n", opline->op1_type));
+        //     //         break;
+        //     //     }
+        //     // }
+
+        //     // zv = RT_CONSTANT(opline, opline->op2);
+        //     // if (zv)
+        //     // {
+        //     //     switch (opline->op2_type)
+        //     //     {
+        //     //     case IS_CV:
+        //     //         if (Z_TYPE(zv) == IS_STRING)
+        //     //         {
+        //     //             char *str = Z_STRVAL_P(zv);
+        //     //             debug_print(("\top2_str : %s\n", str));
+        //     //         }
+        //     //         else
+        //     //         {
+        //     //             debug_print(("\top2_zv_type : unknown(%d)\n", Z_TYPE(zv)));
+        //     //         }
+        //     //         break;
+        //     //     default:
+        //     //         debug_print(("\top2_type : %d\n", opline->op2_type));
+        //     //         break;
+        //     //     }
+        //     // }
+
+        //     // zv = RT_CONSTANT(opline, opline->result);
+        //     // if (zv)
+        //     // {
+        //     //     switch (opline->result_type)
+        //     //     {
+        //     //     case IS_CV:
+        //     //         if (Z_TYPE(zv) == IS_STRING)
+        //     //         {
+        //     //             char *str = Z_STRVAL_P(zv);
+        //     //             debug_print(("\tresult_str : %s\n", str));
+        //     //         }
+        //     //         else
+        //     //         {
+        //     //             debug_print(("\tresult_zv_type : unknown(%d)\n", Z_TYPE(zv)));
+        //     //         }
+        //     //         break;
+        //     //     default:
+        //     //         debug_print(("\tresult_type : %d\n", opline->result_type));
+        //     //         break;
+        //     //     }
+        //     // }
+
+        //     // if(opline->op1_type == IS_CV)
+        //     // {
+        //     //     debug_print(("\n\t\t\tO?\n"));
+
+        //     //     zval *zv;
+        //     //     size_t len;
+
+        //     //     zv = RT_CONSTANT(opline, opline->op1);
+
+        //     //     debug_print(("opline addr : %x\n", opline));
+        //     //     debug_print(("zval size : %d\n", sizeof(zval)));
+        //     //     if(zv){
+        //     //         debug_print(("\t\t\tOooOOOOoo?\n"));
+        //     //         //debug_print(("\t\t\str  : %s\n", zv->value.str));
+        //     //         debug_print(("\t\t\tcheck : %d\n", zv->u1.v.type));
+        //     //     }
+
+        //     //     zv = RT_CONSTANT(&opline, opline->op1);
+
+        //     //     debug_print(("opline addr : %x\n", opline));
+        //     //     debug_print(("zval size : %d\n", sizeof(zval)));
+        //     //     if(zv){
+        //     //         debug_print(("\t\t\tOooOOOOoo?\n"));
+        //     //         //debug_print(("\t\t\str  : %s\n", zv->value.str));
+        //     //         debug_print(("\t\t\tcheck : %d\n", zv->u1.v.type));
+        //     //     }
+
+        //     // }
+
+        //     // // common 여부
+        //     // if (execute_data->func)
+        //     //     if (execute_data->func->common.attributes)
+        //     //     {
+        //     //         debug_print(("\tattributes OK\n"));
+        //     //     }
+
+        //     // if(execute_data->func->internal_function.function_name){
+        //     //      debug_print(("\tinternal : %s\n", ZSTR_VAL(execute_data->func->internal_function.function_name)));
+        //     // }
+
+        //     // if(execute_data->func->internal_function.attributes){
+        //     //     debug_print(("\tinter - attributes OK\n"));
+        //     // }
+
+        //     // if (execute_data->func->op_array.scope)
+        //     // {
+        //     //     debug_print(("\t scope O \n"));
+
+        //     //     if (execute_data->func->op_array.scope->name)
+        //     //         debug_print(("\t test %s\n", execute_data->func->op_array.scope->name->val));
+        //     // }
+
+        //     // if (EX(func) && EX(func)->op_array.filename)
+        //     // {
+        //     //     // #define EX(element) 			((execute_data)->element)
+        //     //     // func -> execute_data->func
+        //     //     debug_print(("\n%s:%d\n", ZSTR_VAL(EX(func)->op_array.filename), opline->lineno));
+
+        //     //     printLineFromFile(ZSTR_VAL(EX(func)->op_array.filename), opline->lineno);
+        //     //     debug_print(("line_start : %d\n", execute_data->func->op_array.line_start));
+        //     //     debug_print(("line_end : %d\n", execute_data->func->op_array.line_end));
+        //     //     if (execute_data->func->op_array.doc_comment)
+        //     //         debug_print(("doc_comment : %s\n", ZSTR_VAL(execute_data->func->op_array.doc_comment)));
+
+        //     //     debug_print(("\n%s:%d\n", ZSTR_VAL(execute_data->func->op_array.filename), opline->lineno));
+
+        //     //     // if (execute_data->func->op_array.function_name)
+        //     //     //     debug_print(("function name: %s\n", ZSTR_VAL(execute_data->func->op_array.function_name)));
+
+        //     //     debug_print(("num_args : %d\n", execute_data->func->op_array.num_args));
+        //     //     debug_print(("required_num_args : %d\n", execute_data->func->op_array.required_num_args));
+        //     //     debug_print(("temporary : %d\n", execute_data->func->op_array.T));
+        //     //     debug_print(("last var : %d\n", execute_data->func->op_array.last_var));
+        //     //     debug_print(("last : %d\n", execute_data->func->op_array.last));
+        //     //     debug_print(("num_dynamic_func_defs : %d\n", execute_data->func->op_array.num_dynamic_func_defs));
+
+        //     //     int last_var = execute_data->func->op_array.last_var;
+
+        //     //     if(execute_data->func->op_array.static_variables_ptr__ptr){
+        //     //         debug_print(("static_variables OK\n"));
+        //     //         debug_print(("nNumUsed : %d\n", execute_data->func->op_array.static_variables_ptr__ptr->nNumUsed));
+        //     //         debug_print(("nNumOfElements : %d\n", execute_data->func->op_array.static_variables_ptr__ptr->nNumOfElements));
+        //     //     }
+
+        //     //     if(execute_data->func->op_array.attributes){
+        //     //         debug_print(("attributes OK\n"));
+        //     //         debug_print(("nNumUsed : %d\n", execute_data->func->op_array.attributes->nNumUsed));
+        //     //     }
+
+        //     //     debug_print(("last var : %d\n", last_var));
+        //     //     if (last_var)
+        //     //     {
+        //     //         for(int i=0; i<last_var; i++){
+        //     //             debug_print(("\tstr : %s\n", ZSTR_VAL(execute_data->func->op_array.vars[i])));
+        //     //             //debug_print(("\thash : %x\n", execute_data->func->op_array.vars[i]->h));
+        //     //         }
+        //     //     }
+
+        //     //     int last_literal = execute_data->func->op_array.last_literal;
+        //     //     debug_print(("last_literal : %d\n", last_literal));
+        //     //     if(last_literal){
+        //     //         for(int i=0; i<last_literal;i++){
+        //     //             debug_print(("\ttype : %x\n", execute_data->func->op_array.literals[i].u1.v.type));
+        //     //             if(execute_data->func->op_array.literals[i].u1.v.type == IS_STRING){
+        //     //                 debug_print(("\tstr : %s\n", execute_data->func->op_array.literals[i].value.str->val));
+        //     //             }
+        //     //         }
+        //     //     }
+        //     // }
+
+        //     // zend_array *symbol_table = execute_data->func->op_array.static_variables;
+        //     // if(symbol_table != NULL)
+        //     // {
+        //     //     zend_string *key;
+        //     //     zval *value;
+
+        //     //     int i=0;
+        //     //     ZEND_HASH_FOREACH_STR_KEY_VAL(symbol_table, key, value)
+        //     //     {
+        //     //          debug_print(("\t======= looop %d ======\n", i++));
+        //     //     }
+        //     //     ZEND_HASH_FOREACH_END();
+        //     // }
+        //     // // // 이전 opline
+        //     // // const zend_op *preopline = execute_data->opline;
+        //     // // const char *preopname = zend_get_opcode_name(preopline->opcode);
+        //     // // debug_print(("%d] %s (%d)   %d    %d \n", preopline->lineno, preopname, preopline->opcode, preopline->op1_type, preopline->op2_type));
+
+        //     // // fprintf(ofile, "==============================\n");
+        //     // // zend_execute_data *call = execute_data->call;
+        //     // // if (call)
+        //     // // {
+        //     // //     fprintf(ofile, "call O\n");
+        //     // //     zend_function *fbc = call->func;
+        //     // //     if (fbc)
+        //     // //     {
+        //     // //         fprintf(ofile, "fbc O\n");
+        //     // //         zend_string *fname2 = fbc->common.function_name;
+        //     // //         if (fname2)
+        //     // //         {
+        //     // //             fprintf(ofile, "fname2 O\n");
+        //     // //             fprintf(ofile, "FunctionName:%s\n", ZSTR_VAL(fname2));
+        //     // //         }
+        //     // //     }
+        //     // // }
+
+        //     // // zend_function *current_function = execute_data->func;
+
+        //     // // check debug
+        //     // // if (current_function)
+        //     // // {
+        //     // //     fprintf(ofile, "current_function O\n");
+
+        //     // //     if (current_function->common.function_name)
+        //     // //     {
+        //     // //         fprintf(ofile, "len : %x\n", current_function->common.function_name->len);
+
+        //     // //         fprintf(ofile, "str : %s\n", current_function->common.function_name->val);
+        //     // //     }
+        //     // //     else
+        //     // //     {
+        //     // //         fprintf(ofile, "common.function_name X \n");
+        //     // //     }
+
+        //     // //     zend_internal_function current_internal_funtion = execute_data->func->internal_function;
+
+        //     // //     if (current_internal_funtion.function_name)
+        //     // //     {
+        //     // //         fprintf(ofile, "current_internal_funtion.function_name O\n");
+
+        //     // //         fprintf(ofile, "len : %x\n", current_internal_funtion.function_name->len);
+
+        //     // //         fprintf(ofile, "str : %s\n", current_internal_funtion.function_name->val);
+        //     // //     }
+        //     // //     else
+        //     // //     {
+        //     // //         fprintf(ofile, "current_internal_funtion.function_name X\n");
+        //     // //     }
+        //     // // }
+        //     // // else
+        //     // // {
+        //     // //     fprintf(ofile, "current_function X\n");
+        //     // // }
+
+        //     // // // end
+
+        //     // // if (current_function && current_function->common.function_name)
+        //     // // {
+        //     // //     fprintf(ofile, "Currently executing function: %s\n", ZSTR_VAL(current_function->common.function_name));
+        //     // // }
+        //     // // else
+        //     // // {
+        //     // //     fprintf(ofile, "Currently executing function: Unknown function\n");
+        //     // // }
+
+        //     // // fprintf(ofile, "============ zend_execute_data ======\n");
+        //     // // fprintf(ofile, "============ zend_op =========\n");
+        //     // // fprintf(ofile, "%d] %s (%d)   %d    %d \n", opline->lineno, opname, opline->opcode, opline->op1_type, opline->op2_type);
+
+        //     // // // Print all members of _zend_op struct
+        //     // // fprintf(ofile, "Line: %d\n", opline->lineno);
+        //     // // fprintf(ofile, "Opcode: %s (%d)\n", opname, opline->opcode);
+        //     // // fprintf(ofile, "Operand 1 type: %d\n", opline->op1_type);
+        //     // // fprintf(ofile, "Operand 2 type: %d\n", opline->op2_type);
+
+        //     // // debug_print(("=extra=\n"));
+        //     // // if (execute_data && execute_data->extra_named_params)
+        //     // // {
+        //     // //     zend_array *tmp = execute_data->extra_named_params;
+        //     // //     debug_print(("nNumUsed : %d\n", tmp->nNumUsed));
+        //     // //     debug_print(("nNumOfElements : %d\n", tmp->nNumOfElements));
+        //     // //     debug_print(("nTableSize : %d\n", tmp->nTableSize));
+        //     // // }
+        //     // // else
+        //     // // {
+        //     // //     debug_print(("execute_data or extra_named_params is NULL\n"));
+        //     // // }
+
+        //     // // debug_print(("=extra=\n"));
+
+        //     // if (execute_data->prev_execute_data)
+        //     // {
+        //     //     debug_print(("execute_data->prev_execute_data\n"));
+        //     //     zend_string *func_str = execute_data->prev_execute_data->func->common.function_name;
+        //     //     uint32_t *func_num_args = execute_data->prev_execute_data->func->common.num_args;
+        //     //     uint32_t *required_num_args = execute_data->prev_execute_data->func->common.required_num_args;
+
+        //     //     if (func_str)
+        //     //         debug_print(("func str : %s\n", func_str->val));
+        //     //     if (func_num_args)
+        //     //         debug_print(("func_num_args : %d\n", func_num_args));
+
+        //     //     if (required_num_args)
+        //     //         debug_print(("func_required : %d\n", required_num_args));
+        //     // }
+
+        //     // if (execute_data->func)
+        //     // {
+        //     //     debug_print(("execute_data->func\n"));
+        //     //     zend_string *func_str = execute_data->func->common.function_name;
+        //     //     uint32_t *func_num_args = execute_data->func->common.num_args;
+        //     //     uint32_t *required_num_args = execute_data->func->common.required_num_args;
+
+        //     //     if (func_str)
+        //     //         debug_print(("func str : %s\n", func_str->val));
+        //     //     if (func_num_args)
+        //     //         debug_print(("func_num_args : %d\n", func_num_args));
+
+        //     //     if (required_num_args)
+        //     //         debug_print(("func_required : %d\n", required_num_args));
+        //     // }
+
+        //     // if (execute_data->call)
+        //     // {
+        //     //     debug_print(("execute_data->call\n"));
+        //     //     zend_execute_data *tmp = execute_data->call;
+
+        //     //     if (tmp->func)
+        //     //     {
+        //     //         debug_print(("tmp->func\n"));
+        //     //         zend_string *func_str = tmp->func->common.function_name;
+        //     //         uint32_t *func_num_args = tmp->func->common.num_args;
+        //     //         uint32_t *required_num_args = tmp->func->common.required_num_args;
+
+        //     //         if (func_str)
+        //     //             debug_print(("func str : %s\n", func_str->val));
+        //     //         if (func_num_args)
+        //     //             debug_print(("func_num_args : %d\n", func_num_args));
+
+        //     //         if (required_num_args)
+        //     //             debug_print(("func_required : %d\n", required_num_args));
+        //     //     }
+        //     // }
+        //     // debug_print(("op1 type : %d ", opline->op1_type));
+
+        //     // if (opline->op1_type != IS_UNUSED)
+        //     // {
+        //     //     debug_print(("op1 : %x \t", opline->op1.var));
+
+        //     //     // zval *tmp = opline->op1.var;
+        //     //     // debug_print(("tmp type : %x | \t ", tmp->u1.v.type));
+
+        //     //     // char key_str[20];                              // Assuming key won't exceed 20 characters when converted to string
+        //     //     // snprintf(key_str, sizeof(key_str), "%d", opline->op1.var); // Convert integer key to string
+
+        //     //     // zval *val;
+        //     //     // if (executor_globals.zend_constants)
+        //     //     // {
+        //     //     //     zend_string *constant_name = zend_string_init(key_str, strlen(key_str), 0);
+        //     //     //     if ((val = zend_hash_find(executor_globals.zend_constants, constant_name)) != NULL)
+        //     //     //     {
+        //     //     //         debug_print(("Constant: %s, Value: %d\n", key_str, Z_TYPE_P(val)));
+
+        //     //     //     }
+        //     //     //     else
+        //     //     //     {
+        //     //     //         debug_print(("Constant '%s' not found.\n", key_str));
+        //     //     //     }
+        //     //     //     zend_string_release(constant_name);
+        //     //     // }
+        //     //     // HashTable *tmp_constants = executor_globals.zend_constants;
+        //     //     // if (tmp_constants)
+        //     //     // {
+        //     //     //     Bucket *tmp_bucket = tmp_constants->arData[opline->op1.var];
+        //     //     // }
+
+        //     //     // zval *var_value = compiler_globals.active_op_array->vars[opline->op1.var];
+        //     //     // if (var_value != NULL)
+        //     //     // {
+        //     //     //     // 변수가 존재하면 처리합니다.
+        //     //     //     switch (Z_TYPE_P(var_value))
+        //     //     //     {
+        //     //     //     case IS_STRING:
+        //     //     //         // 문자열인 경우 처리
+        //     //     //         printf("Variable at index %d is a string: %s\n", opline->op1.var, Z_STRVAL_P(var_value));
+        //     //     //         break;
+        //     //     //     case IS_LONG:
+        //     //     //         // 정수인 경우 처리
+        //     //     //         printf("Variable at index %d is an integer: %ld\n", opline->op1.var, Z_LVAL_P(var_value));
+        //     //     //         break;
+        //     //     //     // 다른 타입에 대한 처리 추가
+        //     //     //     default:
+        //     //     //         printf("Variable at index %d is of unknown type\n", opline->op1.var);
+        //     //     //         break;
+        //     //     //     }
+        //     //     // }
+        //     //     // else
+        //     //     // {
+        //     //     //     // 변수가 존재하지 않는 경우 처리
+        //     //     //     printf("Variable at index %d does not exist\n", opline->op1.var);
+        //     //     // }
+        //     // }
+        //     // debug_print(("| op2 type : %d ", opline->op2_type));
+        //     // if (opline->op2_type != IS_UNUSED)
+        //     // {
+        //     //     debug_print(("op2 : %x \t", opline->op2.var));
+        //     // }
+
+        //     // debug_print(("| result type : %d ", opline->result_type));
+        //     // if (opline->result_type != IS_UNUSED)
+        //     // {
+        //     //     debug_print(("result : %x |\t", opline->result.var));
+        //     // }
+
+        //     // // debug_print(("%d : %d\n", opline->lineno, execute_data->opline->lineno));
+
+        //     // // if (execute_data->call)
+        //     // //     if (execute_data->call->opline)
+        //     // //         debug_print(("======11=====\n%x\n==========\n", execute_data->call->opline));
+
+        //     // // if(execute_data->prev_execute_data)
+        //     // //     if(execute_data->prev_execute_data->opline)
+        //     // //         debug_print(("======22=====\n%x\n==========\n", execute_data->prev_execute_data->opline));
+
+        //     // // if (execute_data->call)
+        //     // //     if (execute_data->call->opline)
+        //     // //         if (execute_data->call->opline->lineno)
+        //     // //             debug_print(("%d : %d\n", opline->lineno, execute_data->call->opline->lineno));
+        //     // // if (execute_data->prev_execute_data)
+        //     // //     if (execute_data->prev_execute_data->opline)
+        //     // //         if (execute_data->prev_execute_data->opline->lineno)
+        //     // //             debug_print(("%d : %d\n", opline->lineno, execute_data->prev_execute_data->opline->lineno));
+        //     // // // 호출한 자
+
+        //     // // zend_execute_data *current = execute_data->call;
+        //     // // if(current){
+        //     // //     debug_print(("current O\n"));
+
+        //     // // }
+
+        //     // // zend_array *params = execute_data->extra_named_params;
+
+        //     // // if (params != NULL)
+        //     // // {
+        //     // //     zend_string *key;
+        //     // //     zval *value;
+
+        //     // //     ZEND_HASH_FOREACH_STR_KEY_VAL(params, key, value)
+        //     // //     {
+        //     // //         if (key)
+        //     // //         {
+        //     // //             debug_print(("Parameter : %s, Value : %d\n", ZSTR_VAL(key), Z_TYPE_P(value)));
+        //     // //         }
+        //     // //         if(value){
+
+        //     // //         }
+        //     // //     }
+        //     // //     ZEND_HASH_FOREACH_END();
+        //     // // }
+
+        //     // // if (opline->op1_type == IS_CONST)
+        //     // // {
+        //     // //     debug_print(("Value : %x\n", opline->op1.constant));
+        //     // // }
+        //     // // else if (opline->op1_type == IS_CV)
+        //     // // {
+
+        //     // //     if (opline->lineno > 0 && opline->lineno < 20)
+        //     // //     {
+        //     // //         debug_print(("Value : %x\n", opline->op1.var));
+        //     // //         debug_print(("Value : %x\n", opline->op1.constant));
+
+        //     // //         if (opline->op2_type != IS_UNUSED)
+        //     // //         {
+        //     // //             debug_print(("op2 : %x\n", opline->op2.var));
+        //     // //         }
+
+        //     // //         zend_array *symbol_table = execute_data->symbol_table;
+        //     // //         debug_print(("symbol_table's nNumUsed : %d\n", symbol_table->nNumUsed));
+        //     // //         debug_print(("symbol_table's nTableSize : %d\n", symbol_table->nTableSize));
+        //     // //         debug_print(("symbol_table's nNumOfElements : %d\n", symbol_table->nNumOfElements));
+
+        //     // //         Bucket *test = symbol_table->arData;
+        //     // //         debug_print(("test : %s\n", test[0].key->val));
+
+        //     // //         if(execute_data->func==NULL)debug_print(("shit\n"));
+        //     // //         int *count = execute_data->func->op_array.last_var;
+        //     // //         debug_print(("last_var : %d\n", *count));
+
+        //     // //         zend_string *str = execute_data->func->op_array.vars[opline->op1.var];
+
+        //     // //         if (str)
+        //     // //         {
+        //     // //             debug_print(("str : %s\n", str->val));
+        //     // //         }
+        //     // //         else
+        //     // //         {
+        //     // //             debug_print(("??\n"));
+        //     // //         }
+
+        //     // zend_array *symbol_table = execute_data->symbol_table;
+
+        //     // zval *cv_value;
+        //     // if ((cv_value = zend_hash_index_find(symbol_table, opline->op1.var)) != NULL)
+        //     // {
+        //     //     debug_print(("Z_TYPE_P(cv_value) : %d\n", Z_TYPE_P(cv_value)));
+        //     //     switch (Z_TYPE_P(cv_value))
         //     //     {
         //     //     case IS_STRING:
-        //     //         // 문자열인 경우 처리
-        //     //         printf("Variable at index %d is a string: %s\n", opline->op1.var, Z_STRVAL_P(var_value));
+        //     //         debug_print(("Found CV value: %s\n", Z_STRVAL_P(cv_value)));
         //     //         break;
-        //     //     case IS_LONG:
-        //     //         // 정수인 경우 처리
-        //     //         printf("Variable at index %d is an integer: %ld\n", opline->op1.var, Z_LVAL_P(var_value));
-        //     //         break;
-        //     //     // 다른 타입에 대한 처리 추가
         //     //     default:
-        //     //         printf("Variable at index %d is of unknown type\n", opline->op1.var);
+        //     //         debug_print(("unknown\n"));
         //     //         break;
         //     //     }
         //     // }
         //     // else
         //     // {
-        //     //     // 변수가 존재하지 않는 경우 처리
-        //     //     printf("Variable at index %d does not exist\n", opline->op1.var);
+        //     //     debug_print(("CV value not found\n"));
         //     // }
-        // }
-        // debug_print(("| op2 type : %d ", opline->op2_type));
-        // if (opline->op2_type != IS_UNUSED)
-        // {
-        //     debug_print(("op2 : %x \t", opline->op2.var));
-        // }
 
-        // debug_print(("| result type : %d ", opline->result_type));
-        // if (opline->result_type != IS_UNUSED)
-        // {
-        //     debug_print(("result : %x |\t", opline->result.var));
-        // }
+        //     // if ((cv_value = zend_hash_index_find(symbol_table, opline->op2.var)) != NULL)
+        //     // {
+        //     //     debug_print(("Z_TYPE_P(cv_value2) : %d\n", Z_TYPE_P(cv_value)));
+        //     //     switch (Z_TYPE_P(cv_value))
+        //     //     {
+        //     //     case IS_STRING:
+        //     //         debug_print(("Found CV value2: %s\n", Z_STRVAL_P(cv_value)));
+        //     //         break;
+        //     //     default:
+        //     //         debug_print(("unknown2\n"));
+        //     //         break;
+        //     //     }
+        //     // }
+        //     // else
+        //     // {
+        //     //     debug_print(("CV value not found\n"));
+        //     // }
+        //     // //     }
+        //     // // }
 
-        // // debug_print(("%d : %d\n", opline->lineno, execute_data->opline->lineno));
+        //     // // zend_array *symbol_table = execute_data->symbol_table;
 
-        // // if (execute_data->call)
-        // //     if (execute_data->call->opline)
-        // //         debug_print(("======11=====\n%x\n==========\n", execute_data->call->opline));
+        //     // // if (symbol_table != NULL)
+        //     // // {
+        //     // //     zend_string *key;
+        //     // //     zval *value;
 
-        // // if(execute_data->prev_execute_data)
-        // //     if(execute_data->prev_execute_data->opline)
-        // //         debug_print(("======22=====\n%x\n==========\n", execute_data->prev_execute_data->opline));
+        //     // //     ZEND_HASH_FOREACH_STR_KEY_VAL(symbol_table, key, value)
+        //     // //     {
+        //     // //         const char *var_name = key ? ZSTR_VAL(key) : "unknown";
 
-        // // if (execute_data->call)
-        // //     if (execute_data->call->opline)
-        // //         if (execute_data->call->opline->lineno)
-        // //             debug_print(("%d : %d\n", opline->lineno, execute_data->call->opline->lineno));
-        // // if (execute_data->prev_execute_data)
-        // //     if (execute_data->prev_execute_data->opline)
-        // //         if (execute_data->prev_execute_data->opline->lineno)
-        // //             debug_print(("%d : %d\n", opline->lineno, execute_data->prev_execute_data->opline->lineno));
-        // // // 호출한 자
+        //     // //         switch (Z_TYPE_P(value))
+        //     // //         {
+        //     // //         case IS_UNDEF:
+        //     // //             debug_print(("Variable %s: undefined\n", var_name));
+        //     // //             break;
+        //     // //         case IS_NULL:
+        //     // //             debug_print(("Variable %s: NULL\n", var_name));
+        //     // //             break;
+        //     // //         case IS_TRUE:
+        //     // //             debug_print(("Variable %s: true\n", var_name));
+        //     // //             break;
+        //     // //         case IS_FALSE:
+        //     // //             debug_print(("Variable %s: false\n", var_name));
+        //     // //             break;
+        //     // //         case IS_LONG:
+        //     // //             debug_print(("Variable %s: %ld\n", var_name, Z_LVAL_P(value)));
+        //     // //             break;
+        //     // //         case IS_DOUBLE:
+        //     // //             debug_print(("Variable %s: %f\n", var_name, Z_DVAL_P(value)));
+        //     // //             break;
+        //     // //         case IS_STRING:
+        //     // //             debug_print(("Variable %s: %s\n", var_name, Z_STRVAL_P(value)));
+        //     // //             break;
+        //     // //         case IS_ARRAY:
+        //     // //         {
+        //     // //             debug_print(("Variable %s: Array\n", var_name));
 
-        // // zend_execute_data *current = execute_data->call;
-        // // if(current){
-        // //     debug_print(("current O\n"));
+        //     // //             zval *sub_value;
+        //     // //             zval *sub_key;
 
-        // // }
+        //     // //             ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), zend_ulong index, sub_key, sub_value)
+        //     // //             {
+        //     // //                 if (sub_key)
+        //     // //                 {
+        //     // //                     // 문자열인 경우
+        //     // //                     debug_print(("Z_TYPE_P : %d\n", Z_TYPE_P(sub_key)));
+        //     // //                     if (Z_TYPE_P(sub_key) == IS_STRING)
+        //     // //                     {
+        //     // //                         debug_print(("  Key: %s, Value: ", Z_STRVAL_P(sub_key)));
+        //     // //                     }
+        //     // //                     else
+        //     // //                     {
+        //     // //                         // 문자열이 아닌 경우 (예: 숫자 키)
+        //     // //                         debug_print(("  Key: %ld, Value: ", Z_LVAL_P(sub_key)));
+        //     // //                     }
+        //     // //                 }
+        //     // //                 else
+        //     // //                 {
+        //     // //                     // 키가 없는 경우
+        //     // //                     debug_print(("  Key: none, Value: "));
+        //     // //                 }
 
-        // // zend_array *params = execute_data->extra_named_params;
+        //     // //                 // 값을 출력
+        //     // //                 switch (Z_TYPE_P(sub_value))
+        //     // //                 {
+        //     // //                 // 값에 따라 출력 방식 설정
+        //     // //                 case IS_STRING:
+        //     // //                     debug_print(("%s\n", Z_STRVAL_P(sub_value)));
+        //     // //                     break;
+        //     // //                 case IS_LONG:
+        //     // //                     debug_print(("%ld\n", Z_LVAL_P(sub_value)));
+        //     // //                     break;
+        //     // //                 // 다른 타입에 대한 처리 추가
+        //     // //                 default:
+        //     // //                     debug_print(("unknown type\n"));
+        //     // //                     break;
+        //     // //                 }
+        //     // //             }
+        //     // //             ZEND_HASH_FOREACH_END();
 
-        // // if (params != NULL)
-        // // {
-        // //     zend_string *key;
-        // //     zval *value;
+        //     // //             break;
+        //     // //         }
+        //     // //         case IS_OBJECT:
+        //     // //             debug_print(("Variable %s: Object\n", var_name));
+        //     // //             break;
+        //     // //         default:
+        //     // //             debug_print(("Variable %s: unknown type\n", var_name));
+        //     // //             debug_print(("Type : %d\n", Z_TYPE_P(value)));
 
-        // //     ZEND_HASH_FOREACH_STR_KEY_VAL(params, key, value)
-        // //     {
-        // //         if (key)
-        // //         {
-        // //             debug_print(("Parameter : %s, Value : %d\n", ZSTR_VAL(key), Z_TYPE_P(value)));
-        // //         }
-        // //         if(value){
+        //     // //             break;
+        //     // //         }
+        //     // //     }
+        //     // //     ZEND_HASH_FOREACH_END();
+        //     // // }
 
-        // //         }
-        // //     }
-        // //     ZEND_HASH_FOREACH_END();
-        // // }
+        //     // // #define IS_UNUSED	0		/* Unused operand */
+        //     // // #define IS_CONST	    (1<<0)
+        //     // // #define IS_TMP_VAR	(1<<1)
+        //     // // #define IS_VAR		(1<<2)
+        //     // // #define IS_CV		(1<<3)	/* Compiled variable */
 
-        // // if (opline->op1_type == IS_CONST)
-        // // {
-        // //     debug_print(("Value : %x\n", opline->op1.constant));
-        // // }
-        // // else if (opline->op1_type == IS_CV)
-        // // {
+        //     // /*
+        //     // if (opline->op1.constant != NULL)
+        //     // {
+        //     //     if (opline->op1.constant)
+        //     //     {
+        //     //         const char *str = (const char *)opline->op1.constant;
+        //     //         int isString = 1;
 
-        // //     if (opline->lineno > 0 && opline->lineno < 20)
-        // //     {
-        // //         debug_print(("Value : %x\n", opline->op1.var));
-        // //         debug_print(("Value : %x\n", opline->op1.constant));
+        //     //         fprintf(ofile, "str : %x\n", str);
+        //     //         fprintf(ofile, "str : %s\n", str);
+        //     //         for (int i = 0;; ++i)
+        //     //         {
+        //     //             if (str[i] == '\0')
+        //     //             {
+        //     //                 break; // null 종료 문자열을 발견함
+        //     //             }
+        //     //             if (str[i] < 32 || str[i] > 126)
+        //     //             {
+        //     //                 isString = 0; // ASCII 문자 범위를 벗어난 것 발견, 문자열이 아님
+        //     //                 break;
+        //     //             }
+        //     //         }
 
-        // //         if (opline->op2_type != IS_UNUSED)
-        // //         {
-        // //             debug_print(("op2 : %x\n", opline->op2.var));
-        // //         }
-
-        // //         zend_array *symbol_table = execute_data->symbol_table;
-        // //         debug_print(("symbol_table's nNumUsed : %d\n", symbol_table->nNumUsed));
-        // //         debug_print(("symbol_table's nTableSize : %d\n", symbol_table->nTableSize));
-        // //         debug_print(("symbol_table's nNumOfElements : %d\n", symbol_table->nNumOfElements));
-
-        // //         Bucket *test = symbol_table->arData;
-        // //         debug_print(("test : %s\n", test[0].key->val));
-
-        // //         if(execute_data->func==NULL)debug_print(("shit\n"));
-        // //         int *count = execute_data->func->op_array.last_var;
-        // //         debug_print(("last_var : %d\n", *count));
-
-        // //         zend_string *str = execute_data->func->op_array.vars[opline->op1.var];
-
-        // //         if (str)
-        // //         {
-        // //             debug_print(("str : %s\n", str->val));
-        // //         }
-        // //         else
-        // //         {
-        // //             debug_print(("??\n"));
-        // //         }
-
-        // //         // zend_array *symbol_table = execute_data->symbol_table;
-
-        // //         // zval *cv_value;
-        // //         // if ((cv_value = zend_hash_index_find(symbol_table, opline->op1.var)) != NULL)
-        // //         // {
-        // //         //     debug_print(("Z_TYPE_P(cv_value) : %d\n", Z_TYPE_P(cv_value)));
-        // //         //     switch(Z_TYPE_P(cv_value)){
-        // //         //         case IS_STRING:
-        // //         //             debug_print(("Found CV value: %s\n", Z_STRVAL_P(cv_value)));
-        // //         //             break;
-        // //         //         default:
-        // //         //             debug_print(("unknown\n"));
-        // //         //             break;
-        // //         //     }
-
-        // //         // }
-        // //         // else
-        // //         // {
-        // //         //     debug_print(("CV value not found\n"));
-        // //         // }
-
-        // //         // if ((cv_value = zend_hash_index_find(symbol_table, opline->op2.var)) != NULL)
-        // //         // {
-        // //         //     debug_print(("Z_TYPE_P(cv_value2) : %d\n", Z_TYPE_P(cv_value)));
-        // //         //     switch(Z_TYPE_P(cv_value)){
-        // //         //         case IS_STRING:
-        // //         //             debug_print(("Found CV value2: %s\n", Z_STRVAL_P(cv_value)));
-        // //         //             break;
-        // //         //         default:
-        // //         //             debug_print(("unknown2\n"));
-        // //         //             break;
-        // //         //     }
-
-        // //         // }
-        // //         // else
-        // //         // {
-        // //         //     debug_print(("CV value not found\n"));
-        // //         // }
-        // //     }
-        // // }
-
-        // // zend_array *symbol_table = execute_data->symbol_table;
-
-        // // if (symbol_table != NULL)
-        // // {
-        // //     zend_string *key;
-        // //     zval *value;
-
-        // //     ZEND_HASH_FOREACH_STR_KEY_VAL(symbol_table, key, value)
-        // //     {
-        // //         const char *var_name = key ? ZSTR_VAL(key) : "unknown";
-
-        // //         switch (Z_TYPE_P(value))
-        // //         {
-        // //         case IS_UNDEF:
-        // //             debug_print(("Variable %s: undefined\n", var_name));
-        // //             break;
-        // //         case IS_NULL:
-        // //             debug_print(("Variable %s: NULL\n", var_name));
-        // //             break;
-        // //         case IS_TRUE:
-        // //             debug_print(("Variable %s: true\n", var_name));
-        // //             break;
-        // //         case IS_FALSE:
-        // //             debug_print(("Variable %s: false\n", var_name));
-        // //             break;
-        // //         case IS_LONG:
-        // //             debug_print(("Variable %s: %ld\n", var_name, Z_LVAL_P(value)));
-        // //             break;
-        // //         case IS_DOUBLE:
-        // //             debug_print(("Variable %s: %f\n", var_name, Z_DVAL_P(value)));
-        // //             break;
-        // //         case IS_STRING:
-        // //             debug_print(("Variable %s: %s\n", var_name, Z_STRVAL_P(value)));
-        // //             break;
-        // //         case IS_ARRAY:
-        // //         {
-        // //             debug_print(("Variable %s: Array\n", var_name));
-
-        // //             zval *sub_value;
-        // //             zval *sub_key;
-
-        // //             ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), zend_ulong index, sub_key, sub_value)
-        // //             {
-        // //                 if (sub_key)
-        // //                 {
-        // //                     // 문자열인 경우
-        // //                     debug_print(("Z_TYPE_P : %d\n", Z_TYPE_P(sub_key)));
-        // //                     if (Z_TYPE_P(sub_key) == IS_STRING)
-        // //                     {
-        // //                         debug_print(("  Key: %s, Value: ", Z_STRVAL_P(sub_key)));
-        // //                     }
-        // //                     else
-        // //                     {
-        // //                         // 문자열이 아닌 경우 (예: 숫자 키)
-        // //                         debug_print(("  Key: %ld, Value: ", Z_LVAL_P(sub_key)));
-        // //                     }
-        // //                 }
-        // //                 else
-        // //                 {
-        // //                     // 키가 없는 경우
-        // //                     debug_print(("  Key: none, Value: "));
-        // //                 }
-
-        // //                 // 값을 출력
-        // //                 switch (Z_TYPE_P(sub_value))
-        // //                 {
-        // //                 // 값에 따라 출력 방식 설정
-        // //                 case IS_STRING:
-        // //                     debug_print(("%s\n", Z_STRVAL_P(sub_value)));
-        // //                     break;
-        // //                 case IS_LONG:
-        // //                     debug_print(("%ld\n", Z_LVAL_P(sub_value)));
-        // //                     break;
-        // //                 // 다른 타입에 대한 처리 추가
-        // //                 default:
-        // //                     debug_print(("unknown type\n"));
-        // //                     break;
-        // //                 }
-        // //             }
-        // //             ZEND_HASH_FOREACH_END();
-
-        // //             break;
-        // //         }
-        // //         case IS_OBJECT:
-        // //             debug_print(("Variable %s: Object\n", var_name));
-        // //             break;
-        // //         // Add other types as needed
-        // //         default:
-        // //             debug_print(("Variable %s: unknown type\n", var_name));
-        // //             debug_print(("Type : %d\n", Z_TYPE_P(value)));
-
-        // //             break;
-        // //         }
-        // //     }
-        // //     ZEND_HASH_FOREACH_END();
-        // // }
-
-        // // #define IS_UNUSED	0		/* Unused operand */
-        // // #define IS_CONST	    (1<<0)
-        // // #define IS_TMP_VAR	(1<<1)
-        // // #define IS_VAR		(1<<2)
-        // // #define IS_CV		(1<<3)	/* Compiled variable */
-
-        // /*
-        // if (opline->op1.constant != NULL)
-        // {
-        //     if (opline->op1.constant)
-        //     {
-        //         const char *str = (const char *)opline->op1.constant;
-        //         int isString = 1;
-
-        //         fprintf(ofile, "str : %x\n", str);
-        //         fprintf(ofile, "str : %s\n", str);
-        //         for (int i = 0;; ++i)
-        //         {
-        //             if (str[i] == '\0')
-        //             {
-        //                 break; // null 종료 문자열을 발견함
-        //             }
-        //             if (str[i] < 32 || str[i] > 126)
-        //             {
-        //                 isString = 0; // ASCII 문자 범위를 벗어난 것 발견, 문자열이 아님
-        //                 break;
-        //             }
-        //         }
-
-        //         if (isString)
-        //         {
-        //             fprintf(ofile, "opline->op1.constant is a string: %s\n", str);
-        //         }
-        //         else
-        //         {
-        //             fprintf(ofile, "opline->op1.constant is not a string\n");
-        //         }
-        //     }
-        //     else
-        //     {
-        //         fprintf(ofile, "opline->op1.constant is NULL\n");
-        //     }
-        // }
-        // */
-        // // fprintf(ofile, "Result type: %d\n", opline->result_type);
-        // // fprintf(ofile, "Handler: %p\n", opline->handler);
-        // // fprintf(ofile, "Extended value: %u\n", opline->extended_value);
+        //     //         if (isString)
+        //     //         {
+        //     //             fprintf(ofile, "opline->op1.constant is a string: %s\n", str);
+        //     //         }
+        //     //         else
+        //     //         {
+        //     //             fprintf(ofile, "opline->op1.constant is not a string\n");
+        //     //         }
+        //     //     }
+        //     //     else
+        //     //     {
+        //     //         fprintf(ofile, "opline->op1.constant is NULL\n");
+        //     //     }
+        //     // }
+        //     // */
+        //     // // fprintf(ofile, "Result type: %d\n", opline->result_type);
+        //     // // fprintf(ofile, "Handler: %p\n", opline->handler);
+        //     // // fprintf(ofile, "Extended value: %u\n", opline->extended_value);
 
         op = (opline->lineno << 8) | opline->opcode; // opcode; //| (lineno << 8);
 
