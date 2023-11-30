@@ -5,7 +5,6 @@ reflection: ReflectionProperty::getDefaultValue
 
 define('FOO', 42);
 
-#[AllowDynamicProperties]
 class TestClass
 {
     public $foo;

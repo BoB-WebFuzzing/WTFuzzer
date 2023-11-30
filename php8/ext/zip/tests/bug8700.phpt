@@ -1,7 +1,9 @@
 --TEST--
 Bug #8700 (getFromIndex(0) fails)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 $thisdir = __DIR__;

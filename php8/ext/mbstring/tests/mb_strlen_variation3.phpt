@@ -1,7 +1,10 @@
 --TEST--
 Test mb_strlen() function : usage variations - Pass list of encodings
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+extension_loaded('mbstring') or die('skip');
+function_exists('mb_strlen') or die("skip mb_strlen() is not available in this build");
+?>
 --FILE--
 <?php
 /*
@@ -96,7 +99,7 @@ foreach($encoding as $enc) {
 
 echo "Done";
 ?>
---EXPECTF--
+--EXPECT--
 *** Testing mb_strlen() : usage variations ***
 
 -- Iteration 1: UCS-4 --
@@ -335,16 +338,12 @@ Encoding byte4le recognised
 
 -- Iteration 40: BASE64 --
 -- ASCII String --
-
-Deprecated: mb_strlen(): Handling Base64 via mbstring is deprecated; use base64_encode/base64_decode instead in %s on line %d
 Encoding BASE64 recognised
 -- Multibyte String --
 Encoding BASE64 recognised
 
 -- Iteration 41: HTML-ENTITIES --
 -- ASCII String --
-
-Deprecated: mb_strlen(): Handling HTML entities via mbstring is deprecated; use htmlspecialchars, htmlentities, or mb_encode_numericentity/mb_decode_numericentity instead in %s on line %d
 Encoding HTML-ENTITIES recognised
 -- Multibyte String --
 Encoding HTML-ENTITIES recognised

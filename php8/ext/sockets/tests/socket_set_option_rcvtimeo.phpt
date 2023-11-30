@@ -3,8 +3,12 @@ Test if socket_set_option() works, option:SO_RCVTIMEO
 --DESCRIPTION--
 -wrong params
 -set/get params comparison
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+if (!extension_loaded('sockets')) {
+        die('SKIP sockets extension not available.');
+}
+?>
 --FILE--
 <?php
 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);

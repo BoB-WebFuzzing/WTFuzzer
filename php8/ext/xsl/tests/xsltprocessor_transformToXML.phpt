@@ -2,8 +2,8 @@
 Test the basics to function XSLTProcessor::transformToXml().
 --CREDITS--
 Rodrigo Prado de Jesus <royopa [at] gmail [dot] com>
---EXTENSIONS--
-xsl
+--SKIPIF--
+<?php extension_loaded('xsl') or die('skip xsl extension is not available'); ?>
 --FILE--
 <?php
 $xml = <<<EOB

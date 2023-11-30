@@ -1,7 +1,7 @@
 --TEST--
 Observer: call_user_func() from namespace
---EXTENSIONS--
-zend_test
+--SKIPIF--
+<?php if (!extension_loaded('zend-test')) die('skip: zend-test extension required'); ?>
 --INI--
 zend_test.observer.enabled=1
 zend_test.observer.observe_all=1
@@ -26,19 +26,14 @@ namespace Test {
 }
 ?>
 --EXPECTF--
-<!-- init '%s' -->
-<file '%s'>
-  <!-- init call_user_func() -->
-  <call_user_func>
-    <!-- init Test\MyClass::myMethod() -->
-    <Test\MyClass::myMethod>
+<!-- init '%s%eobserver_call_user_func_%d.php' -->
+<file '%s%eobserver_call_user_func_%d.php'>
+  <!-- init Test\MyClass::myMethod() -->
+  <Test\MyClass::myMethod>
 MyClass::myMethod called
-    </Test\MyClass::myMethod>
-  </call_user_func>
-  <call_user_func>
-    <!-- init Test\my_function() -->
-    <Test\my_function>
+  </Test\MyClass::myMethod>
+  <!-- init Test\my_function() -->
+  <Test\my_function>
 my_function called
-    </Test\my_function>
-  </call_user_func>
-</file '%s'>
+  </Test\my_function>
+</file '%s%eobserver_call_user_func_%d.php'>

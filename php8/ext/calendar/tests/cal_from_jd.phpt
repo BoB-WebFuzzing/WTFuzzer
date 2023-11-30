@@ -1,7 +1,7 @@
 --TEST--
 cal_from_jd()
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 print_r(cal_from_jd(1748326, CAL_GREGORIAN));

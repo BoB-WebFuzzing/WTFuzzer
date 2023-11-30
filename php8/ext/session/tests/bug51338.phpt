@@ -1,7 +1,5 @@
 --TEST--
 Bug #51338 (URL-Rewriter should not get enabled if use_only_cookies is set to 1)
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--

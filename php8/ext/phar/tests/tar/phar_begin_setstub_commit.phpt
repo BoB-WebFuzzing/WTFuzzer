@@ -1,7 +1,9 @@
 --TEST--
 Phar::startBuffering()/setStub()/stopBuffering() tar-based
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.readonly=0
 --FILE--

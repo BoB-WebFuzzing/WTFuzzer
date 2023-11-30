@@ -11,23 +11,23 @@ class c_iter implements Iterator {
         echo __METHOD__ . "\n";
         $this->obj = $obj;
     }
-    function rewind(): void {
+    function rewind() {
         echo __METHOD__ . "\n";
     }
-    function valid(): bool {
+    function valid() {
         $more = $this->num < $this->obj->max;
         echo __METHOD__ . ' = ' .($more ? 'true' : 'false') . "\n";
         return $more;
     }
-    function current(): mixed {
+    function current() {
         echo __METHOD__ . "\n";
         return $this->num;
     }
-    function next(): void {
+    function next() {
         echo __METHOD__ . "\n";
         $this->num++;
     }
-    function key(): mixed {
+    function key() {
         return $this->num;
     }
 }
@@ -36,7 +36,7 @@ class c implements IteratorAggregate {
 
     public $max = 4;
 
-    function getIterator(): Traversable {
+    function getIterator() {
         echo __METHOD__ . "\n";
         return new c_iter($this);
     }

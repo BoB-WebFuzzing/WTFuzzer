@@ -1,8 +1,9 @@
 --TEST--
 Bug #27809 (ftp_systype returns null)
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php
+require 'skipif.inc';
+?>
 --FILE--
 <?php
 $bug27809=true;

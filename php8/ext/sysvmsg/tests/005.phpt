@@ -1,7 +1,7 @@
 --TEST--
 sysvmsg functions on non-existing queue
---EXTENSIONS--
-sysvmsg
+--SKIPIF--
+<?php if (!extension_loaded("sysvmsg")) die("skip sysvmsg extension is not available")?>
 --FILE--
 <?php
 

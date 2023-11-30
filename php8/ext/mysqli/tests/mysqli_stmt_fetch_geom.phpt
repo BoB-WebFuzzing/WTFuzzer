@@ -1,9 +1,8 @@
 --TEST--
 mysqli_stmt_fetch - geometry / spatial types
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+    require_once('skipif.inc');
     require_once('skipifconnectfailure.inc');
 
     if (!defined("MYSQLI_TYPE_GEOMETRY"))

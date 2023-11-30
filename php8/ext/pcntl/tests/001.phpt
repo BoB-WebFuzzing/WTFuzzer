@@ -1,13 +1,12 @@
 --TEST--
 Test pcntl wait functionality
---EXTENSIONS--
-pcntl
-posix
 --SKIPIF--
 <?php
-if (PHP_OS == "Darwin") {
-    die("skip do not run on darwin");
-}
+    if (!extension_loaded("pcntl")) print "skip";
+    elseif (!function_exists("posix_kill")) print "skip posix_kill() not available";
+    if (PHP_OS == "Darwin") {
+        die("skip do not run on darwin");
+    }
 ?>
 --FILE--
 <?php

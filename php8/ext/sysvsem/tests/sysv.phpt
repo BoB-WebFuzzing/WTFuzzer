@@ -1,8 +1,11 @@
 --TEST--
 General semaphore and shared memory test
---EXTENSIONS--
-sysvsem
-sysvshm
+--SKIPIF--
+<?php
+if(!extension_loaded('sysvsem') || !extension_loaded('sysvshm')) {
+    die("skip Both sysvsem and sysvshm required");
+}
+?>
 --FILE--
 <?php
 $MEMSIZE = 512;  //  size of shared memory to allocate

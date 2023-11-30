@@ -2,8 +2,10 @@
 DOMDocument::relaxNGValidateSource() should fail on invalid RNG schema
 --CREDITS--
 Knut Urdalen <knut@php.net>
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --FILE--
 <?php
 $rng = <<< RNG

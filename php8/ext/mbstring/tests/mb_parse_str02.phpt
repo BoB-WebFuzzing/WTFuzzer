@@ -1,7 +1,7 @@
 --TEST--
 mb_parse_str() test 2
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --INI--
 arg_separator.input=&#
 --FILE--

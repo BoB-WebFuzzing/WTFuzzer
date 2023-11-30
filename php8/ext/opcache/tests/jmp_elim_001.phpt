@@ -1,9 +1,8 @@
 --TEST--
 Edge-cases in constant conditional jump elimination
---EXTENSIONS--
-opcache
 --SKIPIF--
 <?php if (PHP_INT_SIZE != 8) die("skip for machines with 64-bit longs"); ?>
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $webserver = "Apache";

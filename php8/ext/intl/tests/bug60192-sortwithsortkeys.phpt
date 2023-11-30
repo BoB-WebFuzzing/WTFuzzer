@@ -1,7 +1,9 @@
 --TEST--
 Bug #60192 (SegFault when Collator not constructed properly)
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+    if (!extension_loaded('intl')) { die('skip intl extension not available'); }
+?>
 --FILE--
 <?php
 

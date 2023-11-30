@@ -2,8 +2,6 @@
 OO API: getErrno & getError methods
 --CREDITS--
 Boris Lytochkin
---EXTENSIONS--
-snmp
 --SKIPIF--
 <?php
 require_once(__DIR__.'/skipif.inc');
@@ -138,12 +136,12 @@ string(129) "Could not add variable: OID='.iso.org.dod.internet.mgmt.mib-2.syste
 SNMP::ERRNO_MULTIPLE_SET_QUERIES
 bool(true)
 bool(true)
-string(73) "Cannot fit all OIDs for SET query into one packet, using multiple queries"
+string(74) "Can not fit all OIDs for SET query into one packet, using multiple queries"
 bool(true)
 bool(true)
 bool(true)
 bool(true)
-string(73) "Cannot fit all OIDs for SET query into one packet, using multiple queries"
+string(74) "Can not fit all OIDs for SET query into one packet, using multiple queries"
 bool(true)
 bool(true)
 bool(true)

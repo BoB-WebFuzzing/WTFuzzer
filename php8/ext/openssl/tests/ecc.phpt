@@ -1,18 +1,12 @@
 --TEST--
 openssl_*() with OPENSSL_KEYTYPE_EC
---EXTENSIONS--
-openssl
 --SKIPIF--
-<?php
-if (!defined("OPENSSL_KEYTYPE_EC")) die("skip EC disabled");
-?>
+<?php if (!extension_loaded("openssl") || !defined("OPENSSL_KEYTYPE_EC")) print "skip"; ?>
 --FILE--
 <?php
-$config =  __DIR__ . DIRECTORY_SEPARATOR . 'openssl.cnf';
 $args = array(
     "curve_name" => "secp384r1",
     "private_key_type" => OPENSSL_KEYTYPE_EC,
-    "config" => $config,
 );
 echo "Testing openssl_pkey_new\n";
 $key1 = openssl_pkey_new($args);
@@ -21,7 +15,6 @@ var_dump($key1);
 $argsFailed = array(
     "curve_name" => "invalid_cuve_name",
     "private_key_type" => OPENSSL_KEYTYPE_EC,
-    "config" => $config,
 );
 
 $keyFailed = openssl_pkey_new($argsFailed);
@@ -40,16 +33,6 @@ $d2 = openssl_pkey_get_details($key2);
 // Compare array
 var_dump($d1 === $d2);
 
-// Check that the public key info is computed from the private key if it is missing.
-$d1_priv = $d1;
-unset($d1_priv["ec"]["x"]);
-unset($d1_priv["ec"]["y"]);
-
-$key3 = openssl_pkey_new($d1_priv);
-var_dump($key3);
-$d3 = openssl_pkey_get_details($key3);
-var_dump($d1 === $d3);
-
 $dn = array(
     "countryName" => "BR",
     "stateOrProvinceName" => "Rio Grande do Sul",
@@ -66,7 +49,7 @@ $csr = openssl_csr_new($dn, $keyGenerate, $args);
 
 var_dump($keyGenerate);
 
-$args["digest_alg"] = "sha256";
+$args["digest_alg"] = "sha1";
 echo "Testing openssl_csr_new with existing ecc key\n";
 $csr = openssl_csr_new($dn, $key1, $args);
 var_dump($csr);
@@ -106,9 +89,6 @@ bool(false)
 int(384)
 int(215)
 string(9) "secp384r1"
-bool(true)
-object(OpenSSLAsymmetricKey)#%d (0) {
-}
 bool(true)
 object(OpenSSLAsymmetricKey)#%d (0) {
 }

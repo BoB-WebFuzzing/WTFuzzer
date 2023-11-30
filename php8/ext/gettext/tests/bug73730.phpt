@@ -1,7 +1,9 @@
 --TEST--
 Bug #73730 (textdomain(null) throws in strict mode)
---EXTENSIONS--
-gettext
+--SKIPIF--
+<?php
+if (!extension_loaded('gettext')) die('skip gettext extension is not available');
+?>
 --FILE--
 <?php
 declare(strict_types=1);

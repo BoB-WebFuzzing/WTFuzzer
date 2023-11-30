@@ -1,7 +1,7 @@
 --TEST--
 Bug #71417: fread() does not report zlib.inflate errors
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if (!extension_loaded('zlib')) die ('skip zlib extension not available in this build'); ?>
 --FILE--
 <?php
 

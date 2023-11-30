@@ -1,7 +1,9 @@
 --TEST--
 Bug #79299 (com_print_typeinfo prints duplicate variables)
---EXTENSIONS--
-com_dotnet
+--SKIPIF--
+<?php
+if (!extension_loaded('com_dotnet')) die('skip com_dotnet extension not available');
+?>
 --FILE--
 <?php
 $dict = new COM("Scripting.Dictionary");

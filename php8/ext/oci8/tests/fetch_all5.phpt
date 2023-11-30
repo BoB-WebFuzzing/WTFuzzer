@@ -1,7 +1,7 @@
 --TEST--
 Test oci_fetch_all with 0 and -1 skip & maxrows
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --FILE--
 <?php
 

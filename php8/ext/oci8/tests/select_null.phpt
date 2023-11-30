@@ -1,7 +1,7 @@
 --TEST--
 SELECTing NULL values
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die("skip no oci8 extension"); ?>
 --FILE--
 <?php
 

@@ -20,13 +20,13 @@ class cache implements ArrayAccess
 {
     private $container = array();
 
-    public function offsetGet($id): mixed {}
+    public function offsetGet($id) {}
 
-    public function offsetSet($id, $value): void {}
+    public function offsetSet($id, $value) {}
 
-    public function offsetUnset($id): void {}
+    public function offsetUnset($id) {}
 
-    public function offsetExists($id): bool
+    public function offsetExists($id)
     {
         return isset($this->containers[(string) $id]);
     }

@@ -1,9 +1,8 @@
 --TEST--
 Bug #36745 (LOAD DATA LOCAL INFILE doesn't return correct error message)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --INI--

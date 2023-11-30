@@ -30,24 +30,22 @@ $inputs = array(
 
 foreach($inputs as $key =>$value) {
       echo "\n--$key--\n";
+      var_dump( $value );
       var_dump( gmstrftime($value, $timestamp) );
 };
 
 ?>
---EXPECTF--
+--EXPECT--
 *** Testing gmstrftime() : usage variation ***
 
 --Preferred date and time representation--
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
+string(2) "%c"
 string(24) "Fri Aug  8 08:08:08 2008"
 
 --Preferred date representation--
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
+string(2) "%x"
 string(8) "08/08/08"
 
 --Preferred time representation--
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
+string(2) "%X"
 string(8) "08:08:08"

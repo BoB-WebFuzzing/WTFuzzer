@@ -2,8 +2,8 @@
 Phar - test specific manifest length
 --INI--
 phar.readonly=0
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 

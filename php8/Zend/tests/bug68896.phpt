@@ -4,16 +4,16 @@ Bug #68896 (Changing ArrayObject value cause Segment Fault)
 <?php
 class A implements ArrayAccess {
     private $a = [];
-    function offsetGet($offset): mixed {
+    function offsetGet($offset) {
         return $this->a[$offset];
     }
-        function offsetSet($offset, $value): void {
+        function offsetSet($offset, $value) {
                 $this->a[$offset] = $value;
         }
-        function offsetExists($offset): bool {
+        function offsetExists($offset) {
                 isset($this->a[$offset]);
         }
-        function offsetUnset($offset): void {
+        function offsetUnset($offset) {
                 unset($this->a[$offset]);
         }
 }

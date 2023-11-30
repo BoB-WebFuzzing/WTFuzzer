@@ -1,7 +1,9 @@
 --TEST--
 Bug #28147 (Crash with anti-aliased line)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+    if (!extension_loaded('gd')) die("skip gd extension not available\n");
+?>
 --FILE--
 <?php
 //

@@ -1,7 +1,7 @@
 --TEST--
 Bug #75090 Constants of parent IntlCalendar class not inherited
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 class Foo extends IntlCalendar {}

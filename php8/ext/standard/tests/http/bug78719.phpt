@@ -21,6 +21,6 @@ var_dump(stream_get_meta_data($stream)['wrapper_data'][1] === "Location: $url");
 
 http_server_kill($pid);
 ?>
---EXPECT--
+--EXPECTF--
 string(4) "Body"
 bool(true)

@@ -1,13 +1,17 @@
 --TEST--
 SOAP Interop Round2 base 014 (php/direct): echoStruct
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 precision=14
 --FILE--
 <?php
 class SOAPStruct {
-    function __construct(public $varString, public $varInt, public $varFloat) {}
+    function __construct($s, $i, $f) {
+        $this->varString = $s;
+        $this->varInt = $i;
+        $this->varFloat = $f;
+    }
 }
 
 $client = new SoapClient(NULL,array("location"=>"test://","uri"=>"http://soapinterop.org/","trace"=>1,"exceptions"=>0));

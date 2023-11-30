@@ -1,9 +1,8 @@
 --TEST--
 Check for empty pattern
---EXTENSIONS--
-mbstring
 --SKIPIF--
 <?php
+extension_loaded('mbstring') or die('skip mbstring not available');
 if (!function_exists('mb_ereg')) die('skip mbregex support not available');
 ?>
 --FILE--

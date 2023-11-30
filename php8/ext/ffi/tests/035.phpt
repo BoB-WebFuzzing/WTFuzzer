@@ -1,7 +1,7 @@
 --TEST--
 FFI 035: FFI::new() not-owned
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

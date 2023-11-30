@@ -1,7 +1,7 @@
 --TEST--
 Test all filters returned by filter_list()
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --INI--
 precision=14
 default_charset=UTF-8

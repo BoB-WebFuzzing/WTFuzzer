@@ -84,7 +84,7 @@ object(MyStorage)#%d (2) {
   int(26)
   ["storage":"SplObjectStorage":private]=>
   array(2) {
-    [0]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -94,7 +94,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       string(3) "foo"
     }
-    [1]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -116,7 +116,7 @@ object(MyStorage)#%d (2) {
   int(26)
   ["storage":"SplObjectStorage":private]=>
   array(2) {
-    [0]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -126,7 +126,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       string(3) "foo"
     }
-    [1]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -144,7 +144,7 @@ object(MyStorage)#%d (2) {
   int(26)
   ["storage":"SplObjectStorage":private]=>
   array(4) {
-    [0]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -154,7 +154,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       string(3) "foo"
     }
-    [1]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -164,7 +164,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       int(42)
     }
-    [2]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -175,7 +175,7 @@ object(MyStorage)#%d (2) {
       object(stdClass)#%d (0) {
       }
     }
-    [3]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -203,7 +203,7 @@ object(MyStorage)#%d (2) {
   int(26)
   ["storage":"SplObjectStorage":private]=>
   array(4) {
-    [0]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -213,7 +213,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       string(3) "foo"
     }
-    [1]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -223,7 +223,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       string(3) "bar"
     }
-    [2]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -234,7 +234,7 @@ object(MyStorage)#%d (2) {
       object(stdClass)#%d (0) {
       }
     }
-    [3]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -260,7 +260,7 @@ object(MyStorage)#%d (2) {
   int(26)
   ["storage":"SplObjectStorage":private]=>
   array(4) {
-    [0]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -270,7 +270,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       string(3) "foo"
     }
-    [1]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -280,7 +280,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       string(3) "bar"
     }
-    [2]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {
@@ -290,7 +290,7 @@ object(MyStorage)#%d (2) {
       ["inf"]=>
       string(8) "replaced"
     }
-    [3]=>
+    ["%s"]=>
     array(2) {
       ["obj"]=>
       object(TestClass)#%d (1) {

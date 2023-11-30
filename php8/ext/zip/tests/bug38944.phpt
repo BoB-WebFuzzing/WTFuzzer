@@ -1,7 +1,7 @@
 --TEST--
 Bug #38944 (newly created ZipArchive segfaults when accessing comment property)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php if (!extension_loaded("zip")) print "skip"; ?>
 --FILE--
 <?php
 

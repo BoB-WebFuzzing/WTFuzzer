@@ -1,9 +1,8 @@
 --TEST--
 Interface of the class mysqli_stmt
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+    require_once('skipif.inc');
     require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -40,9 +39,11 @@ mysqli
         'store_result'      => true,
     );
 
-    $expected_methods['get_result'] = true;
-    $expected_methods['more_results'] = true;
-    $expected_methods['next_result'] = true;
+    if ($IS_MYSQLND) {
+        $expected_methods['get_result'] = true;
+        $expected_methods['more_results'] = true;
+        $expected_methods['next_result'] = true;
+    }
 
     foreach ($methods as $k => $method) {
     if (isset($expected_methods[$method])) {
@@ -152,6 +153,16 @@ param_count
 sqlstate
 
 Object variables:
+affected_rows
+insert_id
+num_rows
+param_count
+field_count
+errno
+error
+error_list
+sqlstate
+id
 
 Magic, magic properties:
 mysqli_stmt object is not fully initialized

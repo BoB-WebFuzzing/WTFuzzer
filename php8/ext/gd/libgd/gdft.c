@@ -12,7 +12,7 @@
 #include "gd.h"
 #include "gdhelpers.h"
 
-#ifndef _WIN32
+#ifndef MSWIN32
 #include <unistd.h>
 #else
 #include <io.h>
@@ -774,7 +774,7 @@ void gdFontCacheShutdown()
 	gdMutexUnlock(gdFontCacheMutex);
 }
 
-void gdFreeFontCache(void)
+void gdFreeFontCache()
 {
 	gdFontCacheShutdown();
 }

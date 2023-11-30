@@ -1,7 +1,7 @@
 --TEST--
 Bug #48147 (iconv with //IGNORE cuts the string)
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php extension_loaded('iconv') or die('skip iconv extension is not available'); ?>
 --FILE--
 <?php
 $text = "aa\xC3\xC3\xC3\xB8aa";

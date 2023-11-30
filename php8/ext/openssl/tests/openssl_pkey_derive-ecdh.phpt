@@ -1,9 +1,7 @@
 --TEST--
 openssl_pkey_derive() ECDH
---EXTENSIONS--
-openssl
 --SKIPIF--
-<?php if (!defined("OPENSSL_KEYTYPE_EC")) print "skip"; ?>
+<?php if (!extension_loaded("openssl") || !defined("OPENSSL_KEYTYPE_EC")) print "skip"; ?>
 --FILE--
 <?php
 

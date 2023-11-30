@@ -1,7 +1,5 @@
 --TEST--
 Bug #65119 (pg_copy_from() modifies input array variable)
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
 include("skipif.inc");
@@ -12,10 +10,10 @@ include 'config.inc';
 
 function test(Array $values, $conn_str) {
   $connection = pg_pconnect($conn_str, PGSQL_CONNECT_FORCE_NEW);
-  pg_query($connection, "begin");
-  pg_query($connection, "CREATE TABLE bug65119 (i INTEGER)");
+  pg_query("begin");
+  pg_query("CREATE TABLE bug65119 (i INTEGER)");
   pg_copy_from($connection, "bug65119", $values, "\t", "NULL");
-  pg_query($connection, "rollback");
+  pg_query("rollback");
 }
 
 $values = Array(1,2,3);

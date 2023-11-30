@@ -1,7 +1,7 @@
 --TEST--
 XML parser test using closures as callbacks
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php include("skipif.inc"); ?>
 --FILE--
 <?php
 chdir(__DIR__);

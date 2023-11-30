@@ -1,8 +1,9 @@
 --TEST--
 Bug #39583 (FTP always transfers in binary mode)
---EXTENSIONS--
-ftp
-pcntl
+--SKIPIF--
+<?php
+require 'skipif.inc';
+?>
 --FILE--
 <?php
 $bug39583=1;

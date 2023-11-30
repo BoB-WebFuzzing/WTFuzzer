@@ -21,7 +21,7 @@ function foo($ref, $alt) {
         $b = NULL;
     }
 
-    var_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
+    debug_zval_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
     echo "--\n";
     if ($alt) {
         $a = &$GLOBALS['a'];
@@ -29,25 +29,25 @@ function foo($ref, $alt) {
     } else {
         extract($GLOBALS, EXTR_REFS);
     }
-    var_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
+    debug_zval_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
     echo "--\n";
     $a = &$GLOBALS['a'];
     $b = &$GLOBALS['b'];
-    var_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
+    debug_zval_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
     echo "--\n";
     $GLOBALS['b'] = 3;
-    var_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
+    debug_zval_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
     echo "--\n";
     $a = 4;
-    var_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
+    debug_zval_dump($a, $b, $GLOBALS['a'], $GLOBALS['b']);
     echo "--\n";
     $c = $b;
-    var_dump($b, $GLOBALS['b'], $c);
+    debug_zval_dump($b, $GLOBALS['b'], $c);
     echo "--\n";
     $b = 'x';
-    var_dump($a, $b, $GLOBALS['a'], $GLOBALS['b'], $c);
+    debug_zval_dump($a, $b, $GLOBALS['a'], $GLOBALS['b'], $c);
     echo "--\n";
-    var_dump($org_a, $org_b);
+    debug_zval_dump($org_a, $org_b);
     echo "----";
     if ($ref) echo 'r';
     if ($alt) echo 'a';
@@ -64,9 +64,9 @@ foo(true, true);
 foo(false, false);
 foo(true, false);
 
-var_dump($_a, $_b);
+debug_zval_dump($_a, $_b);
 ?>
---EXPECT--
+--EXPECTF--
 NULL
 NULL
 int(1)
@@ -97,9 +97,9 @@ int(3)
 int(3)
 --
 int(4)
-string(1) "x"
+string(1) "x" refcount(%d)
 int(4)
-string(1) "x"
+string(1) "x" refcount(%d)
 int(3)
 --
 int(1)
@@ -135,9 +135,9 @@ int(3)
 int(3)
 --
 int(4)
-string(1) "x"
+string(1) "x" refcount(%d)
 int(4)
-string(1) "x"
+string(1) "x" refcount(%d)
 int(3)
 --
 int(1)
@@ -173,9 +173,9 @@ int(3)
 int(3)
 --
 int(4)
-string(1) "x"
+string(1) "x" refcount(%d)
 int(4)
-string(1) "x"
+string(1) "x" refcount(%d)
 int(3)
 --
 int(1)
@@ -211,13 +211,13 @@ int(3)
 int(3)
 --
 int(4)
-string(1) "x"
+string(1) "x" refcount(%d)
 int(4)
-string(1) "x"
+string(1) "x" refcount(%d)
 int(3)
 --
 int(1)
 int(2)
 ----r
-string(2) "ok"
-string(2) "ok"
+string(2) "ok" refcount(%d)
+string(2) "ok" refcount(%d)

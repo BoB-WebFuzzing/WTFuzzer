@@ -11,7 +11,7 @@ class A extends \ArrayObject
         $this->foo = 'bar';
     }
 
-    public function serialize(): string
+    public function serialize()
     {
         unset($this->foo);
         $result = parent::serialize();

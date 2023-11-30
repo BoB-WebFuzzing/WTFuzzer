@@ -3,7 +3,7 @@ SPL: SplPriorityQueue: exceptions
 --FILE--
 <?php
 class myPQueue extends SplPriorityQueue {
-    public function compare($a, $b): int {
+    public function compare($a, $b) {
         throw new exception("foo");
     }
 }

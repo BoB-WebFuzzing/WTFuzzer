@@ -1,7 +1,9 @@
 --TEST--
 GH-8848 (imagecopyresized() error refers to the wrong argument)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded("gd")) die("skip gd extension not available");
+?>
 --FILE--
 <?php
 $image1 = imagecreatetruecolor(1, 1);

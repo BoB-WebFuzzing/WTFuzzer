@@ -1,7 +1,7 @@
 --TEST--
 Exercise OCIPing functionality on reconnect (code coverage test)
---EXTENSIONS--
-oci8
+--SKIPIF--
+<?php if (!extension_loaded('oci8')) die ("skip no oci8 extension"); ?>
 --INI--
 oci8.ping_interval=0
 --FILE--

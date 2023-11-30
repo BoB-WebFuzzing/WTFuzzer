@@ -1,7 +1,9 @@
 --TEST--
 Bug #79067 (gdTransformAffineCopy() may use unitialized values)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $matrix = [1, 1, 1, 1, 1, 1];

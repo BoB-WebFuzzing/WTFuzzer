@@ -1,7 +1,7 @@
 --TEST--
 Test dictionary usage on zlib methods
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php if(!extension_loaded('zlib')) die('skip zlib extension not loaded'); ?>
 --FILE--
 <?php
 

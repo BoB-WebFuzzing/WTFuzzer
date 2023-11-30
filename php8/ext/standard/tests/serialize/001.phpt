@@ -4,7 +4,6 @@ serialize()/unserialize()/var_dump()
 serialize_precision=100
 --FILE--
 <?php
-#[AllowDynamicProperties]
 class t
 {
     function __construct()
@@ -13,7 +12,6 @@ class t
     }
 }
 
-#[AllowDynamicProperties]
 class s
 {
     public $a;

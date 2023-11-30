@@ -1,7 +1,11 @@
 --TEST--
 test1() Basic test
---EXTENSIONS--
-%EXTNAME%
+--SKIPIF--
+<?php
+if (!extension_loaded('%EXTNAME%')) {
+    echo 'skip';
+}
+?>
 --FILE--
 <?php
 $ret = test1();

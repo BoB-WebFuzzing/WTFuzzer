@@ -1,7 +1,7 @@
 --TEST--
 Bug #29844 (SoapServer::setClass() should not export non-public methods)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

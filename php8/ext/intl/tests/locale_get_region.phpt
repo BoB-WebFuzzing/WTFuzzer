@@ -1,7 +1,7 @@
 --TEST--
 locale_get_region()
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

@@ -1,7 +1,10 @@
 --TEST--
 Req #44164 (Handle "Content-Length" HTTP header when zlib.output_compression active)
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!function_exists('gzdeflate'))
+    die("skip zlib extension required");
+?>
 --INI--
 zlib.output_compression=On
 --ENV--

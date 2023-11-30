@@ -1,7 +1,5 @@
 --TEST--
 GET test with 2 values and an empty one
---EXTENSIONS--
-filter
 --GET--
 a=1&b=&c=3
 --FILE--

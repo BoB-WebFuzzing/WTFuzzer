@@ -1,7 +1,5 @@
 --TEST--
 Test ini_set() for session : basic functionality
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--

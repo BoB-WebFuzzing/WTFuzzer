@@ -1,7 +1,5 @@
 --TEST--
 Bug #71974 Trans sid will always be send, even if cookies are available
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--

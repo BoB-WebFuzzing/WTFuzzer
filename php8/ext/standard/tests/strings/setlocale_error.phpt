@@ -4,7 +4,6 @@ Test setlocale() function : error condition
 error_reporting=E_ALL
 --SKIPIF--
 <?php
-if (setlocale(LC_ALL, 'invalid') === 'invalid') { die('skip setlocale() is broken /w musl'); }
 if (substr(PHP_OS, 0, 3) == 'WIN') {
     die('skip Not valid for windows');
 }

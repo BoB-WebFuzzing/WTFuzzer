@@ -52,10 +52,10 @@ try {
 
 try {
     $foo = new class implements ArrayAccess {
-        function offsetGet($x): mixed { return [0]; }
-        function offsetSet($x, $y): void {}
-        function offsetExists($x): bool { return true; }
-        function offsetUnset($x): void {}
+        function offsetGet($x) { return [0]; }
+        function offsetSet($x, $y) {}
+        function offsetExists($x) { return true; }
+        function offsetUnset($x) {}
     };
     var_dump($foo[0] += [new class {
         function __destruct() { throw new Exception; }
@@ -65,10 +65,10 @@ try {
 try {
     $foo = new class implements ArrayAccess {
         public $foo = [0];
-        function &offsetGet($x): bool { return $this->foo; }
-        function offsetSet($x, $y): void {}
-        function offsetExists($x): bool { return true; }
-        function offsetUnset($x): void {}
+        function &offsetGet($x) { return $this->foo; }
+        function offsetSet($x, $y) {}
+        function offsetExists($x) { return true; }
+        function offsetUnset($x) {}
     };
     var_dump($foo[0] += [new class {
         function __destruct() { throw new Exception; }
@@ -77,7 +77,6 @@ try {
 
 try {
     var_dump((function() { return new class {
-        public $foo;
         function __construct() { $this->foo = new stdClass; }
         function __destruct() { throw new Exception; }
     }; })()->foo++);
@@ -93,7 +92,6 @@ try {
 
 try {
     var_dump((function() { return new class {
-        public $bar;
         function __construct() { $this->bar = new stdClass; }
         function &__get($x) { return $this->bar; }
         function __destruct() { throw new Exception; }
@@ -117,7 +115,6 @@ try {
 
 try {
     var_dump(++(function() { return new class {
-        public $bar;
         function __construct() { $this->bar = new stdClass; }
         function &__get($x) { return $this->bar; }
         function __destruct() { throw new Exception; }
@@ -126,27 +123,26 @@ try {
 
 try {
     var_dump((function() { return new class implements ArrayAccess {
-        function offsetGet($x): mixed { return [new stdClass]; }
-        function offsetSet($x, $y): void {}
-        function offsetExists($x): bool { return true; }
-        function offsetUnset($x): void {}
+        function offsetGet($x) { return [new stdClass]; }
+        function offsetSet($x, $y) {}
+        function offsetExists($x) { return true; }
+        function offsetUnset($x) {}
         function __destruct() { throw new Exception; }
     }; })()[0]++);
 } catch (Exception $e) { print "caught Exception 15\n"; }
 
 try {
     var_dump(++(function() { return new class implements ArrayAccess {
-        function offsetGet($x): mixed { return [new stdClass]; }
-        function offsetSet($x, $y): void {}
-        function offsetExists($x): bool { return true; }
-        function offsetUnset($x): void {}
+        function offsetGet($x) { return [new stdClass]; }
+        function offsetSet($x, $y) {}
+        function offsetExists($x) { return true; }
+        function offsetUnset($x) {}
         function __destruct() { throw new Exception; }
     }; })()[0]);
 } catch (Exception $e) { print "caught Exception 16\n"; }
 
 try {
     var_dump((new class {
-        public $foo;
         function __construct() { $this->foo = new stdClass; }
         function __destruct() { throw new Exception; }
     })->foo);
@@ -162,17 +158,16 @@ try {
 
 try {
     var_dump((new class implements ArrayAccess {
-        function offsetGet($x): mixed { return [new stdClass]; }
-        function offsetSet($x, $y): void {}
-        function offsetExists($x): bool { return true; }
-        function offsetUnset($x): void {}
+        function offsetGet($x) { return [new stdClass]; }
+        function offsetSet($x, $y) {}
+        function offsetExists($x) { return true; }
+        function offsetUnset($x) {}
         function __destruct() { throw new Exception; }
     })[0]);
 } catch (Exception $e) { print "caught Exception 19\n"; }
 
 try {
     var_dump(isset((new class {
-        public $foo;
         function __construct() { $this->foo = new stdClass; }
         function __destruct() { throw new Exception; }
     })->foo->bar));
@@ -188,10 +183,10 @@ try {
 
 try {
     var_dump(isset((new class implements ArrayAccess {
-        function offsetGet($x): mixed { return [new stdClass]; }
-        function offsetSet($x, $y): void {}
-        function offsetExists($x): bool { return true; }
-        function offsetUnset($x): void {}
+        function offsetGet($x) { return [new stdClass]; }
+        function offsetSet($x, $y) {}
+        function offsetExists($x) { return true; }
+        function offsetUnset($x) {}
         function __destruct() { throw new Exception; }
     })[0]->bar));
 } catch (Exception $e) { print "caught Exception 22\n"; }
@@ -227,10 +222,10 @@ try {
 
 try {
     $foo = new class implements ArrayAccess {
-        function offsetGet($x): mixed {}
-        function offsetSet($x, $y): void { throw new Exception; }
-        function offsetExists($x): bool { return true; }
-        function offsetUnset($x): void {}
+        function offsetGet($x) {}
+        function offsetSet($x, $y) { throw new Exception; }
+        function offsetExists($x) { return true; }
+        function offsetUnset($x) {}
     };
     var_dump($foo[0] = new stdClass);
 } catch (Exception $e) { print "caught Exception 27\n"; }
@@ -283,22 +278,14 @@ caught Exception 2
 caught Exception 3
 caught Exception 4
 caught Exception 5
-
-Deprecated: Creation of dynamic property class@anonymous::$foo is deprecated in %s on line %d
 caught Exception 6
 caught Exception 7
 caught Exception 8
 caught Exception 9
 caught Exception 10
-
-Deprecated: Creation of dynamic property class@anonymous::$foo is deprecated in %s on line %d
 caught Exception 11
-
-Deprecated: Creation of dynamic property class@anonymous::$foo is deprecated in %s on line %d
 caught Exception 12
 caught Exception 13
-
-Deprecated: Creation of dynamic property class@anonymous::$foo is deprecated in %s on line %d
 caught Exception 14
 
 Notice: Indirect modification of overloaded element of ArrayAccess@anonymous has no effect in %s on line %d

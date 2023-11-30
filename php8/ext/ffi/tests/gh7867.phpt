@@ -1,9 +1,9 @@
 --TEST--
 GH-7867 (FFI::cast() from pointer to array is broken)
---EXTENSIONS--
-ffi
---INI--
-ffi.enable=1
+--SKIPIF--
+<?php
+if (!extension_loaded("ffi")) die("skip ffi extension not available");
+?>
 --FILE--
 <?php
 $value = FFI::new('char[26]');

@@ -1,7 +1,13 @@
 --TEST--
 Bug #48514 (cURL extension uses same resource name for simple and multi APIs)
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+
+if (!extension_loaded('curl')) {
+    exit("skip curl extension not loaded");
+}
+
+?>
 --FILE--
 <?php
 

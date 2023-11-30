@@ -1,7 +1,11 @@
 --TEST--
 Test incremental inflate_add() functionality
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 function inflateStream($mode, $flushSize) {

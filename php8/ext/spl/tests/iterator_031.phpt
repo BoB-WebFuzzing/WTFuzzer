@@ -5,7 +5,7 @@ SPL: AppendIterator::append() rewinds when necessary
 
 class MyArrayIterator extends ArrayIterator
 {
-    function rewind(): void
+    function rewind()
     {
         echo __METHOD__ . "\n";
         parent::rewind();
@@ -26,19 +26,19 @@ class MyAppendIterator extends AppendIterator
         echo __METHOD__ . "\n";
     }
 
-    function rewind(): void
+    function rewind()
     {
         echo __METHOD__ . "\n";
         parent::rewind();
     }
 
-    function valid(): bool
+    function valid()
     {
         echo __METHOD__ . "\n";
         return parent::valid();
     }
 
-    function append(Iterator $what): void
+    function append(Iterator $what)
     {
         echo __METHOD__ . "\n";
         parent::append($what);

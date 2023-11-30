@@ -91,7 +91,7 @@ foreach( $step_arr as $step ) {
     }
 }
 ?>
---EXPECTF--
+--EXPECT--
 *** Testing error conditions ***
 
 -- Testing ( (low < high) && (step = 0) ) --
@@ -126,8 +126,6 @@ range(): Argument #3 ($step) must not exceed the specified range
 
 -- Testing Invalid steps --
 range(): Argument #3 ($step) must be of type int|float, string given
-
-Deprecated: range(): Passing null to parameter #3 ($step) of type int|float is deprecated in %s on line %d
 range(): Argument #3 ($step) must not exceed the specified range
 range(): Argument #3 ($step) must not exceed the specified range
 range(): Argument #3 ($step) must be of type int|float, string given

@@ -1,7 +1,11 @@
 --TEST--
 Test function gzseek() by seeking forward in write mode
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 $f = "gzseek_variation1.gz";

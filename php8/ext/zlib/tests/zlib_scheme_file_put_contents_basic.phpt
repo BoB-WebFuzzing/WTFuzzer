@@ -1,7 +1,11 @@
 --TEST--
 Test compress.zlib:// scheme with the file_get_contents
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 $outputFileName = __FILE__.'tmp';

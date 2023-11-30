@@ -2,10 +2,9 @@
 ldap_search() bug 48441 - options persists after specifying them in ldap_search
 --CREDITS--
 Patrick Allaert <patrickallaert@php.net>
---EXTENSIONS--
-ldap
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifbindfailure.inc');
 ?>
 --FILE--
@@ -39,8 +38,7 @@ $link = ldap_connect_and_bind($host, $port, $user, $passwd, $protocol_version);
 remove_dummy_data($link, $base);
 ?>
 --EXPECTF--
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(4) {
   ["count"]=>
   int(3)
@@ -95,8 +93,7 @@ array(4) {
 }
 
 Warning: ldap_search(): Partial search results returned: Sizelimit exceeded in %s on line %d
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(2) {
   ["count"]=>
   int(1)
@@ -115,8 +112,7 @@ array(2) {
     string(%d) "cn=userA,%s"
   }
 }
-object(LDAP\Result)#%d (0) {
-}
+resource(%d) of type (ldap result)
 array(4) {
   ["count"]=>
   int(3)

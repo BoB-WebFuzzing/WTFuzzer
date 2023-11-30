@@ -1,7 +1,5 @@
 --TEST--
 imap_fetchbody() errors: ValueError and Warnings
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

@@ -1,7 +1,5 @@
 --TEST--
 Test imap_reopen() using the CL_EXPUNGE flag
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

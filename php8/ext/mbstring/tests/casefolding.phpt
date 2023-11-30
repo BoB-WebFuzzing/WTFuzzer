@@ -1,7 +1,7 @@
 --TEST--
 Case-insensitive string comparisons use case folding
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php require 'skipif.inc'; ?>
 --FILE--
 <?php
 

@@ -5,7 +5,6 @@ memory_limit=2G
 --FILE--
 <?php
 
-#[AllowDynamicProperties]
 class foo
 {
     public function __construct()

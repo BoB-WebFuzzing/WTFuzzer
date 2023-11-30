@@ -1,9 +1,8 @@
 --TEST--
 Bug #79084 (mysqlnd may fetch wrong column indexes with MYSQLI_BOTH)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

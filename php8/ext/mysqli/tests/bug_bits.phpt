@@ -1,9 +1,8 @@
 --TEST--
 Bug (Incorrectly decoding bit values / Malformed server packet. Field length pointing)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

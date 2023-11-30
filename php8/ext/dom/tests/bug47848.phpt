@@ -1,7 +1,7 @@
 --TEST--
 Bug #47848 (importNode doesn't preserve attribute namespaces)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

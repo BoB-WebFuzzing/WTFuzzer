@@ -1,7 +1,9 @@
 --TEST--
 Phar with unsafe object in metadata does not unserialize on reading a file.
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+?>
 --INI--
 phar.require_hash=0
 phar.readonly=0

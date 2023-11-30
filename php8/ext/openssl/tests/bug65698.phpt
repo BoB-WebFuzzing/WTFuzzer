@@ -1,7 +1,7 @@
 --TEST--
 Bug #65689 (GeneralizedTime format parsing)
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) die("skip"); ?>
 --FILE--
 <?php
 $crt = substr(__FILE__, 0, -4).'.crt';

@@ -3,7 +3,6 @@ __serialize() mechanism (004): Delayed __unserialize() calls
 --FILE--
 <?php
 
-#[AllowDynamicProperties]
 class Wakeup {
     public $data;
     public function __construct(array $data) {
@@ -16,7 +15,6 @@ class Wakeup {
     }
 }
 
-#[AllowDynamicProperties]
 class Unserialize {
     public $data;
     public function __construct(array $data) {

@@ -4,8 +4,8 @@
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | available at through the world-wide-web at the following url:        |
+   | http://www.php.net/license/3_01.txt.                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -97,7 +97,7 @@ static void init_sapi_from_env(sapi_module_struct *sapi_module)
 /* {{{ php_lsapi_startup */
 static int php_lsapi_startup(sapi_module_struct *sapi_module)
 {
-    if (php_module_startup(sapi_module, NULL)==FAILURE) {
+    if (php_module_startup(sapi_module, NULL, 0)==FAILURE) {
         return FAILURE;
     }
     argv0 = sapi_module->executable_location;
@@ -367,7 +367,7 @@ static int sapi_lsapi_send_headers_like_cgi(sapi_headers_struct *sapi_headers)
     char buf[SAPI_LSAPI_MAX_HEADER_LENGTH];
     sapi_header_struct *h;
     zend_llist_position pos;
-    bool ignore_status = 0;
+    zend_bool ignore_status = 0;
     int response_status = SG(sapi_headers).http_response_code;
 
     if (SG(request_info).no_headers == 1) {
@@ -378,7 +378,7 @@ static int sapi_lsapi_send_headers_like_cgi(sapi_headers_struct *sapi_headers)
     if (SG(sapi_headers).http_response_code != 200)
     {
         int len;
-        bool has_status = 0;
+        zend_bool has_status = 0;
 
         char *s;
 
@@ -537,9 +537,9 @@ static void log_message (const char *fmt, ...)
 #define DEBUG_MESSAGE(fmt, ...)
 #endif
 
-static int lsapi_activate_user_ini(void);
+static int lsapi_activate_user_ini();
 
-static int sapi_lsapi_activate(void)
+static int sapi_lsapi_activate()
 {
     char *path, *server_name;
     size_t path_len, server_name_len;
@@ -643,13 +643,11 @@ static void init_request_info( void )
     php_handle_auth_data(pAuth);
 }
 
-static int lsapi_execute_script(void)
+static int lsapi_execute_script( zend_file_handle * file_handle)
 {
-	zend_file_handle file_handle;
     char *p;
     int len;
-	zend_stream_init_filename(&file_handle, SG(request_info).path_translated);
-	file_handle.primary_script = true;
+	zend_stream_init_filename(file_handle, SG(request_info).path_translated);
 
     p = argv0;
     *p++ = ':';
@@ -660,8 +658,7 @@ static int lsapi_execute_script(void)
         len = 0;
     memccpy( p, SG(request_info).path_translated + len, 0, 46 );
 
-    php_execute_script(&file_handle);
-    zend_destroy_file_handle(&file_handle);
+    php_execute_script(file_handle);
     return 0;
 
 }
@@ -677,9 +674,10 @@ static int do_clean_shutdown = 1;
 static int clean_onexit = 1;
 
 
-static void lsapi_clean_shutdown(void)
+static void lsapi_clean_shutdown()
 {
     struct sigaction act;
+    int sa_rc;
     struct itimerval tmv;
 #if PHP_MAJOR_VERSION >= 7
     zend_string * key;
@@ -688,14 +686,15 @@ static void lsapi_clean_shutdown(void)
     sigemptyset(&act.sa_mask);
     act.sa_flags = 0;
     act.sa_handler = lsapi_sigsegv;
-    (void)sigaction(SIGINT,  &act, NULL);
-    (void)sigaction(SIGQUIT, &act, NULL);
-    (void)sigaction(SIGILL,  &act, NULL);
-    (void)sigaction(SIGABRT, &act, NULL);
-    (void)sigaction(SIGBUS,  &act, NULL);
-    (void)sigaction(SIGSEGV, &act, NULL);
-    (void)sigaction(SIGTERM, &act, NULL);
-    (void)sigaction(SIGPROF, &act, NULL);
+    sa_rc = sigaction(SIGINT,  &act, NULL);
+    sa_rc = sigaction(SIGQUIT, &act, NULL);
+    sa_rc = sigaction(SIGILL,  &act, NULL);
+    sa_rc = sigaction(SIGABRT, &act, NULL);
+    sa_rc = sigaction(SIGBUS,  &act, NULL);
+    sa_rc = sigaction(SIGSEGV, &act, NULL);
+    sa_rc = sigaction(SIGTERM, &act, NULL);
+
+    sa_rc = sigaction(SIGPROF, &act, NULL);
     memset(&tmv, 0, sizeof(struct itimerval));
     tmv.it_value.tv_sec = 0;
     tmv.it_value.tv_usec = 100000;
@@ -736,9 +735,13 @@ static void lsapi_atexit(void)
     }
 }
 
+
 static int lsapi_module_main(int show_source)
 {
     struct sigaction act;
+    int sa_rc;
+    zend_file_handle file_handle;
+    memset(&file_handle, 0, sizeof(file_handle));
     if (php_request_startup() == FAILURE ) {
         return -1;
     }
@@ -747,13 +750,13 @@ static int lsapi_module_main(int show_source)
         sigemptyset(&act.sa_mask);
         act.sa_flags = SA_NODEFER;
         act.sa_handler = lsapi_sigterm;
-        (void)sigaction( SIGINT, &act, NULL);
-        (void)sigaction( SIGQUIT, &act, NULL);
-        (void)sigaction( SIGILL, &act, NULL);
-        (void)sigaction( SIGABRT, &act, NULL);
-        (void)sigaction( SIGBUS, &act, NULL);
-        (void)sigaction( SIGSEGV, &act, NULL);
-        (void)sigaction( SIGTERM, &act, NULL);
+        sa_rc = sigaction( SIGINT, &act, NULL);
+        sa_rc = sigaction( SIGQUIT, &act, NULL);
+        sa_rc = sigaction( SIGILL, &act, NULL);
+        sa_rc = sigaction( SIGABRT, &act, NULL);
+        sa_rc = sigaction( SIGBUS, &act, NULL);
+        sa_rc = sigaction( SIGSEGV, &act, NULL);
+        sa_rc = sigaction( SIGTERM, &act, NULL);
 
         clean_onexit = 0;
     }
@@ -764,7 +767,7 @@ static int lsapi_module_main(int show_source)
         php_get_highlight_struct(&syntax_highlighter_ini);
         highlight_file(SG(request_info).path_translated, &syntax_highlighter_ini);
     } else {
-        lsapi_execute_script();
+        lsapi_execute_script( &file_handle);
     }
     zend_try {
         php_request_shutdown(NULL);
@@ -830,7 +833,7 @@ static void user_config_cache_entry_dtor(zval *el)
     free(entry);
 }
 
-static void user_config_cache_init(void)
+static void user_config_cache_init()
 {
     zend_hash_init(&user_config_cache, 0, NULL, user_config_cache_entry_dtor, 1);
 }
@@ -1097,7 +1100,7 @@ static int lsapi_activate_user_ini( void )
 }
 
 
-static void override_ini(void)
+static void override_ini()
 {
 
     LSAPI_ForeachSpecialEnv( alter_ini, NULL );
@@ -1305,9 +1308,8 @@ static int cli_main( int argc, char * argv[] )
         }
         if ( ret == -1 ) {
             if ( *p ) {
-				zend_file_handle file_handle;
+                zend_file_handle file_handle;
 				zend_stream_init_fp(&file_handle, VCWD_FOPEN(*p, "rb"), NULL);
-				file_handle.primary_script = 1;
 
                 if ( file_handle.handle.fp ) {
                     script_filename = *p;
@@ -1327,17 +1329,19 @@ static int cli_main( int argc, char * argv[] )
                             php_get_highlight_struct(&syntax_highlighter_ini);
                             highlight_file(SG(request_info).path_translated, &syntax_highlighter_ini);
                         } else if (source_highlight == 2) {
-                            file_handle.filename = zend_string_init(*p, strlen(*p), 0);
+                            file_handle.filename = *p;
+                            file_handle.free_filename = 0;
                             file_handle.opened_path = NULL;
                             ret = php_lint_script(&file_handle);
                             if (ret==SUCCESS) {
-                                zend_printf("No syntax errors detected in %s\n", ZSTR_VAL(file_handle.filename));
+                                zend_printf("No syntax errors detected in %s\n", file_handle.filename);
                             } else {
-                                zend_printf("Errors parsing %s\n", ZSTR_VAL(file_handle.filename));
+                                zend_printf("Errors parsing %s\n", file_handle.filename);
                             }
 
                         } else {
-                            file_handle.filename = zend_string_init(*p, strlen(*p), 0);
+                            file_handle.filename = *p;
+                            file_handle.free_filename = 0;
                             file_handle.opened_path = NULL;
 
                             php_execute_script(&file_handle);
@@ -1514,7 +1518,7 @@ int main( int argc, char * argv[] )
 
     lsapi_sapi_module.ini_defaults = sapi_lsapi_ini_defaults;
 
-    if (php_module_startup(&lsapi_sapi_module, &litespeed_module_entry) == FAILURE) {
+    if (php_module_startup(&lsapi_sapi_module, &litespeed_module_entry, 1) == FAILURE) {
 #ifdef ZTS
         tsrm_shutdown();
 #endif
@@ -1563,7 +1567,7 @@ int main( int argc, char * argv[] )
     while( ( result = LSAPI_Prefork_Accept_r( &g_req )) >= 0 ) {
 #if defined(linux) || defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
         if (is_criu && !result) {
-            LSCRIU_inc_req_processed();
+            LSCRIU_inc_req_procssed();
         }
 #endif
         if ( slow_script_msec ) {
@@ -1598,7 +1602,13 @@ int main( int argc, char * argv[] )
     return ret;
 }
 
+
 /*   LiteSpeed PHP module starts here */
+
+PHP_FUNCTION(litespeed_request_headers);
+PHP_FUNCTION(litespeed_response_headers);
+PHP_FUNCTION(apache_get_modules);
+PHP_FUNCTION(litespeed_finish_request);
 
 PHP_MINFO_FUNCTION(litespeed);
 

@@ -6,6 +6,7 @@ opcache.enable_cli=1
 opcache.file_update_protection=0
 opcache.jit_buffer_size=1M
 opcache.protect_memory=1
+opcache.jit=function
 --FILE--
 <?php
 class Test {

@@ -1,7 +1,5 @@
 --TEST--
 Test session_commit() function : variation
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -14,7 +12,7 @@ ob_start();
 echo "*** Testing session_commit() : variation ***\n";
 
 var_dump(ini_get('session.use_strict_mode'));
-var_dump(session_id("session-commit-variation4"));
+var_dump(session_id("test"));
 var_dump(session_start());
 var_dump(session_id());
 var_dump(session_commit());
@@ -40,18 +38,18 @@ ob_end_flush();
 string(1) "0"
 string(0) ""
 bool(true)
-string(25) "session-commit-variation4"
+string(4) "test"
 bool(true)
-string(25) "session-commit-variation4"
+string(4) "test"
 bool(true)
 string(1) "0"
-string(25) "session-commit-variation4"
+string(4) "test"
 bool(true)
-string(25) "session-commit-variation4"
+string(4) "test"
 bool(true)
-string(25) "session-commit-variation4"
+string(4) "test"
 bool(true)
-string(25) "session-commit-variation4"
+string(4) "test"
 bool(true)
 bool(true)
 string(1) "0"

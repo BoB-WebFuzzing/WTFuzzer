@@ -3,8 +3,6 @@ Test session_set_save_handler() : shutdown failure
 --INI--
 session.save_handler=files
 session.name=PHPSESSID
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -25,7 +23,7 @@ class MySession extends SessionHandler {
         echo "(#$this->num) destructor called\n";
         $this->destroyed = true;
     }
-    public function write($id, $data): bool {
+    public function write($id, $data) {
         if ($this->destroyed) {
             echo "(#$this->num) destroyed, cannot write\n";
         } else {
@@ -33,7 +31,7 @@ class MySession extends SessionHandler {
         }
         return parent::write($id, $data);
     }
-    public function close(): bool {
+    public function close() {
         $id = session_id();
         if ($this->destroyed) {
             echo "(#$this->num) destroyed, cannot write\n";

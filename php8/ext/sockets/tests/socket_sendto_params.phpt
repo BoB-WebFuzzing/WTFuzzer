@@ -1,7 +1,11 @@
 --TEST--
 ext/sockets - socket_sendto - test with incorrect parameters
---EXTENSIONS--
-sockets
+--SKIPIF--
+<?php
+    if (!extension_loaded('sockets')) {
+        die('skip sockets extension not available.');
+    }
+?>
 --FILE--
 <?php
     $s_c = socket_create_listen(0);

@@ -1,7 +1,5 @@
 --TEST--
 Test interoperability of password_verify()
---EXTENSIONS--
-sodium
 --SKIPIF--
 <?php
 if (!function_exists('sodium_crypto_pwhash_str')) {

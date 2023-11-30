@@ -1,7 +1,7 @@
 --TEST--
 openssl_encrypt() error tests
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 $data = "openssl_encrypt() tests";

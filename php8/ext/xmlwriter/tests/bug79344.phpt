@@ -1,7 +1,9 @@
 --TEST--
 FR #79344 (xmlwriter_write_attribute_ns: $prefix should be nullable)
---EXTENSIONS--
-xmlwriter
+--SKIPIF--
+<?php
+if (!extension_loaded('xmlwriter')) die('skip xmlwriter extension not available');
+?>
 --FILE--
 <?php
 $writer = new XMLWriter;

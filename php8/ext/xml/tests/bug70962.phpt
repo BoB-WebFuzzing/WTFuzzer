@@ -1,7 +1,9 @@
 --TEST--
 Bug #70962 (XML_OPTION_SKIP_WHITE strips embedded whitespace)
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+if (!extension_loaded('xml')) die('skip xml extension not available');
+?>
 --FILE--
 <?php
 function parseAndOutput($xml)

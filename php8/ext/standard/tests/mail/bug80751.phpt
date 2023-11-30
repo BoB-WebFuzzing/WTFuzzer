@@ -1,9 +1,5 @@
 --TEST--
 Bug #80751 (Comma in recipient name breaks email delivery)
---EXTENSIONS--
-imap
---CONFLICTS--
-imap
 --SKIPIF--
 <?php
 if (PHP_OS_FAMILY !== 'Windows') die('skip Windows only test');
@@ -18,7 +14,7 @@ smtp_port=25
 require_once __DIR__ . '/mail_include.inc';
 
 function find_and_delete_message($username, $subject) {
-    global $default_mailbox, $password, $users, $domain;
+    global $default_mailbox, $password;
 
     $imap_stream = imap_open($default_mailbox, $username, $password);
     if ($imap_stream === false) {
@@ -39,11 +35,11 @@ function find_and_delete_message($username, $subject) {
                 echo "Return-Path header found: ";
                 var_dump(strpos($header, 'Return-Path: joe@example.com') !== false);
                 echo "To header found: ";
-                var_dump(strpos($header, "To: \"<bob@example.com>\" <{$users[1]}@$domain>") !== false);
+                var_dump(strpos($header, 'To: "<bob@example.com>" <info@mail.local>') !== false);
                 echo "From header found: ";
                 var_dump(strpos($header, 'From: "<bob@example.com>" <joe@example.com>') !== false);
                 echo "Cc header found: ";
-                var_dump(strpos($header, "Cc: \"Lastname, Firstname\\\\\" <{$users[2]}@$domain>") !== false);
+                var_dump(strpos($header, 'Cc: "Lastname, Firstname\\\\" <admin@mail.local>') !== false);
                 imap_delete($imap_stream, $i);
                 $found = true;
                 break;

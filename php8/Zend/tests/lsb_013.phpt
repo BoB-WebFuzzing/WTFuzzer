@@ -17,15 +17,8 @@ class Test2 extends Test1 {
 Test1::test();
 Test2::test();
 ?>
---EXPECTF--
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
+--EXPECT--
 bool(false)
-
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
 bool(false)
-
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
 bool(true)
-
-Deprecated: Use of "static" in callables is deprecated in %s on line %d
 bool(true)

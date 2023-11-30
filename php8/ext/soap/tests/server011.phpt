@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 11: bind
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --GET--
 wsdl
 --INI--

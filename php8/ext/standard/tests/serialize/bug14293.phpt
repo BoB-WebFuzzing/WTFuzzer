@@ -4,8 +4,6 @@ Bug #14293 (serialize() and __sleep())
 <?php
 class t
 {
-    public $a;
-
     function __construct()
     {
         $this->a = 'hello';

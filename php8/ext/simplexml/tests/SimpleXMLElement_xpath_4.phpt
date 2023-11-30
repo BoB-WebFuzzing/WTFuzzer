@@ -1,9 +1,8 @@
 --TEST--
 Testing xpath() with invalid XML
---EXTENSIONS--
-simplexml
 --SKIPIF--
 <?php
+if (!extension_loaded('simplexml')) die('skip simplexml extension not loaded');
 if (PHP_INT_SIZE != 8) die("skip this test is for 64bit platforms only");
 ?>
 --FILE--

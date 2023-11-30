@@ -1,7 +1,5 @@
 --TEST--
 Bug #71998 Function pg_insert does not insert when column type = inet
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php include("skipif.inc"); ?>
 --FILE--
@@ -13,7 +11,7 @@ include('config.inc');
 
 $db = pg_connect($conn_str);
 
-pg_query($db, "CREATE TABLE tmp_statistics (id integer NOT NULL, remote_addr inet);");
+pg_query("CREATE TABLE tmp_statistics (id integer NOT NULL, remote_addr inet);");
 
 $ips = array(
     /* IPv4*/

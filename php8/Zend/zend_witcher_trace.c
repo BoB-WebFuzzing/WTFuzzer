@@ -535,6 +535,8 @@ unsigned char *cgi_get_shm_mem(char * ch_shm_id) {
  * The witcher init, is needed at the start of the script and is only executed once per child
  * it sets up the tracing enviornment
  */
+
+
 void witcher_cgi_trace_init(char * ch_shm_id) {
     debug_print(("[\e[32mWitcher\e[0m] in Witcher trace\n\t\e[34mSCRIPT_FILENAME=%s\n\t\e[34mAFL_PRELOAD=%s\n\t\e[34mLD_LIBRARY_PATH=%s\e[0m\n", getenv("SCRIPT_FILENAME"), getenv("AFL_PRELOAD"), getenv("LD_LIBRARY_PATH"), getenv("LOGIN_COOKIE")));
 
@@ -609,6 +611,7 @@ void witcher_cgi_trace_finish()
 
 }
 
+/*
 void vld_start_trace(){
     if (getenv("WITCHER_PRINT_OP")){
         char tracefn[50];
@@ -646,5 +649,113 @@ void vld_external_trace(zend_execute_data *execute_data, const zend_op *opline){
     if (ofile){
         fflush(ofile);
         fclose(ofile);
+    }
+}
+*/
+/*
+void vld_start_trace(){
+    printf("vld_start_trace()\n");
+
+    if (getenv("WITCHER_PRINT_OP")){
+        char tracefn[50];
+        sprintf(tracefn, "/tmp/trace-%s.dat", getenv("WITCHER_PRINT_OP"));
+        FILE *ofile = fopen(tracefn, "w");
+        fclose(ofile);
+    }
+}
+
+void vld_external_trace(zend_execute_data *execute_data, const zend_op *opline){
+    printf("vld_external_trace()\n");
+    FILE *ofile = NULL;
+
+    if (witcher_print_op){
+        const char *opname = zend_get_opcode_name(opline->opcode);
+        char tracefn[50];
+        sprintf(tracefn, "/tmp/trace-%s.dat", witcher_print_op);
+        ofile = fopen(tracefn, "a");
+        debug_print(("%d] %s (%d)   %d    %d \n",opline->lineno, opname, opline->opcode, opline->op1_type, opline->op2_type));
+        fprintf(ofile, "%d] %s (%d)   %d    %d \n",opline->lineno, opname, opline->opcode, opline->op1_type, opline->op2_type);
+    }
+
+    if (start_tracing) {
+
+        op = (opline->lineno << 8) | opline->opcode ; //opcode; //| (lineno << 8);
+
+        if (last != 0) {
+            int bitmapLoc = (op ^ last) % MAPSIZE;
+
+            // turned off to disable afl code tracing
+            afl_area_ptr[bitmapLoc]++;
+        }
+    }
+    last = op;
+
+    if (ofile){
+        fflush(ofile);
+        fclose(ofile);
+    }
+}
+*/
+
+
+#define str_witcher_print_op "tracetest"
+static bool trace_run = false;
+
+void vld_start_trace()
+{
+    if (getenv("START_TRACE"))
+        trace_run = true;
+
+    if (afl_area_ptr == NULL)
+    {
+        if (getenv(SHM_ENV_VAR))
+        {
+            int shm_id = atoi(getenv(SHM_ENV_VAR));
+            afl_area_ptr = shmat(shm_id, NULL, 0);
+        }
+    }
+
+    char tracefn[50];
+    sprintf(tracefn, "/tmp/trace-%s.dat", str_witcher_print_op);
+    FILE *ofile = fopen(tracefn, "w");
+    fclose(ofile);
+}
+
+void vld_external_trace(zend_execute_data *execute_data, const zend_op *opline)
+{
+    if (trace_run == true)
+    {
+
+        FILE *ofile = NULL;
+
+        const char *opname = zend_get_opcode_name(opline->opcode);
+        char tracefn[50];
+        sprintf(tracefn, "/tmp/trace-%s.dat", str_witcher_print_op);
+        ofile = fopen(tracefn, "a");
+        debug_print(("%d] %s (%d)   %d    %d \n", opline->lineno, opname, opline->opcode, opline->op1_type, opline->op2_type));
+        fprintf(ofile, "%d] %s (%d)   %d    %d \n", opline->lineno, opname, opline->opcode, opline->op1_type, opline->op2_type);
+
+        op = (opline->lineno << 8) | opline->opcode; // opcode; //| (lineno << 8);
+
+        int bitmapLoc = (op ^ last) % MAPSIZE;
+        if (afl_area_ptr == NULL)
+            {
+                if (getenv(SHM_ENV_VAR))
+                {
+                    int shm_id = atoi(getenv(SHM_ENV_VAR));
+                    afl_area_ptr = shmat(shm_id, NULL, 0);
+                }
+            }
+
+        if (afl_area_ptr != NULL)
+            afl_area_ptr[bitmapLoc]++;
+
+        last = op;
+
+        if (ofile)
+        {
+            fflush(ofile);
+            fclose(ofile);
+        }
     }
 }

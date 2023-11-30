@@ -1,9 +1,8 @@
 --TEST--
 DRCP: privileged connect
---EXTENSIONS--
-oci8
 --SKIPIF--
 <?php
+if (!extension_loaded('oci8')) die("skip no oci8 extension");
 require(__DIR__."/connect.inc");
 if (!$test_drcp) die("skip requires DRCP connection");
 // Looked for :pooled in EZ connect string

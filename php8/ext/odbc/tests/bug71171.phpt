@@ -1,7 +1,5 @@
 --TEST--
 Bug #71171 odbc_fetch_array generates SIGFAULT, variant 0
---EXTENSIONS--
-odbc
 --SKIPIF--
 <?php include 'skipif.inc'; ?>
 --FILE--

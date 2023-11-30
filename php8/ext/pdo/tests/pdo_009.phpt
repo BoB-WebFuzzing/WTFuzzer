@@ -1,9 +1,8 @@
 --TEST--
 PDO Common: PDO::FETCH_CLASSTYPE
---EXTENSIONS--
-pdo
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo')) die('skip');
 $dir = getenv('REDIR_TEST_DIR');
 if (false == $dir) die('skip no driver');
 require_once $dir . 'pdo_test.inc';
@@ -29,9 +28,6 @@ $stmt = $db->prepare('SELECT classtypes.name, test.id AS id, test.val AS val FRO
 
 class Test1
 {
-    public $id;
-    public $val;
-
     public function __construct()
     {
         echo __METHOD__ . "()\n";
@@ -40,9 +36,6 @@ class Test1
 
 class Test2
 {
-    public $id;
-    public $val;
-
     public function __construct()
     {
         echo __METHOD__ . "()\n";
@@ -51,9 +44,6 @@ class Test2
 
 class Test3
 {
-    public $id;
-    public $val;
-
     public function __construct()
     {
         echo __METHOD__ . "()\n";

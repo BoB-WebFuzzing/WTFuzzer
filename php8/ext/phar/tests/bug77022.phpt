@@ -1,9 +1,8 @@
 --TEST--
 Phar: Bug #77022: PharData always creates new files with mode 0666
---EXTENSIONS--
-phar
 --SKIPIF--
 <?php
+if (!extension_loaded("phar")) die("skip");
 if (defined("PHP_WINDOWS_VERSION_MAJOR")) die("skip not for Windows")
 ?>
 --FILE--
@@ -14,9 +13,9 @@ var_dump(decoct(umask()));
 $sFile = tempnam(__DIR__, 'test77022');
 var_dump(decoct(stat($sFile)['mode']));
 
-foreach([Phar::TAR => 'tar', Phar::ZIP => 'zip'] as $format => $ext) {
+foreach([Phar::TAR => 'tar', Phar::ZIP => 'zip'] as $mode => $ext) {
     clearstatcache();
-    $phar = new PharData(__DIR__ . '/test77022.' . $ext, format: $format);
+    $phar = new PharData(__DIR__ . '/test77022.' . $ext, null, null, $mode);
     $phar->addFile($sFile, 'test-file-phar');
     $phar->addFromString("test-from-string", 'test-file-phar');
     $phar->extractTo(__DIR__);

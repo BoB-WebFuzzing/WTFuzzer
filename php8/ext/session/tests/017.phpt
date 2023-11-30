@@ -1,7 +1,5 @@
 --TEST--
 setting $_SESSION before session_start() should not cause segfault
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--

@@ -3,8 +3,6 @@ imap_body() errors: ValueError and Warnings
 --CREDITS--
 Paul Sohier
 #phptestfest utrecht
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

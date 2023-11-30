@@ -1,17 +1,17 @@
 --TEST--
 show information about extension
---EXTENSIONS--
-session
 --SKIPIF--
 <?php
 include "skipif.inc";
-
+if (!extension_loaded("session")) {
+    die("skip session extension required");
+}
 if (PCRE_JIT_SUPPORT == false) {
     die ("skip not pcre jit support builtin");
 }
 ?>
 --INI--
-date.timezone=UTC
+date.timezone=
 --FILE--
 <?php
 

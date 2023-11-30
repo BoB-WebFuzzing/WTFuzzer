@@ -1,7 +1,7 @@
 --TEST--
 Bug #78714 (funcs returning pointer can't use call convention spec)
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

@@ -1,10 +1,8 @@
 --TEST--
 PDO OCI: Insert and fetch 1K records from a table that contains 1 number and 2 LOB columns (stress test)
---EXTENSIONS--
-pdo
-pdo_oci
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo') || !extension_loaded('pdo_oci')) die('skip not loaded');
 if (getenv('SKIP_SLOW_TESTS')) die('skip slow tests excluded by request');
 require(__DIR__.'/../../pdo/tests/pdo_test.inc');
 PDOTest::skip();

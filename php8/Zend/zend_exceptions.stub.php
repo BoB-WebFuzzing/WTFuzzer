@@ -1,15 +1,13 @@
 <?php
 
-/** @generate-class-entries */
-
-require "zend_constants.stub.php";
+/** @generate-function-entries */
 
 interface Throwable extends Stringable
 {
     public function getMessage(): string;
 
     /** @return int */
-    public function getCode(); // TODO add proper type (i.e. int|string)
+    public function getCode();
 
     public function getFile(): string;
 
@@ -24,33 +22,17 @@ interface Throwable extends Stringable
 
 class Exception implements Throwable
 {
-    /**
-     * Intentionally left untyped for BC reasons
-     * @var string
-     */
-    protected $message = "";
-    private string $string = "";
-    /**
-     * Intentionally left untyped for BC reasons
-     * @var int
-     */
-    protected $code = 0;  // TODO add proper type (i.e. int|string)
-    protected string $file = "";
-    protected int $line = 0;
-    private array $trace = [];
-    private ?Throwable $previous = null;
-
-    private function __clone(): void {}
+    final private function __clone(): void {}
 
     public function __construct(string $message = "", int $code = 0, ?Throwable $previous = null) {}
 
-    /** @tentative-return-type */
-    public function __wakeup(): void {}
+    /** @return void */
+    public function __wakeup() {}
 
     final public function getMessage(): string {}
 
     /** @return int */
-    final public function getCode() {} // TODO add proper type (i.e. int|string)
+    final public function getCode() {}
 
     final public function getFile(): string {}
 
@@ -67,49 +49,24 @@ class Exception implements Throwable
 
 class ErrorException extends Exception
 {
-    protected int $severity = E_ERROR;
-
-    public function __construct(
-        string $message = "",
-        int $code = 0,
-        int $severity = E_ERROR,
-        ?string $filename = null,
-        ?int $line = null,
-        ?Throwable $previous = null
-    ) {}
+    public function __construct(string $message = "", int $code = 0, int $severity = E_ERROR, ?string $filename = null, ?int $line = null, ?Throwable $previous = null) {}
 
     final public function getSeverity(): int {}
 }
 
 class Error implements Throwable
 {
-    /**
-     * Intentionally left untyped for BC reasons
-     * @var string
-     */
-    protected $message = "";
-    private string $string = "";
-    /**
-     * Intentionally left untyped for BC reasons
-     * @var int
-     */
-    protected $code = 0; // TODO add proper type (i.e. int|string)
-    protected string $file = "";
-    protected int $line;
-    private array $trace = [];
-    private ?Throwable $previous = null;
-
     /** @implementation-alias Exception::__clone */
-    private function __clone(): void {}
+    final private function __clone(): void {}
 
     /** @implementation-alias Exception::__construct */
     public function __construct(string $message = "", int $code = 0, ?Throwable $previous = null) {}
 
     /**
-     * @tentative-return-type
+     * @return void
      * @implementation-alias Exception::__wakeup
      */
-    public function __wakeup(): void {}
+    public function __wakeup() {}
 
     /** @implementation-alias Exception::getMessage */
     final public function getMessage(): string {}

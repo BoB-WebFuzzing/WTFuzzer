@@ -1,7 +1,7 @@
 --TEST--
 phar: mkdir/rmdir edge cases
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly=0
 --FILE--

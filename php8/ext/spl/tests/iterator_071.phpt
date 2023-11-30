@@ -10,7 +10,7 @@ $recArrIt = new RecursiveArrayIterator($arrOb->getIterator());
 
 class MyRecursiveIteratorIterator extends RecursiveIteratorIterator {
 
-    function nextelement(): void {
+    function nextelement() {
         echo __METHOD__."\n";
     }
 }

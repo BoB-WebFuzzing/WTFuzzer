@@ -1,7 +1,11 @@
 --TEST--
 test for mbstring script_encoding for flex unsafe encoding (Shift_JIS)
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+if (!extension_loaded("mbstring")) {
+  die("skip Requires mbstring extension");
+}
+?>
 --INI--
 zend.multibyte=1
 zend.script_encoding=Shift_JIS

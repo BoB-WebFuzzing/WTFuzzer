@@ -1,7 +1,9 @@
 --TEST--
 Bug #72498 variant_date_from_timestamp null dereference
---EXTENSIONS--
-com_dotnet
+--SKIPIF--
+<?php
+if (!extension_loaded("com_dotnet")) print "skip COM/.Net support not present";
+?>
 --FILE--
 <?php
 

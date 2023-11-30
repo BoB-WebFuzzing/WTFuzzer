@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -31,7 +31,7 @@
 /* {{{ Sends a raw HTTP header */
 PHP_FUNCTION(header)
 {
-	bool rep = 1;
+	zend_bool rep = 1;
 	sapi_header_line ctr = {0};
 	char *line;
 	size_t len;
@@ -110,14 +110,6 @@ PHPAPI zend_result php_setcookie(zend_string *name, zend_string *value, time_t e
 			get_active_function_name());
 		return FAILURE;
 	}
-#ifdef ZEND_ENABLE_ZVAL_LONG64
-	if (expires >= 253402300800) {
-		zend_value_error("%s(): \"expires\" option cannot have a year greater than 9999",
-			get_active_function_name());
-		return FAILURE;
-	}
-#endif
-
 	/* Should check value of SameSite? */
 
 	if (value == NULL || ZSTR_LEN(value) == 0) {
@@ -126,7 +118,7 @@ PHPAPI zend_result php_setcookie(zend_string *name, zend_string *value, time_t e
 		 * so in order to force cookies to be deleted, even on MSIE, we
 		 * pick an expiry date in the past
 		 */
-		dt = php_format_date("D, d M Y H:i:s \\G\\M\\T", sizeof("D, d M Y H:i:s \\G\\M\\T")-1, 1, 0);
+		dt = php_format_date("D, d-M-Y H:i:s T", sizeof("D, d-M-Y H:i:s T")-1, 1, 0);
 		smart_str_appends(&buf, "Set-Cookie: ");
 		smart_str_append(&buf, name);
 		smart_str_appends(&buf, "=deleted; expires=");
@@ -144,12 +136,21 @@ PHPAPI zend_result php_setcookie(zend_string *name, zend_string *value, time_t e
 		} else {
 			smart_str_append(&buf, value);
 		}
-
 		if (expires > 0) {
+			const char *p;
 			double diff;
 
 			smart_str_appends(&buf, COOKIE_EXPIRES);
-			dt = php_format_date("D, d M Y H:i:s \\G\\M\\T", sizeof("D, d M Y H:i:s \\G\\M\\T")-1, expires, 0);
+			dt = php_format_date("D, d-M-Y H:i:s T", sizeof("D, d-M-Y H:i:s T")-1, expires, 0);
+			/* check to make sure that the year does not exceed 4 digits in length */
+			p = zend_memrchr(ZSTR_VAL(dt), '-', ZSTR_LEN(dt));
+			if (!p || *(p + 5) != ' ') {
+				zend_string_free(dt);
+				smart_str_free(&buf);
+				zend_value_error("%s(): \"expires\" option cannot have a year greater than 9999",
+					get_active_function_name());
+				return FAILURE;
+			}
 
 			smart_str_append(&buf, dt);
 			zend_string_free(dt);
@@ -192,7 +193,7 @@ PHPAPI zend_result php_setcookie(zend_string *name, zend_string *value, time_t e
 }
 
 static zend_result php_head_parse_cookie_options_array(HashTable *options, zend_long *expires, zend_string **path,
-		zend_string **domain, bool *secure, bool *httponly, zend_string **samesite)
+		zend_string **domain, zend_bool *secure, zend_bool *httponly, zend_string **samesite)
 {
 	zend_string *key;
 	zval *value;
@@ -227,7 +228,7 @@ static void php_setcookie_common(INTERNAL_FUNCTION_PARAMETERS, bool is_raw)
 	HashTable *options = NULL;
 	zend_long expires = 0;
 	zend_string *name, *value = NULL, *path = NULL, *domain = NULL, *samesite = NULL;
-	bool secure = 0, httponly = 0;
+	zend_bool secure = 0, httponly = 0;
 
 	ZEND_PARSE_PARAMETERS_START(1, 7)
 		Z_PARAM_STR(name)
@@ -312,7 +313,6 @@ PHP_FUNCTION(headers_sent)
 	switch(ZEND_NUM_ARGS()) {
 	case 2:
 		ZEND_TRY_ASSIGN_REF_LONG(arg2, line);
-		ZEND_FALLTHROUGH;
 	case 1:
 		if (file) {
 			ZEND_TRY_ASSIGN_REF_STRING(arg1, file);

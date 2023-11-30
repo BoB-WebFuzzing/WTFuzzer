@@ -7,7 +7,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -25,9 +25,7 @@
    All other licensing and usage conditions are those of the PHP Group.
 */
 
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
+#define _GNU_SOURCE
 #include <string.h>
 
 #include "zend.h"
@@ -65,7 +63,7 @@ static void zend_signal_handler(int signo, siginfo_t *siginfo, void *context);
 static int zend_signal_register(int signo, void (*handler)(int, siginfo_t*, void*));
 
 #if defined(__CYGWIN__) || defined(__PASE__)
-/* Matches zend_execute_API.c; these platforms don't support ITIMER_PROF. */
+/* Matches zend_excute_API.c; these platforms don't support ITIMER_PROF. */
 #define TIMEOUT_SIG SIGALRM
 #else
 #define TIMEOUT_SIG SIGPROF
@@ -87,10 +85,8 @@ void zend_signal_handler_defer(int signo, siginfo_t *siginfo, void *context)
 	zend_signal_queue_t *queue, *qtmp;
 
 #ifdef ZTS
-	/* A signal could hit after TSRM shutdown, in this case globals are already freed.
-	 * Or it could be delivered to a thread that didn't execute PHP yet.
-	 * In the latter case we act as if SIGG(active) is false. */
-	if (tsrm_is_shutdown() || !tsrm_get_ls_cache()) {
+	/* A signal could hit after TSRM shutdown, in this case globals are already freed. */
+	if (tsrm_is_shutdown()) {
 		/* Forward to default handler handler */
 		zend_signal_handler(signo, siginfo, context);
 		return;
@@ -122,7 +118,7 @@ void zend_signal_handler_defer(int signo, siginfo_t *siginfo, void *context)
 		} else { /* delay signal handling */
 			SIGG(blocked) = 1; /* signal is blocked */
 
-			if ((queue = SIGG(pavail))) { /* if none available it's simply forgotten */
+			if ((queue = SIGG(pavail))) { /* if none available it's simply forgotton */
 				SIGG(pavail) = queue->next;
 				queue->zend_signal.signo = signo;
 				queue->zend_signal.siginfo = siginfo;
@@ -182,7 +178,7 @@ static void zend_signal_handler(int signo, siginfo_t *siginfo, void *context)
 	sigset_t sigset;
 	zend_signal_entry_t p_sig;
 #ifdef ZTS
-	if (tsrm_is_shutdown() || !tsrm_get_ls_cache()) {
+	if (tsrm_is_shutdown()) {
 		p_sig.flags = 0;
 		p_sig.handler = SIG_DFL;
 	} else

@@ -1,7 +1,9 @@
 --TEST--
 bug #61820 using ob_gzhandler will complain about headers already sent when no compression
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+extension_loaded("zlib") or die("skip");
+?>
 --FILE--
 <?php
 ob_start('ob_gzhandler');

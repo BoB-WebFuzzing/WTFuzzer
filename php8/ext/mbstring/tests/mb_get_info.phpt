@@ -1,7 +1,7 @@
 --TEST--
 Test mb_get_info() function
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip'); ?>
 --INI--
 mbstring.encoding_translation=1
 mbstring.language=Korean

@@ -1,7 +1,7 @@
 --TEST--
 Phar: Phar::webPhar, open compiled file fails
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip");?>
 --INI--
 phar.readonly=1
 --FILE--

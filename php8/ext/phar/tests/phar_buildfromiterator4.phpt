@@ -1,7 +1,7 @@
 --TEST--
 Phar::buildFromIterator() iterator, 1 file passed in
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.require_hash=0
 phar.readonly=0
@@ -14,25 +14,25 @@ class myIterator implements Iterator
     {
         $this->a = $a;
     }
-    function next(): void {
+    function next() {
         echo "next\n";
-        next($this->a);
+        return next($this->a);
     }
-    function current(): mixed {
+    function current() {
         echo "current\n";
         return current($this->a);
     }
-    function key(): mixed {
+    function key() {
         echo "key\n";
         return key($this->a);
     }
-    function valid(): bool {
+    function valid() {
         echo "valid\n";
         return current($this->a);
     }
-    function rewind(): void {
+    function rewind() {
         echo "rewind\n";
-        reset($this->a);
+        return reset($this->a);
     }
 }
 try {

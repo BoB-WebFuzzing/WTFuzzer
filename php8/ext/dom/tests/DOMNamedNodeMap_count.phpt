@@ -2,8 +2,8 @@
 Test count nodes in DOMNamedNodeMap
 --CREDITS--
 Andreas Treichel <gmblar+github@gmail.com>
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

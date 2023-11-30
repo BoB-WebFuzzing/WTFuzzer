@@ -1,7 +1,7 @@
 --TEST--
 Test finfo_buffer() function : basic functionality
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 $magicFile = __DIR__ . DIRECTORY_SEPARATOR . 'magic私はガラスを食べられます';

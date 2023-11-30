@@ -1,8 +1,10 @@
 --TEST--
 Bug #64739 (Invalid Title and Author data returned)
---EXTENSIONS--
-exif
-mbstring
+--SKIPIF--
+<?php
+extension_loaded("exif") or die("skip need exif");
+if (!extension_loaded('mbstring')) die('skip mbstring extension not available');
+?>
 --FILE--
 <?php
 echo "Test\n";

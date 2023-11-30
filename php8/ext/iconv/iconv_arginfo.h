@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 4367fa431d3e4814e42d9aa514c10cae1d842d8f */
+ * Stub hash: 5d05deb60466c6e1ee73b44ad0b09a032bc8410e */
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_iconv_strlen, 0, 1, MAY_BE_LONG|MAY_BE_FALSE)
 	ZEND_ARG_TYPE_INFO(0, string, IS_STRING, 0)
@@ -85,11 +85,3 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(iconv_get_encoding, arginfo_iconv_get_encoding)
 	ZEND_FE_END
 };
-
-static void register_iconv_symbols(int module_number)
-{
-	REGISTER_STRING_CONSTANT("ICONV_IMPL", PHP_ICONV_IMPL_VALUE, CONST_PERSISTENT);
-	REGISTER_STRING_CONSTANT("ICONV_VERSION", get_iconv_version(), CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("ICONV_MIME_DECODE_STRICT", PHP_ICONV_MIME_DECODE_STRICT, CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("ICONV_MIME_DECODE_CONTINUE_ON_ERROR", PHP_ICONV_MIME_DECODE_CONTINUE_ON_ERROR, CONST_PERSISTENT);
-}

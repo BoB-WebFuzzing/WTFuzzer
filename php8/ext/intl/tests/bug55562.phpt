@@ -1,7 +1,7 @@
 --TEST--
 grapheme_substr() - Bug55562 - grapheme_substr() returns false if length parameter is to large
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 var_dump(

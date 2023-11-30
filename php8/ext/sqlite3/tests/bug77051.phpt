@@ -1,7 +1,7 @@
 --TEST--
 Bug #77051 SQLite3::bindParam memory bug when missing ::reset call
---EXTENSIONS--
-sqlite3
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 

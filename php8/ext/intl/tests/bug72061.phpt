@@ -1,7 +1,7 @@
 --TEST--
 Bug #72061: Out-of-bounds reads in zif_grapheme_stripos with negative offset
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

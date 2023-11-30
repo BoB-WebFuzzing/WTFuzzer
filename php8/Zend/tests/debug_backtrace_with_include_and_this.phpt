@@ -3,7 +3,6 @@ debug_backtrace segmentation fault with include and error handler
 --FILE--
 <?php
 class CLWrapper {
-  public $context;
   function stream_open($path, $mode, $options, $opened_path) {
     return false;
   }

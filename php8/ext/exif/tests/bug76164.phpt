@@ -1,7 +1,9 @@
 --TEST--
 Bug #76164 (exif_read_data zend_mm_heap corrupted)
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php
+if (!extension_loaded('exif')) die('skip exif extension not available');
+?>
 --FILE--
 <?php
 $var1 = 'nonexistentfile';

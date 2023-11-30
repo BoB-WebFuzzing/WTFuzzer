@@ -1,7 +1,7 @@
 --TEST--
 SOAP Server 15: passing request to handle()
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test() {

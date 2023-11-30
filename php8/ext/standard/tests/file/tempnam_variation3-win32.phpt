@@ -26,6 +26,7 @@ $names_arr = array(
     -1,
     TRUE,
     FALSE,
+    NULL,
     "",
     " ",
     "\0",
@@ -40,6 +41,7 @@ $names_arr = array(
 
 $res_arr = array(
     /* Invalid args */
+    true,
     true,
     true,
     true,
@@ -97,15 +99,17 @@ OK
 -- Iteration 3 --
 OK
 -- Iteration 4 --
+OK
+-- Iteration 5 --
 
 Notice: tempnam(): file created in the system's temporary directory in %stempnam_variation3-win32.php on line %d
 Failed, not created in the correct directory %s vs %s
 0
--- Iteration 5 --
-tempnam(): Argument #2 ($prefix) must not contain any null bytes
 -- Iteration 6 --
-tempnam(): Argument #2 ($prefix) must be of type string, array given
+tempnam(): Argument #2 ($prefix) must not contain any null bytes
 -- Iteration 7 --
-OK
+tempnam(): Argument #2 ($prefix) must be of type string, array given
 -- Iteration 8 --
+OK
+-- Iteration 9 --
 OK

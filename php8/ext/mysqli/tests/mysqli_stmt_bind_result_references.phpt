@@ -1,9 +1,8 @@
 --TEST--
 mysqli_stmt_bind_result() - playing with references
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -292,9 +291,9 @@ string(1) "a"
 reference, object, forward declaration...
 int(1)
 object(bar)#%d (2) {
-  ["foo"]=>
-  &string(1) "a"
   ["bar"]=>
+  &string(1) "a"
+  ["foo"]=>
   &string(1) "a"
 }
 string(1) "a"
@@ -302,13 +301,13 @@ references, object, private...
 int(1)
 string(1) "a"
 object(mega_bar)#5 (4) {
-  ["foo"]=>
-  &string(1) "a"
-  ["bar"]=>
-  &string(1) "a"
   [%s]=>
   &int(1)
   ["id_ref"]=>
   &int(1)
+  ["bar"]=>
+  &string(1) "a"
+  ["foo"]=>
+  &string(1) "a"
 }
 done!

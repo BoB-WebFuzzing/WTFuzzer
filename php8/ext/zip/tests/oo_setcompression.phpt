@@ -1,7 +1,9 @@
 --TEST--
 setCompressionName and setCompressionIndex methods
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if (!extension_loaded('zip')) die('skip');
+?>
 --FILE--
 <?php
 $tmpfile = __DIR__ . '/oo_setcompression.zip';

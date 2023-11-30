@@ -1,7 +1,7 @@
 --TEST--
 SOAP Interop Round2 base 007 (soap/direct): echoStringArray(one)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $param =  new SoapParam(new SoapVar(array(

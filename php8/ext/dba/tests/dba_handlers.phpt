@@ -1,7 +1,5 @@
 --TEST--
 DBA Handler Test
---EXTENSIONS--
-dba
 --SKIPIF--
 <?php
 $handler="flatfile";
@@ -33,7 +31,7 @@ check(dba_handlers());
 
 echo "Test 2\n";
 
-check(dba_handlers(false));
+check(dba_handlers(null));
 
 echo "Test 3\n";
 

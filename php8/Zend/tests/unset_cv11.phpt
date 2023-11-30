@@ -1,5 +1,5 @@
 --TEST--
-unset() CV 11 (unset() of copy destroys original value)
+unset() CV 11 (unset() of copy destoies original value)
 --FILE--
 <?php
 $x = array("default"=>"ok");

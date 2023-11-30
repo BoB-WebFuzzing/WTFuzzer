@@ -1,9 +1,8 @@
 --TEST--
 mysqli bind_param/bind_prepare fetch long values
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

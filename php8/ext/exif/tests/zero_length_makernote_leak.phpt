@@ -1,7 +1,11 @@
 --TEST--
 OSS-Fuzz: Memory leak for zero-length MAKERNOTE
---EXTENSIONS--
-exif
+--SKIPIF--
+<?php
+if (!extension_loaded('exif')) {
+    die('skip exif extension not available');
+}
+?>
 --FILE--
 <?php
 

@@ -1,7 +1,7 @@
 --TEST--
 Semi reserved words support: member access
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip"; ?>
 --FILE--
 <?php
 $tokens = token_get_all('<?php

@@ -24,9 +24,6 @@ class x extends c implements a, b {
 }
 
 trait T1 {
-    #[A]
-    public $prop;
-
     static function foo() {
         var_dump(__METHOD__);
     }

@@ -1,7 +1,7 @@
 --TEST--
 Bug #77257: value of variable assigned in a switch() construct gets lost
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 function test($x) {

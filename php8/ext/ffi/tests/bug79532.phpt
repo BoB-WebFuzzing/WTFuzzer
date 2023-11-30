@@ -1,8 +1,10 @@
 --TEST--
 Bug #79532 (sizeof off_t can be wrong)
---EXTENSIONS--
-ffi
-zend_test
+--SKIPIF--
+<?php
+if (!extension_loaded('ffi')) die('skip ffi extension not available');
+if (!extension_loaded('zend-test')) die('skip zend-test extension not available');
+?>
 --FILE--
 <?php
 require_once('utils.inc');

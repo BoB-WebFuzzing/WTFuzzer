@@ -1,7 +1,7 @@
 --TEST--
 Bug #68819 Fileinfo on specific file causes spurious OOM and/or segfault, var 1
---EXTENSIONS--
-fileinfo
+--SKIPIF--
+<?php require_once(__DIR__ . '/skipif.inc'); ?>
 --FILE--
 <?php
 
@@ -15,4 +15,4 @@ $type = $finfo->buffer($string);
 var_dump($type);
 ?>
 --EXPECT--
-string(66) "ASCII text, with very long lines (617), with CRLF line terminators"
+string(60) "ASCII text, with very long lines, with CRLF line terminators"

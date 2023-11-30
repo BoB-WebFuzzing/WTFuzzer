@@ -1,7 +1,7 @@
 --TEST--
 Test token_get_all() function : basic functionality
---EXTENSIONS--
-tokenizer
+--SKIPIF--
+<?php if (!extension_loaded("tokenizer")) print "skip"; ?>
 --FILE--
 <?php
 echo "*** Testing token_get_all() : basic functionality ***\n";

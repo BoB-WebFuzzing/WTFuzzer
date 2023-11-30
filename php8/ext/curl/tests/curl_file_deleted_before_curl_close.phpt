@@ -2,8 +2,8 @@
 Memory corruption error if fp of just created file is closed before curl_close.
 --CREDITS--
 Alexey Shein <confik@gmail.com>
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
 

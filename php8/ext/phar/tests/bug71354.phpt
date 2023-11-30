@@ -1,7 +1,7 @@
 --TEST--
 Phar: bug #71354: Heap corruption in tar/zip/phar parser.
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 $p = new PharData(__DIR__."/bug71354.tar");

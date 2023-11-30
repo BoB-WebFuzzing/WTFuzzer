@@ -3,16 +3,12 @@ DOMDocumentType::notations with invalid state.
 --CREDITS--
 Eric Lee Stewart <ericleestewart@gmail.com>
 # TestFest Atlanta 2009-05-25
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $doctype = new DOMDocumentType();
-try {
-    $notations = $doctype->notations;
-} catch (DOMException $exception) {
-    echo $exception->getMessage() . "\n";
-}
+$notations = $doctype->notations;
 ?>
---EXPECT--
-Invalid State Error
+--EXPECTF--
+Warning: main(): Invalid State Error in %s on line %d

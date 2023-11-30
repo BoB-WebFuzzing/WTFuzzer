@@ -1,9 +1,8 @@
 --TEST--
 mysqli_stmt_data_seek()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -85,7 +84,7 @@ require_once('skipifconnectfailure.inc');
 <?php
     require_once("clean_table.inc");
 ?>
---EXPECT--
+--EXPECTF--
 mysqli_stmt object is not fully initialized
 int(3)
 int(1)

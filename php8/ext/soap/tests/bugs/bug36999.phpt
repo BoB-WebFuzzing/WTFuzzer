@@ -1,7 +1,9 @@
 --TEST--
 Bug #36999 (xsd:long values clamped to LONG_MAX instead of using double)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php
+  if (!extension_loaded('soap')) die('skip soap extension not available');
+?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--
@@ -12,7 +14,6 @@ function echoLong($num) {
 }
 
 class LocalSoapClient extends SoapClient {
-  private $server;
 
   function __construct($wsdl) {
     parent::__construct($wsdl);
@@ -20,7 +21,7 @@ class LocalSoapClient extends SoapClient {
     $this->server->addFunction('echoLong');
   }
 
-  function __doRequest($request, $location, $action, $version, $one_way = 0): ?string {
+  function __doRequest($request, $location, $action, $version, $one_way = 0) {
     ob_start();
     $this->server->handle($request);
     $response = ob_get_contents();

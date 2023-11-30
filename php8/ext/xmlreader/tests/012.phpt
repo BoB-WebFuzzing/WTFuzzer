@@ -1,7 +1,7 @@
 --TEST--
 XMLReader: accessing empty and non existing attributes
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php if (!extension_loaded("xmlreader")) print "skip"; ?>
 --FILE--
 <?php
 

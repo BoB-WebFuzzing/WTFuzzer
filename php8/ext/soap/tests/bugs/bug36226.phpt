@@ -1,7 +1,7 @@
 --TEST--
 Bug #36226 (SOAP Inconsistent handling when passing potential arrays)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--
@@ -17,7 +17,6 @@ function PostEvents($x) {
 }
 
 class TestSoapClient extends SoapClient {
-  private $server;
 
   function __construct($wsdl, $options) {
     parent::__construct($wsdl, $options);
@@ -25,7 +24,7 @@ class TestSoapClient extends SoapClient {
     $this->server->addFunction('PostEvents');
   }
 
-  function __doRequest($request, $location, $action, $version, $one_way = 0): ?string {
+  function __doRequest($request, $location, $action, $version, $one_way = 0) {
         echo "$request\n";
     $this->server->handle($request);
     return $response;

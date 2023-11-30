@@ -1,5 +1,5 @@
 --TEST--
-array unpacking with undefined variable
+array unpacking with undefinded variable
 --FILE--
 <?php
 

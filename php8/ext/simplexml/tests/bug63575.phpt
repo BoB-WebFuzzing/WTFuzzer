@@ -1,7 +1,9 @@
 --TEST--
 Bug #63575 (Root elements are not properly cloned)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php
+if (!extension_loaded('simplexml')) die('skip simplexml extension not available');
+?>
 --FILE--
 <?php
 $xml = '<a><b></b></a>';

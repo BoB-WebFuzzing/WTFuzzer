@@ -1,7 +1,7 @@
 --TEST--
 Bug #77310 (1): Incorrect SCCP for compound assign to arrays
---EXTENSIONS--
-opcache
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

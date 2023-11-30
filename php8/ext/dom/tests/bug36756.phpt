@@ -1,7 +1,7 @@
 --TEST--
 Bug #36756 (DOMDocument::removeChild corrupts node)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 

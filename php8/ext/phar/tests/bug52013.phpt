@@ -5,9 +5,11 @@ Test for a bug where Phar::decompressFiles() mistakenly throws BadMethodCallExce
 http://bugs.php.net/bug.php?id=52013
 --CREDITS--
 Frederic Hardy frederic.hardy@mageekbox.net
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("phar")) die("skip");
+if (!extension_loaded("zlib")) die("skip test needs zlib extension enabled to compress archives with gzip");
+?>
 --INI--
 phar.require_hash=0
 phar.readonly=0

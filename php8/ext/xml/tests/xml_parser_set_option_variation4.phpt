@@ -3,8 +3,12 @@ xml_parser_free - Test setting skip whitespace and invalid encoding type
 --CREDITS--
 Mark Niebergall <mbniebergall@gmail.com>
 PHP TestFest 2017 - UPHPU
---EXTENSIONS--
-xml
+--SKIPIF--
+<?php
+if (!extension_loaded("xml")) {
+    print "skip - XML extension not loaded";
+}
+?>
 --FILE--
 <?php
 

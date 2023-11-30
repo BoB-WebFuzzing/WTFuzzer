@@ -1,7 +1,5 @@
 --TEST--
 Test session_id() function : error functionality
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

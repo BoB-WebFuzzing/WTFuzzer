@@ -8,11 +8,6 @@ function &test() : string {
     return $str[0];
 }
 
-function &gen() {
-    $str = "foo";
-    yield $str[0];
-}
-
 try {
     test();
 } catch (Error $e) {
@@ -26,14 +21,7 @@ try {
     echo $e->getMessage(), "\n";
 }
 
-try {
-    foreach (gen() as $v) {}
-} catch (Error $e) {
-    echo $e->getMessage(), "\n";
-}
-
 ?>
 --EXPECT--
-Cannot create references to/from string offsets
-Cannot create references to/from string offsets
+Cannot return string offsets by reference
 Cannot create references to/from string offsets

@@ -1,7 +1,9 @@
 --TEST--
 Testing null byte injection in imagexbm
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if(!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 $image = imagecreate(1,1);// 1px image

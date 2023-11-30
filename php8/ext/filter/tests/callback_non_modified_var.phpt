@@ -1,7 +1,7 @@
 --TEST--
 callback function returns non modified value
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --FILE--
 <?php
 function callback($var) {

@@ -1,7 +1,9 @@
 --TEST--
 Bug #52487 (PDO::FETCH_INTO leaks memory)
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php
+if (!extension_loaded('pdo_sqlite')) print 'skip not loaded';
+?>
 --FILE--
 <?php
 require __DIR__ . '/../../../ext/pdo/tests/pdo_test.inc';

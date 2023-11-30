@@ -4,7 +4,7 @@ yield from with an IteratorAggregate
 <?php
 class foo implements \IteratorAggregate {
   public $prop = 1;
-  function getIterator(): Traversable {
+  function getIterator() {
     var_dump($this->prop);
     yield;
   }

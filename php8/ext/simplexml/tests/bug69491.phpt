@@ -1,7 +1,9 @@
 --TEST--
 Bug #69491 (simplexml doesn't correctly parse empty nodes on same line as another node)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php
+if (!extension_loaded("simplexml")) die("skip SimpleXML not available");
+?>
 --FILE--
 <?php
 var_dump(simplexml_load_string('<a>

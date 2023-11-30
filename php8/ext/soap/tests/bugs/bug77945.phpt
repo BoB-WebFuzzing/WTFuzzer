@@ -1,7 +1,9 @@
 --TEST--
 Bug #77945: Segmentation fault when constructing SoapClient with WSDL_CACHE_BOTH
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php
+if (!extension_loaded('soap')) die('skip soap extension not available');
+?>
 --FILE--
 <?php
 

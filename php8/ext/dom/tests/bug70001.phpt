@@ -1,7 +1,7 @@
 --TEST--
 Bug #70001 (Assigning to DOMNode::textContent does additional entity encoding)
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $element = new DOMText('<p>foo & bar</p>');

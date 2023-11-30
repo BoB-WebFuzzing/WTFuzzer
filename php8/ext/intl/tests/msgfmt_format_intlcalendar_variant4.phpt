@@ -1,14 +1,9 @@
 --TEST--
 MessageFormat accepts IntlCalendar args
---EXTENSIONS--
-intl
 --SKIPIF--
 <?php
-if (version_compare(INTL_ICU_VERSION, '54.1') < 0) die('skip for ICU >= 54.1');
-if (str_contains(PHP_OS, 'FreeBSD')) {
-    die('xfail Fails on FreeBSD for unknown reason');
-}
-?>
+if (!extension_loaded('intl')) die('skip intl extension not enabled'); ?>
+<?php if (version_compare(INTL_ICU_VERSION, '54.1') < 0) die('skip for ICU >= 54.1'); ?>
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);

@@ -1,7 +1,7 @@
 --TEST--
 mb_strpos()
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
 --FILE--
 <?php
 // TODO: Add more encodings

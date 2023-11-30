@@ -1,7 +1,7 @@
 --TEST--
 Bug #69316: Use-after-free in php_curl related to CURLOPT_FILE/_INFILE/_WRITEHEADER
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php include 'skipif.inc'; ?>
 --FILE--
 <?php
   function hdr_callback($ch, $data) {

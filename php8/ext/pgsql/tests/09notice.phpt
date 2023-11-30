@@ -1,13 +1,11 @@
 --TEST--
 PostgreSQL notice function
---EXTENSIONS--
-pgsql
 --SKIPIF--
 <?php
 
 include("skipif.inc");
 
-_skip_lc_messages($conn);
+_skip_lc_messages();
 
 ?>
 --FILE--
@@ -20,7 +18,7 @@ ini_set('pgsql.ignore_notice', FALSE);
 
 $db = pg_connect($conn_str);
 
-_set_lc_messages($db);
+_set_lc_messages();
 
 $res = pg_query($db, 'SET client_min_messages TO NOTICE;');
 var_dump($res);
@@ -51,8 +49,7 @@ try {
 }
 ?>
 --EXPECTF--
-object(PgSql\Result)#%d (0) {
-}
+resource(%d) of type (pgsql result)
 string(0) ""
 array(0) {
 }

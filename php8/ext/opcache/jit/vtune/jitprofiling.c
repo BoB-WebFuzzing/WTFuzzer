@@ -157,7 +157,7 @@ iJIT_NotifyEvent(iJIT_JVM_EVENT event_type, void *EventSpecificData)
     return ReturnValue;
 }
 
-ITT_EXTERN_C iJIT_IsProfilingActiveFlags JITAPI iJIT_IsProfilingActive(void)
+ITT_EXTERN_C iJIT_IsProfilingActiveFlags JITAPI iJIT_IsProfilingActive()
 {
     if (!iJIT_DLL_is_missing)
     {
@@ -171,7 +171,7 @@ ITT_EXTERN_C iJIT_IsProfilingActiveFlags JITAPI iJIT_IsProfilingActive(void)
  * on success: all functions load,     iJIT_DLL_is_missing = 0, return value = 1
  * on failure: all functions are NULL, iJIT_DLL_is_missing = 1, return value = 0
  */
-static int loadiJIT_Funcs(void)
+static int loadiJIT_Funcs()
 {
     static int bDllWasLoaded = 0;
     char *dllName = (char*)rcsid; /* !! Just to avoid unused code elimination */
@@ -301,7 +301,7 @@ static int loadiJIT_Funcs(void)
     return 1;
 }
 
-ITT_EXTERN_C unsigned int JITAPI iJIT_GetNewMethodID(void)
+ITT_EXTERN_C unsigned int JITAPI iJIT_GetNewMethodID()
 {
     static unsigned int methodID = 1;
 

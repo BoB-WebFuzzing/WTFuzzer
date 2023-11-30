@@ -1,7 +1,7 @@
 --TEST--
 BZ2 with files
---EXTENSIONS--
-bz2
+--SKIPIF--
+<?php if (!extension_loaded("bz2")) print "skip"; ?>
 --FILE--
 <?php
 

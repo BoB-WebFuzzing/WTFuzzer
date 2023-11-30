@@ -3,7 +3,6 @@ Bug #46064 (Exception when creating ReflectionProperty object on dynamicly creat
 --FILE--
 <?php
 
-#[AllowDynamicProperties]
 class x {
     public $zzz = 2;
 }
@@ -33,7 +32,6 @@ class test {
     protected $a = 1;
 }
 
-#[AllowDynamicProperties]
 class bar extends test {
     public function __construct() {
         $this->foobar = 2;

@@ -1,7 +1,7 @@
 --TEST--
 Phar: Phar::createDefaultStub() with and without arg
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 try {

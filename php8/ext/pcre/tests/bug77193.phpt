@@ -1,7 +1,11 @@
 --TEST--
 Bug #77193 Infinite loop in preg_replace_callback
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php
+    if (!extension_loaded("filter")) {
+        die("skip need filter extension");
+    }
+?>
 --FILE--
 <?php
 $text = '{CCM:CID_2}';

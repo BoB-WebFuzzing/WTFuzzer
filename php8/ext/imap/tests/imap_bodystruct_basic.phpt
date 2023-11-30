@@ -1,7 +1,5 @@
 --TEST--
 Test imap_bodystruct() function : basic functionality
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

@@ -1,7 +1,7 @@
 --TEST--
 openssl_pkey_new() error tests
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 /* openssl_pkey_get_details() segfaults when getting the information

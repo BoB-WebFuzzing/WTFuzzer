@@ -1,7 +1,9 @@
 --TEST--
 Bug #60494 (iconv_mime_decode does ignore special characters)
---EXTENSIONS--
-iconv
+--SKIPIF--
+<?php
+if (!extension_loaded('iconv')) die('skip iconv extension not available');
+?>
 --FILE--
 <?php
 var_dump(iconv_mime_decode('ä'));

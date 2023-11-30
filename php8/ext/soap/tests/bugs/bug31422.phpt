@@ -1,7 +1,9 @@
 --TEST--
 Bug #31422 (No Error-Logging on SoapServer-Side)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+?>
 --INI--
 log_errors=1
 error_log=

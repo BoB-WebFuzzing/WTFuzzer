@@ -1,7 +1,11 @@
 --TEST--
 Test function gzread() by calling it while file open for writing
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 

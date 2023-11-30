@@ -3,8 +3,8 @@ __construct() with no arguments.
 --CREDITS--
 Nic Rosental nicrosental@gmail.com
 # TestFest Atlanta 2009-5-14
---EXTENSIONS--
-dom
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
     try {

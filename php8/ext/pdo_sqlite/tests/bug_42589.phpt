@@ -1,14 +1,8 @@
 --TEST--
 PDO SQLite Feature Request #42589 (getColumnMeta() should also return table name)
---EXTENSIONS--
-pdo
-pdo_sqlite
 --SKIPIF--
 <?php
-$db = new PDO("sqlite::memory:");
-$options = $db->query('PRAGMA compile_options')->fetchAll(PDO::FETCH_COLUMN);
-if(!in_array('ENABLE_COLUMN_METADATA', $options, true))
-    die("skip sqlite3 must be compiled with SQLITE_ENABLE_COLUMN_METADATA");
+if (!extension_loaded('pdo') || !extension_loaded('pdo_sqlite')) die('skip not loaded');
 ?>
 --FILE--
 <?php

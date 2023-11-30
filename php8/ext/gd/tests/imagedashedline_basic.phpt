@@ -1,7 +1,5 @@
 --TEST--
 imagedashedline()
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
     if (!function_exists('imagedashedline')) die('skip imagedashedline() not available');

@@ -13,6 +13,9 @@ class Tree
      */
     protected $head;
 
+    /**
+     * @param Node $head
+     */
     public function __construct(Node $head = null)
     {
         $this->head = $head ? : new Node('HEAD');
@@ -65,7 +68,7 @@ class Tree
     /**
      * @return \RecursiveIteratorIterator
      */
-    public function getIterator(): Traversable
+    public function getIterator()
     {
         return new \RecursiveIteratorIterator(
             $this->head->getChildren(),
@@ -218,7 +221,10 @@ class Node extends \RecursiveArrayIterator implements \Countable
         return $this->parent;
     }
 
-    public function current(): Node
+    /**
+     * @return Node
+     */
+    public function current()
     {
         return $this->children[$this->index];
     }
@@ -226,37 +232,55 @@ class Node extends \RecursiveArrayIterator implements \Countable
     /**
      * @return scalar
      */
-    public function key(): string|int|null
+    public function key()
     {
         return $this->index;
     }
 
-    public function next(): void
+    /**
+     * @return void
+     */
+    public function next()
     {
         ++$this->index;
     }
 
-    public function rewind(): void
+    /**
+     * @return void
+     */
+    public function rewind()
     {
         $this->index = 0;
     }
 
-    public function valid(): bool
+    /**
+     * @return bool
+     */
+    public function valid()
     {
         return array_key_exists($this->index, $this->children);
     }
 
-    public function count(): int
+    /**
+     * @return int
+     */
+    public function count()
     {
         return count($this->children);
     }
 
-    public function hasChildren(): bool
+    /**
+     * @return bool
+     */
+    public function hasChildren()
     {
         return !empty($this->children);
     }
 
-    public function getChildren(): RecursiveArrayIterator
+    /**
+     * @return \RecursiveArrayIterator
+     */
+    public function getChildren()
     {
         return new \RecursiveArrayIterator($this->children);
     }

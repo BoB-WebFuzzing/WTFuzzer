@@ -1,7 +1,9 @@
 --TEST--
 SQLite3 authorizer crashes on NULL values
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php
+if (!extension_loaded("pdo_sqlite")) die("skip pdo_sqlite extension not available");
+?>
 --INI--
 open_basedir=.
 --FILE--

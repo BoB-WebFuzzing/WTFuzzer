@@ -5,10 +5,10 @@ SPL: IteratorIterator and ArrayIterator/Object
 
 class ArrayIteratorEx extends ArrayIterator
 {
-    function rewind(): void
+    function rewind()
     {
         echo __METHOD__ . "\n";
-        parent::rewind();
+        return parent::rewind();
     }
 }
 
@@ -21,7 +21,7 @@ foreach(new IteratorIterator($it) as $v)
 
 class ArrayObjectEx extends ArrayObject
 {
-    function getIterator(): Iterator
+    function getIterator()
     {
         echo __METHOD__ . "\n";
         return parent::getIterator();

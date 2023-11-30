@@ -51,23 +51,14 @@ if test "$ac_cv_flush_io" = "yes"; then
   AC_DEFINE(HAVE_FLUSHIO, 1, [Define if flush should be called explicitly after a buffered io.])
 fi
 
-PHP_ARG_WITH([external-libcrypt],
-  [for external libcrypt or libxcrypt],
-  [AS_HELP_STRING([--with-external-libcrypt],
-    [Use external libcrypt or libxcrypt])],
-  [no],
-  [no])
+PHP_CHECK_FUNC(crypt, crypt)
+PHP_CHECK_FUNC(crypt_r, crypt)
+if test "$ac_cv_func_crypt_r" = "yes"; then
+  PHP_CRYPT_R_STYLE
+fi
 
-if test "$PHP_EXTERNAL_LIBCRYPT" != "no"; then
-  PHP_CHECK_FUNC(crypt, crypt)
-  PHP_CHECK_FUNC(crypt_r, crypt)
-  AC_CHECK_HEADERS(crypt.h)
-  if test "$ac_cv_func_crypt_r" = "yes"; then
-    PHP_CRYPT_R_STYLE
-  fi
-
-  AC_CACHE_CHECK(for standard DES crypt, ac_cv_crypt_des,[
-    AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_CACHE_CHECK(for standard DES crypt, ac_cv_crypt_des,[
+  AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <string.h>
 
 #if HAVE_UNISTD_H
@@ -96,8 +87,8 @@ int main() {
   ac_cv_crypt_des=yes
 ])])
 
-  AC_CACHE_CHECK(for extended DES crypt, ac_cv_crypt_ext_des,[
-    AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_CACHE_CHECK(for extended DES crypt, ac_cv_crypt_ext_des,[
+  AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <string.h>
 
 #if HAVE_UNISTD_H
@@ -119,15 +110,15 @@ int main() {
 	return 1;
 #endif
 }]])],[
-    ac_cv_crypt_ext_des=yes
-  ],[
-    ac_cv_crypt_ext_des=no
-  ],[
-    ac_cv_crypt_ext_des=no
-  ])])
+  ac_cv_crypt_ext_des=yes
+],[
+  ac_cv_crypt_ext_des=no
+],[
+  ac_cv_crypt_ext_des=no
+])])
 
-  AC_CACHE_CHECK(for MD5 crypt, ac_cv_crypt_md5,[
-  AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_CACHE_CHECK(for MD5 crypt, ac_cv_crypt_md5,[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <string.h>
 
 #if HAVE_UNISTD_H
@@ -159,15 +150,15 @@ int main() {
 	return 1;
 #endif
 }]])],[
-    ac_cv_crypt_md5=yes
-  ],[
-    ac_cv_crypt_md5=no
-  ],[
-    ac_cv_crypt_md5=no
-  ])])
+  ac_cv_crypt_md5=yes
+],[
+  ac_cv_crypt_md5=no
+],[
+  ac_cv_crypt_md5=no
+])])
 
-  AC_CACHE_CHECK(for Blowfish crypt, ac_cv_crypt_blowfish,[
-  AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_CACHE_CHECK(for Blowfish crypt, ac_cv_crypt_blowfish,[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <string.h>
 
 #if HAVE_UNISTD_H
@@ -196,15 +187,15 @@ int main() {
 	return 1;
 #endif
 }]])],[
-    ac_cv_crypt_blowfish=yes
-  ],[
-    ac_cv_crypt_blowfish=no
-  ],[
-    ac_cv_crypt_blowfish=no
-  ])])
+  ac_cv_crypt_blowfish=yes
+],[
+  ac_cv_crypt_blowfish=no
+],[
+  ac_cv_crypt_blowfish=no
+])])
 
-  AC_CACHE_CHECK(for SHA512 crypt, ac_cv_crypt_sha512,[
-  AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_CACHE_CHECK(for SHA512 crypt, ac_cv_crypt_sha512,[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <string.h>
 
 #if HAVE_UNISTD_H
@@ -231,16 +222,16 @@ int main() {
 #else
 	return 1;
 #endif
-  }]])],[
-    ac_cv_crypt_sha512=yes
-  ],[
-    ac_cv_crypt_sha512=no
-  ],[
-    ac_cv_crypt_sha512=no
-  ])])
+}]])],[
+  ac_cv_crypt_sha512=yes
+],[
+  ac_cv_crypt_sha512=no
+],[
+  ac_cv_crypt_sha512=no
+])])
 
-  AC_CACHE_CHECK(for SHA256 crypt, ac_cv_crypt_sha256,[
-  AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_CACHE_CHECK(for SHA256 crypt, ac_cv_crypt_sha256,[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <string.h>
 
 #if HAVE_UNISTD_H
@@ -268,23 +259,24 @@ int main() {
 	return 1;
 #endif
 }]])],[
-    ac_cv_crypt_sha256=yes
-  ],[
-    ac_cv_crypt_sha256=no
-  ],[
-    ac_cv_crypt_sha256=no
-  ])])
+  ac_cv_crypt_sha256=yes
+],[
+  ac_cv_crypt_sha256=no
+],[
+  ac_cv_crypt_sha256=no
+])])
 
 
-  if test "$ac_cv_crypt_blowfish" = "no" || test "$ac_cv_crypt_des" = "no" || test "$ac_cv_crypt_ext_des" = "no" || test "$ac_cv_crypt_md5" = "no" || test "$ac_cv_crypt_sha512" = "no" || test "$ac_cv_crypt_sha256" = "no" || test "$ac_cv_func_crypt_r" != "yes"; then
-    AC_MSG_ERROR([Cannot use external libcrypt as some algo are missing])
-  fi
-
-  AC_DEFINE_UNQUOTED(PHP_USE_PHP_CRYPT_R, 0, [Whether PHP has to use its own crypt_r])
-else
-  AC_DEFINE_UNQUOTED(PHP_USE_PHP_CRYPT_R, 1, [Whether PHP has to use its own crypt_r])
+dnl
+dnl If one of them is missing, use our own implementation, portable code is then possible
+dnl
+dnl TODO This is currently always enabled
+if test "$ac_cv_crypt_blowfish" = "no" || test "$ac_cv_crypt_des" = "no" || test "$ac_cv_crypt_ext_des" = "no" || test "$ac_cv_crypt_md5" = "no" || test "$ac_cv_crypt_sha512" = "no" || test "$ac_cv_crypt_sha256" = "no" || test "$ac_cv_func_crypt_r" != "yes" || true; then
+  AC_DEFINE_UNQUOTED(PHP_USE_PHP_CRYPT_R, 1, [Whether PHP has to use its own crypt_r for blowfish, des, ext des and md5])
 
   PHP_ADD_SOURCES(PHP_EXT_DIR(standard), crypt_freesec.c crypt_blowfish.c crypt_sha512.c crypt_sha256.c php_crypt_r.c)
+else
+  AC_DEFINE_UNQUOTED(PHP_USE_PHP_CRYPT_R, 0, [Whether PHP has to use its own crypt_r for blowfish, des and ext des])
 fi
 
 dnl
@@ -303,17 +295,7 @@ if test "$ac_cv_attribute_aligned" = "yes"; then
   AC_DEFINE([HAVE_ATTRIBUTE_ALIGNED], 1, [whether the compiler supports __attribute__ ((__aligned__))])
 fi
 
-if test "$cross_compiling" = yes ; then
-  case $host_alias in
-    *linux*)
-      AC_DEFINE([HAVE_FNMATCH], 1,
-		     [Define to 1 if your system has a working POSIX `fnmatch'
-		      function.])
-      ;;
-  esac
-else
-  AC_FUNC_FNMATCH
-fi
+AC_FUNC_FNMATCH
 
 dnl
 dnl Check if there is a support means of creating a new process and defining
@@ -407,27 +389,41 @@ dnl
 dnl Check for CCRandomGenerateBytes
 dnl header absent in previous macOs releases
 dnl
-AC_CHECK_HEADERS([CommonCrypto/CommonRandom.h], [], [],
-[
-	#include <sys/types.h>
-	#include <Availability.h>
-	#include <CommonCrypto/CommonCryptoError.h>
-])
+AC_CHECK_HEADERS([CommonCrypto/CommonRandom.h])
 
 dnl
 dnl Check for argon2
 dnl
 PHP_ARG_WITH([password-argon2],
   [for Argon2 support],
-  [AS_HELP_STRING([[--with-password-argon2]],
-    [Include Argon2 support in password_*])])
+  [AS_HELP_STRING([[--with-password-argon2[=DIR]]],
+    [Include Argon2 support in password_*. DIR is the Argon2 shared library
+    path])])
 
 if test "$PHP_PASSWORD_ARGON2" != "no"; then
-  PKG_CHECK_MODULES([ARGON2], [libargon2])
-  PHP_EVAL_INCLINE($ARGON2_CFLAGS)
-  PHP_EVAL_LIBLINE($ARGON2_LIBS)
+  AC_MSG_CHECKING([for Argon2 library])
+  for i in $PHP_PASSWORD_ARGON2 /usr /usr/local ; do
+    if test -r $i/include/argon2.h; then
+      ARGON2_DIR=$i;
+      AC_MSG_RESULT(found in $i)
+      break
+    fi
+  done
 
-  AC_DEFINE(HAVE_ARGON2LIB, 1, [ ])
+  if test -z "$ARGON2_DIR"; then
+    AC_MSG_RESULT([not found])
+    AC_MSG_ERROR([Please ensure the argon2 header and library are installed])
+  fi
+
+  PHP_ADD_LIBRARY_WITH_PATH(argon2, $ARGON2_DIR/$PHP_LIBDIR)
+  PHP_ADD_INCLUDE($ARGON2_DIR/include)
+
+  AC_CHECK_LIB(argon2, argon2id_hash_raw, [
+    LIBS="$LIBS -largon2"
+    AC_DEFINE(HAVE_ARGON2LIB, 1, [ Define to 1 if you have the <argon2.h> header file ])
+  ], [
+    AC_MSG_ERROR([Problem with libargon2.(a|so). Please verify that Argon2 header and libraries >= 20161029 are installed])
+  ])
 fi
 
 dnl
@@ -463,18 +459,16 @@ dnl
 PHP_NEW_EXTENSION(standard, array.c base64.c basic_functions.c browscap.c crc32.c crypt.c \
                             datetime.c dir.c dl.c dns.c exec.c file.c filestat.c \
                             flock_compat.c formatted_print.c fsock.c head.c html.c image.c \
-                            info.c iptc.c link.c mail.c math.c md5.c metaphone.c \
-                            microtime.c pack.c pageinfo.c quot_print.c \
+                            info.c iptc.c lcg.c link.c mail.c math.c md5.c metaphone.c \
+                            microtime.c pack.c pageinfo.c quot_print.c rand.c mt_rand.c \
                             soundex.c string.c scanf.c syslog.c type.c uniqid.c url.c \
                             var.c versioning.c assert.c strnatcmp.c levenshtein.c \
                             incomplete_class.c url_scanner_ex.c ftp_fopen_wrapper.c \
                             http_fopen_wrapper.c php_fopen_wrapper.c credits.c css.c \
                             var_unserializer.c ftok.c sha1.c user_filters.c uuencode.c \
                             filters.c proc_open.c streamsfuncs.c http.c password.c \
-                            net.c hrtime.c crc32_x86.c libavifinfo/avifinfo.c,,,
+                            random.c net.c hrtime.c crc32_x86.c,,,
 			    -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
-
-PHP_ADD_BUILD_DIR($ext_builddir/libavifinfo)
 
 PHP_ADD_MAKEFILE_FRAGMENT
 PHP_INSTALL_HEADERS([ext/standard/])

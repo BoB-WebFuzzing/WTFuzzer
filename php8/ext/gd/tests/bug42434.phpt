@@ -1,7 +1,11 @@
 --TEST--
 Bug #42434 (ImageLine w/ antialias = 1px shorter)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) {
+    die('skip gd extension not available');
+}
+?>
 --FILE--
 <?php
 $im = imagecreatetruecolor(10, 2);

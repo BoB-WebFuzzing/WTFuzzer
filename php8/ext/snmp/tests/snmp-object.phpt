@@ -2,8 +2,6 @@
 OO API
 --CREDITS--
 Boris Lytochkin
---EXTENSIONS--
-snmp
 --SKIPIF--
 <?php
 require_once(__DIR__.'/skipif.inc');
@@ -232,12 +230,12 @@ bool(true)
 bool(true)
 Multiple OID with max_oids = 1
 
-Warning: SNMP::set(): Cannot fit all OIDs for SET query into one packet, using multiple queries in %s on line %d
+Warning: SNMP::set(): Can not fit all OIDs for SET query into one packet, using multiple queries in %s on line %d
 bool(true)
 bool(true)
 bool(true)
 
-Warning: SNMP::set(): Cannot fit all OIDs for SET query into one packet, using multiple queries in %s on line %d
+Warning: SNMP::set(): Can not fit all OIDs for SET query into one packet, using multiple queries in %s on line %d
 bool(true)
 bool(true)
 bool(true)

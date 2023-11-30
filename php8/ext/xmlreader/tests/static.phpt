@@ -1,7 +1,9 @@
 --TEST--
 Calling XMLReader::open() and ::XML() statically
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php
+if (!extension_loaded("xmlreader")) die('skip xmlreader extension not available');
+?>
 --FILE--
 <?php
 $filename = __DIR__ . '/static.xml';

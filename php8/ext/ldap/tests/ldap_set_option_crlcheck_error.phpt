@@ -2,8 +2,8 @@
 ldap_set_option() - Error test for TLS CRL check ldap option
 --CREDITS--
 Chad Sikorra <Chad.Sikorra@gmail.com>
---EXTENSIONS--
-ldap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 require "connect.inc";

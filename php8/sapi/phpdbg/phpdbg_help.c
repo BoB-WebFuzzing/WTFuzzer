@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | https://www.php.net/license/3_01.txt                                 |
+   | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -20,13 +20,14 @@
 #include "phpdbg.h"
 #include "phpdbg_help.h"
 #include "phpdbg_prompt.h"
+#include "phpdbg_eol.h"
 #include "zend.h"
 
 ZEND_EXTERN_MODULE_GLOBALS(phpdbg)
 
 /* {{{ Commands Table */
 #define PHPDBG_COMMAND_HELP_D(name, tip, alias, action) \
-	{PHPDBG_STRL(#name), tip, sizeof(tip)-1, alias, action, &phpdbg_prompt_commands[16], 0, NULL, (bool) 0}
+	{PHPDBG_STRL(#name), tip, sizeof(tip)-1, alias, action, &phpdbg_prompt_commands[16], 0, NULL, (zend_bool) 0}
 
 const phpdbg_command_t phpdbg_help_commands[] = {
 	PHPDBG_COMMAND_HELP_D(aliases,    "show alias list", 'a', phpdbg_do_help_aliases),
@@ -43,21 +44,26 @@ void pretty_print(char *text)
 	char *new, *p, *q;
 
 	const char  *prompt_escape = phpdbg_get_prompt();
-	size_t prompt_escape_len = strlen(prompt_escape);
-	size_t prompt_len = strlen(PHPDBG_G(prompt)[0]);
+	unsigned int prompt_escape_len = strlen(prompt_escape);
+	unsigned int prompt_len = strlen(PHPDBG_G(prompt)[0]);
 
 	const char  *bold_on_escape  = PHPDBG_G(flags) & PHPDBG_IS_COLOURED ? "\033[1m" : "";
 	const char  *bold_off_escape = PHPDBG_G(flags) & PHPDBG_IS_COLOURED ? "\033[0m" : "";
-	size_t bold_escape_len = strlen(bold_on_escape);
+	unsigned int bold_escape_len = strlen(bold_on_escape);
 
-	uint32_t term_width = phpdbg_get_terminal_width();
-	uint32_t size = 0;
+	unsigned int term_width = phpdbg_get_terminal_width();
+	unsigned int size = 0;
 
 	int in_bold = 0;
 
-	char *last_new_blank = NULL;  /* position in new buffer of last blank char */
-	uint32_t last_blank_count = 0;    /* printable char offset of last blank char */
-	uint32_t line_count = 0;          /* number printable chars on current line */
+	char *last_new_blank = NULL;          /* position in new buffer of last blank char */
+	unsigned int last_blank_count = 0;    /* printable char offset of last blank char */
+	unsigned int line_count = 0;          /* number printable chars on current line */
+
+	if (PHPDBG_G(flags) & PHPDBG_WRITE_XML) {
+		phpdbg_xml("<help %r msg=\"%s\" />", text);
+		return;
+	}
 
 	/* First pass calculates a safe size for the pretty print version */
 	for (p = text; *p; p++) {
@@ -81,7 +87,7 @@ void pretty_print(char *text)
 	 * $P substitutes the prompt sequence
 	 * Lines are wrapped by replacing the last blank with a CR before <term width>
 	 * characters.  (This defaults to 100 if the width can't be detected).  In the
-	 * pathological case where no blanks are found, then the wrap occurs at the
+	 * pathelogical case where no blanks are found, then the wrap occurs at the
 	 * first blank.
 	 */
 	for (p = text, q = new; *p; p++) {
@@ -126,7 +132,7 @@ void pretty_print(char *text)
 	*q++ = '\0';
 
 	if ((q-new)>size) {
-		phpdbg_error("Output overrun of %" PRIu32 " bytes", (uint32_t) ((q - new) - size));
+		phpdbg_error("help", "overrun=\"%lu\"", "Output overrun of %lu bytes", ((q - new) - size));
 	}
 
 	phpdbg_out("%s\n", new);
@@ -148,7 +154,7 @@ static char *get_help(const char * const key)
 	phpdbg_help_text_t *p;
 
 	/* Note that phpdbg_help_text is not assumed to be collated in key order.  This is an
-	   inconvenience that means that help can't be logically grouped Not worth
+	   inconvience that means that help can't be logically grouped Not worth
 	   the savings */
 
 	for (p = phpdbg_help_text; p->key; p++) {
@@ -249,7 +255,7 @@ PHPDBG_COMMAND(help) /* {{{ */
 				pretty_print(get_help("duplicate!"));
 				return SUCCESS;
 			} else {
-				phpdbg_error("Internal help error, non-unique alias \"%c\"", param->str[0]);
+				phpdbg_error("help", "type=\"ambiguousalias\" alias=\"%s\"", "Internal help error, non-unique alias \"%c\"", param->str[0]);
 				return FAILURE;
 			}
 
@@ -263,8 +269,6 @@ PHPDBG_COMMAND(help) /* {{{ */
 					pretty_print(get_help(cmd->name));
 					return SUCCESS;
 				}
-			} else {
-			    phpdbg_error("No help topic found for %s", param->str);
 			}
 		}
 	}
@@ -279,16 +283,16 @@ PHPDBG_HELP(aliases) /* {{{ */
 	int len;
 
 	/* Print out aliases for all commands except help as this one comes last */
-	phpdbg_writeln("Below are the aliased, short versions of all supported commands");
-
+	phpdbg_writeln("help", "", "Below are the aliased, short versions of all supported commands");
+	phpdbg_xml("<helpcommands %r>");
 	for(c = phpdbg_prompt_commands; c->name; c++) {
 		if (c->alias && c->alias != 'h') {
-			phpdbg_writeln(" %c     %-20s  %s", c->alias, c->name, c->tip);
+			phpdbg_writeln("command", "alias=\"%c\" name=\"%s\" tip=\"%s\"", " %c     %-20s  %s", c->alias, c->name, c->tip);
 			if (c->subs) {
 				len = 20 - 1 - c->name_len;
 				for(c_sub = c->subs; c_sub->alias; c_sub++) {
 					if (c_sub->alias) {
-						phpdbg_writeln(" %c %c   %s %-*s  %s",
+						phpdbg_writeln("subcommand", "parent_alias=\"%c\" alias=\"%c\" parent=\"%s\" name=\"%-*s\" tip=\"%s\"", " %c %c   %s %-*s  %s",
 							c->alias, c_sub->alias, c->name, len, c_sub->name, c_sub->tip);
 					}
 				}
@@ -296,17 +300,23 @@ PHPDBG_HELP(aliases) /* {{{ */
 		}
 	}
 
+	phpdbg_xml("</helpcommands>");
+
 	/* Print out aliases for help as this one comes last, with the added text on how aliases are used */
 	get_command("h", 1, &c, phpdbg_prompt_commands);
-	phpdbg_writeln(" %c     %-20s  %s\n", c->alias, c->name, c->tip);
+	phpdbg_writeln("aliasinfo", "alias=\"%c\" name=\"%s\" tip=\"%s\"", " %c     %-20s  %s\n", c->alias, c->name, c->tip);
+
+	phpdbg_xml("<helpaliases>");
 
 	len = 20 - 1 - c->name_len;
 	for(c_sub = c->subs; c_sub->alias; c_sub++) {
 		if (c_sub->alias) {
-			phpdbg_writeln(" %c %c   %s %-*s  %s",
+			phpdbg_writeln("alias", "parent_alias=\"%c\" alias=\"%c\" parent=\"%s\" name=\"%-*s\" tip=\"%s\"", " %c %c   %s %-*s  %s",
 				c->alias, c_sub->alias, c->name, len, c_sub->name, c_sub->tip);
 		}
 	}
+
+	phpdbg_xml("</helpaliases>");
 
 	pretty_print(get_help("aliases!"));
 	return SUCCESS;
@@ -373,10 +383,10 @@ phpdbg_help_text_t phpdbg_help_text[] = {
 "(and list out options if not unique), so **help exp** will give help on the **export** command, "
 "but **help ex** will list the summary for **exec** and **export**." CR CR
 
-"Type **help aliases** to show a full alias list, including any registered phpdbginit functions" CR
+"Type **help aliases** to show a full alias list, including any registered phpdginit functions" CR
 "Type **help syntax** for a general introduction to the command syntax." CR
 "Type **help options** for a list of phpdbg command line options." CR
-"Type **help phpdbginit** to show how to customize the debugger environment."
+"Type **help phpdbginit** to show how to customise the debugger environment."
 },
 {"options", CR
 "Below are the command line options supported by phpdbg" CR CR
@@ -391,14 +401,17 @@ phpdbg_help_text_t phpdbg_help_text[] = {
 "  **-b**                          Disable colour" CR
 "  **-i**      **-i**my.init           Set .phpdbginit file" CR
 "  **-I**                          Ignore default .phpdbginit" CR
+"  **-O**      **-O**my.oplog          Sets oplog output file" CR
 "  **-r**                          Run execution context" CR
 "  **-rr**                         Run execution context and quit after execution (not respecting breakpoints)" CR
 "  **-e**                          Generate extended information for debugger/profiler" CR
 "  **-E**                          Enable step through eval, careful!" CR
 "  **-s**      **-s=**, **-s**=foo         Read code to execute from stdin with an optional delimiter" CR
 "  **-S**      **-S**cli               Override SAPI name, careful!" CR
+"  **-l**      **-l**4000              Setup remote console ports" CR
+"  **-a**      **-a**192.168.0.3       Setup remote console bind address" CR
+"  **-x**                          Enable xml output (instead of normal text output)" CR
 "  **-p**      **-p**, **-p=func**, **-p* **   Output opcodes and quit" CR
-"  **-z**      **-z**extlib            Load Zend extension" CR
 "  **-h**                          Print the help overview" CR
 "  **-V**                          Print version number" CR
 "  **--**      **--** arg1 arg2        Use to delimit phpdbg arguments and php $argv; append any $argv "
@@ -411,6 +424,15 @@ phpdbg_help_text_t phpdbg_help_text[] = {
 "a line break. If **-rr** has been specified, it is allowed to omit the delimiter (**-s=**) and "
 "it will read until EOF. See also the help entry for the **stdin** command." CR CR
 
+"**Remote Console Mode**" CR CR
+
+"This mode is enabled by specifying the **-a** option. Phpdbg will bind only to the loopback "
+"interface by default, and this can only be overridden by explicitly setting the remote console "
+"bind address using the **-a** option. If **-a** is specified without an argument, then phpdbg "
+"will bind to all available interfaces.  You should be aware of the security implications of "
+"doing this, so measures should be taken to secure this service if bound to a publicly accessible "
+"interface/port." CR CR
+
 "**Opcode output**" CR CR
 
 "Outputting opcodes requires that a file path is passed as last argument. Modes of execution:" CR
@@ -422,7 +444,7 @@ phpdbg_help_text_t phpdbg_help_text[] = {
 },
 
 {"phpdbginit", CR
-"Phpdbg uses an debugger script file to initialize the debugger context.  By default, phpdbg looks "
+"Phpdgb uses an debugger script file to initialize the debugger context.  By default, phpdbg looks "
 "for the file named **.phpdbginit** in the current working directory.  This location can be "
 "overridden on the command line using the **-i** switch (see **help options** for a more "
 "details)." CR CR
@@ -492,7 +514,7 @@ phpdbg_help_text_t phpdbg_help_text[] = {
 /******************************** Help Codicils ********************************/
 {"aliases!", CR
 "Note that aliases can be used for either command or sub-command keywords or both, so **info b** "
-"is a synonym for **info break** and **l func** for **list func**, etc." CR CR
+"is a synomyn for **info break** and **l func** for **list func**, etc." CR CR
 
 "Note that help will also accept any alias as a parameter and provide help on that command, for example **h p** will provide help on the print command."
 },
@@ -738,7 +760,7 @@ phpdbg_help_text_t phpdbg_help_text[] = {
 },
 
 {"list",
-"The list command displays source code for the given argument.  The target type is specified by "
+"The list command displays source code for the given argument.  The target type is specficied by "
 "a second subcommand keyword:" CR CR
 
 "  **Type**     **Alias**  **Purpose**" CR
@@ -872,6 +894,7 @@ phpdbg_help_text_t phpdbg_help_text[] = {
 "   **prompt**     **p**     set the prompt" CR
 "   **color**      **c**     set color  <element> <color>" CR
 "   **colors**     **C**     set colors [<on|off>]" CR
+"   **oplog**      **O**     set oplog [output]" CR
 "   **break**      **b**     set break **id** <on|off>" CR
 "   **breaks**     **B**     set breaks [<on|off>]" CR
 "   **quiet**      **q**     set quiet [<on|off>]" CR

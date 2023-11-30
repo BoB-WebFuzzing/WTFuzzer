@@ -1,7 +1,7 @@
 --TEST--
 Bug #78762 (Failing FFI::cast() may leak memory)
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 try {

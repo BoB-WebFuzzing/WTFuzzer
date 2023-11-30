@@ -1,7 +1,11 @@
 --TEST--
 Testing declare statement with several type values
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+if (!extension_loaded("mbstring")) {
+  die("skip Requires ext/mbstring");
+}
+?>
 --INI--
 zend.multibyte=1
 --FILE--

@@ -1,7 +1,7 @@
 --TEST--
 openssl_csr_new() tests
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 

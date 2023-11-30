@@ -1,7 +1,10 @@
 --TEST--
 Bug #74484 MessageFormatter::formatMessage memory corruption with 11+ named placeholder
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+    die('skip intl extension not enabled');
+?>
 --FILE--
 <?php
 $text = "{a} {b} {c} {d} {e} {f} {g} {h} {i} {j} {k} {l}";

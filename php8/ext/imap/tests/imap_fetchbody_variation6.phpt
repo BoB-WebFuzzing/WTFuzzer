@@ -1,7 +1,5 @@
 --TEST--
 Test imap_fetchbody() function : usage variations - $message_num arg
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

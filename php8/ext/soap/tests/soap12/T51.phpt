@@ -1,7 +1,7 @@
 --TEST--
 SOAP 1.2: T51 echoBase64
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 $HTTP_RAW_POST_DATA = <<<EOF

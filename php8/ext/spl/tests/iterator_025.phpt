@@ -5,12 +5,12 @@ SPL: RecursiveIteratorIterator and begin/endIteration()
 
 class MyRecursiveIteratorIterator extends RecursiveIteratorIterator
 {
-    function beginIteration(): void
+    function beginIteration()
     {
         echo __METHOD__ . "()\n";
     }
 
-    function endIteration(): void
+    function endIteration()
     {
         echo __METHOD__ . "()\n";
     }

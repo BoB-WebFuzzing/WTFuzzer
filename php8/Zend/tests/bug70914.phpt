@@ -1,7 +1,11 @@
 --TEST--
 Bug #70914 zend_throw_or_error() format string vulnerability
---EXTENSIONS--
-pdo_sqlite
+--SKIPIF--
+<?php
+if (!extension_loaded("pdo_sqlite")) {
+    die("skip pdo_sqlite required");
+}
+?>
 --FILE--
 <?php
 

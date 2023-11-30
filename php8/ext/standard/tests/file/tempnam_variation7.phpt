@@ -19,6 +19,7 @@ $names_arr = array(
   -1,
   TRUE,
   FALSE,
+  NULL,
   "",
   " ",
   "\0",
@@ -90,22 +91,26 @@ File name is => %s%etempnam_variation3.tmp%s
 File permissions are => 100600
 File created in => temp dir
 -- Iteration 4 --
+File name is => %s%etempnam_variation3.tmp%s
+File permissions are => 100600
+File created in => temp dir
+-- Iteration 5 --
 
 Notice: tempnam(): file created in the system's temporary directory in %stempnam_variation7.php on line %d
 File name is => %s%etempnam_variation3.tmp%s
 File permissions are => 100600
 File created in => temp dir
--- Iteration 5 --
-tempnam(): Argument #1 ($directory) must not contain any null bytes
 -- Iteration 6 --
-tempnam(): Argument #1 ($directory) must be of type string, array given
+tempnam(): Argument #1 ($directory) must not contain any null bytes
 -- Iteration 7 --
+tempnam(): Argument #1 ($directory) must be of type string, array given
+-- Iteration 8 --
 
 Notice: tempnam(): file created in the system's temporary directory in %stempnam_variation7.php on line %d
 File name is => %s/tempnam_variation3.tmp%s
 File permissions are => 100600
 File created in => temp dir
--- Iteration 8 --
+-- Iteration 9 --
 
 Notice: tempnam(): file created in the system's temporary directory in %stempnam_variation7.php on line %d
 File name is => %s/tempnam_variation3.tmp%s

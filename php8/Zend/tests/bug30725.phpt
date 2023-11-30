@@ -5,7 +5,7 @@ Bug #30725 (PHP segfaults when an exception is thrown in getIterator() within fo
 
 class Test implements IteratorAggregate
 {
-    function getIterator(): Traversable
+    function getIterator()
     {
         throw new Exception();
     }

@@ -23,13 +23,9 @@ foreach($inputs as $key =>$value) {
 };
 
 ?>
---EXPECTF--
+--EXPECT--
 *** Testing gmstrftime() : usage variation ***
 
 --A literal % character--
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
 string(1) "%"
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
 string(1) "%"

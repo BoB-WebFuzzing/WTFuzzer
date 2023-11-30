@@ -1,8 +1,7 @@
 --TEST--
 FFI 302: FFI preloading
---EXTENSIONS--
-ffi
 --SKIPIF--
+<?php require_once('skipif.inc'); ?>
 <?php if (substr(PHP_OS, 0, 3) == 'WIN') die('skip not for Windows'); ?>
 --INI--
 ffi.enable=1

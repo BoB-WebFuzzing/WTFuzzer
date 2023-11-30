@@ -5,7 +5,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | https://www.php.net/license/3_01.txt                                 |
+  | http://www.php.net/license/3_01.txt                                  |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -21,6 +21,7 @@
 
 #include "php.h"
 #include "php_ini.h"
+#include "ext/standard/php_string.h"
 #include "ext/standard/info.h"
 #include "pdo/php_pdo.h"
 #include "pdo/php_pdo_driver.h"
@@ -176,7 +177,7 @@ static int pdo_dblib_stmt_execute(pdo_stmt_t *stmt)
 
 	pdo_dblib_stmt_cursor_closer(stmt);
 
-	if (FAIL == dbcmd(H->link, ZSTR_VAL(stmt->active_query_string))) {
+	if (FAIL == dbcmd(H->link, stmt->active_query_string)) {
 		return 0;
 	}
 
@@ -250,6 +251,7 @@ static int pdo_dblib_stmt_describe(pdo_stmt_t *stmt, int colno)
 	}
 
 	col->maxlen = dbcollen(H->link, colno+1);
+	col->param_type = PDO_PARAM_ZVAL;
 
 	return 1;
 }
@@ -302,12 +304,14 @@ static int pdo_dblib_stmt_should_stringify_col(pdo_stmt_t *stmt, int coltype)
 	return 0;
 }
 
-static void pdo_dblib_stmt_stringify_col(int coltype, LPBYTE data, DBINT data_len, zval *zv)
+static void pdo_dblib_stmt_stringify_col(int coltype, LPBYTE data, DBINT data_len, zval **ptr)
 {
 	DBCHAR *tmp_data;
+	DBINT tmp_data_len;
+	zval *zv;
 
 	/* FIXME: We allocate more than we need here */
-	DBINT tmp_data_len = 32 + (2 * (data_len));
+	tmp_data_len = 32 + (2 * (data_len));
 
 	switch (coltype) {
 		case SQLDATETIME:
@@ -322,6 +326,7 @@ static void pdo_dblib_stmt_stringify_col(int coltype, LPBYTE data, DBINT data_le
 	tmp_data = emalloc(tmp_data_len);
 	data_len = dbconvert(NULL, coltype, data, data_len, SQLCHAR, (LPBYTE) tmp_data, tmp_data_len);
 
+	zv = emalloc(sizeof(zval));
 	if (data_len > 0) {
 		/* to prevent overflows, tmp_data_len is provided as a dest len for dbconvert()
 		 * this code previously passed a dest len of -1
@@ -337,9 +342,12 @@ static void pdo_dblib_stmt_stringify_col(int coltype, LPBYTE data, DBINT data_le
 	}
 
 	efree(tmp_data);
+
+	*ptr = zv;
 }
 
-static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, zval *zv, enum pdo_param_type *type)
+static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr,
+	 zend_ulong *len, int *caller_frees)
 {
 
 	pdo_dblib_stmt *S = (pdo_dblib_stmt*)stmt->driver_data;
@@ -349,6 +357,7 @@ static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, zval *zv, enum pd
 	LPBYTE data;
 	DBCHAR *tmp_data;
 	DBINT data_len, tmp_data_len;
+	zval *zv = NULL;
 
 	coltype = dbcoltype(H->link, colno+1);
 	data = dbdata(H->link, colno+1);
@@ -356,8 +365,10 @@ static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, zval *zv, enum pd
 
 	if (data_len != 0 || data != NULL) {
 		if (pdo_dblib_stmt_should_stringify_col(stmt, coltype) && dbwillconvert(coltype, SQLCHAR)) {
-			pdo_dblib_stmt_stringify_col(coltype, data, data_len, zv);
-		} else {
+			pdo_dblib_stmt_stringify_col(coltype, data, data_len, &zv);
+		}
+
+		if (!zv) {
 			switch (coltype) {
 				case SQLCHAR:
 				case SQLVARCHAR:
@@ -371,6 +382,7 @@ static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, zval *zv, enum pd
 				case SQLVARBINARY:
 				case SQLBINARY:
 				case SQLIMAGE: {
+					zv = emalloc(sizeof(zval));
 					ZVAL_STRINGL(zv, (DBCHAR *) data, data_len);
 
 					break;
@@ -395,31 +407,50 @@ static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, zval *zv, enum pd
 #endif
 					);
 
+					zv = emalloc(sizeof(zval));
 					ZVAL_STRINGL(zv, tmp_data, dl);
 
 					efree(tmp_data);
 
 					break;
 				}
-				case SQLFLT4:
+				case SQLFLT4: {
+					zv = emalloc(sizeof(zval));
 					ZVAL_DOUBLE(zv, *(DBFLT4 *) data);
+
 					break;
-				case SQLFLT8:
+				}
+				case SQLFLT8: {
+					zv = emalloc(sizeof(zval));
 					ZVAL_DOUBLE(zv, *(DBFLT8 *) data);
+
 					break;
-				case SQLINT8:
+				}
+				case SQLINT8: {
+					zv = emalloc(sizeof(zval));
 					ZVAL_LONG(zv, *(DBBIGINT *) data);
+
 					break;
-				case SQLINT4:
+				}
+				case SQLINT4: {
+					zv = emalloc(sizeof(zval));
 					ZVAL_LONG(zv, *(DBINT *) data);
+
 					break;
-				case SQLINT2:
+				}
+				case SQLINT2: {
+					zv = emalloc(sizeof(zval));
 					ZVAL_LONG(zv, *(DBSMALLINT *) data);
+
 					break;
+				}
 				case SQLINT1:
-				case SQLBIT:
+				case SQLBIT: {
+					zv = emalloc(sizeof(zval));
 					ZVAL_LONG(zv, *(DBTINYINT *) data);
+
 					break;
+				}
 				case SQLDECIMAL:
 				case SQLNUMERIC:
 				case SQLMONEY:
@@ -427,7 +458,10 @@ static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, zval *zv, enum pd
 				case SQLMONEYN: {
 					DBFLT8 float_value;
 					dbconvert(NULL, coltype, data, 8, SQLFLT8, (LPBYTE) &float_value, -1);
+
+					zv = emalloc(sizeof(zval));
 					ZVAL_DOUBLE(zv, float_value);
+
 					break;
 				}
 
@@ -437,11 +471,13 @@ static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, zval *zv, enum pd
 						tmp_data_len = 36;
 						tmp_data = safe_emalloc(tmp_data_len, sizeof(char), 1);
 						data_len = dbconvert(NULL, SQLUNIQUE, data, data_len, SQLCHAR, (LPBYTE) tmp_data, tmp_data_len);
-						zend_str_toupper(tmp_data, data_len);
+						php_strtoupper(tmp_data, data_len);
+						zv = emalloc(sizeof(zval));
 						ZVAL_STRINGL(zv, tmp_data, data_len);
 						efree(tmp_data);
 					} else {
 						/* 16-byte binary representation */
+						zv = emalloc(sizeof(zval));
 						ZVAL_STRINGL(zv, (DBCHAR *) data, 16);
 					}
 					break;
@@ -449,7 +485,7 @@ static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, zval *zv, enum pd
 
 				default: {
 					if (dbwillconvert(coltype, SQLCHAR)) {
-						pdo_dblib_stmt_stringify_col(coltype, data, data_len, zv);
+						pdo_dblib_stmt_stringify_col(coltype, data, data_len, &zv);
 					}
 
 					break;
@@ -457,6 +493,16 @@ static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, zval *zv, enum pd
 			}
 		}
 	}
+
+	if (zv != NULL) {
+		*ptr = (char*)zv;
+		*len = sizeof(zval);
+	} else {
+		*ptr = NULL;
+		*len = 0;
+	}
+
+	*caller_frees = 1;
 
 	return 1;
 }

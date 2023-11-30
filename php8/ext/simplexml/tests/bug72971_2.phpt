@@ -1,7 +1,7 @@
 --TEST--
 Bug #72971 (2): SimpleXML property write does not respect namespace
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip simplexml extension is not loaded"; ?>
 --FILE--
 <?php
 

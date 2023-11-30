@@ -25,7 +25,7 @@ foreach($intervals as $iv) {
 echo "==DONE==\n";
 ?>
 --EXPECTF--
-object(DateInterval)#%d (%d) {
+object(DateInterval)#%d (16) {
   ["y"]=>
   int(1)
   ["m"]=>
@@ -40,14 +40,26 @@ object(DateInterval)#%d (%d) {
   int(0)
   ["f"]=>
   float(0)
+  ["weekday"]=>
+  int(0)
+  ["weekday_behavior"]=>
+  int(0)
+  ["first_last_day_of"]=>
+  int(0)
   ["invert"]=>
   int(1)
   ["days"]=>
   int(437)
-  ["from_string"]=>
-  bool(false)
+  ["special_type"]=>
+  int(0)
+  ["special_amount"]=>
+  int(0)
+  ["have_weekday_relative"]=>
+  int(0)
+  ["have_special_relative"]=>
+  int(0)
 }
-object(DateInterval)#%d (%d) {
+object(DateInterval)#%d (16) {
   ["y"]=>
   int(0)
   ["m"]=>
@@ -62,14 +74,26 @@ object(DateInterval)#%d (%d) {
   int(0)
   ["f"]=>
   float(0)
+  ["weekday"]=>
+  int(0)
+  ["weekday_behavior"]=>
+  int(0)
+  ["first_last_day_of"]=>
+  int(0)
   ["invert"]=>
   int(0)
   ["days"]=>
   int(294)
-  ["from_string"]=>
-  bool(false)
+  ["special_type"]=>
+  int(0)
+  ["special_amount"]=>
+  int(0)
+  ["have_weekday_relative"]=>
+  int(0)
+  ["have_special_relative"]=>
+  int(0)
 }
-object(DateInterval)#%d (%d) {
+object(DateInterval)#%d (16) {
   ["y"]=>
   int(0)
   ["m"]=>
@@ -84,14 +108,26 @@ object(DateInterval)#%d (%d) {
   int(0)
   ["f"]=>
   float(0)
+  ["weekday"]=>
+  int(0)
+  ["weekday_behavior"]=>
+  int(0)
+  ["first_last_day_of"]=>
+  int(0)
   ["invert"]=>
   int(0)
   ["days"]=>
   int(294)
-  ["from_string"]=>
-  bool(false)
+  ["special_type"]=>
+  int(0)
+  ["special_amount"]=>
+  int(0)
+  ["have_weekday_relative"]=>
+  int(0)
+  ["have_special_relative"]=>
+  int(0)
 }
-Failed to parse interval (2007-05-11T15:30:00Z/)
-Failed to parse interval (2007-05-11T15:30:00Z)
-Unknown or bad format (2007-05-11T15:30:00Z/:00Z)
+DateInterval::__construct(): Failed to parse interval (2007-05-11T15:30:00Z/)
+DateInterval::__construct(): Failed to parse interval (2007-05-11T15:30:00Z)
+DateInterval::__construct(): Unknown or bad format (2007-05-11T15:30:00Z/:00Z)
 ==DONE==

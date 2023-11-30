@@ -4,8 +4,10 @@ Test function posix_errno() by calling it with its expected arguments
 Morten Amundsen mor10am@gmail.com
 Francesco Fullone ff@ideato.it
 #PHPTestFest Cesena Italia on 2009-06-20
---EXTENSIONS--
-posix
+--SKIPIF--
+<?php
+        if(!extension_loaded("posix")) print "skip - POSIX extension not loaded";
+?>
 --FILE--
 <?php
 

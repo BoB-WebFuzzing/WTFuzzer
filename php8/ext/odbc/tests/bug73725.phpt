@@ -1,7 +1,5 @@
 --TEST--
 Bug #73725 Unable to retrieve value of varchar(max) type
---EXTENSIONS--
-odbc
 --SKIPIF--
 <?php include 'skipif.inc'; ?>
 --FILE--

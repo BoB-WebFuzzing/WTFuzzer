@@ -1,9 +1,8 @@
 --TEST--
 Bug GH-8267 (MySQLi uses unsupported format specifier on Windows)
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once("skipif.inc");
 require_once("skipifconnectfailure.inc");
 ?>
 --FILE--

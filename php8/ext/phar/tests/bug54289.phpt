@@ -1,7 +1,7 @@
 --TEST--
 Bug #54289 Phar::extractTo() does not accept specific directories to be extracted
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --INI--
 phar.readonly = 0
 --FILE--

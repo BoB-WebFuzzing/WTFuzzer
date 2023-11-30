@@ -1,7 +1,11 @@
 --TEST--
 Test function gzopen() by calling it twice on the same file and not closing one of them at the end of the script
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 

@@ -1,9 +1,8 @@
 --TEST--
 Bug #44643 (bound parameters ignore explicit type definitions)
---EXTENSIONS--
-pdo_odbc
 --SKIPIF--
 <?php
+if (!extension_loaded('pdo_odbc')) die('skip pdo_odbc extension not available');
 require 'ext/pdo/tests/pdo_test.inc';
 PDOTest::skip();
 ?>

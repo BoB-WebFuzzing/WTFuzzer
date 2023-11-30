@@ -1,7 +1,9 @@
 --TEST--
 Bug #40764 (line thickness not respected for horizontal and vertical lines)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+    if (!extension_loaded('gd')) die("skip gd extension not available\n");
+?>
 --FILE--
 <?php
 $image=imagecreatetruecolor(400, 400);

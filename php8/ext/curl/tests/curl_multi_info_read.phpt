@@ -2,8 +2,10 @@
 array curl_multi_info_read ( resource $mh [, int &$msgs_in_queue = NULL ] );
 --CREDITS--
 marcosptf - <marcosptf@yahoo.com.br> - @phpsp - sao paulo - br
---EXTENSIONS--
-curl
+--SKIPIF--
+<?php
+if (!extension_loaded('curl')) { print("skip"); }
+?>
 --FILE--
 <?php
 $urls = array(

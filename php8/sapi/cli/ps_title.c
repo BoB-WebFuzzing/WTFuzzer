@@ -46,7 +46,6 @@ extern char** environ;
 #include <unistd.h>
 #endif
 
-#include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -155,33 +154,31 @@ char** save_ps_args(int argc, char** argv)
      */
     {
         char* end_of_area = NULL;
-        bool is_contiguous_area = true;
+        int non_contiguous_area = 0;
         int i;
 
         /*
          * check for contiguous argv strings
          */
-        for (i = 0; is_contiguous_area && (i < argc); i++)
+        for (i = 0; (non_contiguous_area == 0) && (i < argc); i++)
         {
-            if (i != 0 && end_of_area + 1 != argv[i]) {
-                is_contiguous_area = false;
-            }
+            if (i != 0 && end_of_area + 1 != argv[i])
+                non_contiguous_area = 1;
             end_of_area = argv[i] + strlen(argv[i]);
-        }
-
-        if (!is_contiguous_area) {
-            goto clobber_error;
         }
 
         /*
          * check for contiguous environ strings following argv
          */
-        for (i = 0; environ[i] != NULL; i++)
+        for (i = 0; (non_contiguous_area == 0) && (environ[i] != NULL); i++)
         {
-            if (end_of_area + 1 == environ[i]) {
-                end_of_area = environ[i] + strlen(environ[i]);
-            }
+            if (end_of_area + 1 != environ[i])
+                non_contiguous_area = 1;
+            end_of_area = environ[i] + strlen(environ[i]);
         }
+
+        if (non_contiguous_area != 0)
+            goto clobber_error;
 
         ps_buffer = argv[0];
         ps_buffer_size = end_of_area - argv[0];
@@ -191,9 +188,8 @@ char** save_ps_args(int argc, char** argv)
          */
         new_environ = (char **) malloc((i + 1) * sizeof(char *));
         frozen_environ = (char **) malloc((i + 1) * sizeof(char *));
-        if (!new_environ || !frozen_environ) {
+        if (!new_environ || !frozen_environ)
             goto clobber_error;
-        }
         for (i = 0; environ[i] != NULL; i++)
         {
             new_environ[i] = strdup(environ[i]);
@@ -283,7 +279,7 @@ clobber_error:
  * and the init function was called.
  * Otherwise returns NOT_AVAILABLE or NOT_INITIALIZED
  */
-int is_ps_title_available(void)
+int is_ps_title_available()
 {
 #ifdef PS_USE_NONE
     return PS_TITLE_NOT_AVAILABLE; /* disabled functionality */
@@ -394,7 +390,7 @@ int set_ps_title(const char* title)
  * length into *displen.
  * The return code indicates the error.
  */
-int get_ps_title(size_t *displen, const char** string)
+int get_ps_title(int *displen, const char** string)
 {
     int rc = is_ps_title_available();
     if (rc != PS_TITLE_SUCCESS)
@@ -420,7 +416,7 @@ int get_ps_title(size_t *displen, const char** string)
 	free(tmp);
     }
 #endif
-    *displen = ps_buffer_cur_len;
+    *displen = (int)ps_buffer_cur_len;
     *string = ps_buffer;
     return PS_TITLE_SUCCESS;
 }

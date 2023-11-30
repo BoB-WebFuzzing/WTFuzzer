@@ -1,7 +1,7 @@
 --TEST--
 SimpleXML: Attribute compared to string
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 

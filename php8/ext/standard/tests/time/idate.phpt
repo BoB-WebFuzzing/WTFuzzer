@@ -3,7 +3,7 @@ idate() function
 --FILE--
 <?php
 date_default_timezone_set('GMT0');
-$tmp = "UYozymndjHGhgistwNLBIW";
+$tmp = "UYzymndjHGhgistwLBIW";
 for($a = 0;$a < strlen($tmp); $a++){
     echo $tmp[$a], ': ', idate($tmp[$a], 1043324459)."\n";
 }
@@ -11,7 +11,6 @@ for($a = 0;$a < strlen($tmp); $a++){
 --EXPECT--
 U: 1043324459
 Y: 2003
-o: 2003
 z: 22
 y: 3
 m: 1
@@ -26,7 +25,6 @@ i: 20
 s: 59
 t: 31
 w: 4
-N: 4
 L: 0
 B: 556
 I: 0

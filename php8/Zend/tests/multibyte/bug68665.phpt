@@ -1,7 +1,11 @@
 --TEST--
 Crash with Big5
---EXTENSIONS--
-mbstring
+--SKIPIF--
+<?php
+if (!extension_loaded("mbstring")) {
+  die("skip Requires mbstring extension");
+}
+?>
 --INI--
 zend.multibyte=1
 internal_encoding=big5

@@ -1,7 +1,9 @@
 --TEST--
 Bug #7214 (zip_entry_read() binary safe)
---EXTENSIONS--
-zip
+--SKIPIF--
+<?php
+if(!extension_loaded('zip')) die('skip');
+ ?>
 --FILE--
 <?php
 $zip = zip_open(__DIR__."/binarynull.zip");

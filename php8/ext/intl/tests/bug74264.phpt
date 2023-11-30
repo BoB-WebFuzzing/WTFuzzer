@@ -1,7 +1,9 @@
 --TEST--
 Bug #74264 (grapheme_sttrpos() broken for negative offsets)
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl')) die("skip intl extension not available");
+?>
 --FILE--
 <?php
 foreach (range(-5, -1) as $offset) {

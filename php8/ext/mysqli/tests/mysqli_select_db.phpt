@@ -1,9 +1,8 @@
 --TEST--
 mysqli_select_db()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -56,11 +55,11 @@ require_once('skipifconnectfailure.inc');
     $current_db = $row['dbname'];
 
     mysqli_report(MYSQLI_REPORT_OFF);
-    mysqli_select_db($link, 'I cannot imagine that this database exists');
+    mysqli_select_db($link, 'I can not imagine that this database exists');
     mysqli_report(MYSQLI_REPORT_ERROR);
 
     ob_start();
-    mysqli_select_db($link, 'I cannot imagine that this database exists');
+    mysqli_select_db($link, 'I can not imagine that this database exists');
     $output = ob_get_contents();
     ob_end_clean();
     if (!stristr($output, "1049") && !stristr($output, "1044") && !stristr($output, "1045")) {

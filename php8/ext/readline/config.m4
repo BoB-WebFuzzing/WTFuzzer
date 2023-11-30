@@ -137,7 +137,6 @@ elif test "$PHP_LIBEDIT" != "no"; then
 fi
 
 if test "$PHP_READLINE" != "no" || test "$PHP_LIBEDIT" != "no"; then
-  dnl Add -Wno-strict-prototypes as depends on user libs
-  PHP_NEW_EXTENSION(readline, readline.c readline_cli.c, $ext_shared, cli, "-Wno-strict-prototypes")
+  PHP_NEW_EXTENSION(readline, readline.c readline_cli.c, $ext_shared, cli)
   PHP_SUBST(READLINE_SHARED_LIBADD)
 fi

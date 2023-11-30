@@ -1,7 +1,9 @@
 --TEST--
 Bug 72482 (Ilegal write/read access caused by gdImageAALine overflow)
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+if (!extension_loaded('gd')) die('skip gd extension not available');
+?>
 --FILE--
 <?php
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'func.inc';

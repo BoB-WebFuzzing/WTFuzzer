@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @generate-class-entries
- * @undocumentable
- */
+/** @generate-function-entries */
 
 function test1(): void {}
 

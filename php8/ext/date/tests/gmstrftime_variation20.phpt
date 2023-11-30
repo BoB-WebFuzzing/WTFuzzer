@@ -30,23 +30,15 @@ foreach($inputs as $key =>$value) {
 };
 
 ?>
---EXPECTF--
-*** Testing gmstrftime() : usage variation ***
+--EXPECTREGEX--
+\*\*\* Testing gmstrftime\(\) : usage variation \*\*\*
 
 --Newline character--
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
-string(1) "
+string\(1\) "
 "
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
-string(1) "
+string\(1\) "
 "
 
 --Tab character--
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
-string(1) "%r\s%r"
-
-Deprecated: Function gmstrftime() is deprecated in %s on line %d
-string(1) "%r\s%r"
+string\(1\) "\s"
+string\(1\) "\s"

@@ -1,7 +1,7 @@
 --TEST--
 Bug #40451 (addAttribute() may crash when used with non-existent child node)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 

@@ -1,7 +1,8 @@
 --TEST--
 Bug #65683 IntlDateFormatter accepts DateTimeImmutable
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl')) die('skip intl extension not enabled'); ?>
 --FILE--
 <?php
 

@@ -2,8 +2,6 @@
 OO API: SNMP::setSecurity (errors)
 --CREDITS--
 Boris Lytochkin
---EXTENSIONS--
-snmp
 --SKIPIF--
 <?php
 require_once(__DIR__.'/skipif.inc');
@@ -61,7 +59,7 @@ var_dump($session->close());
 --EXPECTF--
 Security level must be one of "noAuthNoPriv", "authNoPriv", or "authPriv"
 Security level must be one of "noAuthNoPriv", "authNoPriv", or "authPriv"
-Authentication protocol must be %s
+Authentication protocol must be either "MD5" or "SHA"
 
 Warning: SNMP::setSecurity(): Error generating a key for authentication pass phrase '': Generic error (The supplied password length is too short.) in %s on line %d
 bool(false)

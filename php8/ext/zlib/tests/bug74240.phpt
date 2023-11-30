@@ -1,7 +1,11 @@
 --TEST--
 Bug #74240 (deflate_add can allocate too much memory)
---EXTENSIONS--
-zlib
+--SKIPIF--
+<?php
+if (!extension_loaded("zlib")) {
+    print "skip - ZLIB extension not loaded";
+}
+?>
 --FILE--
 <?php
 

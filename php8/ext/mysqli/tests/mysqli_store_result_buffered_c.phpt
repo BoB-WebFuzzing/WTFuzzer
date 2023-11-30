@@ -1,9 +1,8 @@
 --TEST--
 mysqli_store_result()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 if (!defined('MYSQLI_STORE_RESULT_COPY_DATA')) {
     die("skip Requires MYSQLI_STORE_RESULT_COPY_DATA");

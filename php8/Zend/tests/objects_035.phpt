@@ -3,15 +3,13 @@ Array object clobbering by user error handler
 --FILE--
 <?php
 class A implements ArrayAccess {
-    public function &offsetGet($n): mixed {
-    	return null;
+    public function &offsetGet($n) {
     }
-    public function offsetSet($n, $v): void {
+    public function offsetSet($n, $v) {
     }
-    public function offsetUnset($n): void {
+    public function offsetUnset($n) {
     }
-    public function offsetExists($n): bool {
-    	return false;
+    public function offsetExists($n) {
     }
 }
 

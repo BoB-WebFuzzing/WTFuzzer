@@ -1,7 +1,7 @@
 --TEST--
 IntlChar basic functionality
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if (!extension_loaded('intl')) die("skip requires ext/intl") ?>
 --FILE--
 <?php
 

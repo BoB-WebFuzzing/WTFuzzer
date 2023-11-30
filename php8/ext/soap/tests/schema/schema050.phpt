@@ -1,8 +1,7 @@
 --TEST--
 SOAP XML Schema 50: Array in complex type (maxOccurs > 1, one value)
---EXTENSIONS--
-soap
-xml
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 include "test_schema.inc";

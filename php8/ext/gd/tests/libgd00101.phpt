@@ -1,9 +1,8 @@
 --TEST--
 libgd #101 (imagecreatefromgd can crash if gdImageCreate fails)
---EXTENSIONS--
-gd
 --SKIPIF--
 <?php
+    if (!extension_loaded('gd')) die("skip gd extension not available\n");
     if (!GD_BUNDLED) die("skip requires bundled GD library\n");
 ?>
 --FILE--

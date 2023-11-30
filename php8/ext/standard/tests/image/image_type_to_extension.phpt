@@ -23,14 +23,13 @@ image_type_to_extension()
         "IMAGETYPE_WBMP"     => IMAGETYPE_WBMP,
         "IMAGETYPE_JPEG2000" => IMAGETYPE_JPEG2000,
         "IMAGETYPE_XBM"      => IMAGETYPE_XBM,
-        "IMAGETYPE_WEBP"     => IMAGETYPE_WEBP,
-        "IMAGETYPE_AVIF"     => IMAGETYPE_AVIF,
+        "IMAGETYPE_WEBP"     => IMAGETYPE_WEBP
     );
     foreach($constants as $name => $constant) {
         printf("Constant: %s\n\tWith dot: %s\n\tWithout dot: %s\n", $name, image_type_to_extension($constant), image_type_to_extension($constant, false));
     }
 
-    var_dump(image_type_to_extension(1000000, false));
+    var_dump(image_type_to_extension(1000000, NULL));
     var_dump(image_type_to_extension(0));
 ?>
 Done
@@ -86,9 +85,6 @@ Constant: IMAGETYPE_XBM
 Constant: IMAGETYPE_WEBP
 	With dot: .webp
 	Without dot: webp
-Constant: IMAGETYPE_AVIF
-	With dot: .avif
-	Without dot: avif
 bool(false)
 bool(false)
 Done

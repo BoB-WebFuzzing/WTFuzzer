@@ -1,8 +1,8 @@
 --TEST--
 Phar: tar-based phar, make new bzipped tar
---EXTENSIONS--
-phar
-bz2
+--SKIPIF--
+<?php if (!extension_loaded('phar')) die('skip'); ?>
+<?php if (!extension_loaded("bz2")) die("skip bz2 not available"); ?>
 --INI--
 phar.readonly=0
 --FILE--

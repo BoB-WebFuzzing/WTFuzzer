@@ -1,10 +1,9 @@
 --TEST--
 libxml_disable_entity_loader()
---EXTENSIONS--
-libxml
-dom
-xml
-simplexml
+--SKIPIF--
+<?php
+if (!extension_loaded('libxml')) die('skip libxml extension not available');
+if (!extension_loaded('dom')) die('skip dom extension not available');
 --FILE--
 <?php
 
@@ -46,7 +45,7 @@ var_dump(strpos(parseXML4($xml), 'SECRET_DATA') === false);
 
 echo "Done\n";
 ?>
---EXPECT--
+--EXPECTF--
 bool(true)
 bool(true)
 bool(true)

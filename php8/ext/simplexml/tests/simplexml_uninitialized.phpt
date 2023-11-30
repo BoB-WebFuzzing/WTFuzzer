@@ -1,7 +1,5 @@
 --TEST--
 Incorrectly initialized SimpleXmlElement
---EXTENSIONS--
-simplexml
 --FILE--
 <?php
 

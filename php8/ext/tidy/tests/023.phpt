@@ -1,7 +1,7 @@
 --TEST--
 tidy and tidyNode OO
---EXTENSIONS--
-tidy
+--SKIPIF--
+<?php if (!extension_loaded('tidy')) echo 'skip'; ?>
 --FILE--
 <?php
 
@@ -13,9 +13,6 @@ echo "-------\n";
 
 $tidy = new tidy();
 $tidy->parseString('<html><?php echo "xpto;" ?></html>');
-var_dump(rtrim($tidy->value));
-
-echo "-------\n";
 
 var_dump(tidy_get_root($tidy)->child[0]->isHtml());
 var_dump(tidy_get_root($tidy)->child[0]->child[0]->isPHP());
@@ -27,22 +24,13 @@ var_dump(tidy_get_root($tidy)->child[0]->hasChildren());
 var_dump(tidy_get_root($tidy)->child[0]->child[0]->hasChildren());
 
 ?>
---EXPECTF--
+--EXPECT--
 object(tidy)#1 (2) {
   ["errorBuffer"]=>
   NULL
   ["value"]=>
   NULL
 }
--------
-string(%d) "<html>
-<?php echo "xpto;" ?>
-<head>
-<title></title>
-</head>
-<body>
-</body>
-</html>"
 -------
 bool(true)
 bool(true)

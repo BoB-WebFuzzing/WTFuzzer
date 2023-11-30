@@ -1,9 +1,8 @@
 --TEST--
 mysqli_debug() - append to trace file
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 
 if (!function_exists('mysqli_debug'))
@@ -14,6 +13,9 @@ if (!defined('MYSQLI_DEBUG_TRACE_ENABLED'))
 
 if (defined('MYSQLI_DEBUG_TRACE_ENABLED') && !MYSQLI_DEBUG_TRACE_ENABLED)
     die("skip: debug functionality not enabled");
+
+if (!$IS_MYSQLND)
+    die("SKIP Libmysql feature not sufficiently spec'd in MySQL C API documentation");
 
 if (substr(PHP_OS, 0, 3) == 'WIN') die("skip this test is not for Windows platforms");
 ?>
@@ -81,7 +83,8 @@ if (substr(PHP_OS, 0, 3) == 'WIN') die("skip this test is not for Windows platfo
 
     mysqli_close($link);
     print "done";
-    print "libmysql/DBUG package prints some debug info here."
+    if ($IS_MYSQLND)
+        print "libmysql/DBUG package prints some debug info here."
 ?>
 --CLEAN--
 <?php

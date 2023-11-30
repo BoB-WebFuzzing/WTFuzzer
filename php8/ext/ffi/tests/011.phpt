@@ -1,7 +1,7 @@
 --TEST--
 FFI 011: cast()
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

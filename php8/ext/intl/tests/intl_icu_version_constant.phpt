@@ -1,7 +1,7 @@
 --TEST--
 INTL_ICU_VERSION constant
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 var_dump(defined("INTL_ICU_VERSION"));

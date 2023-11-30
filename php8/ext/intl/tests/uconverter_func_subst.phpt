@@ -1,7 +1,7 @@
 --TEST--
 Basic UConverter::convert() w/ Subsitution
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --INI--
 intl.use_exceptions=false
 --FILE--

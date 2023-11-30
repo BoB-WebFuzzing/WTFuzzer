@@ -1,7 +1,7 @@
 --TEST--
 FFI 001: Check if FFI is loaded
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

@@ -3,8 +3,6 @@ Test session_set_save_handler() : inheritance
 --INI--
 session.save_handler=files
 session.name=PHPSESSID
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -16,18 +14,18 @@ echo "*** Testing session_set_save_handler() : inheritance ***\n";
 
 class MySession3 extends SessionHandler {
     public $i = 0;
-    public function open($path, $name): bool {
+    public function open($path, $name) {
         ++$this->i;
         return parent::open($path, $name);
     }
-    public function read($key): string|false {
+    public function read($key) {
         ++$this->i;
         return parent::read($key);
     }
 }
 
 class MySession4 extends MySession3 {
-    public function write($id, $data): bool {
+    public function write($id, $data) {
         $this->i = "hai";
         return parent::write($id, $data);
     }

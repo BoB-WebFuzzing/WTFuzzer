@@ -1,7 +1,7 @@
 --TEST--
 filter_var() and FLOAT
---EXTENSIONS--
-filter
+--SKIPIF--
+<?php if (!extension_loaded("filter")) die("skip"); ?>
 --INI--
 precision=14
 --FILE--

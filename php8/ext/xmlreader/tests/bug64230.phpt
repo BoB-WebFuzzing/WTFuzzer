@@ -1,7 +1,9 @@
 --TEST--
 Bug #64230 (XMLReader does not suppress errors)
---EXTENSIONS--
-xmlreader
+--SKIPIF--
+<?php
+extension_loaded("xmlreader") or die("skip requires xmlreader");
+?>
 --FILE--
 <?php
 echo "Test\n";

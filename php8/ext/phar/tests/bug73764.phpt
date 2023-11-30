@@ -1,7 +1,7 @@
 --TEST--
 Phar: PHP bug #73764: Crash while loading hostile phar archive
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 chdir(__DIR__);

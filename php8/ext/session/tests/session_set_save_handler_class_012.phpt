@@ -4,8 +4,6 @@ Test session_set_save_handler() : incorrect arguments for existing handler open
 session.save_handler=files
 session.name=PHPSESSID
 session.gc_probability=0
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -17,14 +15,14 @@ echo "*** Testing session_set_save_handler() : incorrect arguments for existing 
 
 class MySession extends SessionHandler {
     public $i = 0;
-    public function open($path, $name): bool {
+    public function open($path, $name) {
         ++$this->i;
         echo 'Open ', session_id(), "\n";
         // This test was written for broken return value handling
         // Mimmick what was actually being tested by returning true here
         return (null === parent::open());
     }
-    public function read($key): string|false {
+    public function read($key) {
         ++$this->i;
         echo 'Read ', session_id(), "\n";
         return parent::read($key);
@@ -47,7 +45,7 @@ var_dump(session_id(), $oldHandler, ini_get('session.save_handler'), $handler->i
 Open 
 SessionHandler::open() expects exactly 2 arguments, 0 given
 
-Warning: Undefined global variable $_SESSION in %s on line %d
+Warning: Undefined variable $_SESSION in %s on line %d
 string(0) ""
 string(5) "files"
 string(4) "user"

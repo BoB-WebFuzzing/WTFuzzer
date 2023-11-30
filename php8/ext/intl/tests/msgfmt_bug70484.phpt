@@ -1,7 +1,9 @@
 --TEST--
 Bug #70484 selectordinal doesn't work with named parameters
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php
+if (!extension_loaded('intl'))
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 

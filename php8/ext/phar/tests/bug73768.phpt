@@ -1,7 +1,7 @@
 --TEST--
 Phar: PHP bug #73768: Memory corruption when loading hostile phar
---EXTENSIONS--
-phar
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
 --FILE--
 <?php
 chdir(__DIR__);

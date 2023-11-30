@@ -5,8 +5,6 @@ session.save_path=
 session.name=PHPSESSID
 session.gc_probability=0
 session.save_handler=files
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -22,8 +20,7 @@ var_dump(session_module_name(FALSE));
 var_dump(session_module_name("blah"));
 var_dump(session_module_name("foo"));
 
-$path = __DIR__ . '/session_set_save_handler_basic';
-@mkdir($path);
+$path = __DIR__;
 session_save_path($path);
 session_set_save_handler("open", "close", "read", "write", "destroy", "gc");
 
@@ -58,7 +55,6 @@ session_start();
 session_destroy();
 
 ob_end_flush();
-rmdir($path);
 ?>
 --EXPECTF--
 *** Testing session_set_save_handler() : basic functionality ***

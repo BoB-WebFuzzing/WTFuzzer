@@ -1,6 +1,6 @@
 <?php
 
-/** @generate-class-entries */
+/** @generate-function-entries */
 
 function xmlwriter_open_uri(string $uri): XMLWriter|false {}
 
@@ -89,256 +89,256 @@ function xmlwriter_flush(XMLWriter $writer, bool $empty = true): string|int {}
 class XMLWriter
 {
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_open_uri
      * @no-verify Behaviour differs from the aliased function
      */
-    public function openUri(string $uri): bool {}
+    public function openUri(string $uri) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_open_memory
      * @no-verify Behaviour differs from the aliased function
      */
-    public function openMemory(): bool {}
+    public function openMemory() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_set_indent
      */
-    public function setIndent(bool $enable): bool {}
+    public function setIndent(bool $enable) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_set_indent_string
      */
-    public function setIndentString(string $indentation): bool {}
+    public function setIndentString(string $indentation) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_comment
      */
-    public function startComment(): bool {}
+    public function startComment() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_comment
      */
-    public function endComment(): bool {}
+    public function endComment() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_attribute
      */
-    public function startAttribute(string $name): bool {}
+    public function startAttribute(string $name) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_attribute
      */
-    public function endAttribute(): bool {}
+    public function endAttribute() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_attribute
      */
-    public function writeAttribute(string $name, string $value): bool {}
+    public function writeAttribute(string $name, string $value) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_attribute_ns
      */
-    public function startAttributeNs(?string $prefix, string $name, ?string $namespace): bool {}
+    public function startAttributeNs(?string $prefix, string $name, ?string $namespace) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_attribute_ns
      */
-    public function writeAttributeNs(?string $prefix, string $name, ?string $namespace, string $value): bool {}
+    public function writeAttributeNs(?string $prefix, string $name, ?string $namespace, string $value) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_element
      */
-    public function startElement(string $name): bool {}
+    public function startElement(string $name) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_element
      */
-    public function endElement(): bool {}
+    public function endElement() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_full_end_element
      */
-    public function fullEndElement(): bool {}
+    public function fullEndElement() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_element_ns
      */
-    public function startElementNs(?string $prefix, string $name, ?string $namespace): bool {}
+    public function startElementNs(?string $prefix, string $name, ?string $namespace) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_element
      */
-    public function writeElement(string $name, ?string $content = null): bool {}
+    public function writeElement(string $name, ?string $content = null) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_element_ns
      */
-    public function writeElementNs(?string $prefix, string $name, ?string $namespace, ?string $content = null): bool {}
+    public function writeElementNs(?string $prefix, string $name, ?string $namespace, ?string $content = null) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_pi
      */
-    public function startPi(string $target): bool {}
+    public function startPi(string $target) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_pi
      */
-    public function endPi(): bool {}
+    public function endPi() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_pi
      */
-    public function writePi(string $target, string $content): bool {}
+    public function writePi(string $target, string $content) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_cdata
      */
-    public function startCdata(): bool {}
+    public function startCdata() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_cdata
      * */
-    public function endCdata(): bool {}
+    public function endCdata() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_cdata
      */
-    public function writeCdata(string $content): bool {}
+    public function writeCdata(string $content) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_text
      */
-    public function text(string $content): bool {}
+    public function text(string $content) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_raw
      */
-    public function writeRaw(string $content): bool {}
+    public function writeRaw(string $content) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_document
      */
-    public function startDocument(?string $version = "1.0", ?string $encoding = null, ?string $standalone = null): bool {}
+    public function startDocument(?string $version = "1.0", ?string $encoding = null, ?string $standalone = null) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_document
      */
-    public function endDocument(): bool {}
+    public function endDocument() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_comment
      */
-    public function writeComment(string $content): bool {}
+    public function writeComment(string $content) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_dtd
      */
-    public function startDtd(string $qualifiedName, ?string $publicId = null, ?string $systemId = null): bool {}
+    public function startDtd(string $qualifiedName, ?string $publicId = null, ?string $systemId = null) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_dtd
      */
-    public function endDtd(): bool {}
+    public function endDtd() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_dtd
      */
-    public function writeDtd(string $name, ?string $publicId = null, ?string $systemId = null, ?string $content = null): bool {}
+    public function writeDtd(string $name, ?string $publicId = null, ?string $systemId = null, ?string $content = null) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_dtd_element
      */
-    public function startDtdElement(string $qualifiedName): bool {}
+    public function startDtdElement(string $qualifiedName) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_dtd_element
      */
-    public function endDtdElement(): bool {}
+    public function endDtdElement() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_dtd_element
      */
-    public function writeDtdElement(string $name, string $content): bool {}
+    public function writeDtdElement(string $name, string $content) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_dtd_attlist
      */
-    public function startDtdAttlist(string $name): bool {}
+    public function startDtdAttlist(string $name) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_dtd_attlist
      */
-    public function endDtdAttlist(): bool {}
+    public function endDtdAttlist() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_dtd_attlist
      */
-    public function writeDtdAttlist(string $name, string $content): bool {}
+    public function writeDtdAttlist(string $name, string $content) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_start_dtd_entity
      */
-    public function startDtdEntity(string $name, bool $isParam): bool {}
+    public function startDtdEntity(string $name, bool $isParam) {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_end_dtd_entity
      */
-    public function endDtdEntity(): bool {}
+    public function endDtdEntity() {}
 
     /**
-     * @tentative-return-type
+     * @return bool
      * @alias xmlwriter_write_dtd_entity
      */
-    public function writeDtdEntity(string $name, string $content, bool $isParam = false, ?string $publicId = null, ?string $systemId = null, ?string $notationData = null): bool {}
+    public function writeDtdEntity(string $name, string $content, bool $isParam = false, ?string $publicId = null, ?string $systemId = null, ?string $notationData = null) {}
 
     /**
-     * @tentative-return-type
+     * @return string
      * @alias xmlwriter_output_memory
      */
-    public function outputMemory(bool $flush = true): string {}
+    public function outputMemory(bool $flush = true) {}
 
     /**
-     * @tentative-return-type
+     * @return string|int
      * @alias xmlwriter_flush
      */
-    public function flush(bool $empty = true): string|int {}
+    public function flush(bool $empty = true) {}
 }

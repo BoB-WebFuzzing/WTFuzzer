@@ -1,9 +1,8 @@
 --TEST--
 mysqli_stmt_param_count()
---EXTENSIONS--
-mysqli
 --SKIPIF--
 <?php
+require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

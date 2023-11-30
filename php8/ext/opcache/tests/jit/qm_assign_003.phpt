@@ -19,8 +19,13 @@ function foo() {
         }
     }
 }
-@foo();
+foo();
 ?>
 DONE
---EXPECT--
+--EXPECTF--
+Warning: Undefined variable $cnt in %sqm_assign_003.php on line 3
+
+Warning: Undefined variable $a in %sqm_assign_003.php on line 4
+
+Warning: Undefined variable $cnt in %sqm_assign_003.php on line 3
 DONE

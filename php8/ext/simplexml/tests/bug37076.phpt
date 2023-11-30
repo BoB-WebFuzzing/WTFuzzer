@@ -1,7 +1,7 @@
 --TEST--
 Bug #37076 (SimpleXML ignores .=)
---EXTENSIONS--
-simplexml
+--SKIPIF--
+<?php if (!extension_loaded("simplexml")) print "skip"; ?>
 --FILE--
 <?php
 $xml = simplexml_load_string("<root><foo /></root>");

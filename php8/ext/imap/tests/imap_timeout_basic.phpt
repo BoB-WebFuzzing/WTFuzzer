@@ -2,8 +2,6 @@
 imap_timeout() function : basic functionality
 --CREDITS--
 Olivier Doucet
---EXTENSIONS--
-imap
 --SKIPIF--
 <?php
 require_once(__DIR__.'/setup/skipif.inc');

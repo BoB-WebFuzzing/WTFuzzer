@@ -1,7 +1,9 @@
 --TEST--
 Test all hebrew month names
---EXTENSIONS--
-calendar
+--SKIPIF--
+<?php
+if (!extension_loaded('calendar')) die('skip calendar extension not available');
+?>
 --FILE--
 <?php
 for ($year = 5000; $year <= 5001; $year++) {

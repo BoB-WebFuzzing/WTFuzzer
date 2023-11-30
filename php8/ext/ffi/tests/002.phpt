@@ -1,7 +1,7 @@
 --TEST--
 FFI 002: Check C declaration parser
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

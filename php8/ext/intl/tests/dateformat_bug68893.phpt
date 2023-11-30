@@ -1,7 +1,7 @@
 --TEST--
 Bug #68893 Stackoverflow in datefmt_create
---EXTENSIONS--
-intl
+--SKIPIF--
+<?php if( !extension_loaded( 'intl' ) ) print 'skip'; ?>
 --FILE--
 <?php
 

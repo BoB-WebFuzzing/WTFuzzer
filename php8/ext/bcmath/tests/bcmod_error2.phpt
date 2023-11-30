@@ -1,7 +1,7 @@
 --TEST--
 bcmod() - mod by 0
---EXTENSIONS--
-bcmath
+--SKIPIF--
+<?php if(!extension_loaded("bcmath")) print "skip"; ?>
 --INI--
 bcmath.scale=0
 --FILE--

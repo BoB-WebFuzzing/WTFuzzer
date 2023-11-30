@@ -3,8 +3,6 @@ Test session_create_id() function : basic functionality
 --INI--
 session.save_handler=files
 session.sid_length=32
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--

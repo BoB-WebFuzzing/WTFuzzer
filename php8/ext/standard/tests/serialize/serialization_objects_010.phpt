@@ -19,7 +19,6 @@ try {
 
 echo "Done";
 ?>
---EXPECTF--
-Deprecated: %s implements the Serializable interface, which is deprecated. Implement __serialize() and __unserialize() instead (or in addition, if support for old PHP versions is necessary) in %s on line %d
+--EXPECT--
 C::serialize() must return a string or NULL
 Done

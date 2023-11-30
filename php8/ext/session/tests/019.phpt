@@ -1,7 +1,5 @@
 --TEST--
 serializing references test case using globals
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --INI--
@@ -25,7 +23,7 @@ class TFoo {
     }
 }
 
-session_id("test019");
+session_id("abtest");
 session_start();
 
 $_SESSION["o1"] = new TFoo(42);

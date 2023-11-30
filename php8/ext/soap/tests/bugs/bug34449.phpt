@@ -1,11 +1,11 @@
 --TEST--
 Bug #34449 (ext/soap: XSD_ANYXML functionality not exposed)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
 class TestSoapClient extends SoapClient {
-  function __doRequest($request, $location, $action, $version, $one_way = 0): ?string {
+  function __doRequest($request, $location, $action, $version, $one_way = 0) {
     echo "$request\n";
     exit;
   }

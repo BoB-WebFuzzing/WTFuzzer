@@ -3,8 +3,6 @@ Test session_set_save_handler() : incorrect arguments for existing handler close
 --INI--
 session.save_handler=files
 session.name=PHPSESSID
---EXTENSIONS--
-session
 --SKIPIF--
 <?php include('skipif.inc'); ?>
 --FILE--
@@ -16,17 +14,17 @@ echo "*** Testing session_set_save_handler() : incorrect arguments for existing 
 
 class MySession extends SessionHandler {
     public $i = 0;
-    public function open($path, $name): bool {
+    public function open($path, $name) {
         ++$this->i;
         echo 'Open ', session_id(), "\n";
         return parent::open($path, $name);
     }
-    public function read($key): string|false {
+    public function read($key) {
         ++$this->i;
         echo 'Read ', session_id(), "\n";
         return parent::read($key);
     }
-    public function close(): bool {
+    public function close() {
         return parent::close(false);
     }
 }

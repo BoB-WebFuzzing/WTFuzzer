@@ -1,7 +1,7 @@
 --TEST--
 openssl_encrypt() crash with old OpenSSL
---EXTENSIONS--
-openssl
+--SKIPIF--
+<?php if (!extension_loaded("openssl")) print "skip"; ?>
 --FILE--
 <?php
 openssl_encrypt('', 'AES-128-CBC', 'foo');

@@ -1,7 +1,7 @@
 --TEST--
 FFI 033: FFI::new(), FFI::free(), FFI::type(), FFI::typeof(), FFI::arrayType()
---EXTENSIONS--
-ffi
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 ffi.enable=1
 --FILE--

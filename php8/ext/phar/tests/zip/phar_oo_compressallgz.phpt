@@ -1,8 +1,8 @@
 --TEST--
 Phar::compressFiles(Phar::GZ) zip format
---EXTENSIONS--
-phar
-zlib
+--SKIPIF--
+<?php if (!extension_loaded("phar")) die("skip"); ?>
+<?php if (!extension_loaded("zlib")) die("skip zlib not present"); ?>
 --INI--
 phar.readonly=0
 --FILE--

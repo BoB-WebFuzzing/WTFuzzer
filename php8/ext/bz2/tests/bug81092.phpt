@@ -1,7 +1,9 @@
 --TEST--
 Bug #81092 (fflush before stream_filter_remove corrupts stream)
---EXTENSIONS--
-bz2
+--SKIPIF--
+<?php
+if (!extension_loaded('bz2')) die('skip bz2 extension not available');
+?>
 --FILE--
 <?php
 $stream = fopen(__DIR__ . "/81092.bz2", 'wb+');

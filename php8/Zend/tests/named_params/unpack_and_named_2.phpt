@@ -1,5 +1,5 @@
 --TEST--
-Named args before unpacking (not supported)
+Mixing unpacking and named params (2)
 --FILE--
 <?php
 
@@ -7,4 +7,4 @@ test(a: 42, ...[]);
 
 ?>
 --EXPECTF--
-Fatal error: Cannot use argument unpacking after named arguments in %s on line %d
+Fatal error: Cannot combine named arguments and argument unpacking in %s on line %d

@@ -1,7 +1,7 @@
 --TEST--
 xmlwriter_set_indent_string passing xmlwriter resource
---EXTENSIONS--
-xmlwriter
+--SKIPIF--
+<?php if (!extension_loaded("xmlwriter")) print "skip"; ?>
 --FILE--
 <?php
 $temp_filename = __DIR__."/xmlwriter_set_indent_string.tmp";

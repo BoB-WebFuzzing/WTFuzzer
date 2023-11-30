@@ -1,7 +1,7 @@
 --TEST--
 Bug #50997 (SOAP Error when trying to submit 2nd Element of a choice)
---EXTENSIONS--
-soap
+--SKIPIF--
+<?php require_once('skipif.inc'); ?>
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--

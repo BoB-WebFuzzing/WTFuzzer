@@ -1,7 +1,9 @@
 --TEST--
 imagecopyresampled()
---EXTENSIONS--
-gd
+--SKIPIF--
+<?php
+    if (!function_exists('imagecopyresampled')) die('skip imagecopyresampled() not available');
+?>
 --FILE--
 <?php
 

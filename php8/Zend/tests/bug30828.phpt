@@ -47,15 +47,15 @@ $b->foo();
 B::bar();
 ?>
 --EXPECTF--
-#0 %sbug30828.php(30): A->__construct()
-#1 %sbug30828.php(42): B->__construct()
+#0  A->__construct() called at [%sbug30828.php:30]
+#1  B->__construct() called at [%sbug30828.php:42]
 A->__construct
 B->__construct
-#0 %sbug30828.php(34): A->foo()
-#1 %sbug30828.php(43): B->foo()
+#0  A->foo() called at [%sbug30828.php:34]
+#1  B->foo() called at [%sbug30828.php:43]
 A->foo
 B->foo
-#0 %sbug30828.php(38): A::bar()
-#1 %sbug30828.php(44): B::bar()
+#0  A::bar() called at [%sbug30828.php:38]
+#1  B::bar() called at [%sbug30828.php:44]
 A::bar
 B::bar
