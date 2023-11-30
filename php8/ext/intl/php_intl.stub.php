@@ -1,6 +1,171 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
+
+/**
+ * @var int
+ * @cvalue INTL_MAX_LOCALE_LEN
+ */
+const INTL_MAX_LOCALE_LEN = UNKNOWN;
+/**
+ * @var string
+ * @cvalue U_ICU_VERSION
+ */
+const INTL_ICU_VERSION = UNKNOWN;
+#ifdef U_ICU_DATA_VERSION
+/**
+ * @var string
+ * @cvalue U_ICU_DATA_VERSION
+ */
+const INTL_ICU_DATA_VERSION = UNKNOWN;
+#endif
+
+/**
+ * @var int
+ * @cvalue GRAPHEME_EXTRACT_TYPE_COUNT
+ */
+const GRAPHEME_EXTR_COUNT = UNKNOWN;
+/**
+ * @var int
+ * @cvalue GRAPHEME_EXTRACT_TYPE_MAXBYTES
+ */
+const GRAPHEME_EXTR_MAXBYTES = UNKNOWN;
+/**
+ * @var int
+ * @cvalue GRAPHEME_EXTRACT_TYPE_MAXCHARS
+ */
+const GRAPHEME_EXTR_MAXCHARS = UNKNOWN;
+
+/**
+ * Option to prohibit processing of unassigned codepoints in the input and
+ * do not check if the input conforms to STD-3 ASCII rules.
+ * @var int
+ * @cvalue UIDNA_DEFAULT
+ */
+const IDNA_DEFAULT = UNKNOWN;
+
+/**
+ * Option to allow processing of unassigned codepoints in the input
+ * @var int
+ * @cvalue UIDNA_ALLOW_UNASSIGNED
+ */
+const IDNA_ALLOW_UNASSIGNED = UNKNOWN;
+
+/**
+ * Option to check if input conforms to STD-3 ASCII rules
+ * @var int
+ * @cvalue UIDNA_USE_STD3_RULES
+ */
+const IDNA_USE_STD3_RULES = UNKNOWN;
+
+/**
+ * Option to check for whether the input conforms to the BiDi rules.
+ * Ignored by the IDNA2003 implementation. (IDNA2003 always performs a BiDi check.)
+ * @var int
+ * @cvalue UIDNA_CHECK_BIDI
+ */
+const IDNA_CHECK_BIDI = UNKNOWN;
+
+/**
+ * Option to check for whether the input conforms to the CONTEXTJ rules.
+ * Ignored by the IDNA2003 implementation. (The CONTEXTJ check is new in IDNA2008.)
+ * @var int
+ * @cvalue UIDNA_CHECK_CONTEXTJ
+ */
+const IDNA_CHECK_CONTEXTJ = UNKNOWN;
+
+/**
+ * Option for nontransitional processing in ToASCII().
+ * By default, ToASCII() uses transitional processing.
+ * Ignored by the IDNA2003 implementation.
+ * @var int
+ * @cvalue UIDNA_NONTRANSITIONAL_TO_ASCII
+ */
+const IDNA_NONTRANSITIONAL_TO_ASCII = UNKNOWN;
+
+/**
+ * Option for nontransitional processing in ToUnicode().
+ * By default, ToUnicode() uses transitional processing.
+ * Ignored by the IDNA2003 implementation.
+ * @var int
+ * @cvalue UIDNA_NONTRANSITIONAL_TO_UNICODE
+ */
+const IDNA_NONTRANSITIONAL_TO_UNICODE = UNKNOWN;
+
+/* VARIANTS */
+
+/**
+ * @var int
+ * @cvalue INTL_IDN_VARIANT_UTS46
+ */
+const INTL_IDNA_VARIANT_UTS46 = UNKNOWN;
+
+/* PINFO ERROR CODES */
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_EMPTY_LABEL
+ */
+const IDNA_ERROR_EMPTY_LABEL = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_LABEL_TOO_LONG
+ */
+const IDNA_ERROR_LABEL_TOO_LONG = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_DOMAIN_NAME_TOO_LONG
+ */
+const IDNA_ERROR_DOMAIN_NAME_TOO_LONG = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_LEADING_HYPHEN
+ */
+const IDNA_ERROR_LEADING_HYPHEN = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_TRAILING_HYPHEN
+ */
+const IDNA_ERROR_TRAILING_HYPHEN = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_HYPHEN_3_4
+ */
+const IDNA_ERROR_HYPHEN_3_4 = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_LEADING_COMBINING_MARK
+ */
+const IDNA_ERROR_LEADING_COMBINING_MARK = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_DISALLOWED
+ */
+const IDNA_ERROR_DISALLOWED = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_PUNYCODE
+ */
+const IDNA_ERROR_PUNYCODE = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_LABEL_HAS_DOT
+ */
+const IDNA_ERROR_LABEL_HAS_DOT = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_INVALID_ACE_LABEL
+ */
+const IDNA_ERROR_INVALID_ACE_LABEL = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_BIDI
+ */
+const IDNA_ERROR_BIDI = UNKNOWN;
+/**
+ * @var int
+ * @cvalue UIDNA_ERROR_CONTEXTJ
+ */
+const IDNA_ERROR_CONTEXTJ = UNKNOWN;
 
 class IntlException extends Exception
 {
@@ -15,6 +180,10 @@ function intlcal_get_keyword_values_for_locale(string $keyword, string $locale, 
 
 function intlcal_get_now(): float {}
 
+/**
+ * @return array<int, string>
+ * @refcount 1
+ */
 function intlcal_get_available_locales(): array {}
 
 function intlcal_get(IntlCalendar $calendar, int $field): int|false {}
@@ -158,7 +327,14 @@ function intl_error_name(int $errorCode): string {}
 /* dateformat */
 
 /** @param IntlTimeZone|DateTimeZone|string|null $timezone */
-function datefmt_create(?string $locale, int $dateType, int $timeType, $timezone = null, IntlCalendar|int|null $calendar = null, ?string $pattern = null): ?IntlDateFormatter {}
+function datefmt_create(
+    ?string $locale,
+    int $dateType = IntlDateFormatter::FULL,
+    int $timeType = IntlDateFormatter::FULL,
+    $timezone = null,
+    IntlCalendar|int|null $calendar = null,
+    ?string $pattern = null
+): ?IntlDateFormatter {}
 
 function datefmt_get_datetype(IntlDateFormatter $formatter): int|false {}
 
@@ -199,7 +375,11 @@ function datefmt_format_object($datetime, $format = null, ?string $locale = null
 /** @param int $offset */
 function datefmt_parse(IntlDateFormatter $formatter, string $string, &$offset = null): int|float|false {}
 
-/** @param int $offset */
+/**
+ * @param int $offset
+ * @return array<string, int>|false
+ * @refcount 1
+ */
 function datefmt_localtime(IntlDateFormatter $formatter, string $string, &$offset = null): array|false {}
 
 function datefmt_get_error_code(IntlDateFormatter $formatter): int {}
@@ -287,6 +467,10 @@ function locale_get_script(string $locale): ?string {}
 
 function locale_get_region(string $locale): ?string {}
 
+/**
+ * @return array<string, string>|false|null
+ * @refcount 1
+ */
 function locale_get_keywords(string $locale): array|false|null {}
 
 function locale_get_display_script(string $locale, ?string $displayLocale = null): string|false {}
@@ -321,8 +505,16 @@ function msgfmt_format(MessageFormatter $formatter, array $values): string|false
 
 function msgfmt_format_message(string $locale, string $pattern, array $values): string|false {}
 
+/**
+ * @return array<int, int|float|string>|false
+ * @refcount 1
+ */
 function msgfmt_parse(MessageFormatter $formatter, string $string): array|false {}
 
+/**
+ * @return array<int, int|float|string>|false
+ * @refcount 1
+ */
 function msgfmt_parse_message(string $locale, string $pattern, string $message): array|false {}
 
 function msgfmt_set_pattern(MessageFormatter $formatter, string $pattern): bool {}
@@ -354,6 +546,10 @@ function resourcebundle_get(ResourceBundle $bundle, $index, bool $fallback = tru
 
 function resourcebundle_count(ResourceBundle $bundle): int {}
 
+/**
+ * @return array<int, string>|false
+ * @refcount 1
+ */
 function resourcebundle_locales(string $bundle): array|false {}
 
 function resourcebundle_get_error_code(ResourceBundle $bundle): int {}
@@ -424,6 +620,10 @@ function transliterator_create(string $id, int $direction = Transliterator::FORW
 
 function transliterator_create_from_rules(string $rules, int $direction = Transliterator::FORWARD): ?Transliterator {}
 
+/**
+ * @return array<int, string>|false
+ * @refcount 1
+ */
 function transliterator_list_ids(): array|false {}
 
 function transliterator_create_inverse(Transliterator $transliterator): ?Transliterator {}

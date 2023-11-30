@@ -172,9 +172,16 @@ else
   AC_DEFINE(ZEND_DEBUG,0,[ ])
 fi
 
-test -n "$GCC" && CFLAGS="-Wall -Wextra -Wno-strict-aliasing -Wno-implicit-fallthrough -Wno-unused-parameter -Wno-sign-compare $CFLAGS"
+test -n "$GCC" && CFLAGS="-Wall -Wextra -Wno-strict-aliasing -Wno-unused-parameter -Wno-sign-compare $CFLAGS"
 dnl Check if compiler supports -Wno-clobbered (only GCC)
 AX_CHECK_COMPILE_FLAG([-Wno-clobbered], CFLAGS="-Wno-clobbered $CFLAGS", , [-Werror])
+dnl Check for support for implicit fallthrough level 1, also add after previous CFLAGS as level 3 is enabled in -Wextra
+AX_CHECK_COMPILE_FLAG([-Wimplicit-fallthrough=1], CFLAGS="$CFLAGS -Wimplicit-fallthrough=1", , [-Werror])
+AX_CHECK_COMPILE_FLAG([-Wduplicated-cond], CFLAGS="-Wduplicated-cond $CFLAGS", , [-Werror])
+AX_CHECK_COMPILE_FLAG([-Wlogical-op], CFLAGS="-Wlogical-op $CFLAGS", , [-Werror])
+AX_CHECK_COMPILE_FLAG([-Wformat-truncation], CFLAGS="-Wformat-truncation $CFLAGS", , [-Werror])
+AX_CHECK_COMPILE_FLAG([-Wstrict-prototypes], CFLAGS="-Wstrict-prototypes $CFLAGS", , [-Werror])
+AX_CHECK_COMPILE_FLAG([-fno-common], CFLAGS="-fno-common $CFLAGS", , [-Werror])
 
 test -n "$DEBUG_CFLAGS" && CFLAGS="$CFLAGS $DEBUG_CFLAGS"
 
@@ -215,7 +222,7 @@ typedef union _mm_align_test {
 
 int main()
 {
-  int i = ZEND_MM_ALIGNMENT;
+  size_t i = ZEND_MM_ALIGNMENT;
   int zeros = 0;
   FILE *fp;
 
@@ -225,7 +232,7 @@ int main()
   }
 
   fp = fopen("conftest.zend", "w");
-  fprintf(fp, "%d %d\n", ZEND_MM_ALIGNMENT, zeros);
+  fprintf(fp, "(size_t)%zu (size_t)%d %d\n", ZEND_MM_ALIGNMENT, zeros, ZEND_MM_ALIGNMENT < 4);
   fclose(fp);
 
   return 0;
@@ -233,11 +240,15 @@ int main()
 ]])], [
   LIBZEND_MM_ALIGN=`cat conftest.zend | cut -d ' ' -f 1`
   LIBZEND_MM_ALIGN_LOG2=`cat conftest.zend | cut -d ' ' -f 2`
+  LIBZEND_MM_NEED_EIGHT_BYTE_REALIGNMENT=`cat conftest.zend | cut -d ' ' -f 3`
   AC_DEFINE_UNQUOTED(ZEND_MM_ALIGNMENT, $LIBZEND_MM_ALIGN, [ ])
   AC_DEFINE_UNQUOTED(ZEND_MM_ALIGNMENT_LOG2, $LIBZEND_MM_ALIGN_LOG2, [ ])
+  AC_DEFINE_UNQUOTED(ZEND_MM_NEED_EIGHT_BYTE_REALIGNMENT, $LIBZEND_MM_NEED_EIGHT_BYTE_REALIGNMENT, [ ])
 ], [], [
   dnl Cross compilation needs something here.
-  LIBZEND_MM_ALIGN=8
+  AC_DEFINE(ZEND_MM_ALIGNMENT, 8, [ ])
+  AC_DEFINE(ZEND_MM_ALIGNMENT_LOG2, 3, [ ])
+  AC_DEFINE(ZEND_MM_NEED_EIGHT_BYTE_REALIGNMENT, 0, [ ])
 ])
 
 AC_MSG_RESULT(done)
@@ -260,6 +271,28 @@ fi
 
 AC_MSG_CHECKING(whether to enable zend signal handling)
 AC_MSG_RESULT($ZEND_SIGNALS)
+
+dnl Don't enable Zend Max Execution Timers by default until PHP 8.3 to not break the ABI
+AC_ARG_ENABLE([zend-max-execution-timers],
+  [AS_HELP_STRING([--enable-zend-max-execution-timers],
+    [whether to enable zend max execution timers])],
+    [ZEND_MAX_EXECUTION_TIMERS=$enableval],
+    [ZEND_MAX_EXECUTION_TIMERS='no'])
+
+AS_CASE(["$host_alias"], [*linux*], [], [ZEND_MAX_EXECUTION_TIMERS='no'])
+
+PHP_CHECK_FUNC(timer_create, rt)
+if test "$ac_cv_func_timer_create" != "yes"; then
+  ZEND_MAX_EXECUTION_TIMERS='no'
+fi
+
+if test "$ZEND_MAX_EXECUTION_TIMERS" = "yes"; then
+  AC_DEFINE(ZEND_MAX_EXECUTION_TIMERS, 1, [Use zend max execution timers])
+  CFLAGS="$CFLAGS -DZEND_MAX_EXECUTION_TIMERS"
+fi
+
+AC_MSG_CHECKING(whether to enable zend max execution timers)
+AC_MSG_RESULT($ZEND_MAX_EXECUTION_TIMERS)
 
 ])
 

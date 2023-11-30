@@ -1,11 +1,9 @@
 --TEST--
 Test gzencode() function : basic functionality
+--EXTENSIONS--
+zlib
 --SKIPIF--
-<?php
-if (!extension_loaded("zlib")) {
-    print "skip - ZLIB extension not loaded";
-}
-?>
+<?php if (getenv('TRAVIS')) die('skip Currently fails on Travis'); ?>
 --FILE--
 <?php
 /*

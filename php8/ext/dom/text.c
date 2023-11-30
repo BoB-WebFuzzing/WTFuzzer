@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -51,13 +51,11 @@ PHP_METHOD(DOMText, __construct)
 	}
 
 	intern = Z_DOMOBJ_P(ZEND_THIS);
-	if (intern != NULL) {
-		oldnode = dom_object_get_node(intern);
-		if (oldnode != NULL) {
-			php_libxml_node_free_resource(oldnode );
-		}
-		php_libxml_increment_node_ptr((php_libxml_node_object *)intern, nodep, (void *)intern);
+	oldnode = dom_object_get_node(intern);
+	if (oldnode != NULL) {
+		php_libxml_node_decrement_resource((php_libxml_node_object *)intern);
 	}
+	php_libxml_increment_node_ptr((php_libxml_node_object *)intern, nodep, (void *)intern);
 }
 /* }}} end DOMText::__construct */
 
@@ -74,7 +72,7 @@ int dom_text_whole_text_read(dom_object *obj, zval *retval)
 	node = dom_object_get_node(obj);
 
 	if (node == NULL) {
-		php_dom_throw_error(INVALID_STATE_ERR, 0);
+		php_dom_throw_error(INVALID_STATE_ERR, 1);
 		return FAILURE;
 	}
 

@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -124,7 +124,11 @@ PHP_FUNCTION(header_register_callback)
 		SG(fci_cache) = empty_fcall_info_cache;
 	}
 
-	ZVAL_COPY(&SG(callback_func), &fci.function_name);
+	/* Don't store callback if headers have already been sent:
+	 * It won't get used and we won't have a chance to release it. */
+	if (!SG(headers_sent)) {
+		ZVAL_COPY(&SG(callback_func), &fci.function_name);
+	}
 
 	RETURN_TRUE;
 }
@@ -204,7 +208,7 @@ static void sapi_read_post_data(void)
 		/* fallback */
 		SG(request_info).post_entry = NULL;
 		if (!sapi_module.default_post_reader) {
-			/* no default reader ? */
+			/* no default reader? */
 			SG(request_info).content_type_dup = NULL;
 			sapi_module.sapi_error(E_WARNING, "Unsupported content type:  '%s'", content_type);
 			return;
@@ -340,7 +344,7 @@ SAPI_API char *sapi_get_default_content_type(void)
 
 SAPI_API void sapi_get_default_content_type_header(sapi_header_struct *default_header)
 {
-    uint32_t len;
+	uint32_t len;
 
 	default_header->header = get_default_content_type(sizeof("Content-type: ")-1, &len);
 	default_header->header_len = len;
@@ -353,7 +357,7 @@ SAPI_API void sapi_get_default_content_type_header(sapi_header_struct *default_h
  * there is not already a charset option in there.
  *
  * If "mimetype" is non-NULL, it should point to a pointer allocated
- * with emalloc().  If a charset is added, the string will be
+ * with emalloc(). If a charset is added, the string will be
  * re-allocated and the new length is returned.  If mimetype is
  * unchanged, 0 is returned.
  *
@@ -585,8 +589,8 @@ static void sapi_update_response_code(int ncode)
 }
 
 /*
- * since zend_llist_del_element only remove one matched item once,
- * we should remove them by ourself
+ * since zend_llist_del_element only removes one matched item once,
+ * we should remove them manually
  */
 static void sapi_remove_header(zend_llist *l, char *name, size_t len) {
 	sapi_header_struct *header;
@@ -616,7 +620,7 @@ static void sapi_remove_header(zend_llist *l, char *name, size_t len) {
 	}
 }
 
-SAPI_API int sapi_add_header_ex(const char *header_line, size_t header_line_len, zend_bool duplicate, zend_bool replace)
+SAPI_API int sapi_add_header_ex(const char *header_line, size_t header_line_len, bool duplicate, bool replace)
 {
 	sapi_header_line ctr = {0};
 	int r;
@@ -792,7 +796,7 @@ SAPI_API int sapi_header_op(sapi_header_op_enum op, void *arg)
 			} else if (!strcasecmp(header_line, "Content-Length")) {
 				/* Script is setting Content-length. The script cannot reasonably
 				 * know the size of the message body after compression, so it's best
-				 * do disable compression altogether. This contributes to making scripts
+				 * to disable compression altogether. This contributes to making scripts
 				 * portable between setups that have and don't have zlib compression
 				 * enabled globally. See req #44164 */
 				zend_string *key = zend_string_init("zlib.output_compression", sizeof("zlib.output_compression")-1, 0);
@@ -840,7 +844,7 @@ SAPI_API int sapi_send_headers(void)
 		return SUCCESS;
 	}
 
-	/* Success-oriented.  We set headers_sent to 1 here to avoid an infinite loop
+	/* Success-oriented. We set headers_sent to 1 here to avoid an infinite loop
 	 * in case of an error situation.
 	 */
 	if (SG(sapi_headers).send_default_content_type && sapi_module.send_headers) {
@@ -1013,29 +1017,30 @@ SAPI_API zend_stat_t *sapi_get_stat(void)
 
 SAPI_API char *sapi_getenv(const char *name, size_t name_len)
 {
+	char *value, *tmp;
+	
+	if (!sapi_module.getenv) {
+		return NULL;
+	}
 	if (!strncasecmp(name, "HTTP_PROXY", name_len)) {
 		/* Ugly fix for HTTP_PROXY issue, see bug #72573 */
 		return NULL;
 	}
-	if (sapi_module.getenv) {
-		char *value, *tmp = sapi_module.getenv(name, name_len);
-		if (tmp) {
-			value = estrdup(tmp);
-#ifdef PHP_WIN32
-			if (strlen(sapi_module.name) == sizeof("cgi-fcgi") - 1 && !strcmp(sapi_module.name, "cgi-fcgi")) {
-				/* XXX more modules to go, if needed. */
-				free(tmp);
-			}
-#endif
-		} else {
-			return NULL;
-		}
-		if (sapi_module.input_filter) {
-			sapi_module.input_filter(PARSE_STRING, name, &value, strlen(value), NULL);
-		}
-		return value;
+	tmp = sapi_module.getenv(name, name_len);
+	if (!tmp) {
+		return NULL;
 	}
-	return NULL;
+	value = estrdup(tmp);
+#ifdef PHP_WIN32
+	if (strlen(sapi_module.name) == sizeof("cgi-fcgi") - 1 && !strcmp(sapi_module.name, "cgi-fcgi")) {
+		/* XXX more modules to go, if needed. */
+		free(tmp);
+	}
+#endif
+	if (sapi_module.input_filter) {
+		sapi_module.input_filter(PARSE_STRING, name, &value, strlen(value), NULL);
+	}
+	return value;
 }
 
 SAPI_API int sapi_get_fd(int *fd)
@@ -1079,9 +1084,8 @@ SAPI_API double sapi_get_request_time(void)
 {
 	if(SG(global_request_time)) return SG(global_request_time);
 
-	if (sapi_module.get_request_time && SG(server_context)) {
-		SG(global_request_time) = sapi_module.get_request_time();
-	} else {
+	if (!sapi_module.get_request_time
+			|| sapi_module.get_request_time(&SG(global_request_time)) == FAILURE) {
 		struct timeval tp = {0};
 		if (!gettimeofday(&tp, NULL)) {
 			SG(global_request_time) = (double)(tp.tv_sec + tp.tv_usec / 1000000.00);

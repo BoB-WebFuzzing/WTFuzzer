@@ -42,6 +42,11 @@ class Response
     private $expectInvalid;
 
     /**
+     * @var bool
+     */
+    private bool $debugOutputted = false;
+
+    /**
      * @param string|array|null $data
      * @param bool              $expectInvalid
      */
@@ -71,11 +76,11 @@ class Response
             $body = implode("\n", $body);
         }
 
-        if (
-            $this->checkIfValid() &&
-            $this->checkDefaultHeaders($contentType) &&
-            $body !== $this->rawBody
-        ) {
+        if ( ! $this->checkIfValid()) {
+            $this->error('Response is invalid');
+        } elseif ( ! $this->checkDefaultHeaders($contentType)) {
+            $this->error('Response default headers not found');
+        } elseif ($body !== $this->rawBody) {
             if ($multiLine) {
                 $this->error(
                     "==> The expected body:\n$body\n" .
@@ -87,6 +92,37 @@ class Response
                 );
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Expect that one of the processes in json status process list has a field with value that
+     * matches the supplied pattern.
+     *
+     * @param string $fieldName
+     * @param string $pattern
+     *
+     * @return Response
+     */
+    public function expectJsonBodyPatternForStatusProcessField(string $fieldName, string $pattern)
+    {
+        $rawData = $this->getBody('application/json');
+        $data = json_decode($rawData, true);
+        if (empty($data['processes']) || !is_array($data['processes'])) {
+            $this->error(
+                "The body data is not a valid status json containing processes field '$rawData'"
+            );
+        }
+        foreach ($data['processes'] as $process) {
+            if (preg_match('|' . $pattern . '|', $process[$fieldName]) !== false) {
+                return $this;
+            }
+        }
+
+        $this->error(
+            "No field $fieldName matched pattern $pattern for any process in status data '$rawData'"
+        );
 
         return $this;
     }
@@ -135,6 +171,57 @@ class Response
     }
 
     /**
+     * Expect error pattern in the response.
+     *
+     * @param string $errorMessagePattern Expected error message RegExp patter.
+     *
+     * @return Response
+     */
+    public function expectErrorPattern(string $errorMessagePattern): Response
+    {
+        $errorData = $this->getErrorData();
+        if (preg_match($errorMessagePattern, $errorData) === 0) {
+            $this->error(
+                "The expected error pattern $errorMessagePattern does not match the returned error '$errorData'"
+            );
+            $this->debugOutput();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Expect response status.
+     *
+     * @param string|null $status Expected status.
+     *
+     * @return Response
+     */
+    public function expectStatus(string|null $status): Response {
+        $headers = $this->getHeaders();
+        if (is_null($status) && !isset($headers['status'])) {
+            return $this;
+        }
+        if (!is_null($status) && !isset($headers['status'])) {
+            $this->error('Status is expected but not supplied');
+        } elseif ($status !== $headers['status']) {
+            $statusMessage = $status === null ? "expected not to be set": "expected to be $status";
+            $this->error("Status is $statusMessage but the actual value is {$headers['status']}");
+        }
+
+        return $this;
+    }
+
+    /**
+     * Expect response status not to be set.
+     *
+     * @return Response
+     */
+    public function expectNoStatus(): Response {
+        return $this->expectStatus(null);
+    }
+
+    /**
      * Expect no error in the response.
      *
      * @return Response
@@ -162,18 +249,22 @@ class Response
 
     /**
      * Print raw body.
+     *
+     * @param string $contentType Expect body to have specified content type.
      */
-    public function dumpBody()
+    public function dumpBody(string $contentType = 'text/html')
     {
-        var_dump($this->getBody());
+        var_dump($this->getBody($contentType));
     }
 
     /**
      * Print raw body.
+     *
+     * @param string $contentType Expect body to have specified content type.
      */
-    public function printBody()
+    public function printBody(string $contentType = 'text/html')
     {
-        echo $this->getBody() . "\n";
+        echo $this->getBody($contentType) . "\n";
     }
 
     /**
@@ -187,6 +278,8 @@ class Response
         echo "----------------- ERR -----------------\n";
         echo $this->data['err_response'] . "\n";
         echo "---------------------------------------\n\n";
+
+        $this->debugOutputted = true;
     }
 
     /**
@@ -331,10 +424,99 @@ class Response
      *
      * @return bool
      */
-    private function error($message): bool
+    private function error(string $message): bool
     {
+        if ( ! $this->debugOutputted) {
+            $this->debugOutput();
+        }
         echo "ERROR: $message\n";
 
         return false;
+    }
+}
+
+class ValuesResponse
+{
+    /**
+     * @var array
+     */
+    private array $values;
+
+    /**
+     * @param string|array|null $values
+     */
+    public function __construct($values = null)
+    {
+        if ( ! is_array($values)) {
+            if ( ! is_null($values) ) {
+                $this->error('Invalid values supplied', true);
+            }
+            $this->values = [];
+        } else {
+            $this->values = $values;
+        }
+    }
+
+    /**
+     * Expect value.
+     *
+     * @param string $name
+     * @param mixed  $value
+     * @return ValuesResponse
+     */
+    public function expectValue(string $name, $value = null)
+    {
+        if ( ! isset($this->values[$name])) {
+            return $this->error("Value $name not found in values");
+        }
+        if ( ! is_null($value) && $value !== $this->values[$name]) {
+            return $this->error("Value $name is {$this->values[$name]} but expected $value");
+        }
+        return $this;
+    }
+
+    /**
+     * Get values.
+     *
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->values;
+    }
+
+    /**
+     * Debug output data.
+     *
+     * @return ValuesResponse
+     */
+    public function debugOutput()
+    {
+        echo ">>> ValuesResponse\n";
+        echo "----------------- Values -----------------\n";
+        var_dump($this->values);
+        echo "---------------------------------------\n\n";
+
+        return $this;
+    }
+
+    /**
+     * Emit error message
+     *
+     * @param string $message
+     * @param bool   $throw
+     *
+     * @return ValuesResponse
+     */
+    private function error(string $message, $throw = false): bool
+    {
+        $errorMessage = "ERROR: $message\n";
+        if ($throw) {
+            throw new \Exception($errorMessage);
+        }
+        $this->debugOutput();
+        echo $errorMessage;
+
+        return $this;
     }
 }

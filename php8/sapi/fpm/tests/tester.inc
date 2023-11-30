@@ -132,6 +132,16 @@ class Tester
     private ?Response $response;
 
     /**
+     * @var string[]
+     */
+    private $expectedAccessLogs;
+
+    /**
+     * @var bool
+     */
+    private $expectSuppressableAccessLogEntries;
+
+    /**
      * Clean all the created files up
      *
      * @param int $backTraceIndex
@@ -259,10 +269,11 @@ class Tester
     static public function skipIfConfigFails(string $configTemplate)
     {
         $tester     = new self($configTemplate, '', [], self::getCallerFileName());
-        $testResult = $tester->testConfig();
+        $testResult = $tester->testConfig(true);
         if ($testResult !== null) {
             self::clean(2);
-            die("skip $testResult");
+            $message = $testResult[0] ?? 'Config failed';
+            die("skip $message");
         }
     }
 
@@ -294,7 +305,7 @@ class Tester
      */
     static public function skipIfNotRoot()
     {
-        if (getmyuid() != 0) {
+        if (exec('whoami') !== 'root') {
             die('skip not running as root');
         }
     }
@@ -304,7 +315,7 @@ class Tester
      */
     static public function skipIfRoot()
     {
-        if (getmyuid() == 0) {
+        if (exec('whoami') === 'root') {
             die('skip running as root');
         }
     }
@@ -316,6 +327,27 @@ class Tester
     {
         if ( ! extension_loaded('posix')) {
             die('skip posix extension not loaded');
+        }
+    }
+
+    /**
+     * Skip if shared extension is not available in extension directory.
+     */
+    static public function skipIfSharedExtensionNotFound($extensionName)
+    {
+        $soPath = ini_get('extension_dir') . '/' . $extensionName . '.so';
+        if ( ! file_exists($soPath)) {
+            die("skip $extensionName extension not present in extension_dir");
+        }
+    }
+
+    /**
+     * Skip if posix extension not loaded.
+     */
+    static public function skipIfUserDoesNotExist($userName) {
+        self::skipIfPosixNotLoaded();
+        if ( posix_getpwnam( $userName ) === false ) {
+            die( "skip user $userName does not exist" );
         }
     }
 
@@ -357,17 +389,26 @@ class Tester
     /**
      * Test configuration file.
      *
-     * @return null|string
+     * @return null|array
      * @throws \Exception
      */
-    public function testConfig()
+    public function testConfig($silent = false)
     {
         $configFile = $this->createConfig();
-        $cmd        = self::findExecutable() . ' -t -y ' . $configFile . ' 2>&1';
+        $cmd        = self::findExecutable() . ' -tt -y ' . $configFile . ' 2>&1';
         $this->trace('Testing config using command', $cmd, true);
         exec($cmd, $output, $code);
         if ($code) {
-            return preg_replace("/\[.+?\]/", "", $output[0]);
+            $messages = [];
+            foreach ($output as $outputLine) {
+                $message    = preg_replace("/\[.+?\]/", "", $outputLine, 1);
+                $messages[] = $message;
+                if ( ! $silent) {
+                    $this->error($message, null, false);
+                }
+            }
+
+            return $messages;
         }
 
         return null;
@@ -380,6 +421,7 @@ class Tester
      * @param bool  $forceStderr Whether to output to stderr so error log is used.
      * @param bool  $daemonize   Whether to start FPM daemonized
      * @param array $extensions  List of extension to add if shared build used.
+     * @param array $iniEntries  List of ini entries to use.
      *
      * @return bool
      * @throws \Exception
@@ -388,7 +430,8 @@ class Tester
         array $extraArgs = [],
         bool $forceStderr = true,
         bool $daemonize = false,
-        array $extensions = []
+        array $extensions = [],
+        array $iniEntries = [],
     ) {
         $configFile = $this->createConfig();
         $desc       = $this->outDesc ? [] : [1 => array('pipe', 'w'), 2 => array('redirect', 1)];
@@ -410,6 +453,10 @@ class Tester
             foreach ($extensions as $extension) {
                 $cmd[] = '-dextension=' . $extension;
             }
+        }
+
+        foreach ($iniEntries as $iniEntryName => $iniEntryValue) {
+            $cmd[] = '-d' . $iniEntryName . '=' . $iniEntryValue;
         }
 
         if (getenv('TEST_FPM_RUN_AS_ROOT')) {
@@ -546,7 +593,7 @@ class Tester
         array $expectedFields,
         string $address = null,
         string $statusPath = '/status',
-        $formats = ['plain', 'html', 'xml', 'json']
+        $formats = ['plain', 'html', 'xml', 'json', 'openmetrics']
     ) {
         if ( ! is_array($formats)) {
             $formats = [$formats];
@@ -577,18 +624,25 @@ class Tester
         array $headers = [],
         string $uri = null,
         string $scriptFilename = null,
+        string $scriptName = null,
         ?string $stdin = null
     ): array {
+        if (is_null($scriptFilename)) {
+            $scriptFilename = $this->makeSourceFile();
+        }
         if (is_null($uri)) {
-            $uri = $this->makeSourceFile();
+            $uri = '/' . basename($scriptFilename);
+        }
+        if (is_null($scriptName)) {
+            $scriptName = $uri;
         }
 
         $params = array_merge(
             [
                 'GATEWAY_INTERFACE' => 'FastCGI/1.0',
                 'REQUEST_METHOD'    => is_null($stdin) ? 'GET' : 'POST',
-                'SCRIPT_FILENAME'   => $scriptFilename ?: $uri,
-                'SCRIPT_NAME'       => $uri,
+                'SCRIPT_FILENAME'   => $scriptFilename === '' ? null : $scriptFilename,
+                'SCRIPT_NAME'       => $scriptName,
                 'QUERY_STRING'      => $query,
                 'REQUEST_URI'       => $uri . ($query ? '?' . $query : ""),
                 'DOCUMENT_URI'      => $uri,
@@ -685,6 +739,7 @@ class Tester
      * @param string|null       $errorMessage
      * @param bool              $connKeepAlive
      * @param string|null       $scriptFilename = null
+     * @param string|null       $scriptName = null
      * @param string|array|null $stdin          = null
      * @param bool              $expectError
      * @param int               $readLimit
@@ -701,6 +756,7 @@ class Tester
         string $errorMessage = null,
         bool $connKeepAlive = false,
         string $scriptFilename = null,
+        string $scriptName = null,
         string|array $stdin = null,
         bool $expectError = false,
         int $readLimit = -1,
@@ -713,7 +769,7 @@ class Tester
             $stdin = $this->parseStdin($stdin, $headers);
         }
 
-        $params = $this->getRequestParams($query, $headers, $uri, $scriptFilename, $stdin);
+        $params = $this->getRequestParams($query, $headers, $uri, $scriptFilename, $scriptName, $stdin);
         $this->trace('Request params', $params);
 
         try {
@@ -780,6 +836,10 @@ class Tester
                     $requestData['uri'] ?? null
                 );
 
+                if (isset($requestData['delay'])) {
+                    usleep($requestData['delay']);
+                }
+
                 return [
                     'client'    => $client,
                     'requestId' => $client->async_request($params, false),
@@ -806,6 +866,38 @@ class Tester
 
             return array_map(fn($request) => new Response(null, true), $requests);
         }
+    }
+
+    /**
+     * Execute request for getting FastCGI values.
+     *
+     * @param string|null $address
+     * @param bool        $connKeepAlive
+     *
+     * @return ValuesResponse
+     * @throws \Exception
+     */
+    public function requestValues(
+        string $address = null,
+        bool $connKeepAlive = false
+    ): ValuesResponse {
+        if ($this->hasError()) {
+            return new Response(null, true);
+        }
+
+        try {
+            $valueResponse = new ValuesResponse(
+                $this->getClient($address, $connKeepAlive)->getValues(['FCGI_MPXS_CONNS'])
+            );
+            if ($this->debug) {
+                $this->response->debugOutput();
+            }
+        } catch (\Exception $exception) {
+            $this->error("Request for getting values failed", $exception);
+            $valueResponse = new ValuesResponse();
+        }
+
+        return $valueResponse;
     }
 
     /**
@@ -1269,6 +1361,7 @@ class Tester
             return $filePath;
         }
         file_put_contents($filePath, $content);
+
         $this->trace('Created file: ' . $filePath, $content, isFile: true);
 
         return $filePath;
@@ -1285,6 +1378,18 @@ class Tester
     }
 
     /**
+     * Create a source file and script name.
+     *
+     * @return string[]
+     */
+    public function createSourceFileAndScriptName(): array
+    {
+        $sourceFile = $this->makeFile('src.php', $this->code, overwrite: false);
+
+        return [$sourceFile, '/' . basename($sourceFile)];
+    }
+
+    /**
      * @param string|null $msg
      */
     private function message($msg)
@@ -1297,14 +1402,15 @@ class Tester
     /**
      * Display error.
      *
-     * @param string          $msg
-     * @param \Exception|null $exception
+     * @param string          $msg       Error message.
+     * @param \Exception|null $exception If there is an exception, log its message
+     * @param bool            $prefix    Whether to prefix the error message
      *
      * @return false
      */
-    private function error($msg, \Exception $exception = null): bool
+    private function error(string $msg, \Exception $exception = null, bool $prefix = true): bool
     {
-        $this->error = 'ERROR: ' . $msg;
+        $this->error = $prefix ? 'ERROR: ' . $msg : ltrim($msg);
         if ($exception) {
             $this->error .= '; EXCEPTION: ' . $exception->getMessage();
         }
@@ -1451,13 +1557,54 @@ class Tester
     /**
      * Expect log pattern in logs.
      *
-     * @param string $pattern Log pattern
+     * @param string   $pattern             Log pattern
+     * @param bool     $checkAllLogs        Whether to also check past logs.
+     * @param int|null $timeoutSeconds      Timeout in seconds for reading of all messages.
+     * @param int|null $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
      *
      * @throws \Exception
      */
-    public function expectLogPattern(string $pattern)
-    {
-        $this->logTool->expectPattern($pattern);
+    public function expectLogPattern(
+        string $pattern,
+        bool $checkAllLogs = false,
+        int $timeoutSeconds = null,
+        int $timeoutMicroseconds = null,
+    ) {
+        $this->logTool->expectPattern(
+            $pattern,
+            false,
+            $checkAllLogs,
+            $timeoutSeconds,
+            $timeoutMicroseconds
+        );
+    }
+
+    /**
+     * Expect no such log pattern in logs.
+     *
+     * @param string   $pattern             Log pattern
+     * @param bool     $checkAllLogs        Whether to also check past logs.
+     * @param int|null $timeoutSeconds      Timeout in seconds for reading of all messages.
+     * @param int|null $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
+     *
+     * @throws \Exception
+     */
+    public function expectNoLogPattern(
+        string $pattern,
+        bool $checkAllLogs = true,
+        int $timeoutSeconds = null,
+        int $timeoutMicroseconds = null,
+    ) {
+        if (is_null($timeoutSeconds) && is_null($timeoutMicroseconds)) {
+            $timeoutMicroseconds = 10;
+        }
+        $this->logTool->expectPattern(
+            $pattern,
+            true,
+            $checkAllLogs,
+            $timeoutSeconds,
+            $timeoutMicroseconds
+        );
     }
 
     /**
@@ -1511,10 +1658,15 @@ class Tester
     /**
      * Expect log entry.
      *
-     * @param string      $type    The log type
-     * @param string      $message The expected message
-     * @param string|null $pool    The pool for pool prefixed log entry
-     * @param int         $count   The number of items
+     * @param string      $type                The log type.
+     * @param string      $message             The expected message.
+     * @param string|null $pool                The pool for pool prefixed log entry.
+     * @param int         $count               The number of items.
+     * @param bool        $checkAllLogs        Whether to also check past logs.
+     * @param bool        $invert              Whether the log entry is not expected rather than expected.
+     * @param int|null    $timeoutSeconds      Timeout in seconds for reading of all messages.
+     * @param int|null    $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
+     * @param string      $ignoreErrorFor      Ignore error for supplied string in the message.
      *
      * @return bool
      * @throws \Exception
@@ -1523,10 +1675,26 @@ class Tester
         string $type,
         string $message,
         string $pool = null,
-        int $count = 1
+        int $count = 1,
+        bool $checkAllLogs = false,
+        bool $invert = false,
+        int $timeoutSeconds = null,
+        int $timeoutMicroseconds = null,
+        string $ignoreErrorFor = LogTool::DEBUG
     ): bool {
         for ($i = 0; $i < $count; $i++) {
-            if ( ! $this->logTool->expectEntry($type, $message, $pool)) {
+            $result = $this->logTool->expectEntry(
+                $type,
+                $message,
+                $pool,
+                $ignoreErrorFor,
+                $checkAllLogs,
+                $invert,
+                $timeoutSeconds,
+                $timeoutMicroseconds,
+            );
+
+            if ( ! $result) {
                 return false;
             }
         }
@@ -1537,76 +1705,177 @@ class Tester
     /**
      * Expect a log debug message.
      *
-     * @param string      $message
-     * @param string|null $pool
-     * @param int         $count
+     * @param string      $message             The expected message.
+     * @param string|null $pool                The pool for pool prefixed log entry.
+     * @param int         $count               The number of items.
+     * @param bool        $checkAllLogs        Whether to also check past logs.
+     * @param bool        $invert              Whether the log entry is not expected rather than expected.
+     * @param int|null    $timeoutSeconds      Timeout in seconds for reading of all messages.
+     * @param int|null    $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
      *
      * @return bool
      * @throws \Exception
      */
-    public function expectLogDebug(string $message, string $pool = null, int $count = 1): bool
-    {
-        return $this->expectLogEntry(LogTool::DEBUG, $message, $pool, $count);
+    public function expectLogDebug(
+        string $message,
+        string $pool = null,
+        int $count = 1,
+        bool $checkAllLogs = false,
+        bool $invert = false,
+        int $timeoutSeconds = null,
+        int $timeoutMicroseconds = null
+    ): bool {
+        return $this->expectLogEntry(
+            LogTool::DEBUG,
+            $message,
+            $pool,
+            $count,
+            $checkAllLogs,
+            $invert,
+            $timeoutSeconds,
+            $timeoutMicroseconds,
+            LogTool::ERROR
+        );
     }
 
     /**
      * Expect a log notice.
      *
-     * @param string      $message
-     * @param string|null $pool
-     * @param int         $count
+     * @param string      $message             The expected message.
+     * @param string|null $pool                The pool for pool prefixed log entry.
+     * @param int         $count               The number of items.
+     * @param bool        $checkAllLogs        Whether to also check past logs.
+     * @param bool        $invert              Whether the log entry is not expected rather than expected.
+     * @param int|null    $timeoutSeconds      Timeout in seconds for reading of all messages.
+     * @param int|null    $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
      *
      * @return bool
      * @throws \Exception
      */
-    public function expectLogNotice(string $message, string $pool = null, int $count = 1): bool
-    {
-        return $this->expectLogEntry(LogTool::NOTICE, $message, $pool, $count);
+    public function expectLogNotice(
+        string $message,
+        string $pool = null,
+        int $count = 1,
+        bool $checkAllLogs = false,
+        bool $invert = false,
+        int $timeoutSeconds = null,
+        int $timeoutMicroseconds = null
+    ): bool {
+        return $this->expectLogEntry(
+            LogTool::NOTICE,
+            $message,
+            $pool,
+            $count,
+            $checkAllLogs,
+            $invert,
+            $timeoutSeconds,
+            $timeoutMicroseconds
+        );
     }
 
     /**
      * Expect a log warning.
      *
-     * @param string      $message
-     * @param string|null $pool
-     * @param int         $count
+     * @param string      $message             The expected message.
+     * @param string|null $pool                The pool for pool prefixed log entry.
+     * @param int         $count               The number of items.
+     * @param bool        $checkAllLogs        Whether to also check past logs.
+     * @param bool        $invert              Whether the log entry is not expected rather than expected.
+     * @param int|null    $timeoutSeconds      Timeout in seconds for reading of all messages.
+     * @param int|null    $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
      *
      * @return bool
      * @throws \Exception
      */
-    public function expectLogWarning(string $message, string $pool = null, int $count = 1): bool
-    {
-        return $this->expectLogEntry(LogTool::WARNING, $message, $pool, $count);
+    public function expectLogWarning(
+        string $message,
+        string $pool = null,
+        int $count = 1,
+        bool $checkAllLogs = false,
+        bool $invert = false,
+        int $timeoutSeconds = null,
+        int $timeoutMicroseconds = null
+    ): bool {
+        return $this->expectLogEntry(
+            LogTool::WARNING,
+            $message,
+            $pool,
+            $count,
+            $checkAllLogs,
+            $invert,
+            $timeoutSeconds,
+            $timeoutMicroseconds
+        );
     }
 
     /**
      * Expect a log error.
      *
-     * @param string      $message
-     * @param string|null $pool
-     * @param int         $count
+     * @param string      $message             The expected message.
+     * @param string|null $pool                The pool for pool prefixed log entry.
+     * @param int         $count               The number of items.
+     * @param bool        $checkAllLogs        Whether to also check past logs.
+     * @param bool        $invert              Whether the log entry is not expected rather than expected.
+     * @param int|null    $timeoutSeconds      Timeout in seconds for reading of all messages.
+     * @param int|null    $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
      *
      * @return bool
      * @throws \Exception
      */
-    public function expectLogError(string $message, string $pool = null, int $count = 1): bool
-    {
-        return $this->expectLogEntry(LogTool::ERROR, $message, $pool, $count);
+    public function expectLogError(
+        string $message,
+        string $pool = null,
+        int $count = 1,
+        bool $checkAllLogs = false,
+        bool $invert = false,
+        int $timeoutSeconds = null,
+        int $timeoutMicroseconds = null
+    ): bool {
+        return $this->expectLogEntry(
+            LogTool::ERROR,
+            $message,
+            $pool,
+            $count,
+            $checkAllLogs,
+            $invert,
+            $timeoutSeconds,
+            $timeoutMicroseconds
+        );
     }
 
     /**
      * Expect a log alert.
      *
-     * @param string      $message
-     * @param string|null $pool
-     * @param int         $count
+     * @param string      $message             The expected message.
+     * @param string|null $pool                The pool for pool prefixed log entry.
+     * @param int         $count               The number of items.
+     * @param bool        $checkAllLogs        Whether to also check past logs.
+     * @param bool        $invert              Whether the log entry is not expected rather than expected.
+     * @param int|null    $timeoutSeconds      Timeout in seconds for reading of all messages.
+     * @param int|null    $timeoutMicroseconds Additional timeout in microseconds for reading of all messages.
      *
      * @return bool
      * @throws \Exception
      */
-    public function expectLogAlert(string $message, string $pool = null, int $count = 1): bool
-    {
-        return $this->expectLogEntry(LogTool::ALERT, $message, $pool, $count);
+    public function expectLogAlert(
+        string $message,
+        string $pool = null,
+        int $count = 1,
+        bool $checkAllLogs = false,
+        bool $invert = false,
+        int $timeoutSeconds = null,
+        int $timeoutMicroseconds = null
+    ): bool {
+        return $this->expectLogEntry(
+            LogTool::ALERT,
+            $message,
+            $pool,
+            $count,
+            $checkAllLogs,
+            $invert,
+            $timeoutSeconds,
+            $timeoutMicroseconds
+        );
     }
 
     /**
@@ -1632,6 +1901,33 @@ class Tester
     }
 
     /**
+     * Expect log config options
+     *
+     * @param array $options
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function expectLogConfigOptions(array $options)
+    {
+        foreach ($options as $value) {
+            $confValue = str_replace(
+                ']',
+                '\]',
+                str_replace(
+                    '[',
+                    '\[',
+                    str_replace('/', '\/', $value)
+                )
+            );
+            $this->expectLogNotice("\s+$confValue", checkAllLogs: true);
+        }
+
+        return true;
+    }
+
+
+    /**
      * Print content of access log.
      */
     public function printAccessLog()
@@ -1643,6 +1939,70 @@ class Tester
     }
 
     /**
+     * Return content of access log.
+     *
+     * @return string|false
+     */
+    public function getAccessLog()
+    {
+        $accessLog = $this->getFile('acc.log');
+        if (is_file($accessLog)) {
+            return file_get_contents($accessLog);
+        }
+        return false;
+    }
+
+    /**
+     * Expect a single access log line.
+     *
+     * @param string $LogLine
+     * @param bool $suppressable see expectSuppressableAccessLogEntries
+     */
+    public function expectAccessLog(
+        string $logLine,
+        bool $suppressable = false
+    ) {
+        if (!$suppressable || $this->expectSuppressableAccessLogEntries) {
+            $this->expectedAccessLogs[] = $logLine;
+        }
+    }
+
+    /**
+     * Checks that all access log entries previously listed as expected by
+     * calling "expectAccessLog" are in the access log.
+     */
+    public function checkAccessLog()
+    {
+        if (isset($this->expectedAccessLogs)) {
+            $expectedAccessLog = implode("\n", $this->expectedAccessLogs) . "\n";
+        } else {
+            $this->error("Called checkAccessLog but did not previous call expectAccessLog");
+        }
+        if ($accessLog = $this->getAccessLog()) {
+            if ($expectedAccessLog !== $accessLog) {
+                $this->error(sprintf(
+                    "Access log was not as expected.\nEXPECTED:\n%s\n\nACTUAL:\n%s",
+                    $expectedAccessLog,
+                    $accessLog
+                ));
+            }
+        } else {
+            $this->error("Called checkAccessLog but access log does not exist");
+        }
+    }
+
+    /**
+     * Flags whether the access log check should expect to see suppressable
+     * log entries, i.e. the URL is not in access.suppress_path[] config
+     *
+     * @param bool
+     */
+    public function expectSuppressableAccessLogEntries(bool $expectSuppressableAccessLogEntries)
+    {
+        $this->expectSuppressableAccessLogEntries = $expectSuppressableAccessLogEntries;
+    }
+
+    /*
      * Read all log entries.
      *
      * @param string      $type    The log type

@@ -5,7 +5,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | http://www.php.net/license/3_01.txt                                  |
+  | https://www.php.net/license/3_01.txt                                 |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -34,7 +34,7 @@
 
 /* {{{ FETCH_DOUBLE_OPTION(var_name, option_name) */
 #define FETCH_DOUBLE_OPTION(var_name, option_name) \
-   	var_name = 0; \
+	var_name = 0; \
 	var_name##_set = 0; \
 	if (option_array) { \
 		if ((option_val = zend_hash_str_find(Z_ARRVAL_P(option_array), option_name, sizeof(option_name) - 1)) != NULL) {	\
@@ -46,7 +46,7 @@
 
 /* {{{ FETCH_LONG_OPTION(var_name, option_name) */
 #define FETCH_LONG_OPTION(var_name, option_name) \
-   	var_name = 0; \
+	var_name = 0; \
 	var_name##_set = 0; \
 	if (option_array) { \
 		if ((option_val = zend_hash_str_find(Z_ARRVAL_P(option_array), option_name, sizeof(option_name) - 1)) != NULL) {	\
@@ -99,6 +99,7 @@ static int php_filter_parse_int(const char *str, size_t str_len, zend_long *ret)
 	switch (*str) {
 		case '-':
 			sign = 1;
+			ZEND_FALLTHROUGH;
 		case '+':
 			str++;
 		default:
@@ -240,6 +241,13 @@ void php_filter_int(PHP_INPUT_FILTER_PARAM_DECL) /* {{{ */
 				error = 1;
 			}
 		} else if (allow_octal) {
+			/* Support explicit octal prefix notation */
+			if (*p == 'o' || *p == 'O') {
+				p++; len--;
+				if (len == 0) {
+					RETURN_VALIDATION_FAILED
+				}
+			}
 			if (php_filter_parse_octal(p, len, &ctx_value) < 0) {
 				error = 1;
 			}
@@ -620,7 +628,7 @@ void php_filter_validate_url(PHP_INPUT_FILTER_PARAM_DECL) /* {{{ */
 	if (
 		url->scheme == NULL ||
 		/* some schemas allow the host to be empty */
-		(url->host == NULL && (strcmp(ZSTR_VAL(url->scheme), "mailto") && strcmp(ZSTR_VAL(url->scheme), "news") && strcmp(ZSTR_VAL(url->scheme), "file"))) ||
+		(url->host == NULL && (!zend_string_equals_literal(url->scheme, "mailto") && !zend_string_equals_literal(url->scheme, "news") && !zend_string_equals_literal(url->scheme, "file"))) ||
 		((flags & FILTER_FLAG_PATH_REQUIRED) && url->path == NULL) || ((flags & FILTER_FLAG_QUERY_REQUIRED) && url->query == NULL)
 	) {
 bad_url:
@@ -762,7 +770,7 @@ static int _php_filter_validate_ipv6(char *str, size_t str_len, int ip[8]) /* {{
 	/* check for bundled IPv4 */
 	ipv4 = memchr(str, '.', str_len);
 	if (ipv4) {
- 		while (ipv4 > str && *(ipv4-1) != ':') {
+		while (ipv4 > str && *(ipv4-1) != ':') {
 			ipv4--;
 		}
 
@@ -802,7 +810,7 @@ static int _php_filter_validate_ipv6(char *str, size_t str_len, int ip[8]) /* {{
 				if (++str == end) {
 					if (blocks > 8) {
 						return 0;
-					}
+				}
 					goto fixup_ip;
 				}
 			} else if ((str - 1) == s) {
@@ -838,7 +846,7 @@ fixup_ip:
 	if (ip && ipv4) {
 		for (i = 0; i < 5; i++) {
 			ip[i] = 0;
-		}
+}
 		ip[i++] = 0xffff;
 		ip[i++] = 256 * ip4elm[0] + ip4elm[1];
 		ip[i++] = 256 * ip4elm[2] + ip4elm[3];
@@ -889,7 +897,7 @@ void php_filter_validate_ip(PHP_INPUT_FILTER_PARAM_DECL) /* {{{ */
 			}
 
 			/* Check flags */
-			if (flags & FILTER_FLAG_NO_PRIV_RANGE) {
+			if (flags & FILTER_FLAG_NO_PRIV_RANGE  || flags & FILTER_FLAG_GLOBAL_RANGE) {
 				if (
 					(ip[0] == 10) ||
 					(ip[0] == 172 && ip[1] >= 16 && ip[1] <= 31) ||
@@ -899,7 +907,7 @@ void php_filter_validate_ip(PHP_INPUT_FILTER_PARAM_DECL) /* {{{ */
 				}
 			}
 
-			if (flags & FILTER_FLAG_NO_RES_RANGE) {
+			if (flags & FILTER_FLAG_NO_RES_RANGE || flags & FILTER_FLAG_GLOBAL_RANGE) {
 				if (
 					(ip[0] == 0) ||
 					(ip[0] >= 240) ||
@@ -909,6 +917,20 @@ void php_filter_validate_ip(PHP_INPUT_FILTER_PARAM_DECL) /* {{{ */
 					RETURN_VALIDATION_FAILED
 				}
 			}
+
+			if (flags & FILTER_FLAG_GLOBAL_RANGE) {
+				if (
+						(ip[0] == 100 && ip[1] >= 64 && ip[1] <= 127 ) ||
+						(ip[0] == 192 && ip[1] == 0 && ip[2] == 0 ) ||
+						(ip[0] == 192 && ip[1] == 0 && ip[2] == 2 ) ||
+						(ip[0] == 198 && ip[1] >= 18 && ip[1] <= 19 ) ||
+						(ip[0] == 198 && ip[1] == 51 && ip[2] == 100 ) ||
+						(ip[0] == 203 && ip[1] == 0 && ip[2] == 113 )
+		   ) {
+					RETURN_VALIDATION_FAILED
+				}
+			}
+
 			break;
 
 		case FORMAT_IPV6:
@@ -919,19 +941,29 @@ void php_filter_validate_ip(PHP_INPUT_FILTER_PARAM_DECL) /* {{{ */
 					RETURN_VALIDATION_FAILED
 				}
 				/* Check flags */
-				if (flags & FILTER_FLAG_NO_PRIV_RANGE) {
+				if (flags & FILTER_FLAG_NO_PRIV_RANGE || flags & FILTER_FLAG_GLOBAL_RANGE) {
 					if (ip[0] >= 0xfc00 && ip[0] <= 0xfdff) {
 						RETURN_VALIDATION_FAILED
 					}
 				}
-				if (flags & FILTER_FLAG_NO_RES_RANGE) {
+				if (flags & FILTER_FLAG_NO_RES_RANGE || flags & FILTER_FLAG_GLOBAL_RANGE) {
 					if ((ip[0] == 0 && ip[1] == 0 && ip[2] == 0 && ip[3] == 0
-						&& ip[4] == 0 && ip[5] == 0 && ip[6] == 0 && (ip[7] == 0 || ip[7] == 1))
+							&& ip[4] == 0 && ip[5] == 0 && ip[6] == 0 && (ip[7] == 0 || ip[7] == 1))
 						|| (ip[0] == 0x5f)
 						|| (ip[0] >= 0xfe80 && ip[0] <= 0xfebf)
 						|| (ip[0] == 0x2001 && (ip[1] == 0x0db8 || (ip[1] >= 0x0010 && ip[1] <= 0x001f)))
 						|| (ip[0] == 0x3ff3)
-					) {
+								) {
+									RETURN_VALIDATION_FAILED
+								}
+				}
+				if (flags & FILTER_FLAG_GLOBAL_RANGE) {
+					if ((ip[0] == 0 && ip[1] == 0 && ip[2] == 0 && ip[3] == 0 && ip[4] == 0 && ip[5] == 0xffff) ||
+							(ip[0] == 0x0100 && ip[1] == 0 && ip[2] == 0 && ip[3] == 0) ||
+							(ip[0] == 0x2001 && ip[1] <= 0x01ff) ||
+							(ip[0] == 0x2001 && ip[1] == 0x0002 && ip[2] == 0) ||
+							(ip[0] >= 0xfc00 && ip[0] <= 0xfdff)
+					   ) {
 						RETURN_VALIDATION_FAILED
 					}
 				}

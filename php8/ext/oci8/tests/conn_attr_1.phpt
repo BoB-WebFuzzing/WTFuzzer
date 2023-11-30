@@ -1,7 +1,10 @@
 --TEST--
 Set and get of connection attributes with all types of connections.
+--EXTENSIONS--
+oci8
 --SKIPIF--
-<?php if (!extension_loaded('oci8')) die("skip no oci8 extension");
+<?php
+if (getenv('SKIP_REPEAT')) die('skip fails with repeat');
 $target_dbs = array('oracledb' => true, 'timesten' => false);  // test runs on these DBs
 require(__DIR__.'/skipif.inc');
 

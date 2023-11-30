@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 89f431b33667e7ee6538a2a50ed7aabcf0449d36 */
+ * Stub hash: 13e1f68463c2abc1a1ce0e1cff5f47a12407cfc1 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject___construct, 0, 0, 0)
 	ZEND_ARG_TYPE_MASK(0, array, MAY_BE_ARRAY|MAY_BE_OBJECT, "[]")
@@ -7,73 +7,81 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject___construct, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, iteratorClass, IS_STRING, 0, "ArrayIterator::class")
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_offsetExists, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_offsetExists, 0, 1, _IS_BOOL, 0)
 	ZEND_ARG_TYPE_INFO(0, key, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayObject_offsetGet arginfo_class_ArrayObject_offsetExists
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_offsetGet, 0, 1, IS_MIXED, 0)
+	ZEND_ARG_TYPE_INFO(0, key, IS_MIXED, 0)
+ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_offsetSet, 0, 0, 2)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_offsetSet, 0, 2, IS_VOID, 0)
 	ZEND_ARG_TYPE_INFO(0, key, IS_MIXED, 0)
 	ZEND_ARG_TYPE_INFO(0, value, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayObject_offsetUnset arginfo_class_ArrayObject_offsetExists
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_offsetUnset, 0, 1, IS_VOID, 0)
+	ZEND_ARG_TYPE_INFO(0, key, IS_MIXED, 0)
+ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_append, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_append, 0, 1, IS_VOID, 0)
 	ZEND_ARG_TYPE_INFO(0, value, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_getArrayCopy, 0, 0, 0)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_getArrayCopy, 0, 0, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayObject_count arginfo_class_ArrayObject_getArrayCopy
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_count, 0, 0, IS_LONG, 0)
+ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayObject_getFlags arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayObject_getFlags arginfo_class_ArrayObject_count
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_setFlags, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_setFlags, 0, 1, IS_VOID, 0)
 	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_asort, 0, 0, 0)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_asort, 0, 0, _IS_BOOL, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, flags, IS_LONG, 0, "SORT_REGULAR")
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_ArrayObject_ksort arginfo_class_ArrayObject_asort
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_uasort, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_uasort, 0, 1, _IS_BOOL, 0)
 	ZEND_ARG_TYPE_INFO(0, callback, IS_CALLABLE, 0)
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_ArrayObject_uksort arginfo_class_ArrayObject_uasort
 
-#define arginfo_class_ArrayObject_natsort arginfo_class_ArrayObject_getArrayCopy
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_natsort, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayObject_natcasesort arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayObject_natcasesort arginfo_class_ArrayObject_natsort
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_unserialize, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_unserialize, 0, 1, IS_VOID, 0)
 	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayObject_serialize arginfo_class_ArrayObject_getArrayCopy
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_serialize, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
 
 #define arginfo_class_ArrayObject___serialize arginfo_class_ArrayObject_getArrayCopy
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject___unserialize, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject___unserialize, 0, 1, IS_VOID, 0)
 	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayObject_getIterator arginfo_class_ArrayObject_getArrayCopy
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_OBJ_INFO_EX(arginfo_class_ArrayObject_getIterator, 0, 0, Iterator, 0)
+ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_exchangeArray, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_exchangeArray, 0, 1, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_MASK(0, array, MAY_BE_ARRAY|MAY_BE_OBJECT, NULL)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayObject_setIteratorClass, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayObject_setIteratorClass, 0, 1, IS_VOID, 0)
 	ZEND_ARG_TYPE_INFO(0, iteratorClass, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayObject_getIteratorClass arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayObject_getIteratorClass arginfo_class_ArrayObject_serialize
 
 #define arginfo_class_ArrayObject___debugInfo arginfo_class_ArrayObject_getArrayCopy
 
@@ -84,19 +92,19 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_class_ArrayIterator_offsetExists arginfo_class_ArrayObject_offsetExists
 
-#define arginfo_class_ArrayIterator_offsetGet arginfo_class_ArrayObject_offsetExists
+#define arginfo_class_ArrayIterator_offsetGet arginfo_class_ArrayObject_offsetGet
 
 #define arginfo_class_ArrayIterator_offsetSet arginfo_class_ArrayObject_offsetSet
 
-#define arginfo_class_ArrayIterator_offsetUnset arginfo_class_ArrayObject_offsetExists
+#define arginfo_class_ArrayIterator_offsetUnset arginfo_class_ArrayObject_offsetUnset
 
 #define arginfo_class_ArrayIterator_append arginfo_class_ArrayObject_append
 
 #define arginfo_class_ArrayIterator_getArrayCopy arginfo_class_ArrayObject_getArrayCopy
 
-#define arginfo_class_ArrayIterator_count arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayIterator_count arginfo_class_ArrayObject_count
 
-#define arginfo_class_ArrayIterator_getFlags arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayIterator_getFlags arginfo_class_ArrayObject_count
 
 #define arginfo_class_ArrayIterator_setFlags arginfo_class_ArrayObject_setFlags
 
@@ -108,37 +116,41 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_class_ArrayIterator_uksort arginfo_class_ArrayObject_uasort
 
-#define arginfo_class_ArrayIterator_natsort arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayIterator_natsort arginfo_class_ArrayObject_natsort
 
-#define arginfo_class_ArrayIterator_natcasesort arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayIterator_natcasesort arginfo_class_ArrayObject_natsort
 
 #define arginfo_class_ArrayIterator_unserialize arginfo_class_ArrayObject_unserialize
 
-#define arginfo_class_ArrayIterator_serialize arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayIterator_serialize arginfo_class_ArrayObject_serialize
 
 #define arginfo_class_ArrayIterator___serialize arginfo_class_ArrayObject_getArrayCopy
 
 #define arginfo_class_ArrayIterator___unserialize arginfo_class_ArrayObject___unserialize
 
-#define arginfo_class_ArrayIterator_rewind arginfo_class_ArrayObject_getArrayCopy
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayIterator_rewind, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayIterator_current arginfo_class_ArrayObject_getArrayCopy
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayIterator_current, 0, 0, IS_MIXED, 0)
+ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayIterator_key arginfo_class_ArrayObject_getArrayCopy
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_MASK_EX(arginfo_class_ArrayIterator_key, 0, 0, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_NULL)
+ZEND_END_ARG_INFO()
 
-#define arginfo_class_ArrayIterator_next arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayIterator_next arginfo_class_ArrayIterator_rewind
 
-#define arginfo_class_ArrayIterator_valid arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_ArrayIterator_valid arginfo_class_ArrayObject_natsort
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ArrayIterator_seek, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_class_ArrayIterator_seek, 0, 1, IS_VOID, 0)
 	ZEND_ARG_TYPE_INFO(0, offset, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_ArrayIterator___debugInfo arginfo_class_ArrayObject_getArrayCopy
 
-#define arginfo_class_RecursiveArrayIterator_hasChildren arginfo_class_ArrayObject_getArrayCopy
+#define arginfo_class_RecursiveArrayIterator_hasChildren arginfo_class_ArrayObject_natsort
 
-#define arginfo_class_RecursiveArrayIterator_getChildren arginfo_class_ArrayObject_getArrayCopy
+ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_OBJ_INFO_EX(arginfo_class_RecursiveArrayIterator_getChildren, 0, 0, RecursiveArrayIterator, 1)
+ZEND_END_ARG_INFO()
 
 
 ZEND_METHOD(ArrayObject, __construct);
@@ -244,3 +256,66 @@ static const zend_function_entry class_RecursiveArrayIterator_methods[] = {
 	ZEND_ME(RecursiveArrayIterator, getChildren, arginfo_class_RecursiveArrayIterator_getChildren, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_ArrayObject(zend_class_entry *class_entry_IteratorAggregate, zend_class_entry *class_entry_ArrayAccess, zend_class_entry *class_entry_Serializable, zend_class_entry *class_entry_Countable)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "ArrayObject", class_ArrayObject_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 4, class_entry_IteratorAggregate, class_entry_ArrayAccess, class_entry_Serializable, class_entry_Countable);
+
+	zval const_STD_PROP_LIST_value;
+	ZVAL_LONG(&const_STD_PROP_LIST_value, SPL_ARRAY_STD_PROP_LIST);
+	zend_string *const_STD_PROP_LIST_name = zend_string_init_interned("STD_PROP_LIST", sizeof("STD_PROP_LIST") - 1, 1);
+	zend_declare_class_constant_ex(class_entry, const_STD_PROP_LIST_name, &const_STD_PROP_LIST_value, ZEND_ACC_PUBLIC, NULL);
+	zend_string_release(const_STD_PROP_LIST_name);
+
+	zval const_ARRAY_AS_PROPS_value;
+	ZVAL_LONG(&const_ARRAY_AS_PROPS_value, SPL_ARRAY_ARRAY_AS_PROPS);
+	zend_string *const_ARRAY_AS_PROPS_name = zend_string_init_interned("ARRAY_AS_PROPS", sizeof("ARRAY_AS_PROPS") - 1, 1);
+	zend_declare_class_constant_ex(class_entry, const_ARRAY_AS_PROPS_name, &const_ARRAY_AS_PROPS_value, ZEND_ACC_PUBLIC, NULL);
+	zend_string_release(const_ARRAY_AS_PROPS_name);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_ArrayIterator(zend_class_entry *class_entry_SeekableIterator, zend_class_entry *class_entry_ArrayAccess, zend_class_entry *class_entry_Serializable, zend_class_entry *class_entry_Countable)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "ArrayIterator", class_ArrayIterator_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 4, class_entry_SeekableIterator, class_entry_ArrayAccess, class_entry_Serializable, class_entry_Countable);
+
+	zval const_STD_PROP_LIST_value;
+	ZVAL_LONG(&const_STD_PROP_LIST_value, SPL_ARRAY_STD_PROP_LIST);
+	zend_string *const_STD_PROP_LIST_name = zend_string_init_interned("STD_PROP_LIST", sizeof("STD_PROP_LIST") - 1, 1);
+	zend_declare_class_constant_ex(class_entry, const_STD_PROP_LIST_name, &const_STD_PROP_LIST_value, ZEND_ACC_PUBLIC, NULL);
+	zend_string_release(const_STD_PROP_LIST_name);
+
+	zval const_ARRAY_AS_PROPS_value;
+	ZVAL_LONG(&const_ARRAY_AS_PROPS_value, SPL_ARRAY_ARRAY_AS_PROPS);
+	zend_string *const_ARRAY_AS_PROPS_name = zend_string_init_interned("ARRAY_AS_PROPS", sizeof("ARRAY_AS_PROPS") - 1, 1);
+	zend_declare_class_constant_ex(class_entry, const_ARRAY_AS_PROPS_name, &const_ARRAY_AS_PROPS_value, ZEND_ACC_PUBLIC, NULL);
+	zend_string_release(const_ARRAY_AS_PROPS_name);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_RecursiveArrayIterator(zend_class_entry *class_entry_ArrayIterator, zend_class_entry *class_entry_RecursiveIterator)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "RecursiveArrayIterator", class_RecursiveArrayIterator_methods);
+	class_entry = zend_register_internal_class_ex(&ce, class_entry_ArrayIterator);
+	zend_class_implements(class_entry, 1, class_entry_RecursiveIterator);
+
+	zval const_CHILD_ARRAYS_ONLY_value;
+	ZVAL_LONG(&const_CHILD_ARRAYS_ONLY_value, SPL_ARRAY_CHILD_ARRAYS_ONLY);
+	zend_string *const_CHILD_ARRAYS_ONLY_name = zend_string_init_interned("CHILD_ARRAYS_ONLY", sizeof("CHILD_ARRAYS_ONLY") - 1, 1);
+	zend_declare_class_constant_ex(class_entry, const_CHILD_ARRAYS_ONLY_name, &const_CHILD_ARRAYS_ONLY_value, ZEND_ACC_PUBLIC, NULL);
+	zend_string_release(const_CHILD_ARRAYS_ONLY_name);
+
+	return class_entry;
+}

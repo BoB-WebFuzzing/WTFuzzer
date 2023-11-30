@@ -1,10 +1,9 @@
 --TEST--
 mb_str_split() tests for the japanese language
---SKIPIF--
-<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
+--EXTENSIONS--
+mbstring
 --INI--
 output_handler=
-mbstring.func_overload=0
 --FILE--
 <?php
 ini_set('include_path','.');
@@ -24,8 +23,15 @@ $charset = [
     "UTF-8"
 ];
 
+/* Try empty strings first */
+foreach ($charset as $cs) {
+    if (count(mb_str_split("", 1, $cs)) !== 0)
+        echo "Empty $cs string should convert to empty array!\n";
+    if (count(mb_str_split("", 2, $cs)) !== 0)
+        echo "Empty $cs string should convert to empty array!\n";
+}
 
-foreach($charset as $cs){
+foreach ($charset as $cs) {
     $enc = mb_convert_encoding($string, $cs, "UTF-8");
     $split = mb_str_split($enc, 1, $cs);
 
@@ -33,7 +39,7 @@ foreach($charset as $cs){
     for($i = 1; $i <= $len; ++$i){
         $ceil = ceil($len / $i);
         $cnt = count(mb_str_split($enc,$i,$cs));
-        if($ceil != $cnt){
+        if ($ceil != $cnt){
           echo "$cs WRONG CHUNKS NUMBER: expected/actual: $ceil/$cnt\n";
         }
     }
@@ -63,6 +69,17 @@ if(end($array) !== $enc){
         last array element: %s expected: %s\n", unpack("H*", end($array))[1],unpack("H*", $enc)[1]);
 }
 
+/* SJIS byte 0x80 was previously wrongly treated as the starting byte for a 2-byte character */
+echo "== Regression test for SJIS byte 0x80 ==\n";
+foreach (['SJIS', 'SJIS-2004', 'MacJapanese', 'SJIS-Mobile#DOCOMO', 'SJIS-Mobile#KDDI', 'SJIS-Mobile#SoftBank'] as $encoding) {
+    $array = mb_str_split("\x80\xA1abc\x80\xA1", 2, $encoding);
+    echo "$encoding: [" . implode(', ', array_map('bin2hex', $array)) . "]\n";
+
+    // Also try bytes 0xFD, 0xFE, and 0xFF
+    $array = mb_str_split("abc\xFD\xFE\xFFab\xFD\xFE\xFF", 2, $encoding);
+    echo "$encoding: [" . implode(', ', array_map('bin2hex', $array)) . "]\n";
+}
+
 ?>
 --EXPECT--
 BIG-5: a4e9 a5bb
@@ -74,3 +91,16 @@ UTF-16LE: e565 2c67
 UTF-32BE: 000065e5 0000672c
 UTF-32LE: e5650000 2c670000
 UTF-8: e697a5 e69cac
+== Regression test for SJIS byte 0x80 ==
+SJIS: [80a1, 6162, 6380, a1]
+SJIS: [6162, 63fd, feff, 6162, fdfe, ff]
+SJIS-2004: [80a1, 6162, 6380, a1]
+SJIS-2004: [6162, 63fd, feff, 6162, fdfe, ff]
+MacJapanese: [80a1, 6162, 6380, a1]
+MacJapanese: [6162, 63fd, feff, 6162, fdfe, ff]
+SJIS-Mobile#DOCOMO: [80a1, 6162, 6380, a1]
+SJIS-Mobile#DOCOMO: [6162, 63fd, feff, 6162, fdfe, ff]
+SJIS-Mobile#KDDI: [80a1, 6162, 6380, a1]
+SJIS-Mobile#KDDI: [6162, 63fd, feff, 6162, fdfe, ff]
+SJIS-Mobile#SoftBank: [80a1, 6162, 6380, a1]
+SJIS-Mobile#SoftBank: [6162, 63fd, feff, 6162, fdfe, ff]

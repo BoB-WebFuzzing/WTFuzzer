@@ -1,10 +1,14 @@
 --TEST--
 DBA CDB handler test (read only)
+--EXTENSIONS--
+dba
 --SKIPIF--
 <?php
-    $handler = 'cdb_make';
-    require_once __DIR__ .'/skipif.inc';
+require_once __DIR__ . '/setup/setup_dba_tests.inc';
+check_skip('cdb_make');
 ?>
+--CONFLICTS--
+test.cdb
 --FILE--
 <?php
     echo "database handler: cdb\n";

@@ -1,8 +1,9 @@
 --TEST--
 Test External Authentication errors with oci_new_connect
+--EXTENSIONS--
+oci8
 --SKIPIF--
 <?php
-if (!extension_loaded('oci8')) die ("skip no oci8 extension");
 if (substr(PHP_OS, 0, 3) == 'WIN') die("skip feature not available on Windows platforms");
 die("skip random CI timeouts caused by Oracle Instant Client, see https://github.com/php/php-src/pull/9524#issuecomment-1244409815");
 ?>
@@ -10,6 +11,10 @@ die("skip random CI timeouts caused by Oracle Instant Client, see https://github
 oci8.privileged_connect=1
 --FILE--
 <?php
+
+error_reporting(E_ALL ^ E_DEPRECATED);
+
+// Run Test
 
 echo "Test 1\n";
 

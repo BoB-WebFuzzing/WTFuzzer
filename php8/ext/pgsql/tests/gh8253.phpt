@@ -1,5 +1,7 @@
 --TEST--
 pg_insert() fails for references
+--EXTENSIONS--
+pgsql
 --SKIPIF--
 <?php
 include("skipif.inc");

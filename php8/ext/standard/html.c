@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -44,7 +44,7 @@
 #include "php_string.h"
 #include "SAPI.h"
 #include <locale.h>
-#if HAVE_LANGINFO_H
+#ifdef HAVE_LANGINFO_H
 #include <langinfo.h>
 #endif
 
@@ -95,7 +95,7 @@ static inline unsigned int get_next_char(
 		const unsigned char *str,
 		size_t str_len,
 		size_t *cursor,
-		int *status)
+		zend_result *status)
 {
 	size_t pos = *cursor;
 	unsigned int this_char = 0;
@@ -346,17 +346,17 @@ static inline unsigned int get_next_char(
 	}
 
 	*cursor = pos;
-  	return this_char;
+	return this_char;
 }
 /* }}} */
 
 /* {{{ php_next_utf8_char
  * Public interface for get_next_char used with UTF-8 */
- PHPAPI unsigned int php_next_utf8_char(
+PHPAPI unsigned int php_next_utf8_char(
 		const unsigned char *str,
 		size_t str_len,
 		size_t *cursor,
-		int *status)
+		zend_result *status)
 {
 	return get_next_char(cs_utf_8, str, str_len, cursor, status);
 }
@@ -365,7 +365,7 @@ static inline unsigned int get_next_char(
 /* {{{ entity_charset determine_charset
  * Returns the charset identifier based on an explicitly provided charset,
  * the internal_encoding and default_charset ini settings, or UTF-8 by default. */
-static enum entity_charset determine_charset(const char *charset_hint, zend_bool quiet)
+static enum entity_charset determine_charset(const char *charset_hint, bool quiet)
 {
 	if (!charset_hint || !*charset_hint) {
 		charset_hint = get_default_charset();
@@ -477,7 +477,7 @@ static inline int map_from_unicode(unsigned code, enum entity_charset charset, u
 			*res = 0xF0; /* numero sign */
 		} else if (code == 0xA7) {
 			*res = 0xFD; /* section sign */
-		} else if (code >= 0x0401 && code <= 0x044F) {
+		} else if (code >= 0x0401 && code <= 0x045F) {
 			if (code == 0x040D || code == 0x0450 || code == 0x045D)
 				return FAILURE;
 			*res = code - 0x360;
@@ -1045,8 +1045,8 @@ static inline void find_entity_for_char(
 		*entity_len = c->data.ent.entity_len;
 	} else {
 		/* peek at next char */
-		size_t	 cursor_before	= *cursor;
-		int		 status			= SUCCESS;
+		size_t cursor_before = *cursor;
+		zend_result status = SUCCESS;
 		unsigned next_char;
 
 		if (!(*cursor < oldlen))
@@ -1100,7 +1100,7 @@ static inline void find_entity_for_char_basic(
 /* }}} */
 
 /* {{{ php_escape_html_entities */
-PHPAPI zend_string *php_escape_html_entities_ex(const unsigned char *old, size_t oldlen, int all, int flags, const char *hint_charset, zend_bool double_encode, zend_bool quiet)
+PHPAPI zend_string *php_escape_html_entities_ex(const unsigned char *old, size_t oldlen, int all, int flags, const char *hint_charset, bool double_encode, bool quiet)
 {
 	size_t cursor, maxlen, len;
 	zend_string *replaced;
@@ -1156,7 +1156,7 @@ PHPAPI zend_string *php_escape_html_entities_ex(const unsigned char *old, size_t
 		const unsigned char *mbsequence = NULL;
 		size_t mbseqlen					= 0,
 		       cursor_before			= cursor;
-		int status						= SUCCESS;
+		zend_result status				= SUCCESS;
 		unsigned int this_char			= get_next_char(charset, old, oldlen, &cursor, &status);
 
 		/* guarantee we have at least 40 bytes to write.
@@ -1316,15 +1316,15 @@ encode_amp:
 static void php_html_entities(INTERNAL_FUNCTION_PARAMETERS, int all)
 {
 	zend_string *str, *hint_charset = NULL;
-	zend_long flags = ENT_COMPAT;
+	zend_long flags = ENT_QUOTES|ENT_SUBSTITUTE;
 	zend_string *replaced;
-	zend_bool double_encode = 1;
+	bool double_encode = 1;
 
 	ZEND_PARSE_PARAMETERS_START(1, 4)
 		Z_PARAM_STR(str)
 		Z_PARAM_OPTIONAL
 		Z_PARAM_LONG(flags)
-		Z_PARAM_STR_EX(hint_charset, 1, 0)
+		Z_PARAM_STR_OR_NULL(hint_charset)
 		Z_PARAM_BOOL(double_encode);
 	ZEND_PARSE_PARAMETERS_END();
 
@@ -1367,7 +1367,7 @@ PHP_FUNCTION(htmlspecialchars)
 PHP_FUNCTION(htmlspecialchars_decode)
 {
 	zend_string *str;
-	zend_long quote_style = ENT_COMPAT;
+	zend_long quote_style = ENT_QUOTES|ENT_SUBSTITUTE;
 	zend_string *replaced;
 
 	ZEND_PARSE_PARAMETERS_START(1, 2)
@@ -1385,7 +1385,7 @@ PHP_FUNCTION(htmlspecialchars_decode)
 PHP_FUNCTION(html_entity_decode)
 {
 	zend_string *str, *hint_charset = NULL;
-	zend_long quote_style = ENT_COMPAT;
+	zend_long quote_style = ENT_QUOTES|ENT_SUBSTITUTE;
 	zend_string *replaced;
 
 	ZEND_PARSE_PARAMETERS_START(1, 3)
@@ -1468,7 +1468,7 @@ static inline void write_s3row_data(
 PHP_FUNCTION(get_html_translation_table)
 {
 	zend_long all = HTML_SPECIALCHARS,
-		 flags = ENT_COMPAT;
+		 flags = ENT_QUOTES|ENT_SUBSTITUTE;
 	int doctype;
 	entity_table_opt entity_table;
 	const enc_to_uni *to_uni_table = NULL;

@@ -1,8 +1,9 @@
 --TEST--
 MySQL 5.6 / MariaDB 10.4.3 EXPIRE PASSWORD protocol change
+--EXTENSIONS--
+mysqli
 --SKIPIF--
 <?php
-require_once('skipif.inc');
 require_once('connect.inc');
 
 if (!$link = @my_mysqli_connect($host, $user, $passwd, $db, $port, $socket)) {
@@ -23,10 +24,6 @@ if ($link->server_version >= 100000) {
     if ($row[0] == 0)
         die("SKIP Cannot run in MariaDB @@disconnect_on_expired_password=OFF state");
 
-}
-
-if  (!$IS_MYSQLND && (mysqli_get_client_version() < 50610)) {
-    die(sprintf("SKIP Needs libmysql 5.6.10 or newer, found  %s\n", mysqli_get_client_version()));
 }
 
 mysqli_query($link, 'DROP USER expiretest');

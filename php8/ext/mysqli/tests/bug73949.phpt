@@ -1,8 +1,9 @@
 --TEST--
 Bug #73949 (leak in mysqli_fetch_object)
+--EXTENSIONS--
+mysqli
 --SKIPIF--
 <?php
-require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -13,7 +14,7 @@ class cc{
     function __construct($c=null){
     }
 };
-$i=mysqli_connect('p:'.$host, $user, $passwd, $db);
+$i=mysqli_connect('p:'.$host, $user, $passwd, $db, $port);
 $res=mysqli_query($i, "SHOW STATUS LIKE 'Connections'");
 $t=array(new stdClass);
 while($db= mysqli_fetch_object($res,'cc',$t)){}

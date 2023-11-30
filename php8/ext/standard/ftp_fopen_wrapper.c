@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -40,7 +40,7 @@
 #include "php_standard.h"
 
 #include <sys/types.h>
-#if HAVE_SYS_SOCKET_H
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
 
@@ -49,7 +49,7 @@
 #else
 #include <netinet/in.h>
 #include <netdb.h>
-#if HAVE_ARPA_INET_H
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 #endif
@@ -415,7 +415,7 @@ php_stream * php_stream_url_wrap_ftp(php_stream_wrapper *wrapper, const char *pa
 	php_stream *reuseid=NULL;
 	size_t file_size = 0;
 	zval *tmpzval;
-	zend_bool allow_overwrite = 0;
+	bool allow_overwrite = 0;
 	int8_t read_write = 0;
 	char *transport;
 	int transport_len;
@@ -490,7 +490,7 @@ php_stream * php_stream_url_wrap_ftp(php_stream_wrapper *wrapper, const char *pa
 	} else if (read_write == 2) {
 		/* when writing file (but not appending), it must NOT exist, unless a context option exists which allows it */
 		if (context && (tmpzval = php_stream_context_get_option(context, "ftp", "overwrite")) != NULL) {
-			allow_overwrite = Z_LVAL_P(tmpzval) ? 1 : 0;
+			allow_overwrite = zend_is_true(tmpzval);
 		}
 		if (result <= 299 && result >= 200) {
 			if (allow_overwrite) {
@@ -1045,15 +1045,15 @@ static int php_stream_ftp_mkdir(php_stream_wrapper *wrapper, const char *url, in
 	if (!recursive) {
 		php_stream_printf(stream, "MKD %s\r\n", ZSTR_VAL(resource->path));
 		result = GET_FTP_RESULT(stream);
-    } else {
-        /* we look for directory separator from the end of string, thus hopefully reducing our work load */
-        char *p, *e, *buf;
+	} else {
+		/* we look for directory separator from the end of string, thus hopefully reducing our work load */
+		char *p, *e, *buf;
 
-        buf = estrndup(ZSTR_VAL(resource->path), ZSTR_LEN(resource->path));
-        e = buf + ZSTR_LEN(resource->path);
+		buf = estrndup(ZSTR_VAL(resource->path), ZSTR_LEN(resource->path));
+		e = buf + ZSTR_LEN(resource->path);
 
-        /* find a top level directory we need to create */
-        while ((p = strrchr(buf, '/'))) {
+		/* find a top level directory we need to create */
+		while ((p = strrchr(buf, '/'))) {
 			*p = '\0';
 			php_stream_printf(stream, "CWD %s\r\n", strlen(buf) ? buf : "/");
 			result = GET_FTP_RESULT(stream);
@@ -1088,7 +1088,7 @@ static int php_stream_ftp_mkdir(php_stream_wrapper *wrapper, const char *url, in
 		}
 
 		efree(buf);
-    }
+	}
 
 	php_url_free(resource);
 	php_stream_close(stream);

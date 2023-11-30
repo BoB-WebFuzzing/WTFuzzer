@@ -26,6 +26,8 @@
 #include "zend_extensions.h"
 #include "zend_API.h"
 #include "zend_sort.h"
+#include "zend_constants.h"
+#include "zend_observer.h"
 
 #include "zend_vm.h"
 
@@ -77,13 +79,16 @@ void init_op_array(zend_op_array *op_array, zend_uchar type, int initial_ops_siz
 	op_array->last_live_range = 0;
 
 	op_array->static_variables = NULL;
-	ZEND_MAP_PTR_INIT(op_array->static_variables_ptr, &op_array->static_variables);
+	ZEND_MAP_PTR_INIT(op_array->static_variables_ptr, NULL);
 	op_array->last_try_catch = 0;
 
 	op_array->fn_flags = 0;
 
 	op_array->last_literal = 0;
 	op_array->literals = NULL;
+
+	op_array->num_dynamic_func_defs = 0;
+	op_array->dynamic_func_defs = NULL;
 
 	ZEND_MAP_PTR_INIT(op_array->run_time_cache, NULL);
 	op_array->cache_size = zend_op_array_extension_handles * sizeof(void*);
@@ -103,13 +108,11 @@ ZEND_API void destroy_zend_function(zend_function *function)
 	zend_function_dtor(&tmp);
 }
 
-ZEND_API void zend_type_release(zend_type type, zend_bool persistent) {
+ZEND_API void zend_type_release(zend_type type, bool persistent) {
 	if (ZEND_TYPE_HAS_LIST(type)) {
 		zend_type *list_type;
 		ZEND_TYPE_LIST_FOREACH(ZEND_TYPE_LIST(type), list_type) {
-			if (ZEND_TYPE_HAS_NAME(*list_type)) {
-				zend_string_release(ZEND_TYPE_NAME(*list_type));
-			}
+			zend_type_release(*list_type, persistent);
 		} ZEND_TYPE_LIST_FOREACH_END();
 		if (!ZEND_TYPE_USES_ARENA(type)) {
 			pefree(ZEND_TYPE_LIST(type), persistent);
@@ -168,46 +171,25 @@ ZEND_API void zend_function_dtor(zval *zv)
 
 ZEND_API void zend_cleanup_internal_class_data(zend_class_entry *ce)
 {
-	if (CE_STATIC_MEMBERS(ce)) {
+	if (ZEND_MAP_PTR(ce->static_members_table) && CE_STATIC_MEMBERS(ce)) {
 		zval *static_members = CE_STATIC_MEMBERS(ce);
 		zval *p = static_members;
 		zval *end = p + ce->default_static_members_count;
-		if (UNEXPECTED(ZEND_MAP_PTR(ce->static_members_table) == &ce->default_static_members_table)) {
-			/* Special case: If this is a static property on a dl'ed internal class, then the
-			 * static property table and the default property table are the same. In this case we
-			 * destroy the values here, but leave behind valid UNDEF zvals and don't free the
-			 * table itself. */
-			while (p != end) {
-				if (UNEXPECTED(Z_ISREF_P(p))) {
-					zend_property_info *prop_info;
-					ZEND_REF_FOREACH_TYPE_SOURCES(Z_REF_P(p), prop_info) {
-						if (prop_info->ce == ce && p - static_members == prop_info->offset) {
-							ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(p), prop_info);
-							break; /* stop iteration here, the array might be realloc()'ed */
-						}
-					} ZEND_REF_FOREACH_TYPE_SOURCES_END();
-				}
-				i_zval_ptr_dtor(p);
-				ZVAL_UNDEF(p);
-				p++;
+		ZEND_MAP_PTR_SET(ce->static_members_table, NULL);
+		while (p != end) {
+			if (UNEXPECTED(Z_ISREF_P(p))) {
+				zend_property_info *prop_info;
+				ZEND_REF_FOREACH_TYPE_SOURCES(Z_REF_P(p), prop_info) {
+					if (prop_info->ce == ce && p - static_members == prop_info->offset) {
+						ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(p), prop_info);
+						break; /* stop iteration here, the array might be realloc()'ed */
+					}
+				} ZEND_REF_FOREACH_TYPE_SOURCES_END();
 			}
-		} else {
-			ZEND_MAP_PTR_SET(ce->static_members_table, NULL);
-			while (p != end) {
-				if (UNEXPECTED(Z_ISREF_P(p))) {
-					zend_property_info *prop_info;
-					ZEND_REF_FOREACH_TYPE_SOURCES(Z_REF_P(p), prop_info) {
-						if (prop_info->ce == ce && p - static_members == prop_info->offset) {
-							ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(p), prop_info);
-							break; /* stop iteration here, the array might be realloc()'ed */
-						}
-					} ZEND_REF_FOREACH_TYPE_SOURCES_END();
-				}
-				i_zval_ptr_dtor(p);
-				p++;
-			}
-			efree(static_members);
+			i_zval_ptr_dtor(p);
+			p++;
 		}
+		efree(static_members);
 	}
 }
 
@@ -260,34 +242,116 @@ static void _destroy_zend_class_traits_info(zend_class_entry *ce)
 	}
 }
 
+ZEND_API void zend_cleanup_mutable_class_data(zend_class_entry *ce)
+{
+	zend_class_mutable_data *mutable_data = ZEND_MAP_PTR_GET_IMM(ce->mutable_data);
+
+	if (mutable_data) {
+		HashTable *constants_table;
+		zval *p;
+
+		constants_table = mutable_data->constants_table;
+		if (constants_table && constants_table != &ce->constants_table) {
+			zend_class_constant *c;
+
+			ZEND_HASH_MAP_FOREACH_PTR(constants_table, c) {
+				if (c->ce == ce || (Z_CONSTANT_FLAGS(c->value) & CONST_OWNED)) {
+					zval_ptr_dtor_nogc(&c->value);
+				}
+			} ZEND_HASH_FOREACH_END();
+			zend_hash_destroy(constants_table);
+			mutable_data->constants_table = NULL;
+		}
+
+		p = mutable_data->default_properties_table;
+		if (p && p != ce->default_properties_table) {
+			zval *end = p + ce->default_properties_count;
+
+			while (p < end) {
+				zval_ptr_dtor_nogc(p);
+				p++;
+			}
+			mutable_data->default_properties_table = NULL;
+		}
+
+		if (mutable_data->backed_enum_table) {
+			zend_hash_release(mutable_data->backed_enum_table);
+			mutable_data->backed_enum_table = NULL;
+		}
+
+		ZEND_MAP_PTR_SET_IMM(ce->mutable_data, NULL);
+	}
+}
+
 ZEND_API void destroy_zend_class(zval *zv)
 {
 	zend_property_info *prop_info;
 	zend_class_entry *ce = Z_PTR_P(zv);
 	zend_function *fn;
 
-	if (ce->ce_flags & (ZEND_ACC_IMMUTABLE|ZEND_ACC_PRELOADED)) {
-		zend_op_array *op_array;
-
-		if (ce->default_static_members_count) {
-			zend_cleanup_internal_class_data(ce);
-		}
-		if (ce->ce_flags & ZEND_HAS_STATIC_IN_METHODS) {
-			ZEND_HASH_FOREACH_PTR(&ce->function_table, op_array) {
-				if (op_array->type == ZEND_USER_FUNCTION) {
-					destroy_op_array(op_array);
-				}
-			} ZEND_HASH_FOREACH_END();
-		}
-		return;
-	} else if (--ce->refcount > 0) {
+	if (ce->ce_flags & ZEND_ACC_IMMUTABLE) {
 		return;
 	}
+
+	if (ce->ce_flags & ZEND_ACC_FILE_CACHED) {
+		zend_class_constant *c;
+		zval *p, *end;
+
+		ZEND_HASH_MAP_FOREACH_PTR(&ce->constants_table, c) {
+			if (c->ce == ce) {
+				zval_ptr_dtor_nogc(&c->value);
+			}
+		} ZEND_HASH_FOREACH_END();
+
+		if (ce->default_properties_table) {
+			p = ce->default_properties_table;
+			end = p + ce->default_properties_count;
+
+			while (p < end) {
+				zval_ptr_dtor_nogc(p);
+				p++;
+			}
+		}
+		return;
+	}
+
+	if (--ce->refcount > 0) {
+		return;
+	}
+
 	switch (ce->type) {
 		case ZEND_USER_CLASS:
-			if (ce->parent_name && !(ce->ce_flags & ZEND_ACC_RESOLVED_PARENT)) {
-				zend_string_release_ex(ce->parent_name, 0);
+			if (!(ce->ce_flags & ZEND_ACC_CACHED)) {
+				if (ce->parent_name && !(ce->ce_flags & ZEND_ACC_RESOLVED_PARENT)) {
+					zend_string_release_ex(ce->parent_name, 0);
+				}
+
+				zend_string_release_ex(ce->name, 0);
+				zend_string_release_ex(ce->info.user.filename, 0);
+
+				if (ce->info.user.doc_comment) {
+					zend_string_release_ex(ce->info.user.doc_comment, 0);
+				}
+
+				if (ce->attributes) {
+					zend_hash_release(ce->attributes);
+				}
+
+				if (ce->num_interfaces > 0 && !(ce->ce_flags & ZEND_ACC_RESOLVED_INTERFACES)) {
+					uint32_t i;
+
+					for (i = 0; i < ce->num_interfaces; i++) {
+						zend_string_release_ex(ce->interface_names[i].name, 0);
+						zend_string_release_ex(ce->interface_names[i].lc_name, 0);
+					}
+					efree(ce->interface_names);
+				}
+
+				if (ce->num_traits > 0) {
+					_destroy_zend_class_traits_info(ce);
+				}
 			}
+
 			if (ce->default_properties_table) {
 				zval *p = ce->default_properties_table;
 				zval *end = p + ce->default_properties_count;
@@ -303,21 +367,13 @@ ZEND_API void destroy_zend_class(zval *zv)
 				zval *end = p + ce->default_static_members_count;
 
 				while (p != end) {
-					if (UNEXPECTED(Z_ISREF_P(p))) {
-						zend_property_info *prop_info;
-						ZEND_REF_FOREACH_TYPE_SOURCES(Z_REF_P(p), prop_info) {
-							if (prop_info->ce == ce && p - ce->default_static_members_table == prop_info->offset) {
-								ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(p), prop_info);
-								break; /* stop iteration here, the array might be realloc()'ed */
-							}
-						} ZEND_REF_FOREACH_TYPE_SOURCES_END();
-					}
+					ZEND_ASSERT(!Z_ISREF_P(p));
 					i_zval_ptr_dtor(p);
 					p++;
 				}
 				efree(ce->default_static_members_table);
 			}
-			ZEND_HASH_FOREACH_PTR(&ce->properties_info, prop_info) {
+			ZEND_HASH_MAP_FOREACH_PTR(&ce->properties_info, prop_info) {
 				if (prop_info->ce == ce) {
 					zend_string_release_ex(prop_info->name, 0);
 					if (prop_info->doc_comment) {
@@ -330,13 +386,12 @@ ZEND_API void destroy_zend_class(zval *zv)
 				}
 			} ZEND_HASH_FOREACH_END();
 			zend_hash_destroy(&ce->properties_info);
-			zend_string_release_ex(ce->name, 0);
 			zend_hash_destroy(&ce->function_table);
 			if (zend_hash_num_elements(&ce->constants_table)) {
 				zend_class_constant *c;
 
-				ZEND_HASH_FOREACH_PTR(&ce->constants_table, c) {
-					if (c->ce == ce) {
+				ZEND_HASH_MAP_FOREACH_PTR(&ce->constants_table, c) {
+					if (c->ce == ce || (Z_CONSTANT_FLAGS(c->value) & CONST_OWNED)) {
 						zval_ptr_dtor_nogc(&c->value);
 						if (c->doc_comment) {
 							zend_string_release_ex(c->doc_comment, 0);
@@ -348,31 +403,17 @@ ZEND_API void destroy_zend_class(zval *zv)
 				} ZEND_HASH_FOREACH_END();
 			}
 			zend_hash_destroy(&ce->constants_table);
-			if (ce->num_interfaces > 0) {
-				if (!(ce->ce_flags & ZEND_ACC_RESOLVED_INTERFACES)) {
-					uint32_t i;
-
-					for (i = 0; i < ce->num_interfaces; i++) {
-						zend_string_release_ex(ce->interface_names[i].name, 0);
-						zend_string_release_ex(ce->interface_names[i].lc_name, 0);
-					}
-				}
+			if (ce->num_interfaces > 0 && (ce->ce_flags & ZEND_ACC_RESOLVED_INTERFACES)) {
 				efree(ce->interfaces);
 			}
-			zend_string_release_ex(ce->info.user.filename, 0);
-			if (ce->info.user.doc_comment) {
-				zend_string_release_ex(ce->info.user.doc_comment, 0);
+			if (ce->backed_enum_table) {
+				zend_hash_release(ce->backed_enum_table);
 			}
-			if (ce->attributes) {
-				zend_hash_release(ce->attributes);
-			}
-
-			if (ce->num_traits > 0) {
-				_destroy_zend_class_traits_info(ce);
-			}
-
 			break;
 		case ZEND_INTERNAL_CLASS:
+			if (ce->backed_enum_table) {
+				zend_hash_release(ce->backed_enum_table);
+			}
 			if (ce->default_properties_table) {
 				zval *p = ce->default_properties_table;
 				zval *end = p + ce->default_properties_count;
@@ -392,15 +433,20 @@ ZEND_API void destroy_zend_class(zval *zv)
 					p++;
 				}
 				free(ce->default_static_members_table);
-				if (ZEND_MAP_PTR(ce->static_members_table) != &ce->default_static_members_table) {
-					zend_cleanup_internal_class_data(ce);
-				}
 			}
+
+			ZEND_HASH_MAP_FOREACH_PTR(&ce->properties_info, prop_info) {
+				if (prop_info->ce == ce) {
+					zend_string_release(prop_info->name);
+					zend_type_release(prop_info->type, /* persistent */ 1);
+					free(prop_info);
+				}
+			} ZEND_HASH_FOREACH_END();
 			zend_hash_destroy(&ce->properties_info);
 			zend_string_release_ex(ce->name, 1);
 
 			/* TODO: eliminate this loop for classes without functions with arg_info / attributes */
-			ZEND_HASH_FOREACH_PTR(&ce->function_table, fn) {
+			ZEND_HASH_MAP_FOREACH_PTR(&ce->function_table, fn) {
 				if (fn->common.scope == ce) {
 					if (fn->common.fn_flags & (ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS)) {
 						zend_free_internal_arg_info(&fn->internal_function);
@@ -417,9 +463,16 @@ ZEND_API void destroy_zend_class(zval *zv)
 			if (zend_hash_num_elements(&ce->constants_table)) {
 				zend_class_constant *c;
 
-				ZEND_HASH_FOREACH_PTR(&ce->constants_table, c) {
+				ZEND_HASH_MAP_FOREACH_PTR(&ce->constants_table, c) {
 					if (c->ce == ce) {
-						zval_internal_ptr_dtor(&c->value);
+						if (Z_TYPE(c->value) == IS_CONSTANT_AST) {
+							/* We marked this as IMMUTABLE, but do need to free it when the
+							 * class is destroyed. */
+							ZEND_ASSERT(Z_ASTVAL(c->value)->kind == ZEND_AST_CONST_ENUM_INIT);
+							free(Z_AST(c->value));
+						} else {
+							zval_internal_ptr_dtor(&c->value);
+						}
 						if (c->doc_comment) {
 							zend_string_release_ex(c->doc_comment, 1);
 						}
@@ -433,6 +486,9 @@ ZEND_API void destroy_zend_class(zval *zv)
 			}
 			if (ce->iterator_funcs_ptr) {
 				free(ce->iterator_funcs_ptr);
+			}
+			if (ce->arrayaccess_funcs_ptr) {
+				free(ce->arrayaccess_funcs_ptr);
 			}
 			if (ce->num_interfaces > 0) {
 				free(ce->interfaces);
@@ -457,18 +513,20 @@ void zend_class_add_ref(zval *zv)
 	}
 }
 
+ZEND_API void zend_destroy_static_vars(zend_op_array *op_array)
+{
+	if (ZEND_MAP_PTR(op_array->static_variables_ptr)) {
+		HashTable *ht = ZEND_MAP_PTR_GET(op_array->static_variables_ptr);
+		if (ht) {
+			zend_array_destroy(ht);
+			ZEND_MAP_PTR_SET(op_array->static_variables_ptr, NULL);
+		}
+	}
+}
+
 ZEND_API void destroy_op_array(zend_op_array *op_array)
 {
 	uint32_t i;
-
-	if (op_array->static_variables) {
-		HashTable *ht = ZEND_MAP_PTR_GET(op_array->static_variables_ptr);
-		if (ht && !(GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE)) {
-			if (GC_DELREF(ht) == 0) {
-				zend_array_destroy(ht);
-			}
-		}
-	}
 
 	if ((op_array->fn_flags & ZEND_ACC_HEAP_RT_CACHE)
 	 && ZEND_MAP_PTR(op_array->run_time_cache)) {
@@ -544,6 +602,22 @@ ZEND_API void destroy_op_array(zend_op_array *op_array)
 			zend_type_release(arg_info[i].type, /* persistent */ 0);
 		}
 		efree(arg_info);
+	}
+	if (op_array->static_variables) {
+		zend_array_destroy(op_array->static_variables);
+	}
+	if (op_array->num_dynamic_func_defs) {
+		for (i = 0; i < op_array->num_dynamic_func_defs; i++) {
+			/* Closures overwrite static_variables in their copy.
+			 * Make sure to destroy them when the prototype function is destroyed. */
+			if (op_array->dynamic_func_defs[i]->static_variables
+					&& (op_array->dynamic_func_defs[i]->fn_flags & ZEND_ACC_CLOSURE)) {
+				zend_array_destroy(op_array->dynamic_func_defs[i]->static_variables);
+				op_array->dynamic_func_defs[i]->static_variables = NULL;
+			}
+			destroy_op_array(op_array->dynamic_func_defs[i]);
+		}
+		efree(op_array->dynamic_func_defs);
 	}
 }
 
@@ -684,38 +758,36 @@ static void emit_live_range(
 			while (def_opline + 1 < use_opline) {
 				def_opline++;
 				start++;
-				if (def_opline->opcode == ZEND_DO_FCALL) {
-					if (level == 0) {
+				switch (def_opline->opcode) {
+					case ZEND_INIT_FCALL:
+					case ZEND_INIT_FCALL_BY_NAME:
+					case ZEND_INIT_NS_FCALL_BY_NAME:
+					case ZEND_INIT_DYNAMIC_CALL:
+					case ZEND_INIT_USER_CALL:
+					case ZEND_INIT_METHOD_CALL:
+					case ZEND_INIT_STATIC_METHOD_CALL:
+					case ZEND_NEW:
+						level++;
 						break;
-					}
-					level--;
-				} else {
-					switch (def_opline->opcode) {
-						case ZEND_INIT_FCALL:
-						case ZEND_INIT_FCALL_BY_NAME:
-						case ZEND_INIT_NS_FCALL_BY_NAME:
-						case ZEND_INIT_DYNAMIC_CALL:
-						case ZEND_INIT_USER_CALL:
-						case ZEND_INIT_METHOD_CALL:
-						case ZEND_INIT_STATIC_METHOD_CALL:
-						case ZEND_NEW:
-							level++;
-							break;
-						case ZEND_DO_ICALL:
-						case ZEND_DO_UCALL:
-						case ZEND_DO_FCALL_BY_NAME:
-							level--;
-							break;
-					}
+					case ZEND_DO_FCALL:
+					case ZEND_DO_FCALL_BY_NAME:
+					case ZEND_DO_ICALL:
+					case ZEND_DO_UCALL:
+						if (level == 0) {
+							goto done;
+						}
+						level--;
+						break;
 				}
 			}
+done:
 			emit_live_range_raw(op_array, var_num, ZEND_LIVE_NEW, orig_start + 1, start + 1);
 			if (start + 1 == end) {
 				/* Trivial live-range, no need to store it. */
 				return;
 			}
 		}
-		/* explicit fallthrough */
+		ZEND_FALLTHROUGH;
 		default:
 			start++;
 			kind = ZEND_LIVE_TMPVAR;
@@ -760,6 +832,8 @@ static void emit_live_range(
 				/* The use might have been optimized away, in which case we will hit the def
 				 * instead. */
 				if (use_opline->opcode == ZEND_COPY_TMP && use_opline->result.var == rt_var_num) {
+					start = def_opline + 1 - op_array->opcodes;
+					emit_live_range_raw(op_array, var_num, kind, start, end);
 					return;
 				}
 			} while (!(
@@ -777,14 +851,14 @@ static void emit_live_range(
 	emit_live_range_raw(op_array, var_num, kind, start, end);
 }
 
-static zend_bool is_fake_def(zend_op *opline) {
+static bool is_fake_def(zend_op *opline) {
 	/* These opcodes only modify the result, not create it. */
 	return opline->opcode == ZEND_ROPE_ADD
 		|| opline->opcode == ZEND_ADD_ARRAY_ELEMENT
 		|| opline->opcode == ZEND_ADD_ARRAY_UNPACK;
 }
 
-static zend_bool keeps_op1_alive(zend_op *opline) {
+static bool keeps_op1_alive(zend_op *opline) {
 	/* These opcodes don't consume their OP1 operand,
 	 * it is later freed by something else. */
 	if (opline->opcode == ZEND_CASE
@@ -976,6 +1050,8 @@ ZEND_API void pass_two(zend_op_array *op_array)
 	CG(context).literals_size = op_array->last_literal;
 #endif
 
+    op_array->T += ZEND_OBSERVER_ENABLED; // reserve last temporary for observers if enabled
+
 	/* Needs to be set directly after the opcode/literal reallocation, to ensure destruction
 	 * happens correctly if any of the following fixups generate a fatal error. */
 	op_array->fn_flags |= ZEND_ACC_DONE_PASS_TWO;
@@ -1017,14 +1093,10 @@ ZEND_API void pass_two(zend_op_array *op_array)
 				if (op_array->fn_flags & ZEND_ACC_HAS_FINALLY_BLOCK) {
 					zend_check_finally_breakout(op_array, opline - op_array->opcodes, opline->op1.opline_num);
 				}
-				/* break omitted intentionally */
+				ZEND_FALLTHROUGH;
 			case ZEND_JMP:
 				ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array, opline, opline->op1);
 				break;
-			case ZEND_JMPZNZ:
-				/* absolute index to relative offset */
-				opline->extended_value = ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, opline->extended_value);
-				/* break omitted intentionally */
 			case ZEND_JMPZ:
 			case ZEND_JMPNZ:
 			case ZEND_JMPZ_EX:

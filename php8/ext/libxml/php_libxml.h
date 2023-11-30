@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -35,6 +35,7 @@ extern zend_module_entry libxml_module_entry;
 
 #include "zend_smart_str.h"
 #include <libxml/tree.h>
+#include <libxml/parser.h>
 
 #define LIBXML_SAVE_NOEMPTYTAG 1<<2
 
@@ -43,11 +44,11 @@ ZEND_BEGIN_MODULE_GLOBALS(libxml)
 	smart_str error_buffer;
 	zend_llist *error_list;
 	struct _php_libxml_entity_resolver {
-		zval                    object;
-		zend_fcall_info			fci;
+		zval 					callback;
+		zend_fcall_info 		fci;
 		zend_fcall_info_cache	fcc;
 	} entity_loader;
-	zend_bool entity_loader_disabled;
+	bool entity_loader_disabled;
 ZEND_END_MODULE_GLOBALS(libxml)
 
 typedef struct _libxml_doc_props {
@@ -106,7 +107,7 @@ PHP_LIBXML_API void php_libxml_ctx_error(void *ctx, const char *msg, ...);
 PHP_LIBXML_API int php_libxml_xmlCheckUTF8(const unsigned char *s);
 PHP_LIBXML_API void php_libxml_switch_context(zval *context, zval *oldcontext);
 PHP_LIBXML_API void php_libxml_issue_error(int level, const char *msg);
-PHP_LIBXML_API zend_bool php_libxml_disable_entity_loader(zend_bool disable);
+PHP_LIBXML_API bool php_libxml_disable_entity_loader(bool disable);
 
 /* Init/shutdown functions*/
 PHP_LIBXML_API void php_libxml_initialize(void);

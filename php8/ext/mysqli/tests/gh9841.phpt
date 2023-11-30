@@ -1,8 +1,9 @@
 --TEST--
 Bug GH-9841 (mysqli_query throws warning despite using silenced error mode)
+--EXTENSIONS--
+mysqli
 --SKIPIF--
 <?php
-require_once 'skipif.inc';
 require_once 'skipifconnectfailure.inc';
 ?>
 --FILE--

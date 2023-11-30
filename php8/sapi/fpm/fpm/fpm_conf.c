@@ -34,6 +34,7 @@
 #include "fpm_status.h"
 #include "fpm_log.h"
 #include "fpm_events.h"
+#include "fpm_unix.h"
 #include "zlog.h"
 #ifdef HAVE_SYSTEMD
 #include "fpm_systemd.h"
@@ -125,6 +126,9 @@ static struct ini_value_parser_s ini_fpm_pool_options[] = {
 	{ "listen.group",              &fpm_conf_set_string,      WPO(listen_group) },
 	{ "listen.mode",               &fpm_conf_set_string,      WPO(listen_mode) },
 	{ "listen.allowed_clients",    &fpm_conf_set_string,      WPO(listen_allowed_clients) },
+#ifdef SO_SETFIB
+	{ "listen.setfib",             &fpm_conf_set_integer,     WPO(listen_setfib) },
+#endif
 	{ "process.priority",          &fpm_conf_set_integer,     WPO(process_priority) },
 	{ "process.dumpable",          &fpm_conf_set_boolean,     WPO(process_dumpable) },
 	{ "pm",                        &fpm_conf_set_pm,          WPO(pm) },
@@ -132,6 +136,7 @@ static struct ini_value_parser_s ini_fpm_pool_options[] = {
 	{ "pm.start_servers",          &fpm_conf_set_integer,     WPO(pm_start_servers) },
 	{ "pm.min_spare_servers",      &fpm_conf_set_integer,     WPO(pm_min_spare_servers) },
 	{ "pm.max_spare_servers",      &fpm_conf_set_integer,     WPO(pm_max_spare_servers) },
+	{ "pm.max_spawn_rate",         &fpm_conf_set_integer,     WPO(pm_max_spawn_rate) },
 	{ "pm.process_idle_timeout",   &fpm_conf_set_time,        WPO(pm_process_idle_timeout) },
 	{ "pm.max_requests",           &fpm_conf_set_integer,     WPO(pm_max_requests) },
 	{ "pm.status_path",            &fpm_conf_set_string,      WPO(pm_status_path) },
@@ -207,9 +212,9 @@ static int fpm_conf_expand_pool_name(char **value) {
 
 static char *fpm_conf_set_boolean(zval *value, void **config, intptr_t offset) /* {{{ */
 {
-	char *val = Z_STRVAL_P(value);
-	long value_y = !strcasecmp(val, "1");
-	long value_n = !strcasecmp(val, "");
+	zend_string *val = Z_STR_P(value);
+	bool value_y = zend_string_equals_literal(val, "1");
+	bool value_n = ZSTR_LEN(val) == 0; /* Empty string is the only valid false value */
 
 	if (!value_y && !value_n) {
 		return "invalid boolean value";
@@ -307,6 +312,7 @@ static char *fpm_conf_set_time(zval *value, void **config, intptr_t offset) /* {
 		case 's' : /* s is the default suffix */
 			val[len-1] = '\0';
 			suffix = '0';
+			ZEND_FALLTHROUGH;
 		default :
 			if (suffix < '0' || suffix > '9') {
 				return "unknown suffix used in time value";
@@ -322,18 +328,18 @@ static char *fpm_conf_set_time(zval *value, void **config, intptr_t offset) /* {
 
 static char *fpm_conf_set_log_level(zval *value, void **config, intptr_t offset) /* {{{ */
 {
-	char *val = Z_STRVAL_P(value);
+	zend_string *val = Z_STR_P(value);
 	int log_level;
 
-	if (!strcasecmp(val, "debug")) {
+	if (zend_string_equals_literal_ci(val, "debug")) {
 		log_level = ZLOG_DEBUG;
-	} else if (!strcasecmp(val, "notice")) {
+	} else if (zend_string_equals_literal_ci(val, "notice")) {
 		log_level = ZLOG_NOTICE;
-	} else if (!strcasecmp(val, "warning") || !strcasecmp(val, "warn")) {
+	} else if (zend_string_equals_literal_ci(val, "warning") || zend_string_equals_literal_ci(val, "warn")) {
 		log_level = ZLOG_WARNING;
-	} else if (!strcasecmp(val, "error")) {
+	} else if (zend_string_equals_literal_ci(val, "error")) {
 		log_level = ZLOG_ERROR;
-	} else if (!strcasecmp(val, "alert")) {
+	} else if (zend_string_equals_literal_ci(val, "alert")) {
 		log_level = ZLOG_ALERT;
 	} else {
 		return "invalid value for 'log_level'";
@@ -347,144 +353,144 @@ static char *fpm_conf_set_log_level(zval *value, void **config, intptr_t offset)
 #ifdef HAVE_SYSLOG_H
 static char *fpm_conf_set_syslog_facility(zval *value, void **config, intptr_t offset) /* {{{ */
 {
-	char *val = Z_STRVAL_P(value);
+	zend_string *val = Z_STR_P(value);
 	int *conf = (int *) ((char *) *config + offset);
 
 #ifdef LOG_AUTH
-	if (!strcasecmp(val, "AUTH")) {
+	if (zend_string_equals_literal_ci(val, "AUTH")) {
 		*conf = LOG_AUTH;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_AUTHPRIV
-	if (!strcasecmp(val, "AUTHPRIV")) {
+	if (zend_string_equals_literal_ci(val, "AUTHPRIV")) {
 		*conf = LOG_AUTHPRIV;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_CRON
-	if (!strcasecmp(val, "CRON")) {
+	if (zend_string_equals_literal_ci(val, "CRON")) {
 		*conf = LOG_CRON;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_DAEMON
-	if (!strcasecmp(val, "DAEMON")) {
+	if (zend_string_equals_literal_ci(val, "DAEMON")) {
 		*conf = LOG_DAEMON;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_FTP
-	if (!strcasecmp(val, "FTP")) {
+	if (zend_string_equals_literal_ci(val, "FTP")) {
 		*conf = LOG_FTP;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_KERN
-	if (!strcasecmp(val, "KERN")) {
+	if (zend_string_equals_literal_ci(val, "KERN")) {
 		*conf = LOG_KERN;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_LPR
-	if (!strcasecmp(val, "LPR")) {
+	if (zend_string_equals_literal_ci(val, "LPR")) {
 		*conf = LOG_LPR;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_MAIL
-	if (!strcasecmp(val, "MAIL")) {
+	if (zend_string_equals_literal_ci(val, "MAIL")) {
 		*conf = LOG_MAIL;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_NEWS
-	if (!strcasecmp(val, "NEWS")) {
+	if (zend_string_equals_literal_ci(val, "NEWS")) {
 		*conf = LOG_NEWS;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_SYSLOG
-	if (!strcasecmp(val, "SYSLOG")) {
+	if (zend_string_equals_literal_ci(val, "SYSLOG")) {
 		*conf = LOG_SYSLOG;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_USER
-	if (!strcasecmp(val, "USER")) {
+	if (zend_string_equals_literal_ci(val, "USER")) {
 		*conf = LOG_USER;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_UUCP
-	if (!strcasecmp(val, "UUCP")) {
+	if (zend_string_equals_literal_ci(val, "UUCP")) {
 		*conf = LOG_UUCP;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_LOCAL0
-	if (!strcasecmp(val, "LOCAL0")) {
+	if (zend_string_equals_literal_ci(val, "LOCAL0")) {
 		*conf = LOG_LOCAL0;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_LOCAL1
-	if (!strcasecmp(val, "LOCAL1")) {
+	if (zend_string_equals_literal_ci(val, "LOCAL1")) {
 		*conf = LOG_LOCAL1;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_LOCAL2
-	if (!strcasecmp(val, "LOCAL2")) {
+	if (zend_string_equals_literal_ci(val, "LOCAL2")) {
 		*conf = LOG_LOCAL2;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_LOCAL3
-	if (!strcasecmp(val, "LOCAL3")) {
+	if (zend_string_equals_literal_ci(val, "LOCAL3")) {
 		*conf = LOG_LOCAL3;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_LOCAL4
-	if (!strcasecmp(val, "LOCAL4")) {
+	if (zend_string_equals_literal_ci(val, "LOCAL4")) {
 		*conf = LOG_LOCAL4;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_LOCAL5
-	if (!strcasecmp(val, "LOCAL5")) {
+	if (zend_string_equals_literal_ci(val, "LOCAL5")) {
 		*conf = LOG_LOCAL5;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_LOCAL6
-	if (!strcasecmp(val, "LOCAL6")) {
+	if (zend_string_equals_literal_ci(val, "LOCAL6")) {
 		*conf = LOG_LOCAL6;
 		return NULL;
 	}
 #endif
 
 #ifdef LOG_LOCAL7
-	if (!strcasecmp(val, "LOCAL7")) {
+	if (zend_string_equals_literal_ci(val, "LOCAL7")) {
 		*conf = LOG_LOCAL7;
 		return NULL;
 	}
@@ -497,10 +503,10 @@ static char *fpm_conf_set_syslog_facility(zval *value, void **config, intptr_t o
 
 static char *fpm_conf_set_rlimit_core(zval *value, void **config, intptr_t offset) /* {{{ */
 {
-	char *val = Z_STRVAL_P(value);
+	zend_string *val = Z_STR_P(value);
 	int *ptr = (int *) ((char *) *config + offset);
 
-	if (!strcasecmp(val, "unlimited")) {
+	if (zend_string_equals_literal_ci(val, "unlimited")) {
 		*ptr = -1;
 	} else {
 		int int_value;
@@ -526,13 +532,13 @@ static char *fpm_conf_set_rlimit_core(zval *value, void **config, intptr_t offse
 
 static char *fpm_conf_set_pm(zval *value, void **config, intptr_t offset) /* {{{ */
 {
-	char *val = Z_STRVAL_P(value);
+	zend_string *val = Z_STR_P(value);
 	struct fpm_worker_pool_config_s  *c = *config;
-	if (!strcasecmp(val, "static")) {
+	if (zend_string_equals_literal_ci(val, "static")) {
 		c->pm = PM_STYLE_STATIC;
-	} else if (!strcasecmp(val, "dynamic")) {
+	} else if (zend_string_equals_literal_ci(val, "dynamic")) {
 		c->pm = PM_STYLE_DYNAMIC;
-	} else if (!strcasecmp(val, "ondemand")) {
+	} else if (zend_string_equals_literal_ci(val, "ondemand")) {
 		c->pm = PM_STYLE_ONDEMAND;
 	} else {
 		return "invalid process manager (static, dynamic or ondemand)";
@@ -555,11 +561,13 @@ static char *fpm_conf_set_array(zval *key, zval *value, void **config, int conve
 	}
 
 	memset(kv, 0, sizeof(*kv));
-	kv->key = strdup(Z_STRVAL_P(key));
+	if (key) {
+		kv->key = strdup(Z_STRVAL_P(key));
 
-	if (!kv->key) {
-		free(kv);
-		return "fpm_conf_set_array: strdup(key) failed";
+		if (!kv->key) {
+			free(kv);
+			return "fpm_conf_set_array: strdup(key) failed";
+		}
 	}
 
 	if (convert_to_bool) {
@@ -610,11 +618,15 @@ static void *fpm_worker_pool_config_alloc(void)
 
 	memset(wp->config, 0, sizeof(struct fpm_worker_pool_config_s));
 	wp->config->listen_backlog = FPM_BACKLOG_DEFAULT;
+	wp->config->pm_max_spawn_rate = 32; /* 32 by default */
 	wp->config->pm_process_idle_timeout = 10; /* 10s by default */
 	wp->config->process_priority = 64; /* 64 means unset */
 	wp->config->process_dumpable = 0;
 	wp->config->clear_env = 1;
 	wp->config->decorate_workers_output = 1;
+#ifdef SO_SETFIB
+	wp->config->listen_setfib = -1;
+#endif
 
 	if (!fpm_worker_all_pools) {
 		fpm_worker_all_pools = wp;
@@ -659,6 +671,11 @@ int fpm_worker_pool_config_free(struct fpm_worker_pool_config_s *wpc) /* {{{ */
 	free(wpc->apparmor_hat);
 #endif
 
+	for (kv = wpc->access_suppress_paths; kv; kv = kv_next) {
+		kv_next = kv->next;
+		free(kv->value);
+		free(kv);
+	}
 	for (kv = wpc->php_values; kv; kv = kv_next) {
 		kv_next = kv->next;
 		free(kv->key);
@@ -847,7 +864,7 @@ static int fpm_conf_process_all_pools(void)
 			return -1;
 		}
 
-		/* pm.start_servers, pm.min_spare_servers, pm.max_spare_servers */
+		/* pm.start_servers, pm.min_spare_servers, pm.max_spare_servers, pm.max_spawn_rate */
 		if (wp->config->pm == PM_STYLE_DYNAMIC) {
 			struct fpm_worker_pool_config_s *config = wp->config;
 
@@ -880,11 +897,16 @@ static int fpm_conf_process_all_pools(void)
 				zlog(ZLOG_ALERT, "[pool %s] pm.start_servers(%d) must not be less than pm.min_spare_servers(%d) and not greater than pm.max_spare_servers(%d)", wp->config->name, config->pm_start_servers, config->pm_min_spare_servers, config->pm_max_spare_servers);
 				return -1;
 			}
+
+			if (config->pm_max_spawn_rate < 1) {
+				zlog(ZLOG_ALERT, "[pool %s] pm.max_spawn_rate must be a positive value", wp->config->name);
+				return -1;
+			}
 		} else if (wp->config->pm == PM_STYLE_ONDEMAND) {
 			struct fpm_worker_pool_config_s *config = wp->config;
 
 			if (!fpm_event_support_edge_trigger()) {
-				zlog(ZLOG_ALERT, "[pool %s] ondemand process manager can ONLY be used when events.mechanisme is either epoll (Linux) or kqueue (*BSD).", wp->config->name);
+				zlog(ZLOG_ALERT, "[pool %s] ondemand process manager can ONLY be used when events.mechanism is either epoll (Linux) or kqueue (*BSD).", wp->config->name);
 				return -1;
 			}
 
@@ -898,7 +920,7 @@ static int fpm_conf_process_all_pools(void)
 				config->listen_backlog = FPM_BACKLOG_DEFAULT;
 			}
 
-			/* certainely useless but proper */
+			/* certainly useless but proper */
 			config->pm_start_servers = 0;
 			config->pm_min_spare_servers = 0;
 			config->pm_max_spare_servers = 0;
@@ -1395,7 +1417,7 @@ static void fpm_conf_ini_parser_section(zval *section, void *arg) /* {{{ */
 	int *error = (int *)arg;
 
 	/* switch to global conf */
-	if (!strcasecmp(Z_STRVAL_P(section), "global")) {
+	if (zend_string_equals_literal_ci(Z_STR_P(section), "global")) {
 		current_wp = NULL;
 		return;
 	}
@@ -1438,7 +1460,7 @@ static void fpm_conf_ini_parser_entry(zval *name, zval *value, void *arg) /* {{{
 		return;
 	}
 
-	if (!strcmp(Z_STRVAL_P(name), "include")) {
+	if (zend_string_equals_literal(Z_STR_P(name), "include")) {
 		if (ini_include) {
 			zlog(ZLOG_ERROR, "[%s:%d] two includes at the same time !", ini_filename, ini_lineno);
 			*error = 1;
@@ -1489,18 +1511,31 @@ static void fpm_conf_ini_parser_array(zval *name, zval *key, zval *value, void *
 	char *err = NULL;
 	void *config;
 
-	if (!Z_STRVAL_P(key) || !Z_STRVAL_P(value) || !*Z_STRVAL_P(key)) {
-		zlog(ZLOG_ERROR, "[%s:%d] Misspelled  array ?", ini_filename, ini_lineno);
+	if (zend_string_equals_literal(Z_STR_P(name), "access.suppress_path")) {
+		if (!(*Z_STRVAL_P(key) == '\0')) {
+			zlog(ZLOG_ERROR, "[%s:%d] Keys provided to field 'access.suppress_path' are ignored", ini_filename, ini_lineno);
+			*error = 1;
+		}
+		if (!(*Z_STRVAL_P(value)) || (*Z_STRVAL_P(value) != '/')) {
+			zlog(ZLOG_ERROR, "[%s:%d] Values provided to field 'access.suppress_path' must begin with '/'", ini_filename, ini_lineno);
+			*error = 1;
+		}
+		if (*error) {
+			return;
+		}
+	} else if (!*Z_STRVAL_P(key)) {
+		zlog(ZLOG_ERROR, "[%s:%d] You must provide a key for field '%s'", ini_filename, ini_lineno, Z_STRVAL_P(name));
 		*error = 1;
 		return;
 	}
+
 	if (!current_wp || !current_wp->config) {
 		zlog(ZLOG_ERROR, "[%s:%d] Array are not allowed in the global section", ini_filename, ini_lineno);
 		*error = 1;
 		return;
 	}
 
-	if (!strcmp("env", Z_STRVAL_P(name))) {
+	if (zend_string_equals_literal(Z_STR_P(name), "env")) {
 		if (!*Z_STRVAL_P(value)) {
 			zlog(ZLOG_ERROR, "[%s:%d] empty value", ini_filename, ini_lineno);
 			*error = 1;
@@ -1509,21 +1544,25 @@ static void fpm_conf_ini_parser_array(zval *name, zval *key, zval *value, void *
 		config = (char *)current_wp->config + WPO(env);
 		err = fpm_conf_set_array(key, value, &config, 0);
 
-	} else if (!strcmp("php_value", Z_STRVAL_P(name))) {
+	} else if (zend_string_equals_literal(Z_STR_P(name), "php_value")) {
 		config = (char *)current_wp->config + WPO(php_values);
 		err = fpm_conf_set_array(key, value, &config, 0);
 
-	} else if (!strcmp("php_admin_value", Z_STRVAL_P(name))) {
+	} else if (zend_string_equals_literal(Z_STR_P(name), "php_admin_value")) {
 		config = (char *)current_wp->config + WPO(php_admin_values);
 		err = fpm_conf_set_array(key, value, &config, 0);
 
-	} else if (!strcmp("php_flag", Z_STRVAL_P(name))) {
+	} else if (zend_string_equals_literal(Z_STR_P(name), "php_flag")) {
 		config = (char *)current_wp->config + WPO(php_values);
 		err = fpm_conf_set_array(key, value, &config, 1);
 
-	} else if (!strcmp("php_admin_flag", Z_STRVAL_P(name))) {
+	} else if (zend_string_equals_literal(Z_STR_P(name), "php_admin_flag")) {
 		config = (char *)current_wp->config + WPO(php_admin_values);
 		err = fpm_conf_set_array(key, value, &config, 1);
+
+	} else if (zend_string_equals_literal(Z_STR_P(name), "access.suppress_path")) {
+		config = (char *)current_wp->config + WPO(access_suppress_paths);
+		err = fpm_conf_set_array(NULL, value, &config, 0);
 
 	} else {
 		zlog(ZLOG_ERROR, "[%s:%d] unknown directive '%s'", ini_filename, ini_lineno, Z_STRVAL_P(name));
@@ -1683,7 +1722,7 @@ static void fpm_conf_dump(void)
 	zlog(ZLOG_NOTICE, "\tdaemonize = %s",                   BOOL2STR(fpm_global_config.daemonize));
 	zlog(ZLOG_NOTICE, "\trlimit_files = %d",                fpm_global_config.rlimit_files);
 	zlog(ZLOG_NOTICE, "\trlimit_core = %d",                 fpm_global_config.rlimit_core);
-	zlog(ZLOG_NOTICE, "\tevents.mechanism = %s",            fpm_event_machanism_name());
+	zlog(ZLOG_NOTICE, "\tevents.mechanism = %s",            fpm_event_mechanism_name());
 #ifdef HAVE_SYSTEMD
 	zlog(ZLOG_NOTICE, "\tsystemd_interval = %ds",           fpm_global_config.systemd_interval/1000);
 #endif
@@ -1710,6 +1749,9 @@ static void fpm_conf_dump(void)
 		zlog(ZLOG_NOTICE, "\tlisten.group = %s",               STR2STR(wp->config->listen_group));
 		zlog(ZLOG_NOTICE, "\tlisten.mode = %s",                STR2STR(wp->config->listen_mode));
 		zlog(ZLOG_NOTICE, "\tlisten.allowed_clients = %s",     STR2STR(wp->config->listen_allowed_clients));
+#ifdef SO_SETFIB
+		zlog(ZLOG_NOTICE, "\tlisten.setfib = %d",              wp->config->listen_setfib);
+#endif
 		if (wp->config->process_priority == 64) {
 			zlog(ZLOG_NOTICE, "\tprocess.priority = undefined");
 		} else {
@@ -1721,6 +1763,7 @@ static void fpm_conf_dump(void)
 		zlog(ZLOG_NOTICE, "\tpm.start_servers = %d",           wp->config->pm_start_servers);
 		zlog(ZLOG_NOTICE, "\tpm.min_spare_servers = %d",       wp->config->pm_min_spare_servers);
 		zlog(ZLOG_NOTICE, "\tpm.max_spare_servers = %d",       wp->config->pm_max_spare_servers);
+		zlog(ZLOG_NOTICE, "\tpm.max_spawn_rate = %d",          wp->config->pm_max_spawn_rate);
 		zlog(ZLOG_NOTICE, "\tpm.process_idle_timeout = %d",    wp->config->pm_process_idle_timeout);
 		zlog(ZLOG_NOTICE, "\tpm.max_requests = %d",            wp->config->pm_max_requests);
 		zlog(ZLOG_NOTICE, "\tpm.status_path = %s",             STR2STR(wp->config->pm_status_path));
@@ -1729,6 +1772,9 @@ static void fpm_conf_dump(void)
 		zlog(ZLOG_NOTICE, "\tping.response = %s",              STR2STR(wp->config->ping_response));
 		zlog(ZLOG_NOTICE, "\taccess.log = %s",                 STR2STR(wp->config->access_log));
 		zlog(ZLOG_NOTICE, "\taccess.format = %s",              STR2STR(wp->config->access_format));
+		for (kv = wp->config->access_suppress_paths; kv; kv = kv->next) {
+			zlog(ZLOG_NOTICE, "\taccess.suppress_path[] = %s", kv->value);
+		}
 		zlog(ZLOG_NOTICE, "\tslowlog = %s",                    STR2STR(wp->config->slowlog));
 		zlog(ZLOG_NOTICE, "\trequest_slowlog_timeout = %ds",   wp->config->request_slowlog_timeout);
 		zlog(ZLOG_NOTICE, "\trequest_slowlog_trace_depth = %d", wp->config->request_slowlog_trace_depth);
@@ -1809,6 +1855,12 @@ int fpm_conf_init_main(int test_conf, int force_daemon) /* {{{ */
 	}
 
 	if (test_conf) {
+		for (struct fpm_worker_pool_s *wp = fpm_worker_all_pools; wp; wp = wp->next) {
+			if (!fpm_unix_test_config(wp)) {
+				return -1;
+			}
+		}
+
 		if (test_conf > 1) {
 			fpm_conf_dump();
 		}

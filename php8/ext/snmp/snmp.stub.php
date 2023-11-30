@@ -1,6 +1,114 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
+
+/**
+ * @var int
+ * @cvalue NETSNMP_OID_OUTPUT_SUFFIX
+ */
+const SNMP_OID_OUTPUT_SUFFIX = UNKNOWN;
+/**
+ * @var int
+ * @cvalue NETSNMP_OID_OUTPUT_MODULE
+ */
+const SNMP_OID_OUTPUT_MODULE = UNKNOWN;
+/**
+ * @var int
+ * @cvalue NETSNMP_OID_OUTPUT_FULL
+ */
+const SNMP_OID_OUTPUT_FULL = UNKNOWN;
+/**
+ * @var int
+ * @cvalue NETSNMP_OID_OUTPUT_NUMERIC
+ */
+const SNMP_OID_OUTPUT_NUMERIC = UNKNOWN;
+/**
+ * @var int
+ * @cvalue NETSNMP_OID_OUTPUT_UCD
+ */
+const SNMP_OID_OUTPUT_UCD = UNKNOWN;
+/**
+ * @var int
+ * @cvalue NETSNMP_OID_OUTPUT_NONE
+ */
+const SNMP_OID_OUTPUT_NONE = UNKNOWN;
+
+/**
+ * @var int
+ * @cvalue SNMP_VALUE_LIBRARY
+ */
+const SNMP_VALUE_LIBRARY = UNKNOWN;
+/**
+ * @var int
+ * @cvalue SNMP_VALUE_PLAIN
+ */
+const SNMP_VALUE_PLAIN = UNKNOWN;
+/**
+ * @var int
+ * @cvalue SNMP_VALUE_OBJECT
+ */
+const SNMP_VALUE_OBJECT = UNKNOWN;
+
+/**
+ * @var int
+ * @cvalue ASN_BIT_STR
+ */
+const SNMP_BIT_STR = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_OCTET_STR
+ */
+const SNMP_OCTET_STR = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_OPAQUE
+ */
+const SNMP_OPAQUE = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_NULL
+ */
+const SNMP_NULL = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_OBJECT_ID
+ */
+const SNMP_OBJECT_ID = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_IPADDRESS
+ */
+const SNMP_IPADDRESS = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_GAUGE
+ */
+const SNMP_COUNTER = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_UNSIGNED
+ */
+const SNMP_UNSIGNED = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_TIMETICKS
+ */
+const SNMP_TIMETICKS = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_UINTEGER
+ */
+const SNMP_UINTEGER = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_INTEGER
+ */
+const SNMP_INTEGER = UNKNOWN;
+/**
+ * @var int
+ * @cvalue ASN_COUNTER64
+ */
+const SNMP_COUNTER64 = UNKNOWN;
 
 function snmpget(string $hostname, string $community, array|string $object_id, int $timeout = -1, int $retries = -1): mixed {}
 
@@ -75,34 +183,118 @@ function snmp_read_mib(string $filename): bool {}
 
 class SNMP
 {
+    /**
+     * @var int
+     * @cvalue SNMP_VERSION_1
+     * @link snmp.class.constants.version-1
+     */
+    public const VERSION_1 = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue SNMP_VERSION_2c
+     * @link snmp.class.constants.version-2c
+     */
+    public const VERSION_2c = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue SNMP_VERSION_2c
+     * @link snmp.class.constants.version-2c
+     */
+    public const VERSION_2C = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue SNMP_VERSION_3
+     * @link snmp.class.constants.version-3
+     */
+    public const VERSION_3 = UNKNOWN;
+
+    /**
+     * @var int
+     * @cvalue PHP_SNMP_ERRNO_NOERROR
+     * @link snmp.class.constants.errno-noerror
+     */
+    public const ERRNO_NOERROR = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue PHP_SNMP_ERRNO_ANY
+     * @link snmp.class.constants.errno-any
+     */
+    public const ERRNO_ANY = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue PHP_SNMP_ERRNO_GENERIC
+     * @link snmp.class.constants.errno-generic
+     */
+    public const ERRNO_GENERIC = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue PHP_SNMP_ERRNO_TIMEOUT
+     * @link snmp.class.constants.errno-timeout
+     */
+    public const ERRNO_TIMEOUT = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue PHP_SNMP_ERRNO_ERROR_IN_REPLY
+     * @link snmp.class.constants.errno-error-in-reply
+     */
+    public const ERRNO_ERROR_IN_REPLY = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue PHP_SNMP_ERRNO_OID_NOT_INCREASING
+     * @link snmp.class.constants.errno-oid-not-increasing
+     */
+    public const ERRNO_OID_NOT_INCREASING = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue PHP_SNMP_ERRNO_OID_PARSING_ERROR
+     * @link snmp.class.constants.errno-oid-parsing-error
+     */
+    public const ERRNO_OID_PARSING_ERROR = UNKNOWN;
+    /**
+     * @var int
+     * @cvalue PHP_SNMP_ERRNO_MULTIPLE_SET_QUERIES
+     * @link snmp.class.constants.errno-multiple-set-queries
+     */
+    public const ERRNO_MULTIPLE_SET_QUERIES = UNKNOWN;
+
+    /** @readonly */
+    public array $info;
+    public ?int $max_oids;
+    public int $valueretrieval;
+    public bool $quick_print;
+    public bool $enum_print;
+    public int $oid_output_format;
+    public bool $oid_increasing_check;
+    public int $exceptions_enabled;
+
     public function __construct(int $version, string $hostname, string $community, int $timeout = -1, int $retries = -1) {}
 
-    /** @return bool */
-    public function close() {}
+    /** @tentative-return-type */
+    public function close(): bool {}
 
-    /** @return bool */
+    /** @tentative-return-type */
     public function setSecurity(
         string $securityLevel, string $authProtocol = "", string $authPassphrase = "",
         string $privacyProtocol = "", string $privacyPassphrase = "",
-        string $contextName = "", string $contextEngineId = "") {}
+        string $contextName = "", string $contextEngineId = ""): bool {}
 
-    /** @return mixed */
-    public function get(array|string $objectId, bool $preserveKeys = false) {}
+    /** @tentative-return-type */
+    public function get(array|string $objectId, bool $preserveKeys = false): mixed {}
 
-    /** @return mixed */
-    public function getnext(array|string $objectId) {}
+    /** @tentative-return-type */
+    public function getnext(array|string $objectId): mixed {}
 
-    /** @return array|false */
-    public function walk(array|string $objectId, bool $suffixAsKey = false, int $maxRepetitions = -1, int $nonRepeaters = -1) {}
+    /** @tentative-return-type */
+    public function walk(array|string $objectId, bool $suffixAsKey = false, int $maxRepetitions = -1, int $nonRepeaters = -1): array|false {}
 
-    /** @return bool */
-    public function set(array|string $objectId, array|string $type, array|string $value) {}
+    /** @tentative-return-type */
+    public function set(array|string $objectId, array|string $type, array|string $value): bool {}
 
-    /** @return int */
-    public function getErrno() {}
+    /** @tentative-return-type */
+    public function getErrno(): int {}
 
-    /** @return string */
-    public function getError() {}
+    /** @tentative-return-type */
+    public function getError(): string {}
 }
 
 class SNMPException extends RuntimeException

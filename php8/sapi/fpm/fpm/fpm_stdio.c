@@ -10,6 +10,7 @@
 #include <errno.h>
 
 #include "php_syslog.h"
+#include "php_network.h"
 
 #include "fpm.h"
 #include "fpm_children.h"
@@ -180,7 +181,7 @@ static void fpm_stdio_child_said(struct fpm_event_s *ev, short which, void *arg)
 	if (!arg) {
 		return;
 	}
-	child = (struct fpm_child_s *)arg;
+	child = (struct fpm_child_s *) arg;
 
 	is_stdout = (fd == child->fd_stdout);
 	if (is_stdout) {
@@ -217,7 +218,7 @@ static void fpm_stdio_child_said(struct fpm_event_s *ev, short which, void *arg)
 stdio_read:
 		in_buf = read(fd, buf, max_buf_size - 1);
 		if (in_buf <= 0) { /* no data */
-			if (in_buf == 0 || (errno != EAGAIN && errno != EWOULDBLOCK)) {
+			if (in_buf == 0 || !PHP_IS_TRANSIENT_ERROR(errno)) {
 				/* pipe is closed or error */
 				read_fail = (in_buf < 0) ? in_buf : 1;
 			}
@@ -268,11 +269,12 @@ stdio_read:
 			zlog_stream_finish(log_stream);
 		}
 		if (read_fail < 0) {
-			zlog(ZLOG_SYSERROR, "unable to read what child say");
+			zlog(ZLOG_SYSERROR, "unable to read what child %d said into %s", (int) child->pid, is_stdout ? "stdout" : "stderr");
 		}
 
 		fpm_event_del(event);
 
+		child->postponed_free = true;
 		if (is_stdout) {
 			close(child->fd_stdout);
 			child->fd_stdout = -1;

@@ -257,8 +257,12 @@ dnl Choose the right compiler/flags/etc. for the source-file.
         *.cpp|*.cc|*.cxx[)] ac_comp="$b_cxx_pre $ac_inc $b_cxx_meta $3 -c $ac_srcdir$ac_src -o $ac_bdir$ac_obj.$b_lo $b_cxx_post" ;;
       esac
 
+dnl Generate Makefiles with dependencies
+      ac_comp="$ac_comp -MMD -MF $ac_bdir$ac_obj.dep -MT $ac_bdir[$]ac_obj.lo"
+
 dnl Create a rule for the object/source combo.
     cat >>Makefile.objects<<EOF
+-include $ac_bdir[$]ac_obj.dep
 $ac_bdir[$]ac_obj.lo: $ac_srcdir[$]ac_src
 	$ac_comp
 EOF
@@ -931,7 +935,7 @@ dnl ---------------------------------------------- Static module
     if test "$3" = "shared" || test "$3" = "yes"; then
 dnl ---------------------------------------------- Shared module
       [PHP_]translit($1,a-z_-,A-Z__)[_SHARED]=yes
-      PHP_ADD_SOURCES_X($ext_dir,$2,$ac_extra,shared_objects_$1,yes)
+      PHP_ADD_SOURCES_X($ext_dir,$2,$ac_extra -DZEND_COMPILE_DL_EXT=1,shared_objects_$1,yes)
       PHP_SHARED_MODULE($1,shared_objects_$1, $ext_builddir, $6, $7)
       AC_DEFINE_UNQUOTED([COMPILE_DL_]translit($1,a-z_-,A-Z__), 1, Whether to build $1 as dynamic module)
     fi
@@ -1473,7 +1477,15 @@ int main() {
 ], [
   cookie_io_functions_use_off64_t=no
 ], [
-  cookie_io_functions_use_off64_t=no
+  dnl Cross compilation.
+  case $host_alias in
+    *linux*)
+      cookie_io_functions_use_off64_t=yes
+      ;;
+    *)
+      cookie_io_functions_use_off64_t=no
+      ;;
+  esac
 ])
 
     else
@@ -1578,7 +1590,10 @@ AC_DEFUN([PHP_CHECK_FUNC_LIB],[
   if test "$found" = "yes"; then
     ac_libs=$LIBS
     LIBS="$LIBS -l$2"
-    AC_RUN_IFELSE([AC_LANG_SOURCE([[int main() { return (0); }]])],[found=yes],[found=no],[found=no])
+    AC_RUN_IFELSE([AC_LANG_SOURCE([[int main() { return (0); }]])],[found=yes],[found=no],[
+      dnl Cross compilation.
+      found=yes
+    ])
     LIBS=$ac_libs
   fi
 
@@ -1872,6 +1887,30 @@ AC_DEFUN([PHP_PROG_RE2C],[
   PHP_SUBST(RE2C)
 ])
 
+AC_DEFUN([PHP_PROG_PHP],[
+  AC_CHECK_PROG(PHP, php, php)
+
+  if test -n "$PHP"; then
+    AC_MSG_CHECKING([for php version])
+    php_version=$($PHP -v | head -n1 | cut -d ' ' -f 2 | cut -d '-' -f 1)
+    if test -z "$php_version"; then
+      php_version=0.0.0
+    fi
+    ac_IFS=$IFS; IFS="."
+    set $php_version
+    IFS=$ac_IFS
+    php_version_num=`expr [$]{1:-0} \* 10000 + [$]{2:-0} \* 100 + [$]{3:-0}`
+    dnl Minimum supported version for gen_stub.php is PHP 7.4.
+    if test "$php_version_num" -lt 70400; then
+      AC_MSG_RESULT([$php_version (too old)])
+      unset PHP
+    else
+      AC_MSG_RESULT([$php_version (ok)])
+    fi
+  fi
+  PHP_SUBST(PHP)
+])
+
 dnl ----------------------------------------------------------------------------
 dnl Common setup macros: PHP_SETUP_<what>
 dnl ----------------------------------------------------------------------------
@@ -1903,7 +1942,7 @@ dnl
 AC_DEFUN([PHP_SETUP_OPENSSL],[
   found_openssl=no
 
-  PKG_CHECK_MODULES([OPENSSL], [openssl >= 1.0.1], [found_openssl=yes])
+  PKG_CHECK_MODULES([OPENSSL], [openssl >= 1.0.2], [found_openssl=yes])
 
   if test "$found_openssl" = "yes"; then
     PHP_EVAL_LIBLINE($OPENSSL_LIBS, $1)
@@ -1991,7 +2030,7 @@ ifelse([$3],[],,[else $3])
 ])
 
 dnl
-dnl PHP_SETUP_LIBXML(shared-add [, action-found [, action-not-found]])
+dnl PHP_SETUP_LIBXML(shared-add [, action-found])
 dnl
 dnl Common setup macro for libxml.
 dnl
@@ -2113,7 +2152,7 @@ EOF
    else
     break
    fi
-   $as_echo "$CURRENT_ARG \\" >>$1
+   AS_ECHO(["$CURRENT_ARG \\"]) >>$1
    CONFIGURE_OPTIONS="$CONFIGURE_OPTIONS $CURRENT_ARG"
   done
   echo '"[$]@"' >> $1
@@ -2269,7 +2308,14 @@ int main()
     ],[
       ac_cv_write_stdout=no
     ],[
-      ac_cv_write_stdout=no
+      case $host_alias in
+        *linux*)
+          ac_cv_write_stdout=yes
+          ;;
+        *)
+          ac_cv_write_stdout=no
+          ;;
+      esac
     ])
   ])
   if test "$ac_cv_write_stdout" = "yes"; then
@@ -2654,7 +2700,7 @@ AC_DEFUN([PHP_CHECK_BUILTIN_CPU_INIT], [
   AC_MSG_CHECKING([for __builtin_cpu_init])
 
   AC_LINK_IFELSE([AC_LANG_PROGRAM([], [[
-    return __builtin_cpu_init()? 1 : 0;
+    __builtin_cpu_init();
   ]])], [
     have_builtin_cpu_init=1
     AC_MSG_RESULT([yes])
