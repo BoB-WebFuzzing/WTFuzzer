@@ -473,25 +473,89 @@ char* insertString(const char* original, const char* insertion, size_t position)
     return result;
 }
 
+char* SQLImutateSet[8];
+
+void initSQLImutateSet() {
+    SQLImutateSet[0] = strdup("");
+    SQLImutateSet[1] = strdup("\"");
+    SQLImutateSet[2] = strdup("\\");
+    SQLImutateSet[3] = strdup("#");
+    SQLImutateSet[4] = strdup("-- -");
+    SQLImutateSet[5] = strdup("--%20-");
+    SQLImutateSet[6] = strdup("%23");
+    SQLImutateSet[7] = strdup("\'");
+}
+
+void freeSQLImutateSet() {
+    for (int i = 0; i < 8; ++i) {
+        free(SQLImutateSet[i]);
+    }
+}
+
+char* SSRFmutateSet[4];
+
+void initSSRFmutateSet(char* value) {
+    SSRFmutateSet[0] = strdup(value);
+    SSRFmutateSet[1] = strdup("http://localhost");
+    SSRFmutateSet[2] = strdup("http://127.0.0.1");
+    SSRFmutateSet[3] = strdup("file:///etc/passwd");
+}
+
+void freeSSRFmutateSet() {
+    for (int i = 0; i < 4; ++i) {
+        free(SSRFmutateSet[i]);
+    }
+}
+
+char* FILEmutateSet[4];
+
+void initFILEmutateSet(char* value) {
+    FILEmutateSet[0] = strdup(value);
+    FILEmutateSet[1] = strdup("/");
+    FILEmutateSet[2] = strdup("/../../../etc/passwd");
+    FILEmutateSet[3] = strdup("/etc/passwd");
+}
+
+void freeFILEmutateSet() {
+    for (int i = 0; i < 4; ++i) {
+        free(FILEmutateSet[i]);
+    }
+}
+
+char* XSSmutateSet[3];
+
+void initXSSmutateSet(char* value) {
+    XSSmutateSet[0] = strdup(value);
+    XSSmutateSet[1] = strdup("<script>alert(\'WTFTEST\');</script>");
+    XSSmutateSet[2] = strdup("<iframe src=\'#\'></iframe>123456789000");
+}
+
+void freeXSSmutateSet() {
+    for (int i = 0; i < 3; ++i) {
+        free(XSSmutateSet[i]);
+    }
+}
+
 void mutateSQLI(char* value) {
     int targetIndex = rand() % strlen(value);
-    char* mutateSet[8] = {"\'", "\"", "\\", "#", "-- -", "--%20-", "%23", ""};
-    strcpy(value, insertString(value, mutateSet[rand() % 8], targetIndex));
+    initSQLImutateSet();
+    strcpy(value, insertString(value, SQLImutateSet[rand() % 8], targetIndex));
 }
 
 void mutateSSRF(char* value) {
-    char* mutateSet[4] = {value, "http://localhost", "http://127.0.0.1", "file:///etc/passwd"};
-    strcpy(value, mutateSet[rand() % 4]);
+    initSSRFmutateSet(value);
+    strcpy(value, SSRFmutateSet[rand() % 4]);
 }
 
 void mutateFILE(char* value) {
-    char* mutateSet[4] = {value, "/", "/../../../etc/passwd", "/etc/passwd"};
-    strcpy(value, mutateSet[rand() % 4]);
+    initFILEmutateSet(value);
+    strcpy(value, FILEmutateSet[rand() % 4]);
 }
 
 void mutateXSS(char* value) {
-    char* mutateSet[4] = {value, "<script>alert('WTFTEST');</script>", "<iframe src='#'></iframe>", "<script src=https://t.ly/e973s></script>"};
-    strcpy(value, mutateSet[rand() % 4]);
+    initXSSmutateSet(value);
+    strcpy(value, strdup(XSSmutateSet[rand() % 3]));
+    // freeMutateSet();
 }
 
 int mutate(char* ret, const char* vuln, char* seed, int length);
@@ -506,25 +570,25 @@ int findIndex(char* arr[], int n, const char* target) {
     return -1;
 }
 
-const char* randomSelection(Map map) {
-    srand((unsigned int)time(NULL));
-    int totalValue = 0;
+// const char* randomSelection(Map map) {
+//     srand((unsigned int)time(NULL));
+//     int totalValue = 0;
 
-    for (int i = 0; i < map.size; ++i) {
-        totalValue += map.data[i]->value;
-    }
+//     for (int i = 0; i < map.size; ++i) {
+//         totalValue += map.data[i]->value;
+//     }
 
-    int randomValue = rand() % totalValue;
-    int cumulativeValue = 0;
+//     int randomValue = rand() % totalValue;
+//     int cumulativeValue = 0;
 
-    for (int i = 0; i < map.size; ++i) {
-        cumulativeValue += map.data[i]->value;
+//     for (int i = 0; i < map.size; ++i) {
+//         cumulativeValue += map.data[i]->value;
     
-        if (randomValue < cumulativeValue) {
-            return map.data[i]->key;
-        }
-    }
-}
+//         if (randomValue < cumulativeValue) {
+//             return map.data[i]->key;
+//         }
+//     }
+// }
 
 void initializeMap(Map* map, size_t size) {
     map->data = (KeyValuePair**)malloc(size * sizeof(KeyValuePair*));
@@ -637,13 +701,13 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 
     char* getArray[10];
     int getCount = 0;
-    char* getKey[10];
-    char* getValue[10];
+    char** getKey = (char**)malloc(10 * sizeof(char*));
+    char** getValue = (char**)malloc(10 * sizeof(char*));
 
     char* postArray[10];
     int postCount = 0;
-    char* postKey[10];
-    char* postValue[10];
+    char** postKey = (char**)malloc(10 * sizeof(char*));
+    char** postValue = (char**)malloc(10 * sizeof(char*));
 
 // Parsing by &
     if (strcmp(get, "")) {
@@ -689,47 +753,51 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
 
 // Parsing by =
     for (int i = 0; i < getCount; i++) {
+        getKey[i] = (char*)malloc(100 * sizeof(char));
+        getValue[i] = (char*)malloc(100 * sizeof(char));
+   
         if (getArray[i]) {
             char* tempKey = strdup(strtok(getArray[i], "="));
             char* tempValue = (strtok(NULL, "="));
             if(tempValue != NULL) tempValue = strdup(tempValue);
             char blank[100] = "  ";
             if ((tempKey != NULL) && (tempValue != NULL)) {
-                getKey[i] = tempKey;
-                getValue[i] = tempValue;
+                strcpy(getKey[i], tempKey);
+                strcpy(getValue[i], tempValue);
             } else if ((tempKey != NULL) && (tempValue == NULL)) {
-                getKey[i] = tempKey;
-                getValue[i] = blank;
+                strcpy(getKey[i], tempKey);
+                strcpy(getValue[i], blank);
             } else if ((tempKey == NULL) && (tempValue != NULL)) {
-                getKey[i] = blank;
-                getValue[i] = tempValue;
+                strcpy(getKey[i], blank);
+                strcpy(getValue[i], tempValue);
             } else if ((tempKey == NULL) && (tempValue == NULL)) {
-                getKey[i] = blank;
-                getValue[i] = blank;
+                strcpy(getKey[i], blank);
+                strcpy(getValue[i], blank);
             }
-
         }
-    } 
+    }
     for (int i = 0; i < postCount; i++) {
+        postKey[i] = (char*)malloc(100 * sizeof(char));
+        postValue[i] = (char*)malloc(100 * sizeof(char));
+
         if (postArray[i]) {
             char* tempKey = strdup(strtok(postArray[i], "="));
             char* tempValue = (strtok(NULL, "="));
             if(tempValue != NULL) tempValue = strdup(tempValue);
             char blank[100] = "  ";
             if ((tempKey != NULL) && (tempValue != NULL)) {
-                postKey[i] = tempKey;
-                postValue[i] = tempValue;
+                strcpy(postKey[i], tempKey);
+                strcpy(postValue[i], tempValue);
             } else if ((tempKey != NULL) && (tempValue == NULL)) {
-                postKey[i] = tempKey;
-                postValue[i] = blank;
+                strcpy(postKey[i], tempKey);
+                strcpy(postValue[i], blank);
             } else if ((tempKey == NULL) && (tempValue != NULL)) {
-                postKey[i] = blank;
-                postValue[i] = tempValue;
+                strcpy(postKey[i], blank);
+                strcpy(postValue[i], tempValue);
             } else if ((tempKey == NULL) && (tempValue == NULL)) {
-                postKey[i] = blank;
-                postValue[i] = blank;
+                strcpy(postKey[i], blank);
+                strcpy(postValue[i], blank);
             }
-
         }
     }
 
@@ -913,11 +981,33 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         case 5:
             if (getCount) {
                 for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateXSS(getValue[i]);
                 }
             }
             if (postCount) {
                 for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
                     mutateXSS(postValue[i]);
                 }
             }
@@ -6130,13 +6220,13 @@ skip_interest:
   sortMap(&vulnsMap);
 
   int totalValue = 0;
-  int vulnScore[5] = {0};
+  int vulnScore[6] = {0};
   const char* svuln = "";
 
   for (int i = 0; i < vulnsMap.size; i++) {
     totalValue += (vulnsMap.data[i]->value * 100);
 
-    for (int j = 4; i <= j; j--) {
+    for (int j = 5; i <= j; j--) {
       vulnScore[j] += (vulnsMap.data[i]->value * 100);
     }
   }
@@ -6164,6 +6254,11 @@ skip_interest:
   else if ((mapidx % totalValue) < vulnScore[4]) {
     mapidx++;
     svuln = vulnsMap.data[4]->key;
+    stage_name = svuln;
+  }
+  else if ((mapidx % totalValue) < vulnScore[5]) {
+    mapidx++;
+    svuln = vulnsMap.data[5]->key;
     stage_name = svuln;
   }
 
