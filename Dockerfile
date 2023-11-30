@@ -61,8 +61,8 @@ RUN mv apr-util-1.6.3 httpd-2.4.58/srclib/apr-util
 
 ENV  CFLAGS="-DBIG_SECURITY_HOLE"
 RUN  cd httpd-2.4.58 && export CFLAGS && ./configure --prefix=/usr/local/apache \
-    --enable-rewrite=shared \
-    --enable-speling=shared \
+    --enable-rewrite \
+    --enable-speling \
     --with-included-apr && make && make install
 
 COPY httpd.conf /usr/local/apache/conf/httpd.conf
