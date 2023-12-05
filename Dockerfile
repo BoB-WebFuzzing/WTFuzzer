@@ -129,16 +129,17 @@ RUN git clone https://github.com/krakjoe/uopz.git
 
 RUN cd /uopz && phpize && ./configure --enable-uopz && make -j $(nproc) && make install
 
-RUN mkdir /home/tmp
+RUN mkdir /home/tmp && mkdir /tmp/coverage
 RUN chmod 777 -R /home/tmp
 
-COPY hook.php /lib/hook.php
+COPY enable_cc.php /enable_cc.php
+COPY config/calculate_coverage.py /tmp/coverage
 
 COPY config/httpreqr /tmp/httpreqr
 
 RUN cd /tmp/httpreqr && make && mv httpreqr /
 
-RUN printf '\nauto_prepend_file=/lib/hook.php\nextension=uopz\nuopz.exit=1\nzend_extension=/usr/local/lib/php/extensions/no-debug-zts-20220829/xdebug.so\nxdebug.mode=debug\nxdebug.start_with_request=yes\nxdebug.client_port = 9003\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
+RUN printf '\nauto_prepend_file=/enable_cc.php\nzend_extension=/usr/local/lib/php/extensions/no-debug-zts-20220829/xdebug.so\nxdebug.mode=coverage\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
 
 ######## WORDPRESS INSTALL ######
 

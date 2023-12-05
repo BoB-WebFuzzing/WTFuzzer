@@ -1,5 +1,5 @@
 services:
-  wtfuzzer:
+  coverage:
     build: .
     privileged: true
     ports:
