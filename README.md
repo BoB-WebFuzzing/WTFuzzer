@@ -1,20 +1,10 @@
+# Description
+Code coverage 측정용 branch.
 
+# Usage
+docker compose 를 통해서 Container 빌드.
 
-# mysql
-```
-create database wordpress;
-alter user root@localhost identified by 'root';
-```
+PHP를 실행하면 Code coverage 측정값이 Endpoints로 구분되어 자동으로 `/tmp/coverages` 폴더에 json 파일로 저장됨.
 
-# Wordpress settings
-Edit /app/wp-config.php
-- define('FS_METHOD', 'direct');
-
-Edit /usr/local/lib/php.ini
-- upload_max_filesize=200M;
-
-Add permissions
-```
-chmod -R 777 /app/wp-content/
-```
-
+`/tmp/coverage/calculate_coverage.py` 를 실행하면 Code coverage 결과값을 확인할 수 있음.
+ex) `python3 /tmp/coverage/calculate_coverage.py`
