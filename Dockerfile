@@ -138,7 +138,7 @@ COPY config/httpreqr /tmp/httpreqr
 
 RUN cd /tmp/httpreqr && make && mv httpreqr /
 
-RUN printf '\nauto_prepend_file=/lib/hook.php\nextension=uopz\nuopz.exit=1\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
+RUN printf '\nauto_prepend_file=/lib/hook.php\nextension=uopz\nuopz.exit=1\nzend_extension=/usr/local/lib/php/extensions/no-debug-zts-20220829/xdebug.so\nxdebug.mode=debug\nxdebug.start_with_request=yes\nxdebug.client_port = 9003\n\n' >> $(php -i |egrep "Loaded Configuration File.*php.ini"|cut -d ">" -f2|cut -d " " -f2)
 
 ######## WORDPRESS INSTALL ######
 
