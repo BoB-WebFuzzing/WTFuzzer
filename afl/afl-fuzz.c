@@ -700,12 +700,14 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
   }
 
   char * getArray[10];
+  getArray[0] = strdup("");
   int getCount = 0;
   char ** getVuln = (char ** ) malloc(10 * sizeof(char * ));
   char ** getKey = (char ** ) malloc(10 * sizeof(char * ));
   char ** getValue = (char ** ) malloc(10 * sizeof(char * ));
 
   char * postArray[10];
+  postArray[0] = strdup("");
   int postCount = 0;
   char ** postVuln = (char ** ) malloc(10 * sizeof(char * ));
   char ** postKey = (char ** ) malloc(10 * sizeof(char * ));
@@ -829,22 +831,47 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
           getVuln[getCount] = (char * ) malloc(100 * sizeof(char));
           getKey[getCount] = (char * ) malloc(100 * sizeof(char));
           getValue[getCount] = (char * ) malloc(100 * sizeof(char));
-          strcpy(getVuln[getCount], strdup(tvuln));
+
+          if (600 < mapidx) {
+            strcpy(getVuln[getCount], strdup(vuln));
+          }
+          else {
+            strcpy(getVuln[getCount], strdup(tvuln));
+          }
           strcpy(getKey[getCount], strdup(key));
           strcpy(getValue[getCount], strdup("  "));
           getCount++;
         } else {
-          strcpy(getVuln[gk], strdup(tvuln));
+          if (600 < mapidx) {
+            strcpy(getVuln[gk], strdup(vuln));
+          }
+          else {
+            strcpy(getVuln[gk], strdup(tvuln));
+          }
         }
       } else if (!strcmp(method, "_POST")) {
-        int pk = findIndex(postKey, 10, key);
+        int pk = findIndex(postKey, postCount, key);
         if (pk == -1) {
-          strcpy(postVuln[postCount], strdup(tvuln));
-          strcpy(postKey[postCount], strdup(method));
+          postVuln[postCount] = (char * ) malloc(100 * sizeof(char));
+          postKey[postCount] = (char * ) malloc(100 * sizeof(char));
+          postValue[postCount] = (char * ) malloc(100 * sizeof(char));
+
+          if (600 < mapidx) {
+            strcpy(postVuln[postCount], strdup(vuln));
+          }
+          else {
+            strcpy(postVuln[postCount], strdup(tvuln));
+          }
+          strcpy(postKey[postCount], strdup(key));
           strcpy(postValue[postCount], strdup("  "));
           postCount++;
         } else {
-          strcpy(postVuln[postCount], strdup(tvuln));
+          if (600 < mapidx) {
+            strcpy(postVuln[pk], strdup(vuln));
+          }
+          else {
+            strcpy(postVuln[pk], strdup(tvuln));
+          }
         }
       }
     }
@@ -870,10 +897,13 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
           getCount++;
         }
       } else if (!strcmp(method, "_POST")) {
-        int pk = findIndex(postKey, 10, key);
+        int pk = findIndex(postKey, postCount, key);
         if (pk == -1) {
+          postVuln[postCount] = (char * ) malloc(100 * sizeof(char));
+          postKey[postCount] = (char * ) malloc(100 * sizeof(char));
+          postValue[postCount] = (char * ) malloc(100 * sizeof(char));
           strcpy(postVuln[postCount], strdup(vuln));
-          strcpy(postKey[postCount], strdup(method));
+          strcpy(postKey[postCount], strdup(key));
           strcpy(postValue[postCount], strdup("  "));
           postCount++;
         }
@@ -965,30 +995,27 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
     }
   }
 
-// Concat by =, &
-  if (strcmp(get, "")) {
-    for (int i = 0; i < getCount; i++) {
-      getArray[i] = strcat(strcat(getKey[i], "="), getValue[i]);
-    }
-
-    get = getArray[0];
-
-    for (int i = 1; i < getCount; i++) {
-      strcat(strcat(get, "&"), getArray[i]);
-    }
+  // Concat by =, &
+  for (int i = 0; i < getCount; i++) {
+    getArray[i] = strcat(strcat(getKey[i], "="), getValue[i]);
   }
 
-  if (strcmp(post, "")) {
-    for (int i = 0; i < postCount; i++) {
-      postArray[i] = strcat(strcat(postKey[i], "="), postValue[i]);
-    }
+  get = getArray[0];
 
-    post = postArray[0];
-
-    for (int i = 1; i < postCount; i++) {
-      strcat(strcat(post, "&"), postArray[i]);
-    }
+  for (int i = 1; i < getCount; i++) {
+    strcat(strcat(get, "&"), getArray[i]);
   }
+
+  for (int i = 0; i < postCount; i++) {
+    postArray[i] = strcat(strcat(postKey[i], "="), postValue[i]);
+  }
+
+  post = postArray[0];
+
+  for (int i = 1; i < postCount; i++) {
+    strcat(strcat(post, "&"), postArray[i]);
+  }
+
 
   if (strcmp(get, "") && strcmp(post, "")) {
     ret[0] = '\x00';
@@ -5937,8 +5964,8 @@ static u8 fuzz_one(char** argv) {
 
 
   /* WTFUZZ init */
-  Map vulnsMap;
-  size_t mapSize = 6;
+  // Map vulnsMap;
+  // size_t mapSize = 6;
 
   s32 len, fd, temp_len, i, j;
   u8  *in_buf, *out_buf, *orig_in, *ex_tmp, *eff_map = 0;
@@ -6164,66 +6191,65 @@ skip_interest:
 
   FILE *fp;
 
-  if ((fp = fopen("/tmp/mutate.txt", "r")) != NULL) {  
-    initializeMap(&vulnsMap, mapSize);
+  // if ((fp = fopen("/tmp/mutate.txt", "r")) != NULL) {  
+  //   initializeMap(&vulnsMap, mapSize);
 
-    while (fgets(line, sizeof(line), fp) != NULL) {
-      sscanf(line, "%s : %d", vuln, &count);
+  //   while (fgets(line, sizeof(line), fp) != NULL) {
+  //     sscanf(line, "%s : %d", vuln, &count);
 
-      addToMap(&vulnsMap, vuln, count);
+  //     addToMap(&vulnsMap, vuln, count);
 
-      // printf("key : %s, value : %d\n------------\n", vuln, getFromMap(&vulnsMap, vuln));
-      i++;
-    }
+  //     i++;
+  //   }
 
-    fclose(fp);
-  }
-  else {
-    printf("/tmp/mutate.txt is not found\n");
-  }
+  //   fclose(fp);
+  // }
+  // else {
+  //   printf("/tmp/mutate.txt is not found\n");
+  // }
 
-  sortMap(&vulnsMap);
+  // sortMap(&vulnsMap);
 
-  int totalValue = 0;
-  int vulnScore[6] = {0};
+  int totalValue = 600;
+  int vulnScore[6] = {100, 200, 300, 400, 500, 600};
   const char* svuln = "";
 
-  for (int i = 0; i < vulnsMap.size; i++) {
-    totalValue += (vulnsMap.data[i]->value * 100);
+  // for (int i = 0; i < vulnsMap.size; i++) {
+  //   totalValue += (vulnsMap.data[i]->value * 100);
 
-    for (int j = 5; i <= j; j--) {
-      vulnScore[j] += (vulnsMap.data[i]->value * 100);
-    }
-  }
+  //   for (int j = 5; i <= j; j--) {
+  //     vulnScore[j] += (vulnsMap.data[i]->value * 100);
+  //   }
+  // }
 
   if ((mapidx % totalValue) < vulnScore[0]) {
     mapidx++;
-    svuln = vulnsMap.data[0]->key;
+    svuln = "SQLi";
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[1]) {
     mapidx++;
-    svuln = vulnsMap.data[1]->key;
+    svuln = "SSRF";
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[2]) {
     mapidx++;
-    svuln = vulnsMap.data[2]->key;
+    svuln = "FileUpload";
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[3]) {
     mapidx++;
-    svuln = vulnsMap.data[3]->key;
+    svuln = "FileDownload";
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[4]) {
     mapidx++;
-    svuln = vulnsMap.data[4]->key;
+    svuln = "FileDeletion";
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[5]) {
     mapidx++;
-    svuln = vulnsMap.data[5]->key;
+    svuln = "XSS";
     stage_name = svuln;
   }
 
@@ -6266,7 +6292,7 @@ skip_interest:
     ck_free(mutatedSeed);
   }
 
-  freeMap(&vulnsMap);
+  // freeMap(&vulnsMap);
 
   new_hit_cnt = queued_paths + unique_crashes;
 
