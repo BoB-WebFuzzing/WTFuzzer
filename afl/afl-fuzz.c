@@ -789,7 +789,7 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
             char* tempKey = strdup(strtok(postArray[i], "="));
             char* tempValue = (strtok(NULL, "="));
             if(tempValue != NULL) tempValue = strdup(tempValue);
-            char blank[100] = "  ";
+            char blank[100] = "%20%20";
             if ((tempKey != NULL) && (tempValue != NULL)) {
                 strcpy(postKey[i], tempKey);
                 strcpy(postValue[i], tempValue);
