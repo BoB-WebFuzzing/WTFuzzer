@@ -522,16 +522,17 @@ void freeFILEmutateSet() {
     }
 }
 
-char* XSSmutateSet[3];
+char* XSSmutateSet[4];
 
 void initXSSmutateSet(char* value) {
     XSSmutateSet[0] = strdup(value);
     XSSmutateSet[1] = strdup("<script>alert(\'WTFTEST\');</script>");
     XSSmutateSet[2] = strdup("<iframe src=\"javascript:alert(\'WTFTEST\')\"></iframe>");
+    XSSmutateSet[3] = strdup("%3Cp%3E%26lt%3Bscript%26gt%3Balert('WTFTEST')%26lt%3B%2Fscript%26gt%3B%3C%2Fp%3E");
 }
 
 void freeXSSmutateSet() {
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
         free(XSSmutateSet[i]);
     }
 }
@@ -654,394 +655,432 @@ int setFilter() {
         fclose(fp);
     }
     else {
-        printf("/tmp/filter.txt is not found\n");
+        printf("/tmp/mutate.txt is not found\n");
     }
 
     return 0;
 }
 
-int mutate(char * ret, const char * vuln, char * seed, int length) {
-  char * get = NULL;
-  char * post = NULL;
-  char buffer[1024 * 1024];
-  int part = 0;
-  int i = 0;
+int mutate(char* ret, const char* vuln, char* seed, int length) {
+    char* get = NULL;
+    char* post = NULL;
+    char* header = NULL;
+    char buffer[1024*1024];
+    int part = 0;
+    int i = 0;
 
-  seed += 1;
+    seed += 1;
 
-  while (i < length) {
-    if (seed[i] == '\x00') {
-      strncpy(buffer, seed, i);
+    while (i < length) {
+        if (seed[i] == '\x00') {
+            strncpy(buffer, seed, i);
 
-      buffer[i] = '\0';
+            buffer[i] = '\0';
 
-      switch (part) {
-      case 0:
-        get = strdup(buffer);
-        break;
-      case 1:
-        post = strdup(buffer);
-        break;
-      default:
-        break;
-      }
+            switch (part) {
+                case 0:
+                    get = strdup(buffer);
+                    break;
+                case 1:
+                    post = strdup(buffer);
+                    break;
+                case 2:
+                    header = strdup(buffer);
+                    break;
+                default:
+                    break;
+            }
 
-      memset(buffer, 0, sizeof(buffer));
+            memset(buffer, 0, sizeof(buffer));
 
-      seed += i + 1;
-      length -= i + 1;
-      i = 0;
-      part++;
+            seed += i + 1;
+            length -= i + 1;
+            i = 0;
+            part++;
 
-      continue;
-    }
-
-    i++;
-  }
-
-  char * getArray[10];
-  getArray[0] = strdup("");
-  int getCount = 0;
-  char ** getVuln = (char ** ) malloc(10 * sizeof(char * ));
-  char ** getKey = (char ** ) malloc(10 * sizeof(char * ));
-  char ** getValue = (char ** ) malloc(10 * sizeof(char * ));
-
-  char * postArray[10];
-  postArray[0] = strdup("");
-  int postCount = 0;
-  char ** postVuln = (char ** ) malloc(10 * sizeof(char * ));
-  char ** postKey = (char ** ) malloc(10 * sizeof(char * ));
-  char ** postValue = (char ** ) malloc(10 * sizeof(char * ));
-
-  // Parsing by &
-  if (strcmp(get, "")) {
-    char * getToken = strdup(strtok(get, "&"));
-    char * tempToken;
-    i = 0;
-
-    while (getToken != NULL && i < 10) {
-      getArray[i] = getToken;
-      i++;
-      getCount++;
-
-      // free(getToken);
-      tempToken = strtok(NULL, "&");
-
-      if (tempToken == NULL)
-        break;
-
-      getToken = strdup(tempToken);
-    }
-  }
-
-  if (strcmp(post, "")) {
-    char * postToken = strdup(strtok(post, "&"));
-    char * tempToken;
-    i = 0;
-
-    while (postToken != NULL && i < 10) {
-      postArray[i] = postToken;
-      i++;
-      postCount++;
-
-      // free(postToken);
-      tempToken = strtok(NULL, "&");
-
-      if (tempToken == NULL)
-        break;
-
-      postToken = strdup(tempToken);
-    }
-  }
-
-  // Parsing by =
-  for (int i = 0; i < getCount; i++) {
-    getVuln[i] = (char * ) malloc(100 * sizeof(char));
-    getKey[i] = (char * ) malloc(100 * sizeof(char));
-    getValue[i] = (char * ) malloc(100 * sizeof(char));
-
-    if (getArray[i]) {
-      char * tempKey = strdup(strtok(getArray[i], "="));
-      char * tempValue = (strtok(NULL, "="));
-      if (tempValue != NULL) tempValue = strdup(tempValue);
-      char blank[100] = "  ";
-      if ((tempKey != NULL) && (tempValue != NULL)) {
-        strcpy(getVuln[i], strdup(vuln));
-        strcpy(getKey[i], tempKey);
-        strcpy(getValue[i], tempValue);
-      } else if ((tempKey != NULL) && (tempValue == NULL)) {
-        strcpy(getVuln[i], strdup(vuln));
-        strcpy(getKey[i], tempKey);
-        strcpy(getValue[i], blank);
-      } else if ((tempKey == NULL) && (tempValue != NULL)) {
-        strcpy(getVuln[i], strdup(vuln));
-        strcpy(getKey[i], blank);
-        strcpy(getValue[i], tempValue);
-      } else if ((tempKey == NULL) && (tempValue == NULL)) {
-        strcpy(getVuln[i], strdup(vuln));
-        strcpy(getKey[i], blank);
-        strcpy(getValue[i], blank);
-      }
-    }
-  }
-  for (int i = 0; i < postCount; i++) {
-    postVuln[i] = (char * ) malloc(100 * sizeof(char));
-    postKey[i] = (char * ) malloc(100 * sizeof(char));
-    postValue[i] = (char * ) malloc(100 * sizeof(char));
-
-    if (postArray[i]) {
-      char * tempKey = strdup(strtok(postArray[i], "="));
-      char * tempValue = (strtok(NULL, "="));
-      if (tempValue != NULL) tempValue = strdup(tempValue);
-      char blank[100] = "  ";
-      if ((tempKey != NULL) && (tempValue != NULL)) {
-        strcpy(postVuln[i], strdup(vuln));
-        strcpy(postKey[i], tempKey);
-        strcpy(postValue[i], tempValue);
-      } else if ((tempKey != NULL) && (tempValue == NULL)) {
-        strcpy(postVuln[i], strdup(vuln));
-        strcpy(postKey[i], tempKey);
-        strcpy(postValue[i], blank);
-      } else if ((tempKey == NULL) && (tempValue != NULL)) {
-        strcpy(postVuln[i], strdup(vuln));
-        strcpy(postKey[i], blank);
-        strcpy(postValue[i], tempValue);
-      } else if ((tempKey == NULL) && (tempValue == NULL)) {
-        strcpy(postVuln[i], strdup(vuln));
-        strcpy(postKey[i], blank);
-        strcpy(postValue[i], blank);
-      }
-    }
-  }
-
-  FILE * fp;
-  char method[10];
-  char key[20];
-  char tvuln[20];
-  unsigned int count = 0;
-  char line[100];
-
-  if ((fp = fopen("/tmp/tracelog.txt", "r")) != NULL) {
-    while ((fgets(line, sizeof(line), fp) != NULL) && getCount < 10 && postCount < 10) {
-      sscanf(line, "%s\t\t%s\t\t%s\t\t%d", method, key, tvuln, & count);
-
-      if (!strcmp(method, "_GET")) {
-        int gk = findIndex(getKey, getCount, key);
-        if (gk == -1) {
-          getVuln[getCount] = (char * ) malloc(100 * sizeof(char));
-          getKey[getCount] = (char * ) malloc(100 * sizeof(char));
-          getValue[getCount] = (char * ) malloc(100 * sizeof(char));
-
-          if (600 < mapidx) {
-            strcpy(getVuln[getCount], strdup(vuln));
-          }
-          else {
-            strcpy(getVuln[getCount], strdup(tvuln));
-          }
-          strcpy(getKey[getCount], strdup(key));
-          strcpy(getValue[getCount], strdup("  "));
-          getCount++;
-        } else {
-          if (600 < mapidx) {
-            strcpy(getVuln[gk], strdup(vuln));
-          }
-          else {
-            strcpy(getVuln[gk], strdup(tvuln));
-          }
+            continue;
         }
-      } else if (!strcmp(method, "_POST")) {
-        int pk = findIndex(postKey, postCount, key);
-        if (pk == -1) {
-          postVuln[postCount] = (char * ) malloc(100 * sizeof(char));
-          postKey[postCount] = (char * ) malloc(100 * sizeof(char));
-          postValue[postCount] = (char * ) malloc(100 * sizeof(char));
 
-          if (600 < mapidx) {
-            strcpy(postVuln[postCount], strdup(vuln));
-          }
-          else {
-            strcpy(postVuln[postCount], strdup(tvuln));
-          }
-          strcpy(postKey[postCount], strdup(key));
-          strcpy(postValue[postCount], strdup("  "));
-          postCount++;
-        } else {
-          if (600 < mapidx) {
-            strcpy(postVuln[pk], strdup(vuln));
-          }
-          else {
-            strcpy(postVuln[pk], strdup(tvuln));
-          }
-        }
-      }
+        i++;
     }
 
-    fclose(fp);
-  } else {
-    printf("/tmp/tracelog.txt is not found\n");
-  }
+    int numberOfParams = 20;
+    char* getArray[numberOfParams];
+    int getCount = 0;
+    char** getKey = (char**)malloc(numberOfParams * sizeof(char*));
+    char** getValue = (char**)malloc(numberOfParams * sizeof(char*));
 
-  if ((fp = fopen("/tmp/dict.txt", "r")) != NULL) {
-    while ((fgets(line, sizeof(line), fp) != NULL) && getCount < 10 && postCount < 10) {
-      sscanf(line, "%s\t\t%s", method, key);
+    char* postArray[numberOfParams];
+    int postCount = 0;
+    char** postKey = (char**)malloc(numberOfParams * sizeof(char*));
+    char** postValue = (char**)malloc(numberOfParams * sizeof(char*));
 
-      if (!strcmp(method, "_GET")) {
-        int gk = findIndex(getKey, getCount, key);
-        if (gk == -1) {
-          getVuln[getCount] = (char * ) malloc(100 * sizeof(char));
-          getKey[getCount] = (char * ) malloc(100 * sizeof(char));
-          getValue[getCount] = (char * ) malloc(100 * sizeof(char));
-          strcpy(getVuln[getCount], strdup(vuln));
-          strcpy(getKey[getCount], strdup(key));
-          strcpy(getValue[getCount], strdup("  "));
-          getCount++;
+// Parsing by &
+    if (strcmp(get, "")) {
+        char* getToken = strdup(strtok(get, "&"));
+        char* tempToken;
+        i = 0;
+
+        while (getToken != NULL && i < numberOfParams) {
+            getArray[i] = getToken;
+            i++;
+            getCount++;
+
+            // free(getToken);
+            tempToken = strtok(NULL, "&");
+
+            if (tempToken == NULL)
+                break;
+
+            getToken = strdup(tempToken);
         }
-      } else if (!strcmp(method, "_POST")) {
-        int pk = findIndex(postKey, postCount, key);
-        if (pk == -1) {
-          postVuln[postCount] = (char * ) malloc(100 * sizeof(char));
-          postKey[postCount] = (char * ) malloc(100 * sizeof(char));
-          postValue[postCount] = (char * ) malloc(100 * sizeof(char));
-          strcpy(postVuln[postCount], strdup(vuln));
-          strcpy(postKey[postCount], strdup(key));
-          strcpy(postValue[postCount], strdup("  "));
-          postCount++;
-        }
-      }
     }
 
-    fclose(fp);
-  } else {
-    printf("/tmp/dict.txt is not found\n");
-  }
 
-  if (getCount) {
+    if (strcmp(post, "")) {
+        char* postToken = strdup(strtok(post, "&"));
+        char* tempToken;
+        i = 0;
+
+        while (postToken != NULL && i < numberOfParams) {
+            postArray[i] = postToken;
+            i++;
+            postCount++;
+
+            // free(postToken);
+            tempToken = strtok(NULL, "&");
+
+            if (tempToken == NULL)
+                break;
+
+            postToken = strdup(tempToken);
+        }
+    }
+
+// Parsing by =
     for (int i = 0; i < getCount; i++) {
-      bool found = false;
-
-      for (int j = 0; j < MAX_LINES; j++) {
-        if (strcmp(getKey[i], lines[j]) == 0) {
-          found = true;
-          break;
+        getKey[i] = (char*)malloc(100 * sizeof(char));
+        getValue[i] = (char*)malloc(100 * sizeof(char));
+   
+        if (getArray[i]) {
+            char* tempKey = strdup(strtok(getArray[i], "="));
+            char* tempValue = (strtok(NULL, "="));
+            if(tempValue != NULL) tempValue = strdup(tempValue);
+            char blank[100] = "11";
+            if ((tempKey != NULL) && (tempValue != NULL)) {
+                strcpy(getKey[i], tempKey);
+                strcpy(getValue[i], tempValue);
+            } else if ((tempKey != NULL) && (tempValue == NULL)) {
+                strcpy(getKey[i], tempKey);
+                strcpy(getValue[i], blank);
+            } else if ((tempKey == NULL) && (tempValue != NULL)) {
+                strcpy(getKey[i], blank);
+                strcpy(getValue[i], tempValue);
+            } else if ((tempKey == NULL) && (tempValue == NULL)) {
+                strcpy(getKey[i], blank);
+                strcpy(getValue[i], blank);
+            }
         }
-      }
-
-      if (found) {
-        continue;
-      }
-
-      switch (findIndex(vulns, 6, getVuln[i])) {
-      case 0:
-        mutateSQLI(getValue[i]);
-        break;
-      case 1:
-        mutateSSRF(getValue[i]);
-        break;
-      case 2:
-        mutateFILE(getValue[i]);
-        break;
-      case 3:
-        mutateFILE(getValue[i]);
-        break;
-      case 4:
-        mutateFILE(getValue[i]);
-        break;
-      case 5:
-        mutateXSS(getValue[i]);
-        break;
-      default:
-        break;
-      }
     }
-  }
-
-  if (postCount) {
     for (int i = 0; i < postCount; i++) {
-      bool found = false;
+        postKey[i] = (char*)malloc(100 * sizeof(char));
+        postValue[i] = (char*)malloc(100 * sizeof(char));
 
-      for (int j = 0; j < MAX_LINES; j++) {
-        if (strcmp(postKey[i], lines[j]) == 0) {
-          found = true;
-          break;
+        if (postArray[i]) {
+            char* tempKey = strdup(strtok(postArray[i], "="));
+            char* tempValue = (strtok(NULL, "="));
+            if(tempValue != NULL) tempValue = strdup(tempValue);
+            char blank[100] = "11";
+            if ((tempKey != NULL) && (tempValue != NULL)) {
+                strcpy(postKey[i], tempKey);
+                strcpy(postValue[i], tempValue);
+            } else if ((tempKey != NULL) && (tempValue == NULL)) {
+                strcpy(postKey[i], tempKey);
+                strcpy(postValue[i], blank);
+            } else if ((tempKey == NULL) && (tempValue != NULL)) {
+                strcpy(postKey[i], blank);
+                strcpy(postValue[i], tempValue);
+            } else if ((tempKey == NULL) && (tempValue == NULL)) {
+                strcpy(postKey[i], blank);
+                strcpy(postValue[i], blank);
+            }
         }
-      }
-
-      if (found) {
-        continue;
-      }
-
-      switch (findIndex(vulns, 6, postVuln[i])) {
-      case 0:
-        mutateSQLI(postValue[i]);
-        break;
-      case 1:
-        mutateSSRF(postValue[i]);
-        break;
-      case 2:
-        mutateFILE(postValue[i]);
-        break;
-      case 3:
-        mutateFILE(postValue[i]);
-        break;
-      case 4:
-        mutateFILE(postValue[i]);
-        break;
-      case 5:
-        mutateXSS(postValue[i]);
-        break;
-      default:
-        break;
-      }
     }
-  }
 
-  // Concat by =, &
-  for (int i = 0; i < getCount; i++) {
-    getArray[i] = strcat(strcat(getKey[i], "="), getValue[i]);
-  }
+// Select vuln class
+    switch (findIndex(vulns, 6, vuln)) {
+        case 0:
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
 
-  get = getArray[0];
+                    if (found) {
+                        continue;
+                    }
+                    mutateSQLI(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
 
-  for (int i = 1; i < getCount; i++) {
-    strcat(strcat(get, "&"), getArray[i]);
-  }
+                    if (found) {
+                        continue;
+                    }
+                    mutateSQLI(postValue[i]);
+                }
+            }
 
-  for (int i = 0; i < postCount; i++) {
-    postArray[i] = strcat(strcat(postKey[i], "="), postValue[i]);
-  }
+            break;
+        case 1:
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
 
-  post = postArray[0];
+                    if (found) {
+                        continue;
+                    }
+                    mutateSSRF(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
 
-  for (int i = 1; i < postCount; i++) {
-    strcat(strcat(post, "&"), postArray[i]);
-  }
+                    if (found) {
+                        continue;
+                    }
+                    mutateSSRF(postValue[i]);
+                }
+            }
 
+            break;
+        case 2:
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
 
-  if (strcmp(get, "") && strcmp(post, "")) {
-    ret[0] = '\x00';
-    strcat(ret + 1, get);
-    ret[1 + strlen(get)] = '\x00';
-    strcat(ret + 2 + strlen(get), post);
-    ret[1 + strlen(get) + 1 + strlen(post)] = '\x00';
-    return 1 + strlen(get) + 1 + strlen(post) + 1;
-  } else if (strcmp(get, "") && !strcmp(post, "")) {
-    ret[0] = '\x00';
-    strcat(ret + 1, get);
-    ret[1 + strlen(get)] = '\x00';
-    ret[1 + strlen(get) + 1] = '\x00';
-    return 1 + strlen(get) + 1 + 1;
-  } else if (!strcmp(get, "") && strcmp(post, "")) {
-    ret[0] = '\x00';
-    ret[1] = '\x00';
-    strcat(ret + 2, post);
-    ret[2 + strlen(post)] = '\x00';
-    return 2 + strlen(post) + 1;
-  } else {
-    ret[0] = '\x00';
-    ret[1] = '\x00';
-    ret[2] = '\x00';
-    return 3;
-  }
+                    if (found) {
+                        continue;
+                    }
+                    mutateFILE(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
+                    mutateFILE(postValue[i]);
+                }
+            }
+
+            break;
+        case 3:
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
+                    mutateFILE(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
+                    mutateFILE(postValue[i]);
+                }
+            }
+
+            break;
+        case 4:
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
+                    mutateFILE(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
+                    mutateFILE(postValue[i]);
+                }
+            }
+
+            break;
+        case 5:
+            if (getCount) {
+                for (int i = 0; i < getCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(getKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
+                    mutateXSS(getValue[i]);
+                }
+            }
+            if (postCount) {
+                for (int i = 0; i < postCount; i++) {
+                    bool found = false;
+                    for (int j = 0; j < MAX_LINES; j++) {
+                        if (strcmp(postKey[i], lines[j]) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        continue;
+                    }
+                    mutateXSS(postValue[i]);
+                }
+            }
+
+            break;
+        default:
+            break;
+            // printf("%s is not in vulns\n", vuln);
+    }
+
+// Concat by =, &
+    if (strcmp(get, "")) {
+        for (int i = 0; i < getCount; i++) {
+            getArray[i] = strcat(strcat(getKey[i], "="), getValue[i]);
+        }
+
+        get = getArray[0];
+
+        for (int i = 1; i < getCount; i++) {
+            strcat(strcat(get, "&"), getArray[i]);
+        }
+    }
+
+    if (strcmp(post, "")) {
+        for (int i = 0; i < postCount; i++) {
+            postArray[i] = strcat(strcat(postKey[i], "="), postValue[i]);
+        }
+
+        post = postArray[0];
+
+        for (int i = 1; i < postCount; i++) {
+            strcat(strcat(post, "&"), postArray[i]);
+        }
+    }
+
+    if (strcmp(get, "") && strcmp(post, "")) {
+        ret[0] = '\x00';
+        strcat(ret + 1, get);
+        ret[1 + strlen(get)] = '\x00';
+        strcat(ret + 2 + strlen(get), post);
+        ret[1 + strlen(get) + 1 + strlen(post)] = '\x00';
+        strcat(ret + 2 + strlen(get) + 1 + strlen(post), header);
+        ret[1 + strlen(get) + 1 + strlen(post) + 1 + strlen(header)] = '\x00';
+        return 1 + strlen(get) + 1 + strlen(post) + 1 + strlen(header) + 1;
+    } else if (strcmp(get, "") && !strcmp(post, "")) {
+        ret[0] = '\x00';
+        strcat(ret + 1, get);
+        ret[1 + strlen(get)] = '\x00';
+        ret[1 + strlen(get) + 1] = '\x00';
+        strcat(ret + 1 + strlen(get) + 2, header);
+        ret[1 + strlen(get) + 2 + strlen(header)] = '\x00';
+        return 1 + strlen(get) + 2 + strlen(header) + 1;
+    } else if (!strcmp(get, "") && strcmp(post, "")) {
+        ret[0] = '\x00';
+        ret[1] = '\x00';
+        strcat(ret + 2, post);
+        ret[2 + strlen(post)] = '\x00';
+        strcat(ret + 2 + strlen(post) + 1, header);
+        ret[2 + strlen(post) + 1 + strlen(header)] = '\x00';
+        return 2 + strlen(post) + 1 + strlen(header) + 1;
+    } else {
+        ret[0] = '\x00';
+        ret[1] = '\x00';
+        ret[2] = '\x00';
+        ret[3] = '\x00';
+        return 4;
+    }
 }
 
 
@@ -3439,10 +3478,6 @@ static void check_map_coverage(void) {
 
 static void perform_dry_run(char** argv) {
 
-
-
-
-
   struct queue_entry* q = queue;
   u32 cal_failures = 0;
   u8* skip_crashes = getenv("AFL_SKIP_CRASHES");
@@ -3666,20 +3701,6 @@ static void perform_dry_run(char** argv) {
   }
 
   OKF("All test cases processed.");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 
@@ -5964,8 +5985,8 @@ static u8 fuzz_one(char** argv) {
 
 
   /* WTFUZZ init */
-  // Map vulnsMap;
-  // size_t mapSize = 6;
+  Map vulnsMap;
+  size_t mapSize = 6;
 
   s32 len, fd, temp_len, i, j;
   u8  *in_buf, *out_buf, *orig_in, *ex_tmp, *eff_map = 0;
@@ -6191,65 +6212,66 @@ skip_interest:
 
   FILE *fp;
 
-  // if ((fp = fopen("/tmp/mutate.txt", "r")) != NULL) {  
-  //   initializeMap(&vulnsMap, mapSize);
+  if ((fp = fopen("/tmp/mutate.txt", "r")) != NULL) {  
+    initializeMap(&vulnsMap, mapSize);
 
-  //   while (fgets(line, sizeof(line), fp) != NULL) {
-  //     sscanf(line, "%s : %d", vuln, &count);
+    while (fgets(line, sizeof(line), fp) != NULL) {
+      sscanf(line, "%s : %d", vuln, &count);
 
-  //     addToMap(&vulnsMap, vuln, count);
+      addToMap(&vulnsMap, vuln, count);
 
-  //     i++;
-  //   }
+      // printf("key : %s, value : %d\n------------\n", vuln, getFromMap(&vulnsMap, vuln));
+      i++;
+    }
 
-  //   fclose(fp);
-  // }
-  // else {
-  //   printf("/tmp/mutate.txt is not found\n");
-  // }
+    fclose(fp);
+  }
+  else {
+    printf("/tmp/mutate.txt is not found\n");
+  }
 
-  // sortMap(&vulnsMap);
+  sortMap(&vulnsMap);
 
-  int totalValue = 600;
-  int vulnScore[6] = {100, 200, 300, 400, 500, 600};
+  int totalValue = 0;
+  int vulnScore[6] = {0};
   const char* svuln = "";
 
-  // for (int i = 0; i < vulnsMap.size; i++) {
-  //   totalValue += (vulnsMap.data[i]->value * 100);
+  for (int i = 0; i < vulnsMap.size; i++) {
+    totalValue += (vulnsMap.data[i]->value * 100);
 
-  //   for (int j = 5; i <= j; j--) {
-  //     vulnScore[j] += (vulnsMap.data[i]->value * 100);
-  //   }
-  // }
+    for (int j = 5; i <= j; j--) {
+      vulnScore[j] += (vulnsMap.data[i]->value * 100);
+    }
+  }
 
   if ((mapidx % totalValue) < vulnScore[0]) {
     mapidx++;
-    svuln = "SQLi";
+    svuln = vulnsMap.data[0]->key;
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[1]) {
     mapidx++;
-    svuln = "SSRF";
+    svuln = vulnsMap.data[1]->key;
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[2]) {
     mapidx++;
-    svuln = "FileUpload";
+    svuln = vulnsMap.data[2]->key;
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[3]) {
     mapidx++;
-    svuln = "FileDownload";
+    svuln = vulnsMap.data[3]->key;
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[4]) {
     mapidx++;
-    svuln = "FileDeletion";
+    svuln = vulnsMap.data[4]->key;
     stage_name = svuln;
   }
   else if ((mapidx % totalValue) < vulnScore[5]) {
     mapidx++;
-    svuln = "XSS";
+    svuln = vulnsMap.data[5]->key;
     stage_name = svuln;
   }
 
@@ -6292,7 +6314,7 @@ skip_interest:
     ck_free(mutatedSeed);
   }
 
-  // freeMap(&vulnsMap);
+  freeMap(&vulnsMap);
 
   new_hit_cnt = queued_paths + unique_crashes;
 
