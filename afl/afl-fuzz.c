@@ -526,8 +526,8 @@ char* XSSmutateSet[4];
 
 void initXSSmutateSet(char* value) {
     XSSmutateSet[0] = strdup(value);
-    XSSmutateSet[1] = strdup("<script>alert(\'WTFTEST\');</script>");
-    XSSmutateSet[2] = strdup("<iframe src=\"javascript:alert(\'WTFTEST\')\"></iframe>");
+    XSSmutateSet[1] = strdup("%22%2F%3E%3Cscript%3Ealert%60WTFTEST%60%3C%2Fscript%3E");
+    XSSmutateSet[2] = strdup("%3Ciframe%20src%3D%5C%22javascript%3Aalert%28%5C%27WTFTEST%5C%27%29%5C%22%3E%3C%2Fiframe%3E");
     XSSmutateSet[3] = strdup("%26lt%3Bscript%26gt%3Balert('WTFTEST')%26lt%3B%2Fscript%26gt%3B");
 }
 
@@ -540,17 +540,17 @@ void freeXSSmutateSet() {
 void mutateSQLI(char* value) {
     int targetIndex = rand() % strlen(value);
     initSQLImutateSet();
-    strcpy(value, insertString(value, SQLImutateSet[rand() % 8], targetIndex));
+    strcpy(value, strdup(insertString(value, SQLImutateSet[rand() % 8], targetIndex)));
 }
 
 void mutateSSRF(char* value) {
     initSSRFmutateSet(value);
-    strcpy(value, SSRFmutateSet[rand() % 4]);
+    strcpy(value, strdup(SSRFmutateSet[rand() % 4]));
 }
 
 void mutateFILE(char* value) {
     initFILEmutateSet(value);
-    strcpy(value, FILEmutateSet[rand() % 4]);
+    strcpy(value, strdup(FILEmutateSet[rand() % 4]));
 }
 
 void mutateXSS(char* value) {
@@ -704,7 +704,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
     i++;
   }
 
-  int numberOfParams = 20;
+  int numberOfParams = 25;
   char * getArray[numberOfParams];
   getArray[0] = strdup("");
   int getCount = 0;
