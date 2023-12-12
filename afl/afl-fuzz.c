@@ -663,6 +663,7 @@ int setFilter() {
 int mutate(char* ret, const char* vuln, char* seed, int length) {
     char* get = NULL;
     char* post = NULL;
+    char* header = NULL;
     char buffer[1024*1024];
     int part = 0;
     int i = 0;
@@ -682,6 +683,9 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
                 case 1:
                     post = strdup(buffer);
                     break;
+                case 2:
+                    header = strdup(buffer);
+                    break;
                 default:
                     break;
             }
@@ -699,15 +703,16 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         i++;
     }
 
-    char* getArray[10];
+    int numberOfParams = 20;
+    char* getArray[numberOfParams];
     int getCount = 0;
-    char** getKey = (char**)malloc(10 * sizeof(char*));
-    char** getValue = (char**)malloc(10 * sizeof(char*));
+    char** getKey = (char**)malloc(numberOfParams * sizeof(char*));
+    char** getValue = (char**)malloc(numberOfParams * sizeof(char*));
 
-    char* postArray[10];
+    char* postArray[numberOfParams];
     int postCount = 0;
-    char** postKey = (char**)malloc(10 * sizeof(char*));
-    char** postValue = (char**)malloc(10 * sizeof(char*));
+    char** postKey = (char**)malloc(numberOfParams * sizeof(char*));
+    char** postValue = (char**)malloc(numberOfParams * sizeof(char*));
 
 // Parsing by &
     if (strcmp(get, "")) {
@@ -715,7 +720,7 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         char* tempToken;
         i = 0;
 
-        while (getToken != NULL && i < 10) {
+        while (getToken != NULL && i < numberOfParams) {
             getArray[i] = getToken;
             i++;
             getCount++;
@@ -736,7 +741,7 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         char* tempToken;
         i = 0;
 
-        while (postToken != NULL && i < 10) {
+        while (postToken != NULL && i < numberOfParams) {
             postArray[i] = postToken;
             i++;
             postCount++;
@@ -760,7 +765,7 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
             char* tempKey = strdup(strtok(getArray[i], "="));
             char* tempValue = (strtok(NULL, "="));
             if(tempValue != NULL) tempValue = strdup(tempValue);
-            char blank[100] = "  ";
+            char blank[100] = "%20%20";
             if ((tempKey != NULL) && (tempValue != NULL)) {
                 strcpy(getKey[i], tempKey);
                 strcpy(getValue[i], tempValue);
@@ -1049,24 +1054,31 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
         ret[1 + strlen(get)] = '\x00';
         strcat(ret + 2 + strlen(get), post);
         ret[1 + strlen(get) + 1 + strlen(post)] = '\x00';
-        return 1 + strlen(get) + 1 + strlen(post) + 1;
+        strcat(ret + 2 + strlen(get) + 1 + strlen(post), header);
+        ret[1 + strlen(get) + 1 + strlen(post) + 1 + strlen(header)] = '\x00';
+        return 1 + strlen(get) + 1 + strlen(post) + 1 + strlen(header) + 1;
     } else if (strcmp(get, "") && !strcmp(post, "")) {
         ret[0] = '\x00';
         strcat(ret + 1, get);
         ret[1 + strlen(get)] = '\x00';
         ret[1 + strlen(get) + 1] = '\x00';
-        return 1 + strlen(get) + 1 + 1;
+        strcat(ret + 1 + strlen(get) + 2, header);
+        ret[1 + strlen(get) + 2 + strlen(header)] = '\x00';
+        return 1 + strlen(get) + 2 + strlen(header) + 1;
     } else if (!strcmp(get, "") && strcmp(post, "")) {
         ret[0] = '\x00';
         ret[1] = '\x00';
         strcat(ret + 2, post);
         ret[2 + strlen(post)] = '\x00';
-        return 2 + strlen(post) + 1;
+        strcat(ret + 2 + strlen(post) + 1, header);
+        ret[2 + strlen(post) + 1 + strlen(header)] = '\x00';
+        return 2 + strlen(post) + 1 + strlen(header) + 1;
     } else {
         ret[0] = '\x00';
         ret[1] = '\x00';
         ret[2] = '\x00';
-        return 3;
+        ret[3] = '\x00';
+        return 4;
     }
 }
 
