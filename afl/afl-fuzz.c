@@ -522,16 +522,17 @@ void freeFILEmutateSet() {
     }
 }
 
-char* XSSmutateSet[3];
+char* XSSmutateSet[4];
 
 void initXSSmutateSet(char* value) {
     XSSmutateSet[0] = strdup(value);
     XSSmutateSet[1] = strdup("<script>alert(\'WTFTEST\');</script>");
     XSSmutateSet[2] = strdup("<iframe src=\"javascript:alert(\'WTFTEST\')\"></iframe>");
+    XSSmutateSet[3] = strdup("%26lt%3Bscript%26gt%3Balert('WTFTEST')%26lt%3B%2Fscript%26gt%3B");
 }
 
 void freeXSSmutateSet() {
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
         free(XSSmutateSet[i]);
     }
 }
@@ -554,7 +555,7 @@ void mutateFILE(char* value) {
 
 void mutateXSS(char* value) {
     initXSSmutateSet(value);
-    strcpy(value, strdup(XSSmutateSet[rand() % 3]));
+    strcpy(value, strdup(XSSmutateSet[rand() % 4]));
     // freeMutateSet();
 }
 
@@ -699,19 +700,20 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
     i++;
   }
 
-  char * getArray[10];
+  int numberOfParams = 20;
+  char * getArray[numberOfParams];
   getArray[0] = strdup("");
   int getCount = 0;
-  char ** getVuln = (char ** ) malloc(10 * sizeof(char * ));
-  char ** getKey = (char ** ) malloc(10 * sizeof(char * ));
-  char ** getValue = (char ** ) malloc(10 * sizeof(char * ));
+  char ** getVuln = (char ** ) malloc(numberOfParams * sizeof(char * ));
+  char ** getKey = (char ** ) malloc(numberOfParams * sizeof(char * ));
+  char ** getValue = (char ** ) malloc(numberOfParams * sizeof(char * ));
 
-  char * postArray[10];
+  char * postArray[numberOfParams];
   postArray[0] = strdup("");
   int postCount = 0;
-  char ** postVuln = (char ** ) malloc(10 * sizeof(char * ));
-  char ** postKey = (char ** ) malloc(10 * sizeof(char * ));
-  char ** postValue = (char ** ) malloc(10 * sizeof(char * ));
+  char ** postVuln = (char ** ) malloc(numberOfParams * sizeof(char * ));
+  char ** postKey = (char ** ) malloc(numberOfParams * sizeof(char * ));
+  char ** postValue = (char ** ) malloc(numberOfParams * sizeof(char * ));
 
   // Parsing by &
   if (strcmp(get, "")) {
@@ -719,7 +721,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
     char * tempToken;
     i = 0;
 
-    while (getToken != NULL && i < 10) {
+    while (getToken != NULL && i < numberOfParams) {
       getArray[i] = getToken;
       i++;
       getCount++;
@@ -739,7 +741,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
     char * tempToken;
     i = 0;
 
-    while (postToken != NULL && i < 10) {
+    while (postToken != NULL && i < numberOfParams) {
       postArray[i] = postToken;
       i++;
       postCount++;
@@ -764,7 +766,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
       char * tempKey = strdup(strtok(getArray[i], "="));
       char * tempValue = (strtok(NULL, "="));
       if (tempValue != NULL) tempValue = strdup(tempValue);
-      char blank[100] = "  ";
+      char blank[100] = "11";
       if ((tempKey != NULL) && (tempValue != NULL)) {
         strcpy(getVuln[i], strdup(vuln));
         strcpy(getKey[i], tempKey);
@@ -793,7 +795,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
       char * tempKey = strdup(strtok(postArray[i], "="));
       char * tempValue = (strtok(NULL, "="));
       if (tempValue != NULL) tempValue = strdup(tempValue);
-      char blank[100] = "  ";
+      char blank[100] = "11";
       if ((tempKey != NULL) && (tempValue != NULL)) {
         strcpy(postVuln[i], strdup(vuln));
         strcpy(postKey[i], tempKey);
@@ -821,7 +823,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
   unsigned int count = 0;
   char line[100];
 
-  if ((fp = fopen("/tmp/tracelog.txt", "r")) != NULL) {
+  if ((fp = fopen("/tmp/tracelog.txt", "w")) != NULL) {
     while ((fgets(line, sizeof(line), fp) != NULL) && getCount < 10 && postCount < 10) {
       sscanf(line, "%s\t\t%s\t\t%s\t\t%d", method, key, tvuln, & count);
 
@@ -839,7 +841,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
             strcpy(getVuln[getCount], strdup(tvuln));
           }
           strcpy(getKey[getCount], strdup(key));
-          strcpy(getValue[getCount], strdup("  "));
+          strcpy(getValue[getCount], strdup("11"));
           getCount++;
         } else {
           if (600 < mapidx) {
@@ -863,7 +865,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
             strcpy(postVuln[postCount], strdup(tvuln));
           }
           strcpy(postKey[postCount], strdup(key));
-          strcpy(postValue[postCount], strdup("  "));
+          strcpy(postValue[postCount], strdup("11"));
           postCount++;
         } else {
           if (600 < mapidx) {
@@ -881,7 +883,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
     printf("/tmp/tracelog.txt is not found\n");
   }
 
-  if ((fp = fopen("/tmp/dict.txt", "r")) != NULL) {
+  if ((fp = fopen("/tmp/dict.txt", "w")) != NULL) {
     while ((fgets(line, sizeof(line), fp) != NULL) && getCount < 10 && postCount < 10) {
       sscanf(line, "%s\t\t%s", method, key);
 
@@ -893,7 +895,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
           getValue[getCount] = (char * ) malloc(100 * sizeof(char));
           strcpy(getVuln[getCount], strdup(vuln));
           strcpy(getKey[getCount], strdup(key));
-          strcpy(getValue[getCount], strdup("  "));
+          strcpy(getValue[getCount], strdup("11"));
           getCount++;
         }
       } else if (!strcmp(method, "_POST")) {
@@ -904,7 +906,7 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
           postValue[postCount] = (char * ) malloc(100 * sizeof(char));
           strcpy(postVuln[postCount], strdup(vuln));
           strcpy(postKey[postCount], strdup(key));
-          strcpy(postValue[postCount], strdup("  "));
+          strcpy(postValue[postCount], strdup("11"));
           postCount++;
         }
       }
@@ -1023,24 +1025,31 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
     ret[1 + strlen(get)] = '\x00';
     strcat(ret + 2 + strlen(get), post);
     ret[1 + strlen(get) + 1 + strlen(post)] = '\x00';
-    return 1 + strlen(get) + 1 + strlen(post) + 1;
+    strcat(ret + 2 + strlen(get) + 1 + strlen(post), header);
+    ret[1 + strlen(get) + 1 + strlen(post) + 1 + strlen(header)] = '\x00';
+    return 1 + strlen(get) + 1 + strlen(post) + 1 + strlen(header) + 1;
   } else if (strcmp(get, "") && !strcmp(post, "")) {
     ret[0] = '\x00';
     strcat(ret + 1, get);
     ret[1 + strlen(get)] = '\x00';
     ret[1 + strlen(get) + 1] = '\x00';
-    return 1 + strlen(get) + 1 + 1;
+    strcat(ret + 1 + strlen(get) + 2, header);
+    ret[1 + strlen(get) + 2 + strlen(header)] = '\x00';
+    return 1 + strlen(get) + 2 + strlen(header) + 1;
   } else if (!strcmp(get, "") && strcmp(post, "")) {
     ret[0] = '\x00';
     ret[1] = '\x00';
     strcat(ret + 2, post);
     ret[2 + strlen(post)] = '\x00';
-    return 2 + strlen(post) + 1;
+    strcat(ret + 2 + strlen(post) + 1, header);
+    ret[2 + strlen(post) + 1 + strlen(header)] = '\x00';
+    return 2 + strlen(post) + 1 + strlen(header) + 1;
   } else {
     ret[0] = '\x00';
     ret[1] = '\x00';
     ret[2] = '\x00';
-    return 3;
+    ret[3] = '\x00';
+    return 4;
   }
 }
 
