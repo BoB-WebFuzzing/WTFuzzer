@@ -664,6 +664,7 @@ int setFilter() {
 int mutate(char * ret, const char * vuln, char * seed, int length) {
   char * get = NULL;
   char * post = NULL;
+  char * header = NULL;
   char buffer[1024 * 1024];
   int part = 0;
   int i = 0;
@@ -682,6 +683,9 @@ int mutate(char * ret, const char * vuln, char * seed, int length) {
         break;
       case 1:
         post = strdup(buffer);
+        break;
+      case 2:
+        header = strdup(buffer);
         break;
       default:
         break;
