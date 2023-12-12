@@ -363,8 +363,22 @@ void sendRequest(RequestData *reqD ){
     }
     cout << "METHOD: " << reqD->getMethod() << endl;
     cout << "[main] URL=" << reqD->getURL() << endl;
+
     if (reqD->hasHeaders()){
-        headers = curl_slist_append(headers, reqD->getHeaders().c_str());
+
+      std::vector<std::string> lines;
+      std::istringstream iss(reqD->getHeaders());
+      std::string line;
+
+      while (std::getline(iss, line)) {
+          lines.push_back(line);
+      }
+
+      for (const auto& str : lines) {
+        headers = curl_slist_append(headers, str.c_str());
+    }
+
+      
     }
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
