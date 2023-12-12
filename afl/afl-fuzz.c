@@ -522,16 +522,17 @@ void freeFILEmutateSet() {
     }
 }
 
-char* XSSmutateSet[3];
+char* XSSmutateSet[4];
 
 void initXSSmutateSet(char* value) {
     XSSmutateSet[0] = strdup(value);
     XSSmutateSet[1] = strdup("<script>alert(\'WTFTEST\');</script>");
     XSSmutateSet[2] = strdup("<iframe src=\"javascript:alert(\'WTFTEST\')\"></iframe>");
+    XSSmutateSet[3] = strdup("%3Cp%3E%26lt%3Bscript%26gt%3Balert('WTFTEST')%26lt%3B%2Fscript%26gt%3B%3C%2Fp%3E");
 }
 
 void freeXSSmutateSet() {
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
         free(XSSmutateSet[i]);
     }
 }
@@ -765,7 +766,7 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
             char* tempKey = strdup(strtok(getArray[i], "="));
             char* tempValue = (strtok(NULL, "="));
             if(tempValue != NULL) tempValue = strdup(tempValue);
-            char blank[100] = "%20%20";
+            char blank[100] = "11";
             if ((tempKey != NULL) && (tempValue != NULL)) {
                 strcpy(getKey[i], tempKey);
                 strcpy(getValue[i], tempValue);
@@ -789,7 +790,7 @@ int mutate(char* ret, const char* vuln, char* seed, int length) {
             char* tempKey = strdup(strtok(postArray[i], "="));
             char* tempValue = (strtok(NULL, "="));
             if(tempValue != NULL) tempValue = strdup(tempValue);
-            char blank[100] = "%20%20";
+            char blank[100] = "11";
             if ((tempKey != NULL) && (tempValue != NULL)) {
                 strcpy(postKey[i], tempKey);
                 strcpy(postValue[i], tempValue);
