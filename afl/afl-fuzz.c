@@ -556,6 +556,10 @@ void mutateFILE(char* value) {
 void mutateXSS(char* value) {
     initXSSmutateSet(value);
     strcpy(value, strdup(XSSmutateSet[rand() % 4]));
+
+    FILE* fp;
+    fp = fopen("/tmp/XSS", "w");
+    fclose(fp);
     // freeMutateSet();
 }
 
